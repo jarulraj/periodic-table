@@ -35,317 +35,485 @@ Each principle is tagged with a short symbol (e.g., `Co` for composability, `Op`
 
 ## Table of Contents
 
-- [🟪 Group 1: Structure](#-group-1-structure): *How to carve and connect parts with clear boundaries and extension points.*
-- [🟧 Group 2: Efficiency](#-group-2-efficiency): *Do less work, or do it cheaper, by focusing effort where it pays.*
-- [🟨 Group 3: Semantics](#-group-3-semantics): *Specify behavior and interfaces precisely.*
-- [⬛ Group 4: Distribution](#-group-4-distribution): *Coordinate work and data across distributed architectures.*
-- [🟩 Group 5: Planning](#-group-5-planning): *Select plans automatically from goals, costs, and constraints.*
-- [🟦 Group 6: Operability](#-group-6-operability): *Observe, adapt, and evolve running systems with minimal disruption.*
-- [🟥 Group 7: Reliability](#-group-7-reliability): *Stay correct under faults, concurrency, and partial failure.*
-- [🟫 Group 8: Security](#-group-8-security): *Bound authority and enforce isolation to preserve safety and integrity.*
+- [<img src="assets/swatches/structure.svg" width="14" height="14" alt=""> Group 1: Structure](#user-content-group-1-structure): *How to carve and connect parts with clear boundaries and extension points.*
+- [<img src="assets/swatches/efficiency.svg" width="14" height="14" alt=""> Group 2: Efficiency](#user-content-group-2-efficiency): *Do less work, or do it cheaper, by focusing effort where it pays.*
+- [<img src="assets/swatches/semantics.svg" width="14" height="14" alt=""> Group 3: Semantics](#user-content-group-3-semantics): *Specify behavior and interfaces precisely.*
+- [<img src="assets/swatches/distribution.svg" width="14" height="14" alt=""> Group 4: Distribution](#user-content-group-4-distribution): *Coordinate work and data across distributed architectures.*
+- [<img src="assets/swatches/planning.svg" width="14" height="14" alt=""> Group 5: Planning](#user-content-group-5-planning): *Select plans automatically from goals, costs, and constraints.*
+- [<img src="assets/swatches/operability.svg" width="14" height="14" alt=""> Group 6: Operability](#user-content-group-6-operability): *Observe, adapt, and evolve running systems with minimal disruption.*
+- [<img src="assets/swatches/reliability.svg" width="14" height="14" alt=""> Group 7: Reliability](#user-content-group-7-reliability): *Stay correct under faults, concurrency, and partial failure.*
+- [<img src="assets/swatches/security.svg" width="14" height="14" alt=""> Group 8: Security](#user-content-group-8-security): *Bound authority and enforce isolation to preserve safety and integrity.*
 
 **Legend:** `Code` = unique short symbol, `Name` = principle, `Intent` = short description.
 
-<img width="400" alt="periodic-table" src="https://github.com/user-attachments/assets/36e11f9b-e99b-4138-85c1-f92f1306c3d6" />
+<a id="principle-table"></a>
+
+| Str | Eff | Sem | Dist | Plan | Oper | Rel | Sec |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| [![Structure](assets/swatches/structure.svg) **Si**](#user-content-principle-si) | [![Efficiency](assets/swatches/efficiency.svg) **Sc**](#user-content-principle-sc) | [![Semantics](assets/swatches/semantics.svg) **Al**](#user-content-principle-al) | [![Distribution](assets/swatches/distribution.svg) **Lt**](#user-content-principle-lt) | [![Planning](assets/swatches/planning.svg) **Ep**](#user-content-principle-ep) | [![Operability](assets/swatches/operability.svg) **Ad**](#user-content-principle-ad) | [![Reliability](assets/swatches/reliability.svg) **Ft**](#user-content-principle-ft) | [![Security](assets/swatches/security.svg) **Sy**](#user-content-principle-sy) |
+| [![Structure](assets/swatches/structure.svg) **Mo**](#user-content-principle-mo) | [![Efficiency](assets/swatches/efficiency.svg) **Rc**](#user-content-principle-rc) | [![Semantics](assets/swatches/semantics.svg) **Lu**](#user-content-principle-lu) | [![Distribution](assets/swatches/distribution.svg) **Dc**](#user-content-principle-dc) | [![Planning](assets/swatches/planning.svg) **Cm**](#user-content-principle-cm) | [![Operability](assets/swatches/operability.svg) **Ec**](#user-content-principle-ec) | [![Reliability](assets/swatches/reliability.svg) **Is**](#user-content-principle-is) | [![Security](assets/swatches/security.svg) **Ac**](#user-content-principle-ac) |
+| [![Structure](assets/swatches/structure.svg) **Co**](#user-content-principle-co) | [![Efficiency](assets/swatches/efficiency.svg) **Wv**](#user-content-principle-wv) | [![Semantics](assets/swatches/semantics.svg) **Se**](#user-content-principle-se) | [![Distribution](assets/swatches/distribution.svg) **Fp**](#user-content-principle-fp) | [![Planning](assets/swatches/planning.svg) **Cp**](#user-content-principle-cp) | [![Operability](assets/swatches/operability.svg) **Wa**](#user-content-principle-wa) | [![Reliability](assets/swatches/reliability.svg) **At**](#user-content-principle-at) | [![Security](assets/swatches/security.svg) **Lp**](#user-content-principle-lp) |
+| [![Structure](assets/swatches/structure.svg) **Ex**](#user-content-principle-ex) | [![Efficiency](assets/swatches/efficiency.svg) **Cc**](#user-content-principle-cc) | [![Semantics](assets/swatches/semantics.svg) **Fs**](#user-content-principle-fs) | [![Distribution](assets/swatches/distribution.svg) **Lo**](#user-content-principle-lo) | [![Planning](assets/swatches/planning.svg) **Gd**](#user-content-principle-gd) | [![Operability](assets/swatches/operability.svg) **Au**](#user-content-principle-au) | [![Reliability](assets/swatches/reliability.svg) **Cr**](#user-content-principle-cr) | [![Security](assets/swatches/security.svg) **Tq**](#user-content-principle-tq) |
+| [![Structure](assets/swatches/structure.svg) **Pm**](#user-content-principle-pm) | [![Efficiency](assets/swatches/efficiency.svg) **Bo**](#user-content-principle-bo) | [![Semantics](assets/swatches/semantics.svg) **Ig**](#user-content-principle-ig) | [![Distribution](assets/swatches/distribution.svg) **Cz**](#user-content-principle-cz) | [![Planning](assets/swatches/planning.svg) **Bb**](#user-content-principle-bb) | [![Operability](assets/swatches/operability.svg) **Ho**](#user-content-principle-ho) | &nbsp; | [![Security](assets/swatches/security.svg) **Cf**](#user-content-principle-cf) |
+| [![Structure](assets/swatches/structure.svg) **Gr**](#user-content-principle-gr) | [![Efficiency](assets/swatches/efficiency.svg) **Ha**](#user-content-principle-ha) | &nbsp; | &nbsp; | [![Planning](assets/swatches/planning.svg) **Ah**](#user-content-principle-ah) | [![Operability](assets/swatches/operability.svg) **Ev**](#user-content-principle-ev) | &nbsp; | [![Security](assets/swatches/security.svg) **Sa**](#user-content-principle-sa) |
+| [![Structure](assets/swatches/structure.svg) **Pd**](#user-content-principle-pd) | [![Efficiency](assets/swatches/efficiency.svg) **Op**](#user-content-principle-op) | &nbsp; | &nbsp; | &nbsp; | &nbsp; | &nbsp; | &nbsp; |
+| &nbsp; | [![Efficiency](assets/swatches/efficiency.svg) **La**](#user-content-principle-la) | &nbsp; | &nbsp; | &nbsp; | &nbsp; | &nbsp; | &nbsp; |
 
 
-## 🟪 Group 1: Structure
+<a id="group-1-structure"></a>
 
-🟪 **Si – Simplicity**
+## <img src="assets/swatches/structure.svg" width="14" height="14" alt=""> Group 1: Structure
+
+<a id="principle-si"></a>
+<img src="assets/swatches/structure.svg" width="14" height="14" alt=""> **Si – Simplicity**
 
 Choose the simplest system design that meets current needs; resist complexity, such as additional layers, services, or generality added "just in case", until evidence shows benefit. 
 
 **Example:** Avoid premature architectural optimisation of the system [23].
 
-🟪 **Mo – Modularity**
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-mo"></a>
+<img src="assets/swatches/structure.svg" width="14" height="14" alt=""> **Mo – Modularity**
 
 Partition the system into cohesive units with minimal interfaces, so that each unit can be reasoned about, replaced, or evolved independently. This principle focuses on decomposition: choosing boundaries to favor clear separation of concerns so that each responsibility sits in one module.
 
 **Example:** The OSI model decomposes communication into standardised layers with well-defined boundaries that permit independent development and substitution [48].
 
-🟪 **Co – Composability**
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-co"></a>
+<img src="assets/swatches/structure.svg" width="14" height="14" alt=""> **Co – Composability**
 
 Design components that can be safely and flexibly recombined; rely on explicit contracts and type-constrained interfaces so that every legal composition remains correct, letting components be assembled like interchangeable bricks. Unlike modularity, this principle focuses on re-composition: making sure the components can be combined safely and flexibly.
 
 **Example:** Unix programs (e.g., grep, sort, uniq) read from stdin and write to stdout, letting the user compose complex text processing pipelines [41].
 
-🟪 **Ex – Extensibility**
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-ex"></a>
+<img src="assets/swatches/structure.svg" width="14" height="14" alt=""> **Ex – Extensibility**
 
 Design systems to allow safe user-defined extensions, such as plug-ins, without requiring changes to the system core. When extensions come from untrusted parties, isolate them through sandboxing to preserve safety.
 
 **Example:** Unix also illustrates extensibility: new programs can be added by the user without kernel changes [41].
 
-🟪 **Pm – Policy/Mechanism Separation**
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-pm"></a>
+<img src="assets/swatches/structure.svg" width="14" height="14" alt=""> **Pm – Policy/Mechanism Separation**
 
 Separate what should be done (policy) from how it is carried out (mechanism) by exposing a common interface through which multiple policies can plug into the same mechanism.
 
 **Example:** Hydra has a kernel of generic mechanisms (scheduling, paging, protection) and moved resource-allocation policies to user-level modules [32].
 
-🟪 **Gr – Generalized Design**
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-gr"></a>
+<img src="assets/swatches/structure.svg" width="14" height="14" alt=""> **Gr – Generalized Design**
 
 Design a single core with explicit variation points like types, knobs, or plug-ins, so that it can serve many use cases without duplication, but specialise when doing so yields meaningful gains in performance, accuracy, or clarity.
 
 **Example:** The C++ Standard Template Library is a collection of containers, iterators, and algorithms parameterized by templates [45]. Postgres allows users to add types and operators to the core database system [46].
 
-🟪 **Pd – Probabilistic Design** 
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-pd"></a>
+<img src="assets/swatches/structure.svg" width="14" height="14" alt=""> **Pd – Probabilistic Design** 
 
 Introduce controlled randomness to gain efficiency, scalability, or simplicity while accepting a small, quantified risk of error or loss.
 
 **Example:** Routers treat queue length as a probability signal: as the queue grows, they drop incoming packets with increasing probability, proactively signalling congestion [13].
 
-## 🟧 Group 2: Efficiency
+<sub><a href="#user-content-principle-table">back to table</a></sub>
 
-🟧 **Sc – Scalability**
+<a id="group-2-efficiency"></a>
+
+## <img src="assets/swatches/efficiency.svg" width="14" height="14" alt=""> Group 2: Efficiency
+
+<a id="principle-sc"></a>
+<img src="assets/swatches/efficiency.svg" width="14" height="14" alt=""> **Sc – Scalability**
 
 Design the system to handle growth in data, traffic, or nodes with near-linear cost or latency.
 
 **Example:** MapReduce scales across nodes by dividing work into parallel tasks and aggregating results with minimal coordination [10].
 
-🟧 **Rc – Reuse of Computation**
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-rc"></a>
+<img src="assets/swatches/efficiency.svg" width="14" height="14" alt=""> **Rc – Reuse of Computation**
 
 Avoid redundant work by caching, materializing intermediate results (e.g., indexes), or incrementally updating outputs across repeated or slightly modified inputs, saving computation.
 
 **Example:** A B+tree reuses its sorted key order: lookups follow the existing search path instead of rescanning the entire data set each time, thereby reusing computation [2].
 
-🟧 **Wv – Work Avoidance**
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-wv"></a>
+<img src="assets/swatches/efficiency.svg" width="14" height="14" alt=""> **Wv – Work Avoidance**
 
 Skip computation that would not alter externally observable results. Examples include lazy evaluation and predicate short-circuiting.
 
 **Example:** Lazy evaluation defers work until a value is demanded, eliminating useless computation [19].
 
-🟧 **Cc – Common-Case Specialization**
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-cc"></a>
+<img src="assets/swatches/efficiency.svg" width="14" height="14" alt=""> **Cc – Common-Case Specialization**
 
 Detect the execution paths or data items that dominate run-time ("hot spots") and create a streamlined fast path just for them, while a slower, general path still handles every case correctly.
 
 **Example:** Caching the target method for the receiver class on the first call, so that subsequent calls on that common receiver hit the fast path; uncommon classes fall back to the full method-lookup routine [5].
 
-🟧 **Bo – Bottleneck-Oriented Optimisation**
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-bo"></a>
+<img src="assets/swatches/efficiency.svg" width="14" height="14" alt=""> **Bo – Bottleneck-Oriented Optimisation**
 
 Profile end-to-end performance, locate the tightest resource constraint, and focus improvement effort there until another stage becomes the limiter.
 
 **Example:** Rare 99th-percentile stragglers bottleneck latency, and replicated requests help cut tail response times [9].
 
-🟧 **Ha – Hardware-Aware Design**
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-ha"></a>
+<img src="assets/swatches/efficiency.svg" width="14" height="14" alt=""> **Ha – Hardware-Aware Design**
 
 Shape algorithms and data structures to the latency, bandwidth, parallelism, and persistence properties of underlying hardware (e.g., cache hierarchy, NUMA, SSDs, GPUs).
 
 **Example:** BLAS defines cache- and vector-tuned kernels so linear-algebra code exploits hardware efficiently [31].
 
-🟧 **Op – Optimistic Design**
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-op"></a>
+<img src="assets/swatches/efficiency.svg" width="14" height="14" alt=""> **Op – Optimistic Design**
 
 Proceed as if the common case will succeed, skipping coordination, and rely on a (possibly expensive) recovery path only when that assumption proves wrong.
 
 **Example:** Optimistic Concurrency Control runs transactions lock-free, then validates at commit and rolls back only when a conflict is detected [24].
 
-🟧 **La – Learned Approximation**
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-la"></a>
+<img src="assets/swatches/efficiency.svg" width="14" height="14" alt=""> **La – Learned Approximation**
 
 Replace hand-crafted algorithms with models trained on data, trading bounded inaccuracy for efficiency or flexibility.
 
 **Example:** The perceptron branch predictor learns weights online to forecast branch outcomes, outperforming fixed two-bit counters without enlarging the table [22].
 
-## 🟨 Group 3: Semantics
+<sub><a href="#user-content-principle-table">back to table</a></sub>
 
-🟨 **Al – Abstraction Lifting**
+<a id="group-3-semantics"></a>
+
+## <img src="assets/swatches/semantics.svg" width="14" height="14" alt=""> Group 3: Semantics
+
+<a id="principle-al"></a>
+<img src="assets/swatches/semantics.svg" width="14" height="14" alt=""> **Al – Abstraction Lifting**
 
 Wrap low-level operations behind a higher-level interface or domain-specific language that expresses intent rather than steps. This enables internal optimization and also allows a single definition to target diverse back-ends.
 
 **Example:** SQL queries declare the result to retrieve; the DBMS chooses access paths, join orders, and physical operators automatically \[44].
 
-🟨 **Lu – Language Homogeneity**
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-lu"></a>
+<img src="assets/swatches/semantics.svg" width="14" height="14" alt=""> **Lu – Language Homogeneity**
 
 Adopt a single, well-specified intermediate representation (or language) across core components and extensions so semantics align, tools compose, and cross-layer optimisations and reuse happen with minimal effort.
 
 **Example:** LLVM exposes a typed, SSA-based IR that many front ends target and many back ends share, enabling cross-language optimisation and reuse of the same middle-end passes \[30].
 
-🟨 **Se – Semantically Explicit Interfaces**
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-se"></a>
+<img src="assets/swatches/semantics.svg" width="14" height="14" alt=""> **Se – Semantically Explicit Interfaces**
 
 Specify an interface precisely (covering effect visibility, ordering, durability, etc.) so that users can reason about a call’s true externally observable state without guessing about hidden buffering or replication.
 
 **Example:** SQL isolation levels specify precise anomaly semantics and make visibility guarantees explicit \[3].
 
-🟨 **Fs – Formal Specification**
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-fs"></a>
+<img src="assets/swatches/semantics.svg" width="14" height="14" alt=""> **Fs – Formal Specification**
 
 Describe system behaviour using mathematical models or logic to support rigorous reasoning, verification, or synthesis. Mechanisms for realizing this principle include temporal logic, state machines, and other formalisms that make system properties analyzable.
 
 **Example:** TLA+ shows how to specify and check systems using logic and set theory to catch design errors before coding \[27].
 
-🟨 **Ig – Invariant-Guided Transformation**
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-ig"></a>
+<img src="assets/swatches/semantics.svg" width="14" height="14" alt=""> **Ig – Invariant-Guided Transformation**
 
 Use formally stated invariants to drive safe refactoring, optimisation, or reconfiguration.
 
 **Example:** In compilers, SSA treats "one definition per name" as an IR invariant; passes rewrite code while preserving semantics and then re-establish SSA \[8]. In query optimisers, relational-algebra equivalences (e.g., selection/projection pushdown) preserve result semantics \[44].
 
-## ⬛ Group 4: Distribution
+<sub><a href="#user-content-principle-table">back to table</a></sub>
 
-⬛ **Lt – Location Transparency**
+<a id="group-4-distribution"></a>
+
+## <img src="assets/swatches/distribution.svg" width="14" height="14" alt=""> Group 4: Distribution
+
+<a id="principle-lt"></a>
+<img src="assets/swatches/distribution.svg" width="14" height="14" alt=""> **Lt – Location Transparency**
 
 Hide the physical whereabouts of resources so clients interact via uniform names or handles.
 
 **Example:** Programs can call remote procedures as if they were local, masking host location \[4].
 
-⬛ **Dc – Decentralised Control**
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-dc"></a>
+<img src="assets/swatches/distribution.svg" width="14" height="14" alt=""> **Dc – Decentralised Control**
 
 Distribute decision-making among many nodes to avoid single points of failure or bottlenecks.
 
 **Example:** Dynamo partitions data via consistent hashing and uses gossip-based membership, avoiding any central coordinator \[12].
 
-⬛ **Fp – Function Placement**
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-fp"></a>
+<img src="assets/swatches/distribution.svg" width="14" height="14" alt=""> **Fp – Function Placement**
 
 Place functionality where the necessary context and resources exist to achieve correctness and efficiency, avoiding redundant work elsewhere.
 
 **Example:** The end-to-end argument shows that functions like reliability checks achieve correctness only at the endpoints \[42].
 
-⬛ **Lo – Locality of Reference**
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-lo"></a>
+<img src="assets/swatches/distribution.svg" width="14" height="14" alt=""> **Lo – Locality of Reference**
 
 Place related data and operations close together in time and space to preserve access patterns and minimize separation between computation and state.
 
 **Example:** The working-set model formalises temporal locality to keep hot pages in memory \[11].
 
-⬛ **Cz – Coordination Avoidance** 
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-cz"></a>
+<img src="assets/swatches/distribution.svg" width="14" height="14" alt=""> **Cz – Coordination Avoidance** 
 
 Design computations and dataflows to reduce the need for distributed coordination by identifying operations that can proceed independently while preserving application-level correctness.
 
 **Example:** CRDTs allow replicas to update independently and merge states deterministically, guaranteeing convergence without runtime coordination \[47].
 
-## 🟩 Group 5: Planning
+<sub><a href="#user-content-principle-table">back to table</a></sub>
 
-🟩 **Ep – Equivalence-based Planning**
+<a id="group-5-planning"></a>
+
+## <img src="assets/swatches/planning.svg" width="14" height="14" alt=""> Group 5: Planning
+
+<a id="principle-ep"></a>
+<img src="assets/swatches/planning.svg" width="14" height="14" alt=""> **Ep – Equivalence-based Planning**
 
 Apply algebraic/logic rewrite rules over a common IR that preserve semantic equivalence; defer final choice to later cost/constraint stages.
 
 **Example:** Starburst’s rule-based rewrite system applies relational equivalences (e.g., predicate pushdown) to generate logically equivalent queries \[39].
 
-🟩 **Cm – Cost-based Planning**
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-cm"></a>
+<img src="assets/swatches/planning.svg" width="14" height="14" alt=""> **Cm – Cost-based Planning**
 
 When a system must choose among alternative designs, configurations, or execution strategies, use a cost model to guide the search toward low-cost solutions (energy, money, etc.) without needing to enumerate the full space.
 
 **Example:** The Selinger query optimizer selects the lowest-cost plan under a cost model \[44].
 
-🟩 **Cp – Constraint-based Planning**
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-cp"></a>
+<img src="assets/swatches/planning.svg" width="14" height="14" alt=""> **Cp – Constraint-based Planning**
 
 Encode decisions and hard or soft constraints and rely on a solver (ILP/SMT etc.) to find a feasible or optimal assignment.
 
 **Example:** Quincy formulates cluster scheduling as a min-cost flow with locality and fairness constraints and solves it to obtain an assignment \[21].
 
-🟩 **Gd – Goal-Directed Planning**
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-gd"></a>
+<img src="assets/swatches/planning.svg" width="14" height="14" alt=""> **Gd – Goal-Directed Planning**
 
 Accept a declarative description of the desired end-state and automatically synthesise a concrete sequence of operations to reach it, shielding the user from implementation details.
 
 **Example:** The Cascades query optimizer turns an SQL query (the goal) into an executable plan via rule-based transformation and cost-guided search \[14].
 
-🟩 **Bb – Black-Box Tuning**
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-bb"></a>
+<img src="assets/swatches/planning.svg" width="14" height="14" alt=""> **Bb – Black-Box Tuning**
 
 When analytic cost models are not available, search the plan/configuration space by measuring candidates on the target system, iteratively choosing better ones (e.g., heuristic or Bayesian search), and caching the winner.
 
 **Example:** ATLAS empirically times candidate BLAS kernel configurations on the target CPU and fixes the best-performing parameters, without an analytic cost model \[47].
 
-🟩 **Ah – Advisory Hinting**
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-ah"></a>
+<img src="assets/swatches/planning.svg" width="14" height="14" alt=""> **Ah – Advisory Hinting**
 
 Provide non-binding hints that systems may exploit to improve performance, without changing correctness or requiring enforcement.
 
 **Example:** Lampson advocates optional "hints" that help performance but must not affect correctness if ignored \[29].
 
-## 🟦 Group 6: Operability
+<sub><a href="#user-content-principle-table">back to table</a></sub>
 
-🟦 **Ad – Adaptive Processing**
+<a id="group-6-operability"></a>
+
+## <img src="assets/swatches/operability.svg" width="14" height="14" alt=""> Group 6: Operability
+
+<a id="principle-ad"></a>
+<img src="assets/swatches/operability.svg" width="14" height="14" alt=""> **Ad – Adaptive Processing**
 
 Monitor runtime conditions and automatically adjust parameters or strategy.
 
 **Example:** Eddies continuously reorder query operators at runtime based on feedback, adapting without stopping execution \[1].
 
-🟦 **Ec – Elasticity**
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-ec"></a>
+<img src="assets/swatches/operability.svg" width="14" height="14" alt=""> **Ec – Elasticity**
 
 Automatically adjust resource allocation in response to shifting demand and cost goals. Examples include predictive autoscaling and load shaping.
 
 **Example:** Chase et al. dynamically provision servers based on load and utility, exemplifying elastic resource management \[6].
 
-🟦 **Wa – Workload-Aware Optimisation**
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-wa"></a>
+<img src="assets/swatches/operability.svg" width="14" height="14" alt=""> **Wa – Workload-Aware Optimisation**
 
 Continuously observe workload shape (skew, locality, access frequency, etc.), and adapt data layouts, algorithm choices, or resource allocations to match current patterns.
 
 **Example:** Database "cracking" incrementally reorganises column data based on query predicates, adapting the data layout continuously to the observed workload \[20].
 
-🟦 **Au – Automation and Autonomy**
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-au"></a>
+<img src="assets/swatches/operability.svg" width="14" height="14" alt=""> **Au – Automation and Autonomy**
 
 Let the system perform routine or reactive tasks without human intervention, often by learning from traces or user-provided examples.
 
 **Example:** AutoAdmin automatically recommends indexes/materialized views from workload traces \[7]. Programming-by-example systems automate tasks by generalizing from a few user-provided examples \[33].
 
-🟦 **Ho – Human Observability**
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-ho"></a>
+<img src="assets/swatches/operability.svg" width="14" height="14" alt=""> **Ho – Human Observability**
 
 Expose internal state of the system, like metrics, traces, plans, to make the system intentionally transparent; that transparency improves observability, debugging, introspection, and control.
 
 **Example:** Paxson’s end-to-end Internet packet dynamics analysis demonstrates how rich measurement and tracing enable informed debugging and tuning \[37].
 
-🟦 **Ev – Evolvability**
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-ev"></a>
+<img src="assets/swatches/operability.svg" width="14" height="14" alt=""> **Ev – Evolvability**
 
 Design so the system can change with minimal downtime or rewrites and do so without breaking external contracts or observable behaviour for existing clients. Unlike extensibility that lets outsiders add new behavior via defined hook points without touching the core, evolvability lets the system’s internals change over time without breaking existing external contracts.
 
 **Example:** Parnas presents how a modular design makes system easier to extend without disruptive rewrites \[36].
 
-## 🟥 Group 7: Reliability
+<sub><a href="#user-content-principle-table">back to table</a></sub>
 
-🟥 **Ft – Fault Tolerance**
+<a id="group-7-reliability"></a>
+
+## <img src="assets/swatches/reliability.svg" width="14" height="14" alt=""> Group 7: Reliability
+
+<a id="principle-ft"></a>
+<img src="assets/swatches/reliability.svg" width="14" height="14" alt=""> **Ft – Fault Tolerance**
 
 Design the system to continue operating, perhaps in degraded form, despite component failures.
 
 **Example:** Gray’s analysis of why computers stop shows that replication and automatic restart let services keep running through hardware and software faults \[15].
 
-🟥 **Is – Isolation for Correctness**
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-is"></a>
+<img src="assets/swatches/reliability.svg" width="14" height="14" alt=""> **Is – Isolation for Correctness**
 
 Prevent unintended interference among components so local reasoning remains valid.
 
 **Example:** Two-phase row-level locking stops one transaction from reading or overwriting another’s uncommitted data, preserving isolation guarantees \[16].
 
-🟥 **At – Atomic Execution**
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-at"></a>
+<img src="assets/swatches/reliability.svg" width="14" height="14" alt=""> **At – Atomic Execution**
 
 Group multiple operations so they appear indivisible, either all take effect or none do.
 
 **Example:** With Transactional Memory, memory operations inside a transaction speculatively execute, then commit atomically; if any conflict or fault occurs, the entire block aborts and leaves no partial state \[18].
 
-🟥 **Cr – Consistency Relaxation**
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-cr"></a>
+<img src="assets/swatches/reliability.svg" width="14" height="14" alt=""> **Cr – Consistency Relaxation**
 
 Deliberately relax strong consistency or ordering constraints, but only within documented bounds, to improve performance, availability, or concurrency.
 
 **Example:** Bayou lets mobile clients update replicas while disconnected, guaranteeing eventual convergence when replicas reconnect, trading strict consistency for offline availability \[38].
 
-## 🟫 Group 8: Security
+<sub><a href="#user-content-principle-table">back to table</a></sub>
 
-🟫 **Sy – Security via Isolation**
+<a id="group-8-security"></a>
+
+## <img src="assets/swatches/security.svg" width="14" height="14" alt=""> Group 8: Security
+
+<a id="principle-sy"></a>
+<img src="assets/swatches/security.svg" width="14" height="14" alt=""> **Sy – Security via Isolation**
 
 Enforce strong boundaries so faults or hostile code cannot affect other components.
 
 **Example:** A correct virtual machine monitor presents each guest with a complete, isolated machine and intercepts privileged operations, preventing one guest from compromising others or the host \[40].
 
-🟫 **Ac – Access Control and Auditing**
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-ac"></a>
+<img src="assets/swatches/security.svg" width="14" height="14" alt=""> **Ac – Access Control and Auditing**
 
 Define permissions and log every access for accountability.
 
 **Example:** Lampson’s taxonomy of access-control lists, capabilities, and audit trails underpins modern security mechanisms \[28].
 
-🟫 **Lp – Least Privilege**
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-lp"></a>
+<img src="assets/swatches/security.svg" width="14" height="14" alt=""> **Lp – Least Privilege**
 
 Grant only minimal authority needed for a task, shrinking the blast radius.
 
 **Example:** The post-mortem on the 1988 Internet Worm shows how excess privilege let the worm spread and spurred widespread adoption of least-privilege daemons \[35].
 
-🟫 **Tq – Trust via Quorum**
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-tq"></a>
+<img src="assets/swatches/security.svg" width="14" height="14" alt=""> **Tq – Trust via Quorum**
 
 Rely on agreement from multiple, independent participants rather than a single authority.
 
 **Example:** Paxos algorithm replicates state across a majority quorum so the service stays correct even if minority nodes crash or act maliciously \[26].
 
-🟫 **Cf – Conservative Defaults**
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-cf"></a>
+<img src="assets/swatches/security.svg" width="14" height="14" alt=""> **Cf – Conservative Defaults**
 
 Ship with restrictive, safe settings; let experts opt-in to riskier, faster modes.
 
 **Example:** With a "default no-access" policy, every protection mechanism should allow access only when explicitly granted \[43].
 
-🟫 **Sa – Safety by Construction**
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-sa"></a>
+<img src="assets/swatches/security.svg" width="14" height="14" alt=""> **Sa – Safety by Construction**
 
 Structure code or data so entire classes of errors become impossible rather than merely detected.
 
 **Example:** Rust’s ownership and borrow checker prevent data races and dangling pointers at compile time \[34].
+
+<sub><a href="#user-content-principle-table">back to table</a></sub>
 
 ## 4. CASE STUDY
 
