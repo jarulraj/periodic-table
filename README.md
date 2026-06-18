@@ -2,6 +2,16 @@
 
 #### [Joy Arulraj (Georgia Tech)](https://faculty.cc.gatech.edu/~jarulraj/)
 
+<p align="center">
+  <a href="#user-content-principle-table"><strong>Explore the table</strong></a>
+  &nbsp;·&nbsp;
+  <a href="#user-content-table-of-contents">Groups</a>
+  &nbsp;·&nbsp;
+  <a href="#user-content-references">References</a>
+  &nbsp;·&nbsp;
+  <a href="#user-content-how-to-cite">How to cite</a>
+</p>
+
 System design is often taught through  solutions specific to particular domains, such as databases, operating systems, or computer architecture, each with its own methods and vocabulary. While this diversity is a strength, it can obscure cross-cutting principles that recur across domains. This paper proposes a preliminary taxonomy of system design principles distilled from several domains in computer systems. The goal is a shared, concise vocabulary that helps students, researchers, and practitioners reason about structure and trade-offs, compare designs across domains, and communicate choices more clearly.
 
 ## 1. INTRODUCTION
@@ -63,68 +73,68 @@ Each principle is tagged with a short symbol (e.g., `Co` for composability, `Op`
   </thead>
   <tbody>
     <tr>
-      <td align="center"><a href="#user-content-principle-si"><img src="assets/tiles/si.svg" width="84" alt="Si - Simplicity"></a></td>
-      <td align="center"><a href="#user-content-principle-sc"><img src="assets/tiles/sc.svg" width="84" alt="Sc - Scalability"></a></td>
-      <td align="center"><a href="#user-content-principle-al"><img src="assets/tiles/al.svg" width="84" alt="Al - Abstraction Lifting"></a></td>
-      <td align="center"><a href="#user-content-principle-lt"><img src="assets/tiles/lt.svg" width="84" alt="Lt - Location Transparency"></a></td>
-      <td align="center"><a href="#user-content-principle-ep"><img src="assets/tiles/ep.svg" width="84" alt="Ep - Equivalence-based Planning"></a></td>
-      <td align="center"><a href="#user-content-principle-ad"><img src="assets/tiles/ad.svg" width="84" alt="Ad - Adaptive Processing"></a></td>
-      <td align="center"><a href="#user-content-principle-ft"><img src="assets/tiles/ft.svg" width="84" alt="Ft - Fault Tolerance"></a></td>
-      <td align="center"><a href="#user-content-principle-sy"><img src="assets/tiles/sy.svg" width="84" alt="Sy - Security via Isolation"></a></td>
+      <td align="center"><a href="#user-content-principle-si"><img src="assets/tiles/si.svg" width="72" alt="Si - Simplicity"></a></td>
+      <td align="center"><a href="#user-content-principle-sc"><img src="assets/tiles/sc.svg" width="72" alt="Sc - Scalability"></a></td>
+      <td align="center"><a href="#user-content-principle-al"><img src="assets/tiles/al.svg" width="72" alt="Al - Abstraction Lifting"></a></td>
+      <td align="center"><a href="#user-content-principle-lt"><img src="assets/tiles/lt.svg" width="72" alt="Lt - Location Transparency"></a></td>
+      <td align="center"><a href="#user-content-principle-ep"><img src="assets/tiles/ep.svg" width="72" alt="Ep - Equivalence-based Planning"></a></td>
+      <td align="center"><a href="#user-content-principle-ad"><img src="assets/tiles/ad.svg" width="72" alt="Ad - Adaptive Processing"></a></td>
+      <td align="center"><a href="#user-content-principle-ft"><img src="assets/tiles/ft.svg" width="72" alt="Ft - Fault Tolerance"></a></td>
+      <td align="center"><a href="#user-content-principle-sy"><img src="assets/tiles/sy.svg" width="72" alt="Sy - Security via Isolation"></a></td>
     </tr>
     <tr>
-      <td align="center"><a href="#user-content-principle-mo"><img src="assets/tiles/mo.svg" width="84" alt="Mo - Modularity"></a></td>
-      <td align="center"><a href="#user-content-principle-rc"><img src="assets/tiles/rc.svg" width="84" alt="Rc - Reuse of Computation"></a></td>
-      <td align="center"><a href="#user-content-principle-lu"><img src="assets/tiles/lu.svg" width="84" alt="Lu - Language Homogeneity"></a></td>
-      <td align="center"><a href="#user-content-principle-dc"><img src="assets/tiles/dc.svg" width="84" alt="Dc - Decentralised Control"></a></td>
-      <td align="center"><a href="#user-content-principle-cm"><img src="assets/tiles/cm.svg" width="84" alt="Cm - Cost-based Planning"></a></td>
-      <td align="center"><a href="#user-content-principle-ec"><img src="assets/tiles/ec.svg" width="84" alt="Ec - Elasticity"></a></td>
-      <td align="center"><a href="#user-content-principle-is"><img src="assets/tiles/is.svg" width="84" alt="Is - Isolation for Correctness"></a></td>
-      <td align="center"><a href="#user-content-principle-ac"><img src="assets/tiles/ac.svg" width="84" alt="Ac - Access Control and Auditing"></a></td>
+      <td align="center"><a href="#user-content-principle-mo"><img src="assets/tiles/mo.svg" width="72" alt="Mo - Modularity"></a></td>
+      <td align="center"><a href="#user-content-principle-rc"><img src="assets/tiles/rc.svg" width="72" alt="Rc - Reuse of Computation"></a></td>
+      <td align="center"><a href="#user-content-principle-lu"><img src="assets/tiles/lu.svg" width="72" alt="Lu - Language Homogeneity"></a></td>
+      <td align="center"><a href="#user-content-principle-dc"><img src="assets/tiles/dc.svg" width="72" alt="Dc - Decentralised Control"></a></td>
+      <td align="center"><a href="#user-content-principle-cm"><img src="assets/tiles/cm.svg" width="72" alt="Cm - Cost-based Planning"></a></td>
+      <td align="center"><a href="#user-content-principle-ec"><img src="assets/tiles/ec.svg" width="72" alt="Ec - Elasticity"></a></td>
+      <td align="center"><a href="#user-content-principle-is"><img src="assets/tiles/is.svg" width="72" alt="Is - Isolation for Correctness"></a></td>
+      <td align="center"><a href="#user-content-principle-ac"><img src="assets/tiles/ac.svg" width="72" alt="Ac - Access Control and Auditing"></a></td>
     </tr>
     <tr>
-      <td align="center"><a href="#user-content-principle-co"><img src="assets/tiles/co.svg" width="84" alt="Co - Composability"></a></td>
-      <td align="center"><a href="#user-content-principle-wv"><img src="assets/tiles/wv.svg" width="84" alt="Wv - Work Avoidance"></a></td>
-      <td align="center"><a href="#user-content-principle-se"><img src="assets/tiles/se.svg" width="84" alt="Se - Semantically Explicit Interfaces"></a></td>
-      <td align="center"><a href="#user-content-principle-fp"><img src="assets/tiles/fp.svg" width="84" alt="Fp - Function Placement"></a></td>
-      <td align="center"><a href="#user-content-principle-cp"><img src="assets/tiles/cp.svg" width="84" alt="Cp - Constraint-based Planning"></a></td>
-      <td align="center"><a href="#user-content-principle-wa"><img src="assets/tiles/wa.svg" width="84" alt="Wa - Workload-Aware Optimisation"></a></td>
-      <td align="center"><a href="#user-content-principle-at"><img src="assets/tiles/at.svg" width="84" alt="At - Atomic Execution"></a></td>
-      <td align="center"><a href="#user-content-principle-lp"><img src="assets/tiles/lp.svg" width="84" alt="Lp - Least Privilege"></a></td>
+      <td align="center"><a href="#user-content-principle-co"><img src="assets/tiles/co.svg" width="72" alt="Co - Composability"></a></td>
+      <td align="center"><a href="#user-content-principle-wv"><img src="assets/tiles/wv.svg" width="72" alt="Wv - Work Avoidance"></a></td>
+      <td align="center"><a href="#user-content-principle-se"><img src="assets/tiles/se.svg" width="72" alt="Se - Semantically Explicit Interfaces"></a></td>
+      <td align="center"><a href="#user-content-principle-fp"><img src="assets/tiles/fp.svg" width="72" alt="Fp - Function Placement"></a></td>
+      <td align="center"><a href="#user-content-principle-cp"><img src="assets/tiles/cp.svg" width="72" alt="Cp - Constraint-based Planning"></a></td>
+      <td align="center"><a href="#user-content-principle-wa"><img src="assets/tiles/wa.svg" width="72" alt="Wa - Workload-Aware Optimisation"></a></td>
+      <td align="center"><a href="#user-content-principle-at"><img src="assets/tiles/at.svg" width="72" alt="At - Atomic Execution"></a></td>
+      <td align="center"><a href="#user-content-principle-lp"><img src="assets/tiles/lp.svg" width="72" alt="Lp - Least Privilege"></a></td>
     </tr>
     <tr>
-      <td align="center"><a href="#user-content-principle-ex"><img src="assets/tiles/ex.svg" width="84" alt="Ex - Extensibility"></a></td>
-      <td align="center"><a href="#user-content-principle-cc"><img src="assets/tiles/cc.svg" width="84" alt="Cc - Common-Case Specialization"></a></td>
-      <td align="center"><a href="#user-content-principle-fs"><img src="assets/tiles/fs.svg" width="84" alt="Fs - Formal Specification"></a></td>
-      <td align="center"><a href="#user-content-principle-lo"><img src="assets/tiles/lo.svg" width="84" alt="Lo - Locality of Reference"></a></td>
-      <td align="center"><a href="#user-content-principle-gd"><img src="assets/tiles/gd.svg" width="84" alt="Gd - Goal-Directed Planning"></a></td>
-      <td align="center"><a href="#user-content-principle-au"><img src="assets/tiles/au.svg" width="84" alt="Au - Automation and Autonomy"></a></td>
-      <td align="center"><a href="#user-content-principle-cr"><img src="assets/tiles/cr.svg" width="84" alt="Cr - Consistency Relaxation"></a></td>
-      <td align="center"><a href="#user-content-principle-tq"><img src="assets/tiles/tq.svg" width="84" alt="Tq - Trust via Quorum"></a></td>
+      <td align="center"><a href="#user-content-principle-ex"><img src="assets/tiles/ex.svg" width="72" alt="Ex - Extensibility"></a></td>
+      <td align="center"><a href="#user-content-principle-cc"><img src="assets/tiles/cc.svg" width="72" alt="Cc - Common-Case Specialization"></a></td>
+      <td align="center"><a href="#user-content-principle-fs"><img src="assets/tiles/fs.svg" width="72" alt="Fs - Formal Specification"></a></td>
+      <td align="center"><a href="#user-content-principle-lo"><img src="assets/tiles/lo.svg" width="72" alt="Lo - Locality of Reference"></a></td>
+      <td align="center"><a href="#user-content-principle-gd"><img src="assets/tiles/gd.svg" width="72" alt="Gd - Goal-Directed Planning"></a></td>
+      <td align="center"><a href="#user-content-principle-au"><img src="assets/tiles/au.svg" width="72" alt="Au - Automation and Autonomy"></a></td>
+      <td align="center"><a href="#user-content-principle-cr"><img src="assets/tiles/cr.svg" width="72" alt="Cr - Consistency Relaxation"></a></td>
+      <td align="center"><a href="#user-content-principle-tq"><img src="assets/tiles/tq.svg" width="72" alt="Tq - Trust via Quorum"></a></td>
     </tr>
     <tr>
-      <td align="center"><a href="#user-content-principle-pm"><img src="assets/tiles/pm.svg" width="84" alt="Pm - Policy/Mechanism Separation"></a></td>
-      <td align="center"><a href="#user-content-principle-bo"><img src="assets/tiles/bo.svg" width="84" alt="Bo - Bottleneck-Oriented Optimisation"></a></td>
-      <td align="center"><a href="#user-content-principle-ig"><img src="assets/tiles/ig.svg" width="84" alt="Ig - Invariant-Guided Transformation"></a></td>
-      <td align="center"><a href="#user-content-principle-cz"><img src="assets/tiles/cz.svg" width="84" alt="Cz - Coordination Avoidance"></a></td>
-      <td align="center"><a href="#user-content-principle-bb"><img src="assets/tiles/bb.svg" width="84" alt="Bb - Black-Box Tuning"></a></td>
-      <td align="center"><a href="#user-content-principle-ho"><img src="assets/tiles/ho.svg" width="84" alt="Ho - Human Observability"></a></td>
+      <td align="center"><a href="#user-content-principle-pm"><img src="assets/tiles/pm.svg" width="72" alt="Pm - Policy/Mechanism Separation"></a></td>
+      <td align="center"><a href="#user-content-principle-bo"><img src="assets/tiles/bo.svg" width="72" alt="Bo - Bottleneck-Oriented Optimisation"></a></td>
+      <td align="center"><a href="#user-content-principle-ig"><img src="assets/tiles/ig.svg" width="72" alt="Ig - Invariant-Guided Transformation"></a></td>
+      <td align="center"><a href="#user-content-principle-cz"><img src="assets/tiles/cz.svg" width="72" alt="Cz - Coordination Avoidance"></a></td>
+      <td align="center"><a href="#user-content-principle-bb"><img src="assets/tiles/bb.svg" width="72" alt="Bb - Black-Box Tuning"></a></td>
+      <td align="center"><a href="#user-content-principle-ho"><img src="assets/tiles/ho.svg" width="72" alt="Ho - Human Observability"></a></td>
       <td align="center">&nbsp;</td>
-      <td align="center"><a href="#user-content-principle-cf"><img src="assets/tiles/cf.svg" width="84" alt="Cf - Conservative Defaults"></a></td>
+      <td align="center"><a href="#user-content-principle-cf"><img src="assets/tiles/cf.svg" width="72" alt="Cf - Conservative Defaults"></a></td>
     </tr>
     <tr>
-      <td align="center"><a href="#user-content-principle-gr"><img src="assets/tiles/gr.svg" width="84" alt="Gr - Generalized Design"></a></td>
-      <td align="center"><a href="#user-content-principle-ha"><img src="assets/tiles/ha.svg" width="84" alt="Ha - Hardware-Aware Design"></a></td>
+      <td align="center"><a href="#user-content-principle-gr"><img src="assets/tiles/gr.svg" width="72" alt="Gr - Generalized Design"></a></td>
+      <td align="center"><a href="#user-content-principle-ha"><img src="assets/tiles/ha.svg" width="72" alt="Ha - Hardware-Aware Design"></a></td>
       <td align="center">&nbsp;</td>
       <td align="center">&nbsp;</td>
-      <td align="center"><a href="#user-content-principle-ah"><img src="assets/tiles/ah.svg" width="84" alt="Ah - Advisory Hinting"></a></td>
-      <td align="center"><a href="#user-content-principle-ev"><img src="assets/tiles/ev.svg" width="84" alt="Ev - Evolvability"></a></td>
+      <td align="center"><a href="#user-content-principle-ah"><img src="assets/tiles/ah.svg" width="72" alt="Ah - Advisory Hinting"></a></td>
+      <td align="center"><a href="#user-content-principle-ev"><img src="assets/tiles/ev.svg" width="72" alt="Ev - Evolvability"></a></td>
       <td align="center">&nbsp;</td>
-      <td align="center"><a href="#user-content-principle-sa"><img src="assets/tiles/sa.svg" width="84" alt="Sa - Safety by Construction"></a></td>
+      <td align="center"><a href="#user-content-principle-sa"><img src="assets/tiles/sa.svg" width="72" alt="Sa - Safety by Construction"></a></td>
     </tr>
     <tr>
-      <td align="center"><a href="#user-content-principle-pd"><img src="assets/tiles/pd.svg" width="84" alt="Pd - Probabilistic Design"></a></td>
-      <td align="center"><a href="#user-content-principle-op"><img src="assets/tiles/op.svg" width="84" alt="Op - Optimistic Design"></a></td>
+      <td align="center"><a href="#user-content-principle-pd"><img src="assets/tiles/pd.svg" width="72" alt="Pd - Probabilistic Design"></a></td>
+      <td align="center"><a href="#user-content-principle-op"><img src="assets/tiles/op.svg" width="72" alt="Op - Optimistic Design"></a></td>
       <td align="center">&nbsp;</td>
       <td align="center">&nbsp;</td>
       <td align="center">&nbsp;</td>
@@ -134,7 +144,7 @@ Each principle is tagged with a short symbol (e.g., `Co` for composability, `Op`
     </tr>
     <tr>
       <td align="center">&nbsp;</td>
-      <td align="center"><a href="#user-content-principle-la"><img src="assets/tiles/la.svg" width="84" alt="La - Learned Approximation"></a></td>
+      <td align="center"><a href="#user-content-principle-la"><img src="assets/tiles/la.svg" width="72" alt="La - Learned Approximation"></a></td>
       <td align="center">&nbsp;</td>
       <td align="center">&nbsp;</td>
       <td align="center">&nbsp;</td>
@@ -635,193 +645,289 @@ System design spans diverse domains and vocabularies, which can make shared disc
 
 [1] Ron Avnur and Joseph M. Hellerstein. *Eddies: Continuously Adaptive Query Processing*. In SIGMOD, 2000.
 
+<sub>back to: <a href="#user-content-principle-ad">Ad</a></sub>
+
 <a id="ref-2"></a>
 
 [2] Rudolf Bayer and Edward McCreight. *Organization and Maintenance of Large Ordered Indexes*. Acta Informatica, 1972.
+
+<sub>back to: <a href="#user-content-principle-rc">Rc</a></sub>
 
 <a id="ref-3"></a>
 
 [3] Hal Berenson, Philip A. Bernstein, Jim Gray, Jim Melton, Elizabeth J. O’Neil, and Patrick E. O’Neil. *A Critique of ANSI SQL Isolation Levels*. In SIGMOD, 1995.
 
+<sub>back to: <a href="#user-content-principle-se">Se</a></sub>
+
 <a id="ref-4"></a>
 
 [4] Andrew D. Birrell and Bruce J. Nelson. *Implementing Remote Procedure Calls*. ACM TOCS, 1984.
+
+<sub>back to: <a href="#user-content-principle-lt">Lt</a></sub>
 
 <a id="ref-5"></a>
 
 [5] Craig Chambers and David Ungar. *Customization: Optimizing Compiler Technology for SELF*. In PLDI, 1989.
 
+<sub>back to: <a href="#user-content-principle-cc">Cc</a></sub>
+
 <a id="ref-6"></a>
 
 [6] Jeffrey S. Chase et al. *Managing Energy and Server Resources in Hosting Centers*. In SOSP, 2001.
+
+<sub>back to: <a href="#user-content-principle-ec">Ec</a></sub>
 
 <a id="ref-7"></a>
 
 [7] Surajit Chaudhuri and Vivek R. Narasayya. *An Efficient, Cost-Driven Index Selection Tool for Microsoft SQL Server*. In VLDB, 1997.
 
+<sub>back to: <a href="#user-content-principle-au">Au</a></sub>
+
 <a id="ref-8"></a>
 
 [8] Ron Cytron et al. *Efficiently Computing Static Single Assignment Form and the Control Dependence Graph*. ACM TOPLAS, 1991.
+
+<sub>back to: <a href="#user-content-principle-ig">Ig</a></sub>
 
 <a id="ref-9"></a>
 
 [9] Jeff Dean and Luiz André Barroso. *The Tail at Scale*. Communications of the ACM, 2013.
 
+<sub>back to: <a href="#user-content-principle-bo">Bo</a></sub>
+
 <a id="ref-10"></a>
 
 [10] Jeffrey Dean and Sanjay Ghemawat. *MapReduce: Simplified Data Processing on Large Clusters*. In OSDI, 2004.
+
+<sub>back to: <a href="#user-content-principle-sc">Sc</a></sub>
 
 <a id="ref-11"></a>
 
 [11] Peter J. Denning. *The Working Set Model for Program Behavior*. Communications of the ACM, 1968.
 
+<sub>back to: <a href="#user-content-principle-lo">Lo</a></sub>
+
 <a id="ref-12"></a>
 
 [12] Giuseppe DeCandia et al. *Dynamo: Amazon’s Highly Available Key-Value Store*. In SOSP, 2007.
+
+<sub>back to: <a href="#user-content-principle-dc">Dc</a></sub>
 
 <a id="ref-13"></a>
 
 [13] Sally Floyd and Van Jacobson. *Random Early Detection Gateways for Congestion Avoidance*. In SIGCOMM, 1993.
 
+<sub>back to: <a href="#user-content-principle-pd">Pd</a></sub>
+
 <a id="ref-14"></a>
 
 [14] Goetz Graefe. *The Cascades Framework for Query Optimisation*. HPL Technical Report HPL-95-18, 1995.
+
+<sub>back to: <a href="#user-content-principle-gd">Gd</a></sub>
 
 <a id="ref-15"></a>
 
 [15] Jim Gray. *Why Do Computers Stop and What Can Be Done About It?* Tandem Technical Report, 1986.
 
+<sub>back to: <a href="#user-content-principle-ft">Ft</a></sub>
+
 <a id="ref-16"></a>
 
 [16] Jim Gray and Andreas Reuter. *Transaction Processing: Concepts and Techniques*. Morgan Kaufmann, 1993.
+
+<sub>back to: <a href="#user-content-principle-is">Is</a></sub>
 
 <a id="ref-17"></a>
 
 [17] J. N. Gray et al. *Granularity of Locks in a Shared Data Base*. In VLDB, 1975.
 
+<sub>back to: <a href="#user-content-1-introduction">Introduction</a></sub>
+
 <a id="ref-18"></a>
 
 [18] Maurice Herlihy and J. Eliot B. Moss. *Transactional Memory: Architectural Support for Lock-Free Data Structures*. In ISCA, 1993.
+
+<sub>back to: <a href="#user-content-principle-at">At</a></sub>
 
 <a id="ref-19"></a>
 
 [19] John Hughes. *Why Functional Programming Matters*. In *Research Topics in Functional Programming*, Addison-Wesley, 1990.
 
+<sub>back to: <a href="#user-content-principle-wv">Wv</a></sub>
+
 <a id="ref-20"></a>
 
 [20] Stratos Idreos et al. *Database Cracking*. In CIDR, 2007.
+
+<sub>back to: <a href="#user-content-principle-wa">Wa</a></sub>
 
 <a id="ref-21"></a>
 
 [21] Michael Isard et al. *Quincy: Fair Scheduling for Distributed Computing Clusters*. In SOSP, 2009.
 
+<sub>back to: <a href="#user-content-principle-cp">Cp</a></sub>
+
 <a id="ref-22"></a>
 
 [22] Daniel A. Jiménez and Calvin Lin. *Dynamic Branch Prediction with Perceptrons*. In HPCA, 2001.
+
+<sub>back to: <a href="#user-content-principle-la">La</a></sub>
 
 <a id="ref-23"></a>
 
 [23] Donald E. Knuth. *Structured Programming with go to Statements*. ACM Computing Surveys, 1974.
 
+<sub>back to: <a href="#user-content-principle-si">Si</a></sub>
+
 <a id="ref-24"></a>
 
 [24] H. T. Kung and John T. Robinson. *On Optimistic Methods for Concurrency Control*. ACM TODS, 1981.
+
+<sub>back to: <a href="#user-content-principle-op">Op</a></sub>
 
 <a id="ref-25"></a>
 
 [25] Leslie Lamport. *The Part-Time Parliament*. ACM TOCS, 1998.
 
+<sub>back to: <a href="#user-content-1-introduction">Introduction</a></sub>
+
 <a id="ref-26"></a>
 
 [26] Leslie Lamport. *The Part-Time Parliament*. ACM TOCS, 1998.
+
+<sub>back to: <a href="#user-content-principle-tq">Tq</a></sub>
 
 <a id="ref-27"></a>
 
 [27] Leslie Lamport. *Specifying Systems: The TLA+ Language and Tools for Hardware and Software Engineers*. Addison-Wesley, 2002.
 
+<sub>back to: <a href="#user-content-principle-fs">Fs</a></sub>
+
 <a id="ref-28"></a>
 
 [28] Butler W. Lampson. *Protection*. ACM Operating Systems Review, 1974.
+
+<sub>back to: <a href="#user-content-principle-ac">Ac</a></sub>
 
 <a id="ref-29"></a>
 
 [29] Butler W. Lampson. *Hints for Computer System Design*. ACM Operating Systems Review, 1983.
 
+<sub>back to: <a href="#user-content-principle-ah">Ah</a></sub>
+
 <a id="ref-30"></a>
 
 [30] Chris Lattner and Vikram Adve. *LLVM: A Compilation Framework for Lifelong Program Analysis & Transformation*. In CGO, 2004.
+
+<sub>back to: <a href="#user-content-principle-lu">Lu</a></sub>
 
 <a id="ref-31"></a>
 
 [31] C. L. Lawson et al. *Basic Linear Algebra Subprograms for Fortran Usage*. ACM TOMS, 1979.
 
+<sub>back to: <a href="#user-content-principle-ha">Ha</a></sub>
+
 <a id="ref-32"></a>
 
 [32] R. Levin et al. *Policy/Mechanism Separation in Hydra*. In SOSP, 1975.
+
+<sub>back to: <a href="#user-content-principle-pm">Pm</a></sub>
 
 <a id="ref-33"></a>
 
 [33] Henry Lieberman. *Your Wish is My Command: Programming by Example*. Morgan Kaufmann, 2001.
 
+<sub>back to: <a href="#user-content-principle-au">Au</a></sub>
+
 <a id="ref-34"></a>
 
 [34] Nicholas D. Matsakis and Felix Klock. *The Rust Language*. In ACM SIGAda, 2014.
+
+<sub>back to: <a href="#user-content-principle-sa">Sa</a></sub>
 
 <a id="ref-35"></a>
 
 [35] Robert T. Morris. *A Tour of the Worm*. USENIX, 1989.
 
+<sub>back to: <a href="#user-content-principle-lp">Lp</a></sub>
+
 <a id="ref-36"></a>
 
 [36] David L. Parnas. *Designing Software for Ease of Extension and Contraction*. IEEE TSE, 1979.
+
+<sub>back to: <a href="#user-content-principle-ev">Ev</a></sub>
 
 <a id="ref-37"></a>
 
 [37] Vern Paxson. *End-to-End Internet Packet Dynamics*. IEEE/ACM TON, 1999.
 
+<sub>back to: <a href="#user-content-principle-ho">Ho</a></sub>
+
 <a id="ref-38"></a>
 
 [38] K. Petersen et al. *Flexible Update Propagation for Weakly Consistent Replication*. In SOSP, 1997.
+
+<sub>back to: <a href="#user-content-principle-cr">Cr</a></sub>
 
 <a id="ref-39"></a>
 
 [39] Hamid Pirahesh et al. *Extensible/Rule-Based Query Rewrite Optimization in Starburst*. In SIGMOD, 1992.
 
+<sub>back to: <a href="#user-content-principle-ep">Ep</a></sub>
+
 <a id="ref-40"></a>
 
 [40] Gerald J. Popek and Robert P. Goldberg. *Formal Requirements for Virtualizable Third Generation Architectures*. Communications of the ACM, 1974.
+
+<sub>back to: <a href="#user-content-principle-sy">Sy</a></sub>
 
 <a id="ref-41"></a>
 
 [41] Dennis M. Ritchie and Ken Thompson. *The UNIX Time-Sharing System*. Communications of the ACM, 1974.
 
+<sub>back to: <a href="#user-content-principle-co">Co</a> · <a href="#user-content-principle-ex">Ex</a></sub>
+
 <a id="ref-42"></a>
 
 [42] J. H. Saltzer et al. *End-to-End Arguments in System Design*. ACM TOCS, 1984.
+
+<sub>back to: <a href="#user-content-principle-fp">Fp</a></sub>
 
 <a id="ref-43"></a>
 
 [43] Jerome H. Saltzer and Michael D. Schroeder. *The Protection of Information in Computer Systems*. Proc. IEEE, 1975.
 
+<sub>back to: <a href="#user-content-principle-cf">Cf</a></sub>
+
 <a id="ref-44"></a>
 
 [44] Patricia G. Selinger et al. *Access Path Selection in a Relational Database Management System*. In SIGMOD, 1979.
+
+<sub>back to: <a href="#user-content-principle-al">Al</a> · <a href="#user-content-principle-ig">Ig</a> · <a href="#user-content-principle-cm">Cm</a></sub>
 
 <a id="ref-45"></a>
 
 [45] Alexander A. Stepanov and Meng Lee. *The Standard Template Library*. HP Laboratories Technical Report, 1994. 
 
+<sub>back to: <a href="#user-content-principle-gr">Gr</a></sub>
+
 <a id="ref-46"></a>
 
 [46] Michael Stonebraker and Lawrence A. Rowe. *The Design of POSTGRES*. In SIGMOD, 1986.
+
+<sub>back to: <a href="#user-content-principle-gr">Gr</a></sub>
 
 <a id="ref-47"></a>
 
 [47] R. Clint Whaley and Jack J. Dongarra. *Automatically Tuned Linear Algebra Software*. In SC, 1998.
 
+<sub>back to: <a href="#user-content-principle-cz">Cz</a> · <a href="#user-content-principle-bb">Bb</a></sub>
+
 <a id="ref-48"></a>
 
 [48] Hubert Zimmermann. *OSI Reference Model – The ISO Model of Architecture for Open Systems Interconnection*. IEEE Transactions on Communications, 1980.
+
+<sub>back to: <a href="#user-content-principle-mo">Mo</a></sub>
 
 ## HOW TO CITE
 

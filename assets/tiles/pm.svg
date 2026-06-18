@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="84" height="64" viewBox="0 0 84 64" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="72" height="54" viewBox="0 0 72 54" role="img" aria-labelledby="title desc">
   <title id="title">Pm - Policy/Mechanism Separation</title>
   <desc id="desc">Periodic-table tile for Policy/Mechanism Separation</desc>
-  <rect x="1.5" y="1.5" width="81" height="61" rx="5" fill="#D9D9FC" stroke="#222222" stroke-width="1.5"/>
-  <rect x="5" y="5" width="74" height="54" rx="3" fill="none" stroke="#FFFFFF" stroke-opacity="0.55"/>
-  <text x="42" y="39" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#111111">Pm</text>
+  <rect x="1.25" y="1.25" width="69.5" height="51.5" rx="4" fill="#D9D9FC" stroke="#222222" stroke-width="1.25"/>
+  <rect x="4.5" y="4.5" width="63" height="45" rx="3" fill="none" stroke="#FFFFFF" stroke-opacity="0.58"/>
+  <text x="36" y="34" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700" fill="#111111">Pm</text>
 </svg>
