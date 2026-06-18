@@ -10,7 +10,11 @@
   <a href="#user-content-references">References</a>
   &nbsp;·&nbsp;
   <a href="#user-content-how-to-cite">How to cite</a>
+  &nbsp;·&nbsp;
+  <a href="#user-content-how-to-contribute">Contribute</a>
 </p>
+
+<p align="center"><sub>A compact, cross-linked map of recurring computer systems design moves.</sub></p>
 
 System design is often taught through  solutions specific to particular domains, such as databases, operating systems, or computer architecture, each with its own methods and vocabulary. While this diversity is a strength, it can obscure cross-cutting principles that recur across domains. This paper proposes a preliminary taxonomy of system design principles distilled from several domains in computer systems. The goal is a shared, concise vocabulary that helps students, researchers, and practitioners reason about structure and trade-offs, compare designs across domains, and communicate choices more clearly.
 
@@ -54,7 +58,7 @@ Each principle is tagged with a short symbol (e.g., `Co` for composability, `Op`
 - [<img src="assets/swatches/reliability.svg" width="14" height="14" alt=""> Group 7: Reliability](#user-content-group-7-reliability): *Stay correct under faults, concurrency, and partial failure.*
 - [<img src="assets/swatches/security.svg" width="14" height="14" alt=""> Group 8: Security](#user-content-group-8-security): *Bound authority and enforce isolation to preserve safety and integrity.*
 
-**Legend:** `Code` = unique short symbol, `Name` = principle, `Intent` = short description. Click a group heading or tile to jump to its definition; citation numbers jump to the corresponding reference.
+**Legend:** `Code` = unique short symbol, `Name` = principle, `Intent` = short description.
 
 <a id="principle-table"></a>
 
@@ -73,68 +77,68 @@ Each principle is tagged with a short symbol (e.g., `Co` for composability, `Op`
   </thead>
   <tbody>
     <tr>
-      <td align="center"><a href="#user-content-principle-si"><img src="assets/tiles/si.svg" width="72" alt="Si - Simplicity"></a></td>
-      <td align="center"><a href="#user-content-principle-sc"><img src="assets/tiles/sc.svg" width="72" alt="Sc - Scalability"></a></td>
-      <td align="center"><a href="#user-content-principle-al"><img src="assets/tiles/al.svg" width="72" alt="Al - Abstraction Lifting"></a></td>
-      <td align="center"><a href="#user-content-principle-lt"><img src="assets/tiles/lt.svg" width="72" alt="Lt - Location Transparency"></a></td>
-      <td align="center"><a href="#user-content-principle-ep"><img src="assets/tiles/ep.svg" width="72" alt="Ep - Equivalence-based Planning"></a></td>
-      <td align="center"><a href="#user-content-principle-ad"><img src="assets/tiles/ad.svg" width="72" alt="Ad - Adaptive Processing"></a></td>
-      <td align="center"><a href="#user-content-principle-ft"><img src="assets/tiles/ft.svg" width="72" alt="Ft - Fault Tolerance"></a></td>
-      <td align="center"><a href="#user-content-principle-sy"><img src="assets/tiles/sy.svg" width="72" alt="Sy - Security via Isolation"></a></td>
+      <td align="center"><a href="#user-content-principle-si"><img src="assets/tiles/si.svg" width="60" alt="Si - Simplicity"></a></td>
+      <td align="center"><a href="#user-content-principle-sc"><img src="assets/tiles/sc.svg" width="60" alt="Sc - Scalability"></a></td>
+      <td align="center"><a href="#user-content-principle-al"><img src="assets/tiles/al.svg" width="60" alt="Al - Abstraction Lifting"></a></td>
+      <td align="center"><a href="#user-content-principle-lt"><img src="assets/tiles/lt.svg" width="60" alt="Lt - Location Transparency"></a></td>
+      <td align="center"><a href="#user-content-principle-ep"><img src="assets/tiles/ep.svg" width="60" alt="Ep - Equivalence-based Planning"></a></td>
+      <td align="center"><a href="#user-content-principle-ad"><img src="assets/tiles/ad.svg" width="60" alt="Ad - Adaptive Processing"></a></td>
+      <td align="center"><a href="#user-content-principle-ft"><img src="assets/tiles/ft.svg" width="60" alt="Ft - Fault Tolerance"></a></td>
+      <td align="center"><a href="#user-content-principle-sy"><img src="assets/tiles/sy.svg" width="60" alt="Sy - Security via Isolation"></a></td>
     </tr>
     <tr>
-      <td align="center"><a href="#user-content-principle-mo"><img src="assets/tiles/mo.svg" width="72" alt="Mo - Modularity"></a></td>
-      <td align="center"><a href="#user-content-principle-rc"><img src="assets/tiles/rc.svg" width="72" alt="Rc - Reuse of Computation"></a></td>
-      <td align="center"><a href="#user-content-principle-lu"><img src="assets/tiles/lu.svg" width="72" alt="Lu - Language Homogeneity"></a></td>
-      <td align="center"><a href="#user-content-principle-dc"><img src="assets/tiles/dc.svg" width="72" alt="Dc - Decentralised Control"></a></td>
-      <td align="center"><a href="#user-content-principle-cm"><img src="assets/tiles/cm.svg" width="72" alt="Cm - Cost-based Planning"></a></td>
-      <td align="center"><a href="#user-content-principle-ec"><img src="assets/tiles/ec.svg" width="72" alt="Ec - Elasticity"></a></td>
-      <td align="center"><a href="#user-content-principle-is"><img src="assets/tiles/is.svg" width="72" alt="Is - Isolation for Correctness"></a></td>
-      <td align="center"><a href="#user-content-principle-ac"><img src="assets/tiles/ac.svg" width="72" alt="Ac - Access Control and Auditing"></a></td>
+      <td align="center"><a href="#user-content-principle-mo"><img src="assets/tiles/mo.svg" width="60" alt="Mo - Modularity"></a></td>
+      <td align="center"><a href="#user-content-principle-rc"><img src="assets/tiles/rc.svg" width="60" alt="Rc - Reuse of Computation"></a></td>
+      <td align="center"><a href="#user-content-principle-lu"><img src="assets/tiles/lu.svg" width="60" alt="Lu - Language Homogeneity"></a></td>
+      <td align="center"><a href="#user-content-principle-dc"><img src="assets/tiles/dc.svg" width="60" alt="Dc - Decentralised Control"></a></td>
+      <td align="center"><a href="#user-content-principle-cm"><img src="assets/tiles/cm.svg" width="60" alt="Cm - Cost-based Planning"></a></td>
+      <td align="center"><a href="#user-content-principle-ec"><img src="assets/tiles/ec.svg" width="60" alt="Ec - Elasticity"></a></td>
+      <td align="center"><a href="#user-content-principle-is"><img src="assets/tiles/is.svg" width="60" alt="Is - Isolation for Correctness"></a></td>
+      <td align="center"><a href="#user-content-principle-ac"><img src="assets/tiles/ac.svg" width="60" alt="Ac - Access Control and Auditing"></a></td>
     </tr>
     <tr>
-      <td align="center"><a href="#user-content-principle-co"><img src="assets/tiles/co.svg" width="72" alt="Co - Composability"></a></td>
-      <td align="center"><a href="#user-content-principle-wv"><img src="assets/tiles/wv.svg" width="72" alt="Wv - Work Avoidance"></a></td>
-      <td align="center"><a href="#user-content-principle-se"><img src="assets/tiles/se.svg" width="72" alt="Se - Semantically Explicit Interfaces"></a></td>
-      <td align="center"><a href="#user-content-principle-fp"><img src="assets/tiles/fp.svg" width="72" alt="Fp - Function Placement"></a></td>
-      <td align="center"><a href="#user-content-principle-cp"><img src="assets/tiles/cp.svg" width="72" alt="Cp - Constraint-based Planning"></a></td>
-      <td align="center"><a href="#user-content-principle-wa"><img src="assets/tiles/wa.svg" width="72" alt="Wa - Workload-Aware Optimisation"></a></td>
-      <td align="center"><a href="#user-content-principle-at"><img src="assets/tiles/at.svg" width="72" alt="At - Atomic Execution"></a></td>
-      <td align="center"><a href="#user-content-principle-lp"><img src="assets/tiles/lp.svg" width="72" alt="Lp - Least Privilege"></a></td>
+      <td align="center"><a href="#user-content-principle-co"><img src="assets/tiles/co.svg" width="60" alt="Co - Composability"></a></td>
+      <td align="center"><a href="#user-content-principle-wv"><img src="assets/tiles/wv.svg" width="60" alt="Wv - Work Avoidance"></a></td>
+      <td align="center"><a href="#user-content-principle-se"><img src="assets/tiles/se.svg" width="60" alt="Se - Semantically Explicit Interfaces"></a></td>
+      <td align="center"><a href="#user-content-principle-fp"><img src="assets/tiles/fp.svg" width="60" alt="Fp - Function Placement"></a></td>
+      <td align="center"><a href="#user-content-principle-cp"><img src="assets/tiles/cp.svg" width="60" alt="Cp - Constraint-based Planning"></a></td>
+      <td align="center"><a href="#user-content-principle-wa"><img src="assets/tiles/wa.svg" width="60" alt="Wa - Workload-Aware Optimisation"></a></td>
+      <td align="center"><a href="#user-content-principle-at"><img src="assets/tiles/at.svg" width="60" alt="At - Atomic Execution"></a></td>
+      <td align="center"><a href="#user-content-principle-lp"><img src="assets/tiles/lp.svg" width="60" alt="Lp - Least Privilege"></a></td>
     </tr>
     <tr>
-      <td align="center"><a href="#user-content-principle-ex"><img src="assets/tiles/ex.svg" width="72" alt="Ex - Extensibility"></a></td>
-      <td align="center"><a href="#user-content-principle-cc"><img src="assets/tiles/cc.svg" width="72" alt="Cc - Common-Case Specialization"></a></td>
-      <td align="center"><a href="#user-content-principle-fs"><img src="assets/tiles/fs.svg" width="72" alt="Fs - Formal Specification"></a></td>
-      <td align="center"><a href="#user-content-principle-lo"><img src="assets/tiles/lo.svg" width="72" alt="Lo - Locality of Reference"></a></td>
-      <td align="center"><a href="#user-content-principle-gd"><img src="assets/tiles/gd.svg" width="72" alt="Gd - Goal-Directed Planning"></a></td>
-      <td align="center"><a href="#user-content-principle-au"><img src="assets/tiles/au.svg" width="72" alt="Au - Automation and Autonomy"></a></td>
-      <td align="center"><a href="#user-content-principle-cr"><img src="assets/tiles/cr.svg" width="72" alt="Cr - Consistency Relaxation"></a></td>
-      <td align="center"><a href="#user-content-principle-tq"><img src="assets/tiles/tq.svg" width="72" alt="Tq - Trust via Quorum"></a></td>
+      <td align="center"><a href="#user-content-principle-ex"><img src="assets/tiles/ex.svg" width="60" alt="Ex - Extensibility"></a></td>
+      <td align="center"><a href="#user-content-principle-cc"><img src="assets/tiles/cc.svg" width="60" alt="Cc - Common-Case Specialization"></a></td>
+      <td align="center"><a href="#user-content-principle-fs"><img src="assets/tiles/fs.svg" width="60" alt="Fs - Formal Specification"></a></td>
+      <td align="center"><a href="#user-content-principle-lo"><img src="assets/tiles/lo.svg" width="60" alt="Lo - Locality of Reference"></a></td>
+      <td align="center"><a href="#user-content-principle-gd"><img src="assets/tiles/gd.svg" width="60" alt="Gd - Goal-Directed Planning"></a></td>
+      <td align="center"><a href="#user-content-principle-au"><img src="assets/tiles/au.svg" width="60" alt="Au - Automation and Autonomy"></a></td>
+      <td align="center"><a href="#user-content-principle-cr"><img src="assets/tiles/cr.svg" width="60" alt="Cr - Consistency Relaxation"></a></td>
+      <td align="center"><a href="#user-content-principle-tq"><img src="assets/tiles/tq.svg" width="60" alt="Tq - Trust via Quorum"></a></td>
     </tr>
     <tr>
-      <td align="center"><a href="#user-content-principle-pm"><img src="assets/tiles/pm.svg" width="72" alt="Pm - Policy/Mechanism Separation"></a></td>
-      <td align="center"><a href="#user-content-principle-bo"><img src="assets/tiles/bo.svg" width="72" alt="Bo - Bottleneck-Oriented Optimisation"></a></td>
-      <td align="center"><a href="#user-content-principle-ig"><img src="assets/tiles/ig.svg" width="72" alt="Ig - Invariant-Guided Transformation"></a></td>
-      <td align="center"><a href="#user-content-principle-cz"><img src="assets/tiles/cz.svg" width="72" alt="Cz - Coordination Avoidance"></a></td>
-      <td align="center"><a href="#user-content-principle-bb"><img src="assets/tiles/bb.svg" width="72" alt="Bb - Black-Box Tuning"></a></td>
-      <td align="center"><a href="#user-content-principle-ho"><img src="assets/tiles/ho.svg" width="72" alt="Ho - Human Observability"></a></td>
+      <td align="center"><a href="#user-content-principle-pm"><img src="assets/tiles/pm.svg" width="60" alt="Pm - Policy/Mechanism Separation"></a></td>
+      <td align="center"><a href="#user-content-principle-bo"><img src="assets/tiles/bo.svg" width="60" alt="Bo - Bottleneck-Oriented Optimisation"></a></td>
+      <td align="center"><a href="#user-content-principle-ig"><img src="assets/tiles/ig.svg" width="60" alt="Ig - Invariant-Guided Transformation"></a></td>
+      <td align="center"><a href="#user-content-principle-cz"><img src="assets/tiles/cz.svg" width="60" alt="Cz - Coordination Avoidance"></a></td>
+      <td align="center"><a href="#user-content-principle-bb"><img src="assets/tiles/bb.svg" width="60" alt="Bb - Black-Box Tuning"></a></td>
+      <td align="center"><a href="#user-content-principle-ho"><img src="assets/tiles/ho.svg" width="60" alt="Ho - Human Observability"></a></td>
       <td align="center">&nbsp;</td>
-      <td align="center"><a href="#user-content-principle-cf"><img src="assets/tiles/cf.svg" width="72" alt="Cf - Conservative Defaults"></a></td>
+      <td align="center"><a href="#user-content-principle-cf"><img src="assets/tiles/cf.svg" width="60" alt="Cf - Conservative Defaults"></a></td>
     </tr>
     <tr>
-      <td align="center"><a href="#user-content-principle-gr"><img src="assets/tiles/gr.svg" width="72" alt="Gr - Generalized Design"></a></td>
-      <td align="center"><a href="#user-content-principle-ha"><img src="assets/tiles/ha.svg" width="72" alt="Ha - Hardware-Aware Design"></a></td>
+      <td align="center"><a href="#user-content-principle-gr"><img src="assets/tiles/gr.svg" width="60" alt="Gr - Generalized Design"></a></td>
+      <td align="center"><a href="#user-content-principle-ha"><img src="assets/tiles/ha.svg" width="60" alt="Ha - Hardware-Aware Design"></a></td>
       <td align="center">&nbsp;</td>
       <td align="center">&nbsp;</td>
-      <td align="center"><a href="#user-content-principle-ah"><img src="assets/tiles/ah.svg" width="72" alt="Ah - Advisory Hinting"></a></td>
-      <td align="center"><a href="#user-content-principle-ev"><img src="assets/tiles/ev.svg" width="72" alt="Ev - Evolvability"></a></td>
+      <td align="center"><a href="#user-content-principle-ah"><img src="assets/tiles/ah.svg" width="60" alt="Ah - Advisory Hinting"></a></td>
+      <td align="center"><a href="#user-content-principle-ev"><img src="assets/tiles/ev.svg" width="60" alt="Ev - Evolvability"></a></td>
       <td align="center">&nbsp;</td>
-      <td align="center"><a href="#user-content-principle-sa"><img src="assets/tiles/sa.svg" width="72" alt="Sa - Safety by Construction"></a></td>
+      <td align="center"><a href="#user-content-principle-sa"><img src="assets/tiles/sa.svg" width="60" alt="Sa - Safety by Construction"></a></td>
     </tr>
     <tr>
-      <td align="center"><a href="#user-content-principle-pd"><img src="assets/tiles/pd.svg" width="72" alt="Pd - Probabilistic Design"></a></td>
-      <td align="center"><a href="#user-content-principle-op"><img src="assets/tiles/op.svg" width="72" alt="Op - Optimistic Design"></a></td>
+      <td align="center"><a href="#user-content-principle-pd"><img src="assets/tiles/pd.svg" width="60" alt="Pd - Probabilistic Design"></a></td>
+      <td align="center"><a href="#user-content-principle-op"><img src="assets/tiles/op.svg" width="60" alt="Op - Optimistic Design"></a></td>
       <td align="center">&nbsp;</td>
       <td align="center">&nbsp;</td>
       <td align="center">&nbsp;</td>
@@ -144,7 +148,7 @@ Each principle is tagged with a short symbol (e.g., `Co` for composability, `Op`
     </tr>
     <tr>
       <td align="center">&nbsp;</td>
-      <td align="center"><a href="#user-content-principle-la"><img src="assets/tiles/la.svg" width="72" alt="La - Learned Approximation"></a></td>
+      <td align="center"><a href="#user-content-principle-la"><img src="assets/tiles/la.svg" width="60" alt="La - Learned Approximation"></a></td>
       <td align="center">&nbsp;</td>
       <td align="center">&nbsp;</td>
       <td align="center">&nbsp;</td>

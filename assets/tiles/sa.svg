@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="72" height="54" viewBox="0 0 72 54" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="60" height="45" viewBox="0 0 60 45" role="img" aria-labelledby="title desc">
   <title id="title">Sa - Safety by Construction</title>
   <desc id="desc">Periodic-table tile for Safety by Construction</desc>
-  <rect x="1.25" y="1.25" width="69.5" height="51.5" rx="4" fill="#E2CDE4" stroke="#222222" stroke-width="1.25"/>
-  <rect x="4.5" y="4.5" width="63" height="45" rx="3" fill="none" stroke="#FFFFFF" stroke-opacity="0.58"/>
-  <text x="36" y="34" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700" fill="#111111">Sa</text>
+  <rect x="1" y="1" width="58" height="43" rx="4" fill="#E2CDE4" stroke="#222222" stroke-width="1.1"/>
+  <rect x="4" y="4" width="52" height="37" rx="3" fill="none" stroke="#FFFFFF" stroke-opacity="0.6"/>
+  <text x="30" y="29" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="700" fill="#111111">Sa</text>
 </svg>
