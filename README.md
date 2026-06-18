@@ -22,7 +22,7 @@ System design is often taught through  solutions specific to particular domains,
 
 One of the rewards of working in computer systems is the field’s sheer diversity, spanning operating systems, databases, computer architecture, distributed systems, programming languages, networking, and more, each with a rich history. For newcomers, it can be challenging to spot connections across different domains due to the diversity of traditions and vocabularies: the same design principle may appear in different guises across domains.
 
-For example, consider the classic paper on database isolation levels by Jim Gray et al. <a href="#user-content-ref-17">[17]</a>. It offers a careful account of concurrency-control mechanisms and the trade-offs between correctness and performance. Yet without prior exposure to similar issues in operating systems or computer architecture, the ideas can appear narrowly “about databases.” In reality, the same design principle, "relaxation of consistency" reappears across systems in different guises -- from weakly ordered memory hierarchies to eventual-consistency protocols in distributed systems. When each community uses its own terms and exemplars, newcomers may find it difficult to recognize the underlying design principles. This fragmentation increases cognitive overhead, as the same trade-off must be relearned in each context.
+For example, consider the classic paper on database isolation levels by Jim Gray et al. <a href="#user-content-ref-17">[17]</a>. It offers a careful account of concurrency-control mechanisms and the trade-offs between correctness and performance. Yet without prior exposure to similar issues in operating systems or computer architecture, the ideas can appear narrowly “about databases.” In reality, the same design principle, [Consistency Relaxation (Cr)](#user-content-principle-cr), reappears across systems in different guises -- from weakly ordered memory hierarchies to eventual-consistency protocols in distributed systems. When each community uses its own terms and exemplars, newcomers may find it difficult to recognize the underlying design principles. This fragmentation increases cognitive overhead, as the same trade-off must be relearned in each context.
 
 This is a broader pattern: systems research is rich in practical insight but lighter on shared conceptual scaffolding. Across domains, similar challenges recur, such as managing concurrency, ensuring consistency, and adapting to change, while the framing and vocabulary often differ. As a result, deep connections between seemingly disparate domains can remain relatively obscure.
 
@@ -32,7 +32,7 @@ This article is a small step toward bridging those gaps. Borrowing Mendeleev’s
 
 We identified principles by going over 100+ influential papers across operating systems, computer architecture, databases, networking, programming languages, security, and other domains in computer systems. These papers were chosen for historical significance and ongoing relevance, such as classic papers on concurrency control <a href="#user-content-ref-17">[17]</a> and consensus <a href="#user-content-ref-25">[25]</a>, and more recent work on using machine learning inside systems <a href="#user-content-ref-22">[22]</a> and designing systems for the cloud <a href="#user-content-ref-6">[6]</a>. 
 
-For each paper we asked: what is the underlying high-level design principle? Across domains, independent systems often converged not on mechanisms but on shared design principles: for example, relaxing consistency to improve performance or lifting abstractions to enhance usability. 
+For each paper we asked: what is the underlying high-level design principle? Across domains, independent systems often converged not on mechanisms but on shared design principles: for example, [relaxing consistency](#user-content-principle-cr) to improve performance or [lifting abstractions](#user-content-principle-al) to enhance usability. 
 
 To qualify as a system design principle, it must satisfy two conditions:
 
@@ -45,18 +45,18 @@ This analysis does not aim to catalogue every principle, but to surface many of 
 
 We have curated a structured set of 40+ general-purpose design principles distilled from the systems literature. As shown in Table 1, they are organised into thematic groups that mirror familiar axes of system design.
 
-Each principle is tagged with a short symbol (e.g., `Co` for composability, `Op` for optimistic design) for quick reference. We emphasise **design intent** rather than prescribing mechanisms: instead of “use this locking protocol” or “optimise this query plan,” the principles state aims such as “preserve correctness under concurrency” or “prioritise the common case,” leaving concrete realisations to specific domains.
+Each principle is tagged with a short symbol (e.g., [`Co`](#user-content-principle-co) for composability, [`Op`](#user-content-principle-op) for optimistic design) for quick reference. We emphasise **design intent** rather than prescribing mechanisms: instead of “use this locking protocol” or “optimise this query plan,” the principles state aims such as “preserve correctness under concurrency” or “prioritise the common case,” leaving concrete realisations to specific domains.
 
 ## Table of Contents
 
-- [<img src="assets/swatches/structure.svg" width="14" height="14" alt=""> Group 1: Structure](#user-content-group-1-structure): *How to carve and connect parts with clear boundaries and extension points.*
-- [<img src="assets/swatches/efficiency.svg" width="14" height="14" alt=""> Group 2: Efficiency](#user-content-group-2-efficiency): *Do less work, or do it cheaper, by focusing effort where it pays.*
-- [<img src="assets/swatches/semantics.svg" width="14" height="14" alt=""> Group 3: Semantics](#user-content-group-3-semantics): *Specify behavior and interfaces precisely.*
-- [<img src="assets/swatches/distribution.svg" width="14" height="14" alt=""> Group 4: Distribution](#user-content-group-4-distribution): *Coordinate work and data across distributed architectures.*
-- [<img src="assets/swatches/planning.svg" width="14" height="14" alt=""> Group 5: Planning](#user-content-group-5-planning): *Select plans automatically from goals, costs, and constraints.*
-- [<img src="assets/swatches/operability.svg" width="14" height="14" alt=""> Group 6: Operability](#user-content-group-6-operability): *Observe, adapt, and evolve running systems with minimal disruption.*
-- [<img src="assets/swatches/reliability.svg" width="14" height="14" alt=""> Group 7: Reliability](#user-content-group-7-reliability): *Stay correct under faults, concurrency, and partial failure.*
-- [<img src="assets/swatches/security.svg" width="14" height="14" alt=""> Group 8: Security](#user-content-group-8-security): *Bound authority and enforce isolation to preserve safety and integrity.*
+- [<img src="assets/swatches/structure.svg" width="14" height="14" alt=""> Group 1: Structure](#user-content-group-1-structure): *Control complexity by choosing boundaries that make parts understandable, replaceable, and extensible.*
+- [<img src="assets/swatches/efficiency.svg" width="14" height="14" alt=""> Group 2: Efficiency](#user-content-group-2-efficiency): *Improve performance by reducing unnecessary work and matching effort to dominant costs.*
+- [<img src="assets/swatches/semantics.svg" width="14" height="14" alt=""> Group 3: Semantics](#user-content-group-3-semantics): *Make behavior explicit enough to reason about, transform, and preserve.*
+- [<img src="assets/swatches/distribution.svg" width="14" height="14" alt=""> Group 4: Distribution](#user-content-group-4-distribution): *Manage state, computation, and coordination when a system spans machines.*
+- [<img src="assets/swatches/planning.svg" width="14" height="14" alt=""> Group 5: Planning](#user-content-group-5-planning): *Turn goals and constraints into concrete choices among alternative designs or executions.*
+- [<img src="assets/swatches/operability.svg" width="14" height="14" alt=""> Group 6: Operability](#user-content-group-6-operability): *Keep systems understandable and adjustable as workloads, resources, and requirements change.*
+- [<img src="assets/swatches/reliability.svg" width="14" height="14" alt=""> Group 7: Reliability](#user-content-group-7-reliability): *Preserve acceptable behavior under failure, interference, concurrency, and weaker guarantees.*
+- [<img src="assets/swatches/security.svg" width="14" height="14" alt=""> Group 8: Security](#user-content-group-8-security): *Limit authority and isolate effects so misuse or compromise remains contained.*
 
 **Legend:** `Code` = unique short symbol, `Name` = principle, `Intent` = short description.
 
@@ -619,13 +619,13 @@ Structure code or data so entire classes of errors become impossible rather than
 
 To illustrate how multiple design principles intersect in practice, consider the mapping from logical to physical operator plans in a relational database system.
 
-- The database system translates declarative intent into executable steps (**Policy/Mechanism Separation**).
-- SQL expresses the "what" (**Abstraction Lifting**) with precise semantics (**Semantically Explicit Interfaces**).
-- The optimizer first rewrites the query using algebraic equivalences (**Equivalence-Based Planning**).
-- It then chooses concrete physical operators using a cost model (**Cost-based Planning**).
-- Physical operators are often optimized for underlying hardware features (**Hardware-Aware Design**).
-- Predicate-pushdown illustrates **Work Avoidance**, while indexes enable **Reuse of Computation**.
-- **Advisory Hints** can guide the optimizer, and newer database systems add runtime re-optimization (**Adaptive Processing**), learned models (**Learned Approximation**), and sampling (**Probabilistic Design**).
+- The database system translates declarative intent into executable steps (**[Policy/Mechanism Separation (Pm)](#user-content-principle-pm)**).
+- SQL expresses the "what" (**[Abstraction Lifting (Al)](#user-content-principle-al)**) with precise semantics (**[Semantically Explicit Interfaces (Se)](#user-content-principle-se)**).
+- The optimizer first rewrites the query using algebraic equivalences (**[Equivalence-based Planning (Ep)](#user-content-principle-ep)**).
+- It then chooses concrete physical operators using a cost model (**[Cost-based Planning (Cm)](#user-content-principle-cm)**).
+- Physical operators are often optimized for underlying hardware features (**[Hardware-Aware Design (Ha)](#user-content-principle-ha)**).
+- Predicate-pushdown illustrates **[Work Avoidance (Wv)](#user-content-principle-wv)**, while indexes enable **[Reuse of Computation (Rc)](#user-content-principle-rc)**.
+- **[Advisory Hinting (Ah)](#user-content-principle-ah)** can guide the optimizer, and newer database systems add runtime re-optimization (**[Adaptive Processing (Ad)](#user-content-principle-ad)**), learned models (**[Learned Approximation (La)](#user-content-principle-la)**), and sampling (**[Probabilistic Design (Pd)](#user-content-principle-pd)**).
 
 Thus, logical-to-physical operator mapping in database systems exemplifies how several design principles come together to efficiently process declarative SQL queries.
 
