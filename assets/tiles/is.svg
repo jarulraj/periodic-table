@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="60" height="45" viewBox="0 0 60 45" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="36" viewBox="0 0 60 45" role="img" aria-labelledby="title desc">
   <title id="title">Is - Isolation for Correctness</title>
   <desc id="desc">Periodic-table tile for Isolation for Correctness</desc>
-  <rect x="1" y="1" width="58" height="43" rx="4" fill="#F9DADA" stroke="#222222" stroke-width="1.1"/>
+  <rect x="1" y="1" width="58" height="43" rx="4" fill="#F1C7C5" stroke="#3D4652" stroke-width="1.1"/>
   <rect x="4" y="4" width="52" height="37" rx="3" fill="none" stroke="#FFFFFF" stroke-opacity="0.6"/>
-  <text x="30" y="29" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="700" fill="#111111">Is</text>
+  <text x="30" y="29" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="700" fill="#18202A">Is</text>
 </svg>
