@@ -941,7 +941,9 @@ or
 
 ## HOW TO CONTRIBUTE
 
-We welcome PRs that add, refine, or re-group principles, and PRs that add "classic" papers as examples. Open an issue describing:
-  - **What** you are adding or changing.
-  - **Why** (include a rationale for the orthogonality and generality of the principle).
-  - **Citations** (classic papers preferred).
+Contributions are very welcome. Good contributions might add a missing principle, sharpen an existing one, suggest a better grouping, or connect a principle to a classic systems paper.
+
+Before opening a PR, please open an issue with:
+  - **What** you would like to add or change.
+  - **Why** it belongs here, especially how it is general across domains and distinct from nearby principles.
+  - **Citations or examples**, with classic papers especially helpful.
