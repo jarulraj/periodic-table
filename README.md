@@ -2,20 +2,6 @@
 
 #### [Joy Arulraj (Georgia Tech)](https://faculty.cc.gatech.edu/~jarulraj/)
 
-<p align="center">
-  <a href="#user-content-principle-table"><strong>Explore the table</strong></a>
-  &nbsp;·&nbsp;
-  <a href="#user-content-table-of-contents">Groups</a>
-  &nbsp;·&nbsp;
-  <a href="#user-content-references">References</a>
-  &nbsp;·&nbsp;
-  <a href="#user-content-how-to-cite">How to cite</a>
-  &nbsp;·&nbsp;
-  <a href="#user-content-how-to-contribute">Contribute</a>
-</p>
-
-<p align="center"><sub>A compact, cross-linked map of recurring computer systems design moves.</sub></p>
-
 System design is often taught through  solutions specific to particular domains, such as databases, operating systems, or computer architecture, each with its own methods and vocabulary. While this diversity is a strength, it can obscure cross-cutting principles that recur across domains. This paper proposes a preliminary taxonomy of system design principles distilled from several domains in computer systems. The goal is a shared, concise vocabulary that helps students, researchers, and practitioners reason about structure and trade-offs, compare designs across domains, and communicate choices more clearly.
 
 ## 1. INTRODUCTION
