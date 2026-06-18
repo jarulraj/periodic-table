@@ -44,8 +44,6 @@ Each principle is tagged with a short symbol (e.g., [`Co`](#user-content-princip
 - [<img src="assets/swatches/reliability.svg" width="14" height="14" alt=""> Group 7: Reliability](#user-content-group-7-reliability): *Preserve acceptable behavior under failure, interference, concurrency, and weaker guarantees.*
 - [<img src="assets/swatches/security.svg" width="14" height="14" alt=""> Group 8: Security](#user-content-group-8-security): *Limit authority and isolate effects so misuse or compromise remains contained.*
 
-**Legend:** `Code` = unique short symbol, `Name` = principle, `Intent` = short description.
-
 <a id="principle-table"></a>
 
 <table>
