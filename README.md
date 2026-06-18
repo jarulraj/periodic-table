@@ -203,7 +203,7 @@ Design a single core with explicit variation points like types, knobs, or plug-i
 <sub><a href="#user-content-principle-table">back to table</a></sub>
 
 <a id="principle-pd"></a>
-<img src="assets/swatches/structure.svg" width="14" height="14" alt=""> **Pd – Probabilistic Design** 
+<img src="assets/swatches/structure.svg" width="14" height="14" alt=""> **Pd – Probabilistic Design**
 
 Introduce controlled randomness to gain efficiency, scalability, or simplicity while accepting a small, quantified risk of error or loss.
 
@@ -377,7 +377,7 @@ Place related data and operations close together in time and space to preserve a
 <sub><a href="#user-content-principle-table">back to table</a></sub>
 
 <a id="principle-cz"></a>
-<img src="assets/swatches/distribution.svg" width="14" height="14" alt=""> **Cz – Coordination Avoidance** 
+<img src="assets/swatches/distribution.svg" width="14" height="14" alt=""> **Cz – Coordination Avoidance**
 
 Design computations and dataflows to reduce the need for distributed coordination by identifying operations that can proceed independently while preserving application-level correctness.
 
@@ -603,13 +603,13 @@ Structure code or data so entire classes of errors become impossible rather than
 
 To illustrate how multiple design principles intersect in practice, consider the mapping from logical to physical operator plans in a relational database system.
 
-- The database system translates declarative intent into executable steps (**[Policy/Mechanism Separation (Pm)](#user-content-principle-pm)**).
-- SQL expresses the "what" (**[Abstraction Lifting (Al)](#user-content-principle-al)**) with precise semantics (**[Semantically Explicit Interfaces (Se)](#user-content-principle-se)**).
-- The optimizer first rewrites the query using algebraic equivalences (**[Equivalence-based Planning (Ep)](#user-content-principle-ep)**).
-- It then chooses concrete physical operators using a cost model (**[Cost-based Planning (Cm)](#user-content-principle-cm)**).
-- Physical operators are often optimized for underlying hardware features (**[Hardware-Aware Design (Ha)](#user-content-principle-ha)**).
-- Predicate-pushdown illustrates **[Work Avoidance (Wv)](#user-content-principle-wv)**, while indexes enable **[Reuse of Computation (Rc)](#user-content-principle-rc)**.
-- **[Advisory Hinting (Ah)](#user-content-principle-ah)** can guide the optimizer, and newer database systems add runtime re-optimization (**[Adaptive Processing (Ad)](#user-content-principle-ad)**), learned models (**[Learned Approximation (La)](#user-content-principle-la)**), and sampling (**[Probabilistic Design (Pd)](#user-content-principle-pd)**).
+- <a href="#user-content-principle-pm"><img src="assets/tiles/pm.svg" width="36" alt="Pm - Policy/Mechanism Separation"></a> The database system translates declarative intent into executable steps (**[Policy/Mechanism Separation](#user-content-principle-pm)**).
+- <a href="#user-content-principle-al"><img src="assets/tiles/al.svg" width="36" alt="Al - Abstraction Lifting"></a> <a href="#user-content-principle-se"><img src="assets/tiles/se.svg" width="36" alt="Se - Semantically Explicit Interfaces"></a> SQL expresses the "what" (**[Abstraction Lifting](#user-content-principle-al)**) with precise semantics (**[Semantically Explicit Interfaces](#user-content-principle-se)**).
+- <a href="#user-content-principle-ep"><img src="assets/tiles/ep.svg" width="36" alt="Ep - Equivalence-based Planning"></a> The optimizer first rewrites the query using algebraic equivalences (**[Equivalence-based Planning](#user-content-principle-ep)**).
+- <a href="#user-content-principle-cm"><img src="assets/tiles/cm.svg" width="36" alt="Cm - Cost-based Planning"></a> It then chooses concrete physical operators using a cost model (**[Cost-based Planning](#user-content-principle-cm)**).
+- <a href="#user-content-principle-ha"><img src="assets/tiles/ha.svg" width="36" alt="Ha - Hardware-Aware Design"></a> Physical operators are often optimized for underlying hardware features (**[Hardware-Aware Design](#user-content-principle-ha)**).
+- <a href="#user-content-principle-wv"><img src="assets/tiles/wv.svg" width="36" alt="Wv - Work Avoidance"></a> <a href="#user-content-principle-rc"><img src="assets/tiles/rc.svg" width="36" alt="Rc - Reuse of Computation"></a> Predicate-pushdown illustrates **[Work Avoidance](#user-content-principle-wv)**, while indexes enable **[Reuse of Computation](#user-content-principle-rc)**.
+- <a href="#user-content-principle-ah"><img src="assets/tiles/ah.svg" width="36" alt="Ah - Advisory Hinting"></a> <a href="#user-content-principle-ad"><img src="assets/tiles/ad.svg" width="36" alt="Ad - Adaptive Processing"></a> <a href="#user-content-principle-la"><img src="assets/tiles/la.svg" width="36" alt="La - Learned Approximation"></a> <a href="#user-content-principle-pd"><img src="assets/tiles/pd.svg" width="36" alt="Pd - Probabilistic Design"></a> **[Advisory Hinting](#user-content-principle-ah)** can guide the optimizer, and newer database systems add runtime re-optimization (**[Adaptive Processing](#user-content-principle-ad)**), learned models (**[Learned Approximation](#user-content-principle-la)**), and sampling (**[Probabilistic Design](#user-content-principle-pd)**).
 
 Thus, logical-to-physical operator mapping in database systems exemplifies how several design principles come together to efficiently process declarative SQL queries.
 
