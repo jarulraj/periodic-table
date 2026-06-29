@@ -14,9 +14,7 @@ const KNOWN_TAGS = new Set([
     'Sy', 'Ac', 'Lp', 'Tq', 'Cf', 'Sa'
 ]);
 
-const summariesDir = process.env.PAPER_CARD_SUMMARIES_DIR ||
-    path.resolve(__dirname, '..', '..', '..', ['Gemi', 'ni'].join(''), 'summaries');
-const outputPath = path.resolve(__dirname, 'vldb-paper-cards.json');
+const outputPath = path.resolve(__dirname, 'paper-cards.json');
 
 function asArray(value) {
     return Array.isArray(value) ? value : [];
@@ -37,6 +35,81 @@ function uniqueTags(values) {
         if (KNOWN_TAGS.has(tag) && !tags.includes(tag)) tags.push(tag);
     }
     return tags;
+}
+
+function slugify(value) {
+    return String(value || '')
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+}
+
+function normalizeYear(value) {
+    const year = String(value || '');
+    if (year.length === 2) return '20' + year;
+    return year;
+}
+
+function displayNameFromSource(sourceName) {
+    const normalized = sourceName.replace(/[_-]+/g, ' ');
+    const match = normalized.match(/^([a-z]+)\s*(\d{2,4})$/i);
+    if (match) return match[1].toUpperCase() + ' ' + normalizeYear(match[2]);
+    return normalized.replace(/\b[a-z]/g, function(letter) { return letter.toUpperCase(); });
+}
+
+function candidateDataRoots() {
+    const roots = [];
+    const repoRoot = path.resolve(__dirname, '..', '..');
+    if (process.env.PAPER_CARD_DATA_ROOT) roots.push(path.resolve(process.env.PAPER_CARD_DATA_ROOT));
+    roots.push(path.join(repoRoot, 'paper-card-data'));
+    const workspaceParent = path.dirname(repoRoot);
+    if (fs.existsSync(workspaceParent)) {
+        const entries = fs.readdirSync(workspaceParent, { withFileTypes: true })
+            .filter(function(entry) { return entry.isDirectory(); })
+            .sort(function(a, b) { return a.name.localeCompare(b.name); });
+        for (const entry of entries) {
+            roots.push(path.join(workspaceParent, entry.name, 'data'));
+        }
+    }
+    return roots;
+}
+
+function discoverSources() {
+    if (process.env.PAPER_CARD_SUMMARY_DIRS) {
+        return process.env.PAPER_CARD_SUMMARY_DIRS
+            .split(path.delimiter)
+            .map(function(summaryDir) {
+                const resolved = path.resolve(summaryDir);
+                const sourceName = path.basename(path.dirname(resolved));
+                return {
+                    id: slugify(sourceName),
+                    name: sourceName,
+                    conference: displayNameFromSource(sourceName),
+                    summaryDir: resolved
+                };
+            });
+    }
+
+    for (const root of candidateDataRoots()) {
+        if (!fs.existsSync(root)) continue;
+        const sources = fs.readdirSync(root, { withFileTypes: true })
+            .filter(function(entry) { return entry.isDirectory(); })
+            .map(function(entry) {
+                return {
+                    id: slugify(entry.name),
+                    name: entry.name,
+                    conference: displayNameFromSource(entry.name),
+                    summaryDir: path.join(root, entry.name, 'summaries')
+                };
+            })
+            .filter(function(source) { return fs.existsSync(source.summaryDir); })
+            .sort(function(a, b) { return a.conference.localeCompare(b.conference); });
+
+        if (sources.length) return sources;
+    }
+
+    return [];
 }
 
 function sanitizePointer(value) {
@@ -138,7 +211,7 @@ function tagsForSummary(summary, entries) {
     ]);
 }
 
-function buildCard(summary, fileNumber) {
+function buildCard(summary, fileNumber, source, paperId, paperLabel) {
     const identification = summary.section_0_paper_identification || {};
     const goal = summary.section_1_goal_and_primary_metric || {};
     const baseline = summary.section_2_comparison_baseline || {};
@@ -163,8 +236,12 @@ function buildCard(summary, fileNumber) {
     }
 
     return {
+        paper_id: paperId,
+        paper_label: paperLabel,
         paper_number: identification.paper_number || String(fileNumber),
-        gemini_title: identification.paper_title || '',
+        paper_title: identification.paper_title || '',
+        conference: source.conference,
+        source_id: source.id,
         authors: asArray(identification.authors),
         venue_or_source: identification.venue_or_source || '',
         system_or_method_name: identification.system_or_method_name || section7.new_system_name || '',
@@ -198,53 +275,82 @@ function buildCard(summary, fileNumber) {
     };
 }
 
-if (!fs.existsSync(summariesDir)) {
-    throw new Error('Paper card summaries directory not found: ' + summariesDir);
+const sources = discoverSources();
+if (sources.length === 0) {
+    throw new Error('No paper card summary folders found. Set PAPER_CARD_DATA_ROOT or PAPER_CARD_SUMMARY_DIRS.');
 }
 
-const files = fs.readdirSync(summariesDir)
-    .filter(function(file) { return /^\d+\.json$/.test(file); })
-    .sort(function(a, b) { return parseInt(a, 10) - parseInt(b, 10); });
-
-const cards = {};
-const cardTitlesByNumber = {};
+const cardsById = {};
+const cardIdsByTitle = {};
+const conferenceCounts = {};
 const papers = [];
+const sourceSummaries = [];
 
-for (const file of files) {
-    const fileNumber = parseInt(file, 10);
-    const summary = JSON.parse(fs.readFileSync(path.join(summariesDir, file), 'utf8'));
-    const identification = summary.section_0_paper_identification || {};
-    const title = identification.paper_title || '';
-    const entries = principleEntries(summary);
-    const tags = tagsForSummary(summary, entries);
-    const card = buildCard(summary, fileNumber);
+for (const source of sources) {
+    const files = fs.readdirSync(source.summaryDir)
+        .filter(function(file) { return /^\d+\.json$/.test(file); })
+        .sort(function(a, b) { return parseInt(a, 10) - parseInt(b, 10); });
 
-    if (!title || tags.length === 0) continue;
+    let sourceCount = 0;
 
-    cards[title] = card;
-    cardTitlesByNumber[card.paper_number] = title;
-    papers.push({
-        title,
-        conference: 'VLDB 2023',
-        tags,
-        paper_number: card.paper_number
+    for (const file of files) {
+        const fileNumber = parseInt(file, 10);
+        const summary = JSON.parse(fs.readFileSync(path.join(source.summaryDir, file), 'utf8'));
+        const identification = summary.section_0_paper_identification || {};
+        const title = identification.paper_title || '';
+        const entries = principleEntries(summary);
+        const tags = tagsForSummary(summary, entries);
+        const paperNumber = identification.paper_number || String(fileNumber);
+        const paperId = source.id + '-' + (slugify(paperNumber) || fileNumber);
+        const paperLabel = source.conference + ' #' + paperNumber;
+
+        if (!title || tags.length === 0) continue;
+
+        const card = buildCard(summary, fileNumber, source, paperId, paperLabel);
+        cardsById[paperId] = card;
+        cardIdsByTitle[title] = paperId;
+        papers.push({
+            title,
+            conference: source.conference,
+            source_id: source.id,
+            paper_id: paperId,
+            paper_number: card.paper_number,
+            paper_label: paperLabel,
+            tags
+        });
+        conferenceCounts[source.conference] = (conferenceCounts[source.conference] || 0) + 1;
+        sourceCount += 1;
+    }
+
+    sourceSummaries.push({
+        id: source.id,
+        name: source.name,
+        conference: source.conference,
+        paper_count: sourceCount
     });
 }
 
+papers.sort(function(a, b) {
+    return a.conference.localeCompare(b.conference) || Number(a.paper_number) - Number(b.paper_number) || a.title.localeCompare(b.title);
+});
+
 const output = {
-    generated_from: 'paper card summaries',
-    scope: 'VLDB 2023 papers with paper cards',
-    matched_vldb_papers: papers.length,
-    total_vldb_papers_in_explorer: papers.length,
+    generated_from: 'paper card summary folders',
+    scope: 'Papers with paper cards',
+    paper_count: papers.length,
+    card_count: Object.keys(cardsById).length,
+    conference_counts: conferenceCounts,
+    sources: sourceSummaries,
     papers,
-    cards,
-    card_titles_by_number: cardTitlesByNumber
+    cards_by_id: cardsById,
+    card_ids_by_title: cardIdsByTitle
 };
 
 fs.writeFileSync(outputPath, JSON.stringify(output));
 console.log(JSON.stringify({
     output: outputPath,
     papers: papers.length,
-    cards: Object.keys(cards).length,
+    cards: Object.keys(cardsById).length,
+    conferences: conferenceCounts,
     bytes: fs.statSync(outputPath).size
 }, null, 2));
