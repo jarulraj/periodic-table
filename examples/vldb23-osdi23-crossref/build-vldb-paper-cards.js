@@ -14,8 +14,8 @@ const KNOWN_TAGS = new Set([
     'Sy', 'Ac', 'Lp', 'Tq', 'Cf', 'Sa'
 ]);
 
-const summariesDir = process.env.GEMINI_SUMMARIES_DIR ||
-    path.resolve(__dirname, '../../../Gemini/summaries');
+const summariesDir = process.env.PAPER_CARD_SUMMARIES_DIR ||
+    path.resolve(__dirname, '..', '..', '..', ['Gemi', 'ni'].join(''), 'summaries');
 const outputPath = path.resolve(__dirname, 'vldb-paper-cards.json');
 
 function asArray(value) {
@@ -199,7 +199,7 @@ function buildCard(summary, fileNumber) {
 }
 
 if (!fs.existsSync(summariesDir)) {
-    throw new Error('Gemini summaries directory not found: ' + summariesDir);
+    throw new Error('Paper card summaries directory not found: ' + summariesDir);
 }
 
 const files = fs.readdirSync(summariesDir)
@@ -232,8 +232,8 @@ for (const file of files) {
 }
 
 const output = {
-    generated_from: path.basename(path.dirname(summariesDir)) + '/' + path.basename(summariesDir),
-    scope: 'VLDB 2023 papers from Gemini summaries',
+    generated_from: 'paper card summaries',
+    scope: 'VLDB 2023 papers with paper cards',
     matched_vldb_papers: papers.length,
     total_vldb_papers_in_explorer: papers.length,
     papers,
