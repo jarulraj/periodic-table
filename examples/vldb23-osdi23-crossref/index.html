@@ -246,7 +246,7 @@
         }
         .content-grid {
             display: grid;
-            grid-template-columns: minmax(260px, 340px) minmax(0, 1fr);
+            grid-template-columns: minmax(240px, 320px) minmax(360px, 1fr) minmax(300px, 420px);
             gap: 16px;
             align-items: start;
         }
@@ -296,13 +296,22 @@
             gap: 10px;
         }
         .paper-card {
+            width: 100%;
             padding: 13px 14px;
             border: 1px solid #e0e6ef;
             border-radius: 9px;
             background: #fff;
+            cursor: pointer;
         }
-        .paper-card:hover {
+        .paper-card:hover,
+        .paper-card:focus {
             border-color: #b9c8dc;
+            box-shadow: 0 0 0 3px rgba(36, 89, 166, 0.1);
+            outline: none;
+        }
+        .paper-card.active {
+            border-color: var(--accent);
+            box-shadow: inset 0 0 0 1px var(--accent);
         }
         .paper-topline {
             display: flex;
@@ -331,6 +340,19 @@
             background: #eef4ff;
             color: var(--accent);
         }
+        .detail-badge {
+            display: inline-flex;
+            padding: 3px 7px;
+            border-radius: 999px;
+            background: #eef9f0;
+            color: #256b35;
+            font-size: 0.72rem;
+            font-weight: 800;
+        }
+        .detail-badge.muted {
+            background: #f3f5f7;
+            color: #667085;
+        }
         .paper-title {
             margin-bottom: 9px;
             font-size: 1rem;
@@ -356,6 +378,106 @@
             background: #fbfcfe;
             color: var(--muted);
             text-align: center;
+        }
+        .paper-detail-panel {
+            position: sticky;
+            top: 16px;
+            max-height: calc(100vh - 32px);
+            overflow: auto;
+        }
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: start;
+            margin-bottom: 10px;
+        }
+        .detail-close {
+            width: 30px;
+            height: 30px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #fff;
+            color: #475467;
+            font-weight: 850;
+            line-height: 1;
+        }
+        .detail-title {
+            margin-bottom: 6px;
+            font-size: 1.05rem;
+            line-height: 1.25;
+        }
+        .detail-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+        .detail-section {
+            padding-top: 12px;
+            margin-top: 12px;
+            border-top: 1px solid #edf1f6;
+        }
+        .detail-section h3 {
+            margin-bottom: 7px;
+            color: #303743;
+            font-size: 0.88rem;
+        }
+        .detail-section p {
+            margin-bottom: 8px;
+            color: #475467;
+            font-size: 0.9rem;
+        }
+        .detail-list {
+            display: grid;
+            gap: 9px;
+            margin: 0;
+        }
+        .detail-kv dt {
+            color: #303743;
+            font-size: 0.76rem;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+        .detail-kv dd {
+            margin: 2px 0 0;
+            color: #475467;
+            font-size: 0.9rem;
+        }
+        .usage-card {
+            display: grid;
+            gap: 7px;
+            padding: 10px;
+            border: 1px solid #e0e6ef;
+            border-radius: 8px;
+            background: #fbfcfe;
+        }
+        .usage-card + .usage-card {
+            margin-top: 8px;
+        }
+        .usage-label {
+            color: #667085;
+            font-size: 0.76rem;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+        .usage-text {
+            color: #475467;
+            font-size: 0.88rem;
+        }
+        .detail-empty {
+            color: var(--muted);
+            font-size: 0.92rem;
+        }
+        @media (max-width: 1180px) {
+            .content-grid {
+                grid-template-columns: minmax(240px, 320px) minmax(0, 1fr);
+            }
+            .paper-detail-panel {
+                grid-column: 1 / -1;
+                position: static;
+                max-height: none;
+            }
         }
         @media (max-width: 920px) {
             .control-grid,
@@ -457,6 +579,10 @@
                 </div>
                 <div id="paper_results" class="paper-list"></div>
             </section>
+            <aside id="paper_detail" class="panel side-panel paper-detail-panel" aria-live="polite" aria-label="Paper tag details">
+                <h2 class="panel-title">Paper Details</h2>
+                <p class="detail-empty">Click a VLDB paper with a Gemini card to see how the selected principle tag is used. OSDI paper cards are not available yet.</p>
+            </aside>
         </section>
     </main>
 
@@ -476,6 +602,10 @@
         };
 
         const selectedTags = new Set();
+        let PAPER_CARDS = {};
+        let PAPER_CARD_META = {};
+        let paperCardsLoaded = false;
+        let activePaperTitle = '';
 
         function escapeHtml(value) {
             return String(value == null ? '' : value).replace(/[&<>"']/g, function(match) {
@@ -552,6 +682,158 @@
                 return matchingTagCount(b) - matchingTagCount(a) || a.conference.localeCompare(b.conference) || a.title.localeCompare(b.title);
             });
             return copy;
+        }
+
+        function paperCard(paper) {
+            return paper ? PAPER_CARDS[paper.title] : null;
+        }
+
+        function selectedTagsForPaper(paper) {
+            return Array.from(selectedTags).filter(function(tag) {
+                return paper && paper.tags.indexOf(tag) !== -1;
+            });
+        }
+
+        function loadPaperCards() {
+            return fetch('vldb-paper-cards.json')
+                .then(function(response) {
+                    if (!response.ok) throw new Error('Unable to load paper cards');
+                    return response.json();
+                })
+                .then(function(data) {
+                    PAPER_CARD_META = data || {};
+                    PAPER_CARDS = PAPER_CARD_META.cards || {};
+                    paperCardsLoaded = true;
+                })
+                .catch(function() {
+                    PAPER_CARD_META = { matched_vldb_papers: 0, total_vldb_papers_in_explorer: 0 };
+                    PAPER_CARDS = {};
+                    paperCardsLoaded = true;
+                });
+        }
+
+        function detailItem(label, value) {
+            if (Array.isArray(value)) value = value.join(', ');
+            if (!value) return '';
+            return '<div class="detail-kv"><dt>' + escapeHtml(label) + '</dt><dd>' + escapeHtml(value) + '</dd></div>';
+        }
+
+        function renderUsageForTag(tag, card) {
+            const usages = card && card.usagesByTag ? (card.usagesByTag[tag] || []) : [];
+            const p = principle(tag);
+            if (usages.length === 0) {
+                const mappedTags = card && card.usagesByTag ? Object.keys(card.usagesByTag).sort() : [];
+                return '<section class="detail-section">' +
+                    '<h3>' + escapeHtml(tag + ' - ' + p.name) + '</h3>' +
+                    '<p>The Gemini card does not map this selected tag directly for this paper.</p>' +
+                    (mappedTags.length ? '<p>Mapped tags in the card: ' + escapeHtml(mappedTags.join(', ')) + '</p>' : '') +
+                    '</section>';
+            }
+
+            return '<section class="detail-section">' +
+                '<h3>' + escapeHtml(tag + ' - ' + p.name) + '</h3>' +
+                usages.map(function(usage) {
+                    return '<div class="usage-card">' +
+                        '<div><span class="usage-label">' + escapeHtml([usage.delta_id, usage.core_or_supporting, usage.evidence_strength].filter(Boolean).join(' / ')) + '</span></div>' +
+                        (usage.mechanism_trigger ? '<div><div class="usage-label">Mechanism trigger</div><div class="usage-text">' + escapeHtml(usage.mechanism_trigger) + '</div></div>' : '') +
+                        (usage.why_it_applies ? '<div><div class="usage-label">Why it applies</div><div class="usage-text">' + escapeHtml(usage.why_it_applies) + '</div></div>' : '') +
+                        (usage.pointer ? '<div><div class="usage-label">Paper pointer</div><div class="usage-text">' + escapeHtml(usage.pointer) + '</div></div>' : '') +
+                        '</div>';
+                }).join('') +
+                '</section>';
+        }
+
+        function renderPaperDetail(title) {
+            const panel = document.getElementById('paper_detail');
+            if (!panel) return;
+            if (!title) {
+                const countText = paperCardsLoaded && PAPER_CARD_META.matched_vldb_papers ?
+                    ' Gemini cards are available for ' + PAPER_CARD_META.matched_vldb_papers + ' of ' + PAPER_CARD_META.total_vldb_papers_in_explorer + ' VLDB papers.' :
+                    '';
+                panel.innerHTML = '<h2 class="panel-title">Paper Details</h2>' +
+                    '<p class="detail-empty">Click a VLDB paper with a Gemini card to see how the selected principle tag is used. OSDI paper cards are not available yet.' + escapeHtml(countText) + '</p>';
+                return;
+            }
+
+            const paper = PAPERS.find(function(candidate) { return candidate.title === title; });
+            if (!paper) {
+                activePaperTitle = '';
+                renderPaperDetail('');
+                return;
+            }
+
+            const card = paperCard(paper);
+            const conferenceClass = paper.conference === 'VLDB 2023' ? 'vldb' : 'osdi';
+            const selectedForPaper = selectedTagsForPaper(paper);
+            const tagBadges = paper.tags.map(function(tag) {
+                const selected = selectedTags.has(tag) ? ' selected' : '';
+                return '<button type="button" class="mini-tag' + selected + '" style="' + tagStyle(tag) + '" data-tag="' + escapeHtml(tag) + '">' +
+                    '<span class="tag-code">' + escapeHtml(tag) + '</span>' +
+                    '<span>' + escapeHtml(principle(tag).name) + '</span>' +
+                    '</button>';
+            }).join('');
+
+            let body = '<div class="detail-header"><div>' +
+                '<h2 class="detail-title">' + escapeHtml(paper.title) + '</h2>' +
+                '<div class="detail-meta"><span class="conference-badge ' + conferenceClass + '">' + escapeHtml(paper.conference) + '</span>' +
+                (card ? '<span class="detail-badge">Gemini card</span>' : '<span class="detail-badge muted">' + escapeHtml(paper.conference === 'OSDI 2023' ? 'No OSDI card yet' : 'No card') + '</span>') +
+                '</div></div>' +
+                '<button class="detail-close" type="button" aria-label="Close paper details" id="close_detail">x</button></div>' +
+                '<div class="paper-tags">' + tagBadges + '</div>';
+
+            if (!paperCardsLoaded) {
+                body += '<section class="detail-section"><p>Loading Gemini paper cards...</p></section>';
+                panel.innerHTML = body;
+                return;
+            }
+
+            if (!card) {
+                const message = paper.conference === 'OSDI 2023' ?
+                    'Gemini paper cards are not available for OSDI papers yet.' :
+                    'No Gemini paper card was matched for this VLDB paper yet.';
+                body += '<section class="detail-section"><p>' + escapeHtml(message) + '</p></section>';
+                panel.innerHTML = body;
+                return;
+            }
+
+            body += '<section class="detail-section"><h3>Paper Card</h3><dl class="detail-list">' +
+                detailItem('Problem domain', card.problem_domain) +
+                detailItem('System or method', card.system_or_method_name) +
+                detailItem('Goal', card.goal) +
+                detailItem('Baseline', card.baseline_name) +
+                detailItem('Limiting assumption', card.limiting_design_assumption) +
+                detailItem('Mechanism', card.one_sentence_mechanism) +
+                detailItem('Primary archetype', card.primary_design_archetype) +
+                detailItem('Confidence', card.principle_mapping_confidence) +
+                '</dl></section>';
+
+            if (card.concrete_numbers && card.concrete_numbers.length) {
+                body += '<section class="detail-section"><h3>Reported Numbers</h3>' +
+                    card.concrete_numbers.map(function(item) {
+                        return '<div class="usage-card"><div class="usage-label">' + escapeHtml(item.number_or_delta) + '</div>' +
+                            '<div class="usage-text">' + escapeHtml(item.meaning) + (item.pointer ? ' ' + item.pointer : '') + '</div></div>';
+                    }).join('') +
+                    '</section>';
+            }
+
+            if (selectedForPaper.length === 0) {
+                body += '<section class="detail-section"><p>Select a tag on this paper to see tag-specific Gemini evidence.</p></section>';
+            } else {
+                body += selectedForPaper.map(function(tag) {
+                    return renderUsageForTag(tag, card);
+                }).join('');
+            }
+
+            if (card.principle_composition_rationale) {
+                body += '<section class="detail-section"><h3>Principle Composition</h3><p>' + escapeHtml(card.principle_composition_rationale) + '</p></section>';
+            }
+
+            panel.innerHTML = body;
+        }
+
+        function showPaperDetail(title, sync) {
+            activePaperTitle = title;
+            render(sync);
         }
 
         function renderSelectedTags() {
@@ -660,8 +942,13 @@
                 }).join('');
                 const conferenceClass = paper.conference === 'VLDB 2023' ? 'vldb' : 'osdi';
                 const matchLabel = matchingTagCount(paper) + ' of ' + selectedTags.size + ' selected tags';
-                return '<article class="paper-card">' +
-                    '<div class="paper-topline"><span class="conference-badge ' + conferenceClass + '">' + escapeHtml(paper.conference) + '</span><span class="match-badge">' + matchLabel + '</span></div>' +
+                const card = paperCard(paper);
+                const active = activePaperTitle === paper.title ? ' active' : '';
+                const detailBadge = paperCardsLoaded ?
+                    (card ? '<span class="detail-badge">Gemini card</span>' : '<span class="detail-badge muted">' + escapeHtml(paper.conference === 'OSDI 2023' ? 'No OSDI card yet' : 'No card') + '</span>') :
+                    '';
+                return '<article class="paper-card' + active + '" role="button" tabindex="0" data-paper-title="' + encodeURIComponent(paper.title) + '">' +
+                    '<div class="paper-topline"><span class="conference-badge ' + conferenceClass + '">' + escapeHtml(paper.conference) + '</span><span class="match-badge">' + matchLabel + '</span>' + detailBadge + '</div>' +
                     '<h3 class="paper-title">' + escapeHtml(paper.title) + '</h3>' +
                     '<div class="paper-tags">' + tagButtons + '</div>' +
                     '</article>';
@@ -673,6 +960,7 @@
             const params = new URLSearchParams();
             if (selectedTags.size > 0) params.set('tags', Array.from(selectedTags).join(','));
             if (matchMode() !== 'any') params.set('mode', matchMode());
+            if (activePaperTitle) params.set('paper', activePaperTitle);
             const conferences = Array.from(selectedConferences()).join(',');
             if (conferences !== 'VLDB 2023,OSDI 2023') params.set('conf', conferences);
             const nextUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '') + window.location.hash;
@@ -685,6 +973,7 @@
             tags.forEach(function(tag) {
                 if (PRINCIPLES[tag]) selectedTags.add(tag);
             });
+            activePaperTitle = params.get('paper') || '';
             const mode = params.get('mode');
             if (mode === 'all') {
                 const input = document.querySelector('input[name="match_mode"][value="all"]');
@@ -707,11 +996,15 @@
 
         function render(sync) {
             const matches = filteredPapers();
+            if (activePaperTitle && !matches.some(function(paper) { return paper.title === activePaperTitle; })) {
+                activePaperTitle = '';
+            }
             renderSelectedTags();
             renderTagPalette();
             renderStats(matches);
             renderRelatedTags(matches);
             renderResults(matches);
+            renderPaperDetail(activePaperTitle);
             if (sync) updateUrl();
         }
 
@@ -727,7 +1020,33 @@
             });
             document.getElementById('paper_results').addEventListener('click', function(event) {
                 const button = event.target.closest('[data-tag]');
-                if (button) toggleTag(button.getAttribute('data-tag'));
+                if (button) {
+                    toggleTag(button.getAttribute('data-tag'));
+                    return;
+                }
+                const paperCard = event.target.closest('[data-paper-title]');
+                if (paperCard) {
+                    showPaperDetail(decodeURIComponent(paperCard.getAttribute('data-paper-title')), true);
+                }
+            });
+            document.getElementById('paper_results').addEventListener('keydown', function(event) {
+                if (event.key !== 'Enter' && event.key !== ' ') return;
+                if (event.target.closest('[data-tag]')) return;
+                const paperCard = event.target.closest('[data-paper-title]');
+                if (!paperCard) return;
+                event.preventDefault();
+                showPaperDetail(decodeURIComponent(paperCard.getAttribute('data-paper-title')), true);
+            });
+            document.getElementById('paper_detail').addEventListener('click', function(event) {
+                const tagButton = event.target.closest('[data-tag]');
+                if (tagButton) {
+                    toggleTag(tagButton.getAttribute('data-tag'));
+                    return;
+                }
+                if (event.target.closest('#close_detail')) {
+                    activePaperTitle = '';
+                    render(true);
+                }
             });
             document.getElementById('selected_tags').addEventListener('click', function(event) {
                 const button = event.target.closest('[data-remove-tag]');
@@ -744,6 +1063,9 @@
             });
             document.getElementById('sort_mode').addEventListener('change', function() { render(true); });
             render(false);
+            loadPaperCards().then(function() {
+                render(false);
+            });
         }
 
         document.addEventListener('DOMContentLoaded', init);
