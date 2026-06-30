@@ -554,9 +554,9 @@
 
         <section class="panel control-panel" aria-label="Principle tag controls">
             <div class="search-row">
-                <label class="label" for="paper_search">Paper title</label>
+                <label class="label" for="paper_search">Search paper cards</label>
                 <div class="search-input-row">
-                    <input id="paper_search" class="search-input" type="search" autocomplete="off" placeholder="Search by title">
+                    <input id="paper_search" class="search-input" type="search" autocomplete="off" placeholder="Search title, author, or card text">
                     <button id="clear_search" class="clear-button" type="button">Clear search</button>
                 </div>
             </div>
@@ -692,31 +692,69 @@
                 .trim();
         }
 
-        function paperTitleQueryRaw() {
+        function paperSearchQueryRaw() {
             const input = document.getElementById('paper_search');
             return input ? input.value.trim() : '';
         }
 
-        function paperTitleQuery() {
-            return normalizeSearchText(paperTitleQueryRaw());
+        function paperSearchQuery() {
+            return normalizeSearchText(paperSearchQueryRaw());
         }
 
-        function titleMatchScore(paper) {
-            const query = paperTitleQuery();
+        function collectSearchValues(value, values) {
+            if (value == null) return;
+            if (typeof value === 'string' || typeof value === 'number') {
+                values.push(String(value));
+                return;
+            }
+            if (Array.isArray(value)) {
+                value.forEach(function(item) { collectSearchValues(item, values); });
+                return;
+            }
+            if (typeof value === 'object') {
+                Object.keys(value).forEach(function(key) { collectSearchValues(value[key], values); });
+            }
+        }
+
+        function paperCardSearchText(paper) {
+            if (!paper) return '';
+            if (paper.search_text) return paper.search_text;
+            const card = paperCard(paper);
+            const values = [
+                paper.title,
+                paper.conference,
+                paper.paper_label,
+                paper.paper_number
+            ];
+            collectSearchValues(card, values);
+            paper.search_text = normalizeSearchText(values.join(' '));
+            return paper.search_text;
+        }
+
+        function paperSearchScore(paper) {
+            const query = paperSearchQuery();
             if (!query) return 0;
             const title = normalizeSearchText(paper.title);
-            if (!title) return 0;
-            if (title === query) return 400;
-            if (title.indexOf(query) === 0) return 300;
-            if (title.indexOf(query) !== -1) return 200;
             const terms = query.split(' ').filter(Boolean);
             if (terms.length === 0) return 0;
-            const matchedTerms = terms.filter(function(term) { return title.indexOf(term) !== -1; }).length;
-            return matchedTerms === terms.length ? 100 + matchedTerms : 0;
+
+            if (title) {
+                if (title === query) return 600;
+                if (title.indexOf(query) === 0) return 500;
+                if (title.indexOf(query) !== -1) return 450;
+                const titleTermMatches = terms.filter(function(term) { return title.indexOf(term) !== -1; }).length;
+                if (titleTermMatches === terms.length) return 400 + titleTermMatches;
+            }
+
+            const cardText = paperCardSearchText(paper);
+            if (!cardText) return 0;
+            if (cardText.indexOf(query) !== -1) return 250;
+            const cardTermMatches = terms.filter(function(term) { return cardText.indexOf(term) !== -1; }).length;
+            return cardTermMatches === terms.length ? 100 + cardTermMatches : 0;
         }
 
-        function paperMatchesTitle(paper) {
-            return paperTitleQuery() === '' || titleMatchScore(paper) > 0;
+        function paperMatchesSearch(paper) {
+            return paperSearchQuery() === '' || paperSearchScore(paper) > 0;
         }
 
         function countByTag(papers) {
@@ -776,12 +814,12 @@
         function filteredPapers() {
             const tags = Array.from(selectedTags);
             const conferences = selectedConferences();
-            const query = paperTitleQuery();
+            const query = paperSearchQuery();
             if ((tags.length === 0 && query === '') || conferences.size === 0) return [];
             const mode = matchMode();
             return PAPERS.filter(function(paper) {
                 if (!conferences.has(paper.conference)) return false;
-                if (!paperMatchesTitle(paper)) return false;
+                if (!paperMatchesSearch(paper)) return false;
                 if (tags.length === 0) return true;
                 const matches = matchingTagCount(paper);
                 return mode === 'all' ? matches === tags.length : matches > 0;
@@ -794,7 +832,7 @@
             copy.sort(function(a, b) {
                 if (mode === 'title') return a.title.localeCompare(b.title);
                 if (mode === 'conference') return a.conference.localeCompare(b.conference) || a.title.localeCompare(b.title);
-                return titleMatchScore(b) - titleMatchScore(a) ||
+                return paperSearchScore(b) - paperSearchScore(a) ||
                     matchingTagCount(b) - matchingTagCount(a) ||
                     a.conference.localeCompare(b.conference) ||
                     a.title.localeCompare(b.title);
@@ -1034,8 +1072,8 @@
             const related = document.getElementById('related_tags');
             const note = document.getElementById('related_note');
             const conferences = selectedConferences();
-            const hasTitleQuery = paperTitleQuery() !== '';
-            const base = selectedTags.size === 0 && !hasTitleQuery ?
+            const hasSearchQuery = paperSearchQuery() !== '';
+            const base = selectedTags.size === 0 && !hasSearchQuery ?
                 PAPERS.filter(function(paper) { return conferences.has(paper.conference); }) :
                 matches;
             const counts = countByTag(base);
@@ -1044,7 +1082,7 @@
                 .sort(function(a, b) { return counts[b] - counts[a] || a.localeCompare(b); })
                 .slice(0, 18);
 
-            note.textContent = selectedTags.size === 0 && !hasTitleQuery ?
+            note.textContent = selectedTags.size === 0 && !hasSearchQuery ?
                 'Most common tags in the selected conferences.' :
                 'Tags that commonly appear with the current result set.';
             if (relatedTags.length === 0) {
@@ -1065,12 +1103,12 @@
             const note = document.getElementById('results_note');
             const results = document.getElementById('paper_results');
             const conferences = selectedConferences();
-            const rawQuery = paperTitleQueryRaw();
-            const hasTitleQuery = paperTitleQuery() !== '';
-            if (selectedTags.size === 0 && !hasTitleQuery) {
-                note.textContent = 'Search by title or select one or more principle tags to begin.';
+            const rawQuery = paperSearchQueryRaw();
+            const hasSearchQuery = paperSearchQuery() !== '';
+            if (selectedTags.size === 0 && !hasSearchQuery) {
+                note.textContent = 'Search paper cards or select one or more principle tags to begin.';
                 const loadText = paperCardLoadError ? ' Paper cards could not be loaded: ' + paperCardLoadError : '';
-                results.innerHTML = '<div class="empty-state">Search for a paper title or pick principle tags to surface matching paper cards.' + escapeHtml(loadText) + '</div>';
+                results.innerHTML = '<div class="empty-state">Search paper cards or pick principle tags to surface matching papers.' + escapeHtml(loadText) + '</div>';
                 return;
             }
             if (conferences.size === 0) {
@@ -1079,14 +1117,14 @@
                 return;
             }
             if (matches.length === 0) {
-                note.textContent = hasTitleQuery ? 'No papers match this title search.' : 'No papers match this tag combination.';
-                results.innerHTML = '<div class="empty-state">Try a shorter title search or relax the tag filters.</div>';
+                note.textContent = hasSearchQuery ? 'No papers match this search.' : 'No papers match this tag combination.';
+                results.innerHTML = '<div class="empty-state">Try a shorter search or relax the tag filters.</div>';
                 return;
             }
 
             const tags = Array.from(selectedTags).join(' + ');
             const pieces = [];
-            if (hasTitleQuery) pieces.push('title "' + rawQuery + '"');
+            if (hasSearchQuery) pieces.push('search "' + rawQuery + '"');
             if (selectedTags.size > 0) pieces.push('tags ' + tags + ' using ' + matchMode().toUpperCase() + ' matching');
             note.textContent = 'Showing ' + matches.length + ' papers for ' + pieces.join(' and ') + '.';
             results.innerHTML = sortedPapers(matches).map(function(paper) {
@@ -1102,7 +1140,7 @@
                 }).join('');
                 const matchLabel = selectedTags.size > 0 ?
                     matchingTagCount(paper) + ' of ' + selectedTags.size + ' selected tags' :
-                    'Title match';
+                    'Search match';
                 const card = paperCard(paper);
                 const active = activePaperId === paper.paper_id ? ' active' : '';
                 const detailBadge = paperCardsLoaded ? detailBadgeForPaper(paper, card) : '';
@@ -1117,7 +1155,7 @@
         function updateUrl() {
             if (!window.history || !window.history.replaceState) return;
             const params = new URLSearchParams();
-            if (paperTitleQueryRaw()) params.set('q', paperTitleQueryRaw());
+            if (paperSearchQueryRaw()) params.set('q', paperSearchQueryRaw());
             if (selectedTags.size > 0) params.set('tags', Array.from(selectedTags).join(','));
             if (matchMode() !== 'any') params.set('mode', matchMode());
             if (activePaperId) params.set('paper', activePaperId);
