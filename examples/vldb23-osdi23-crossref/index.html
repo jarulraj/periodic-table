@@ -555,7 +555,7 @@
         <header class="page-header">
             <p class="eyebrow">Systems conference paper cards</p>
             <h1>System Design Principles Tag Explorer</h1>
-            <p class="intro">Choose principle tags to find papers that use the same design moves. Switch between broad discovery and stricter intersection searches without scanning a dense graph.</p>
+            <p class="intro">Choose principle tags or search paper cards to inspect how papers use recurring systems design moves.</p>
         </header>
 
         <section class="panel control-panel" aria-label="Principle tag controls">
@@ -907,6 +907,10 @@
             return '<div class="detail-kv"><dt>' + escapeHtml(label) + '</dt><dd>' + escapeHtml(value) + '</dd></div>';
         }
 
+        function institutionForCard(card) {
+            return card && (card.institution || card.institutions || card.affiliation || card.affiliations || '');
+        }
+
         function detailBadgeForPaper(paper, card) {
             if (card) {
                 const label = card.paper_label ? 'Paper card ' + card.paper_label : 'Paper card';
@@ -1007,7 +1011,6 @@
                 detailItem('Limiting assumption', card.limiting_design_assumption) +
                 detailItem('Mechanism', card.one_sentence_mechanism) +
                 detailItem('Primary archetype', card.primary_design_archetype) +
-                detailItem('Confidence', card.principle_mapping_confidence) +
                 '</dl></section>';
 
             const principleTags = orderedPrincipleTagsForPaper(paper, card);
@@ -1032,6 +1035,12 @@
                     }).join('') +
                     '</section>';
             }
+
+            body += '<section class="detail-section"><h3>Authors</h3><dl class="detail-list">' +
+                detailItem('Authors', card.authors) +
+                detailItem('Institution', institutionForCard(card)) +
+                detailItem('Venue/source', card.venue_or_source) +
+                '</dl></section>';
 
             panel.innerHTML = body;
         }
