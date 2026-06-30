@@ -476,6 +476,12 @@
         .usage-card + .usage-card {
             margin-top: 8px;
         }
+        .principle-heading {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+        }
         .usage-label {
             color: #667085;
             font-size: 0.76rem;
@@ -610,7 +616,7 @@
             </section>
             <aside id="paper_detail" class="panel side-panel paper-detail-panel" aria-live="polite" aria-label="Paper tag details">
                 <h2 class="panel-title">Paper Details</h2>
-                <p class="detail-empty">Click a paper card to see how the selected principle tag is used.</p>
+                <p class="detail-empty">Click a paper card to see its principle mappings.</p>
             </aside>
         </section>
     </main>
@@ -852,10 +858,21 @@
                 null;
         }
 
-        function selectedTagsForPaper(paper) {
-            return Array.from(selectedTags).filter(function(tag) {
-                return paper && paper.tags.indexOf(tag) !== -1;
-            });
+        function principleTagsForPaper(paper, card) {
+            const tags = [];
+            function addTag(tag) {
+                if (PRINCIPLES[tag] && tags.indexOf(tag) === -1) tags.push(tag);
+            }
+            if (paper && Array.isArray(paper.tags)) paper.tags.forEach(addTag);
+            Object.keys((card && card.usagesByTag) || {}).sort().forEach(addTag);
+            return tags;
+        }
+
+        function orderedPrincipleTagsForPaper(paper, card) {
+            const tags = principleTagsForPaper(paper, card);
+            const selected = tags.filter(function(tag) { return selectedTags.has(tag); });
+            const rest = tags.filter(function(tag) { return !selectedTags.has(tag); });
+            return selected.concat(rest);
         }
 
         function loadPaperCards() {
@@ -901,17 +918,18 @@
         function renderUsageForTag(tag, card) {
             const usages = card && card.usagesByTag ? (card.usagesByTag[tag] || []) : [];
             const p = principle(tag);
+            const selectedBadge = selectedTags.has(tag) ? ' <span class="match-badge">Selected</span>' : '';
             if (usages.length === 0) {
                 const mappedTags = card && card.usagesByTag ? Object.keys(card.usagesByTag).sort() : [];
                 return '<section class="detail-section">' +
-                    '<h3>' + escapeHtml(tag + ' - ' + p.name) + '</h3>' +
-                    '<p>The paper card does not map this selected tag directly for this paper.</p>' +
+                    '<h3 class="principle-heading"><span>' + escapeHtml(tag + ' - ' + p.name) + '</span>' + selectedBadge + '</h3>' +
+                    '<p>The paper card lists this principle for the paper, but does not include tag-specific evidence text.</p>' +
                     (mappedTags.length ? '<p>Mapped tags in the card: ' + escapeHtml(mappedTags.join(', ')) + '</p>' : '') +
                     '</section>';
             }
 
             return '<section class="detail-section">' +
-                '<h3>' + escapeHtml(tag + ' - ' + p.name) + '</h3>' +
+                '<h3 class="principle-heading"><span>' + escapeHtml(tag + ' - ' + p.name) + '</span>' + selectedBadge + '</h3>' +
                 usages.map(function(usage) {
                     return '<div class="usage-card">' +
                         '<div><span class="usage-label">' + escapeHtml([usage.delta_id, usage.core_or_supporting, usage.evidence_strength].filter(Boolean).join(' / ')) + '</span></div>' +
@@ -931,7 +949,7 @@
                     ' Paper cards are available for ' + PAPER_CARD_META.paper_count + ' papers.' :
                     (paperCardLoadError ? ' Paper cards could not be loaded: ' + paperCardLoadError : '');
                 panel.innerHTML = '<h2 class="panel-title">Paper Details</h2>' +
-                    '<p class="detail-empty">Click a paper card to see how the selected principle tag is used.' + escapeHtml(countText) + '</p>';
+                    '<p class="detail-empty">Click a paper card to see its principle mappings.' + escapeHtml(countText) + '</p>';
                 return;
             }
 
@@ -953,7 +971,6 @@
 
             activePaperId = paper.paper_id;
             const card = paperCard(paper);
-            const selectedForPaper = selectedTagsForPaper(paper);
             const tagBadges = paper.tags.map(function(tag) {
                 const selected = selectedTags.has(tag) ? ' selected' : '';
                 return '<button type="button" class="mini-tag' + selected + '" style="' + tagStyle(tag) + '" data-tag="' + escapeHtml(tag) + '">' +
@@ -967,8 +984,7 @@
                 '<div class="detail-meta"><span class="conference-badge" style="' + conferenceStyle(paper.conference) + '">' + escapeHtml(paper.conference) + '</span>' +
                 detailBadgeForPaper(paper, card) +
                 '</div></div>' +
-                '<button class="detail-close" type="button" aria-label="Close paper details" id="close_detail">x</button></div>' +
-                '<div class="paper-tags">' + tagBadges + '</div>';
+                '<button class="detail-close" type="button" aria-label="Close paper details" id="close_detail">x</button></div>';
 
             if (!paperCardsLoaded) {
                 body += '<section class="detail-section"><p>Loading paper cards...</p></section>';
@@ -994,6 +1010,20 @@
                 detailItem('Confidence', card.principle_mapping_confidence) +
                 '</dl></section>';
 
+            const principleTags = orderedPrincipleTagsForPaper(paper, card);
+            if (principleTags.length) {
+                body += '<section class="detail-section"><h3>Principles</h3><div class="paper-tags">' + tagBadges + '</div></section>';
+                body += principleTags.map(function(tag) {
+                    return renderUsageForTag(tag, card);
+                }).join('');
+            } else {
+                body += '<section class="detail-section"><h3>Principles</h3><p>No principles are listed for this paper card.</p></section>';
+            }
+
+            if (card.principle_composition_rationale) {
+                body += '<section class="detail-section"><h3>Principle Composition</h3><p>' + escapeHtml(card.principle_composition_rationale) + '</p></section>';
+            }
+
             if (card.concrete_numbers && card.concrete_numbers.length) {
                 body += '<section class="detail-section"><h3>Reported Numbers</h3>' +
                     card.concrete_numbers.map(function(item) {
@@ -1001,18 +1031,6 @@
                             '<div class="usage-text">' + escapeHtml(item.meaning) + (item.pointer ? ' ' + item.pointer : '') + '</div></div>';
                     }).join('') +
                     '</section>';
-            }
-
-            if (selectedForPaper.length === 0) {
-                body += '<section class="detail-section"><p>Select a tag on this paper to see tag-specific paper card evidence.</p></section>';
-            } else {
-                body += selectedForPaper.map(function(tag) {
-                    return renderUsageForTag(tag, card);
-                }).join('');
-            }
-
-            if (card.principle_composition_rationale) {
-                body += '<section class="detail-section"><h3>Principle Composition</h3><p>' + escapeHtml(card.principle_composition_rationale) + '</p></section>';
             }
 
             panel.innerHTML = body;
