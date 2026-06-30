@@ -80,6 +80,30 @@
         .control-panel {
             padding: 18px;
         }
+        .search-row {
+            display: grid;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .search-input-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .search-input {
+            width: 100%;
+            min-height: 40px;
+            padding: 8px 11px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #fff;
+            color: #303743;
+        }
+        .search-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(36, 89, 166, 0.12);
+            outline: none;
+        }
         .control-grid {
             display: grid;
             grid-template-columns: minmax(280px, 1fr) auto auto;
@@ -125,6 +149,7 @@
             background: #fff;
             color: #303743;
             font-weight: 650;
+            white-space: nowrap;
         }
         .clear-button:hover,
         .clear-button:focus {
@@ -512,6 +537,10 @@
                 width: 100%;
                 justify-content: space-between;
             }
+            .search-input-row {
+                align-items: stretch;
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -524,6 +553,13 @@
         </header>
 
         <section class="panel control-panel" aria-label="Principle tag controls">
+            <div class="search-row">
+                <label class="label" for="paper_search">Paper title</label>
+                <div class="search-input-row">
+                    <input id="paper_search" class="search-input" type="search" autocomplete="off" placeholder="Search by title">
+                    <button id="clear_search" class="clear-button" type="button">Clear search</button>
+                </div>
+            </div>
             <div class="control-grid">
                 <div class="control-block">
                     <span class="label">Selected principle tags</span>
@@ -647,6 +683,42 @@
             return '--conference-bg: ' + colors.bg + '; --conference-ink: ' + colors.ink + ';';
         }
 
+        function normalizeSearchText(value) {
+            return String(value || '')
+                .normalize('NFKD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, ' ')
+                .trim();
+        }
+
+        function paperTitleQueryRaw() {
+            const input = document.getElementById('paper_search');
+            return input ? input.value.trim() : '';
+        }
+
+        function paperTitleQuery() {
+            return normalizeSearchText(paperTitleQueryRaw());
+        }
+
+        function titleMatchScore(paper) {
+            const query = paperTitleQuery();
+            if (!query) return 0;
+            const title = normalizeSearchText(paper.title);
+            if (!title) return 0;
+            if (title === query) return 400;
+            if (title.indexOf(query) === 0) return 300;
+            if (title.indexOf(query) !== -1) return 200;
+            const terms = query.split(' ').filter(Boolean);
+            if (terms.length === 0) return 0;
+            const matchedTerms = terms.filter(function(term) { return title.indexOf(term) !== -1; }).length;
+            return matchedTerms === terms.length ? 100 + matchedTerms : 0;
+        }
+
+        function paperMatchesTitle(paper) {
+            return paperTitleQuery() === '' || titleMatchScore(paper) > 0;
+        }
+
         function countByTag(papers) {
             const counts = {};
             for (const paper of papers) {
@@ -704,10 +776,13 @@
         function filteredPapers() {
             const tags = Array.from(selectedTags);
             const conferences = selectedConferences();
-            if (tags.length === 0 || conferences.size === 0) return [];
+            const query = paperTitleQuery();
+            if ((tags.length === 0 && query === '') || conferences.size === 0) return [];
             const mode = matchMode();
             return PAPERS.filter(function(paper) {
                 if (!conferences.has(paper.conference)) return false;
+                if (!paperMatchesTitle(paper)) return false;
+                if (tags.length === 0) return true;
                 const matches = matchingTagCount(paper);
                 return mode === 'all' ? matches === tags.length : matches > 0;
             });
@@ -719,7 +794,10 @@
             copy.sort(function(a, b) {
                 if (mode === 'title') return a.title.localeCompare(b.title);
                 if (mode === 'conference') return a.conference.localeCompare(b.conference) || a.title.localeCompare(b.title);
-                return matchingTagCount(b) - matchingTagCount(a) || a.conference.localeCompare(b.conference) || a.title.localeCompare(b.title);
+                return titleMatchScore(b) - titleMatchScore(a) ||
+                    matchingTagCount(b) - matchingTagCount(a) ||
+                    a.conference.localeCompare(b.conference) ||
+                    a.title.localeCompare(b.title);
             });
             return copy;
         }
@@ -956,14 +1034,19 @@
             const related = document.getElementById('related_tags');
             const note = document.getElementById('related_note');
             const conferences = selectedConferences();
-            const base = selectedTags.size === 0 ? PAPERS.filter(function(paper) { return conferences.has(paper.conference); }) : matches;
+            const hasTitleQuery = paperTitleQuery() !== '';
+            const base = selectedTags.size === 0 && !hasTitleQuery ?
+                PAPERS.filter(function(paper) { return conferences.has(paper.conference); }) :
+                matches;
             const counts = countByTag(base);
             const relatedTags = Object.keys(counts)
                 .filter(function(tag) { return !selectedTags.has(tag); })
                 .sort(function(a, b) { return counts[b] - counts[a] || a.localeCompare(b); })
                 .slice(0, 18);
 
-            note.textContent = selectedTags.size === 0 ? 'Most common tags in the selected conferences.' : 'Tags that commonly appear with the current result set.';
+            note.textContent = selectedTags.size === 0 && !hasTitleQuery ?
+                'Most common tags in the selected conferences.' :
+                'Tags that commonly appear with the current result set.';
             if (relatedTags.length === 0) {
                 related.innerHTML = '<div class="empty-state">No related tags for this selection.</div>';
                 return;
@@ -982,10 +1065,12 @@
             const note = document.getElementById('results_note');
             const results = document.getElementById('paper_results');
             const conferences = selectedConferences();
-            if (selectedTags.size === 0) {
-                note.textContent = 'Select one or more principle tags to begin.';
+            const rawQuery = paperTitleQueryRaw();
+            const hasTitleQuery = paperTitleQuery() !== '';
+            if (selectedTags.size === 0 && !hasTitleQuery) {
+                note.textContent = 'Search by title or select one or more principle tags to begin.';
                 const loadText = paperCardLoadError ? ' Paper cards could not be loaded: ' + paperCardLoadError : '';
-                results.innerHTML = '<div class="empty-state">Pick principle tags to surface matching paper cards.' + escapeHtml(loadText) + '</div>';
+                results.innerHTML = '<div class="empty-state">Search for a paper title or pick principle tags to surface matching paper cards.' + escapeHtml(loadText) + '</div>';
                 return;
             }
             if (conferences.size === 0) {
@@ -994,13 +1079,16 @@
                 return;
             }
             if (matches.length === 0) {
-                note.textContent = 'No papers match this tag combination.';
-                results.innerHTML = '<div class="empty-state">Try Any selected tag or remove a tag.</div>';
+                note.textContent = hasTitleQuery ? 'No papers match this title search.' : 'No papers match this tag combination.';
+                results.innerHTML = '<div class="empty-state">Try a shorter title search or relax the tag filters.</div>';
                 return;
             }
 
             const tags = Array.from(selectedTags).join(' + ');
-            note.textContent = 'Showing ' + matches.length + ' papers for ' + tags + ' using ' + matchMode().toUpperCase() + ' matching.';
+            const pieces = [];
+            if (hasTitleQuery) pieces.push('title "' + rawQuery + '"');
+            if (selectedTags.size > 0) pieces.push('tags ' + tags + ' using ' + matchMode().toUpperCase() + ' matching');
+            note.textContent = 'Showing ' + matches.length + ' papers for ' + pieces.join(' and ') + '.';
             results.innerHTML = sortedPapers(matches).map(function(paper) {
                 const selectedFirst = paper.tags.slice().sort(function(a, b) {
                     return Number(selectedTags.has(b)) - Number(selectedTags.has(a)) || a.localeCompare(b);
@@ -1012,7 +1100,9 @@
                         '<span>' + escapeHtml(principle(tag).name) + '</span>' +
                         '</button>';
                 }).join('');
-                const matchLabel = matchingTagCount(paper) + ' of ' + selectedTags.size + ' selected tags';
+                const matchLabel = selectedTags.size > 0 ?
+                    matchingTagCount(paper) + ' of ' + selectedTags.size + ' selected tags' :
+                    'Title match';
                 const card = paperCard(paper);
                 const active = activePaperId === paper.paper_id ? ' active' : '';
                 const detailBadge = paperCardsLoaded ? detailBadgeForPaper(paper, card) : '';
@@ -1027,6 +1117,7 @@
         function updateUrl() {
             if (!window.history || !window.history.replaceState) return;
             const params = new URLSearchParams();
+            if (paperTitleQueryRaw()) params.set('q', paperTitleQueryRaw());
             if (selectedTags.size > 0) params.set('tags', Array.from(selectedTags).join(','));
             if (matchMode() !== 'any') params.set('mode', matchMode());
             if (activePaperId) params.set('paper', activePaperId);
@@ -1040,6 +1131,9 @@
 
         function loadUrlState() {
             const params = new URLSearchParams(window.location.search);
+            const titleQuery = params.get('q') || '';
+            const searchInput = document.getElementById('paper_search');
+            if (searchInput) searchInput.value = titleQuery;
             const tags = (params.get('tags') || '').split(',').map(function(tag) { return tag.trim(); }).filter(Boolean);
             tags.forEach(function(tag) {
                 if (PRINCIPLES[tag]) selectedTags.add(tag);
@@ -1127,6 +1221,18 @@
             });
             document.getElementById('clear_tags').addEventListener('click', function() {
                 selectedTags.clear();
+                render(true);
+            });
+            document.getElementById('paper_search').addEventListener('input', function() {
+                render(true);
+            });
+            document.getElementById('paper_search').addEventListener('search', function() {
+                render(true);
+            });
+            document.getElementById('clear_search').addEventListener('click', function() {
+                const input = document.getElementById('paper_search');
+                input.value = '';
+                input.focus();
                 render(true);
             });
             document.querySelectorAll('input[name="match_mode"]').forEach(function(input) {
