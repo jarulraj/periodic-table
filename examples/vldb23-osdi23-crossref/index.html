@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Systems Conference Principles Tag Explorer</title>
+    <title>Paper Card Explorer</title>
     <style>
         :root {
             --bg: #f5f7fb;
@@ -70,6 +70,12 @@
             margin-bottom: 0;
             color: var(--muted);
             font-size: 1.05rem;
+        }
+        .provenance {
+            max-width: 960px;
+            margin: 2px 0 0;
+            color: var(--muted);
+            font-size: 0.86rem;
         }
         .panel {
             background: var(--panel);
@@ -492,6 +498,22 @@
             color: #475467;
             font-size: 0.88rem;
         }
+        .equation-box {
+            padding: 11px;
+            border-left: 3px solid var(--accent);
+            background: var(--accent-soft);
+            color: #253858;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.84rem;
+            line-height: 1.55;
+            overflow-wrap: anywhere;
+        }
+        .paper-link {
+            color: var(--accent);
+            font-weight: 700;
+            text-decoration-thickness: 1px;
+            text-underline-offset: 2px;
+        }
         .detail-empty {
             color: var(--muted);
             font-size: 0.92rem;
@@ -553,9 +575,10 @@
 <body>
     <main class="page">
         <header class="page-header">
-            <p class="eyebrow">Systems conference paper cards</p>
-            <h1>System Design Principles Tag Explorer</h1>
-            <p class="intro">Choose principle tags or search paper cards to inspect how papers use recurring systems design moves.</p>
+            <p class="eyebrow">Systems research collections</p>
+            <h1>Paper Card Explorer</h1>
+            <p class="intro">Search paper cards and compare how recurring system design principles appear across conferences and reading lists.</p>
+            <p class="provenance">The cards are generated analyses. Follow their paper pointers and source links when checking a mapping.</p>
         </header>
 
         <section class="panel control-panel" aria-label="Principle tag controls">
@@ -579,7 +602,7 @@
                     </div>
                 </div>
                 <div class="control-block">
-                    <span class="label">Conferences</span>
+                    <span class="label">Collections</span>
                     <div id="conference_filters" class="option-row"></div>
                 </div>
                 <button id="clear_tags" class="clear-button" type="button">Clear tags</button>
@@ -590,7 +613,7 @@
         <section class="stats-grid" aria-label="Search summary">
             <div class="stat-card"><span id="stat_matches" class="stat-value">0</span><span class="stat-label">Matching papers</span></div>
             <div class="stat-card"><span id="stat_cards" class="stat-value">0</span><span class="stat-label">Card-backed papers</span></div>
-            <div class="stat-card"><span id="stat_conferences" class="stat-value">0</span><span class="stat-label">Conferences</span></div>
+            <div class="stat-card"><span id="stat_conferences" class="stat-value">0</span><span class="stat-label">Collections</span></div>
             <div class="stat-card"><span id="stat_tags" class="stat-value">0</span><span class="stat-label">Selected tags</span></div>
         </section>
 
@@ -608,7 +631,8 @@
                     </div>
                     <select id="sort_mode" class="sort-select" aria-label="Sort papers">
                         <option value="relevance">Sort by tag match</option>
-                        <option value="conference">Sort by conference</option>
+                        <option value="conference">Sort by collection</option>
+                        <option value="year">Sort by publication year</option>
                         <option value="title">Sort by title</option>
                     </select>
                 </div>
@@ -623,6 +647,8 @@
 
     <script>
         const PRINCIPLES = {"Si":{"name":"Simplicity","group":"Structure"},"Mo":{"name":"Modularity","group":"Structure"},"Co":{"name":"Composability","group":"Structure"},"Ex":{"name":"Extensibility","group":"Structure"},"Pm":{"name":"Policy/Mechanism Separation","group":"Structure"},"Gr":{"name":"Generalized Design","group":"Structure"},"Pd":{"name":"Probabilistic Design","group":"Structure"},"Sc":{"name":"Scalability","group":"Efficiency"},"Rc":{"name":"Reuse of Computation","group":"Efficiency"},"Wv":{"name":"Work Avoidance","group":"Efficiency"},"Cc":{"name":"Common-Case Specialization","group":"Efficiency"},"Bo":{"name":"Bottleneck-Oriented Optimisation","group":"Efficiency"},"Ha":{"name":"Hardware-Aware Design","group":"Efficiency"},"Op":{"name":"Optimistic Design","group":"Efficiency"},"La":{"name":"Learned Approximation","group":"Efficiency"},"Al":{"name":"Abstraction Lifting","group":"Semantics"},"Lu":{"name":"Language Homogeneity","group":"Semantics"},"Se":{"name":"Semantically Explicit Interfaces","group":"Semantics"},"Fs":{"name":"Formal Specification","group":"Semantics"},"Ig":{"name":"Invariant-Guided Transformation","group":"Semantics"},"Lt":{"name":"Location Transparency","group":"Distribution"},"Dc":{"name":"Decentralised Control","group":"Distribution"},"Fp":{"name":"Function Placement","group":"Distribution"},"Lo":{"name":"Locality of Reference","group":"Distribution"},"Cz":{"name":"Coordination Avoidance","group":"Distribution"},"Ep":{"name":"Equivalence-based Planning","group":"Planning"},"Cm":{"name":"Cost-based Planning","group":"Planning"},"Cp":{"name":"Constraint-based Planning","group":"Planning"},"Gd":{"name":"Goal-Directed Planning","group":"Planning"},"Bb":{"name":"Black-Box Tuning","group":"Planning"},"Ah":{"name":"Advisory Hinting","group":"Planning"},"Ad":{"name":"Adaptive Processing","group":"Operability"},"Ec":{"name":"Elasticity","group":"Operability"},"Wa":{"name":"Workload-Aware Optimisation","group":"Operability"},"Au":{"name":"Automation and Autonomy","group":"Operability"},"Ho":{"name":"Human Observability","group":"Operability"},"Ev":{"name":"Evolvability","group":"Operability"},"Ft":{"name":"Fault Tolerance","group":"Reliability"},"Is":{"name":"Isolation for Correctness","group":"Reliability"},"At":{"name":"Atomic Execution","group":"Reliability"},"Cr":{"name":"Consistency Relaxation","group":"Reliability"},"Sy":{"name":"Security via Isolation","group":"Security"},"Ac":{"name":"Access Control and Auditing","group":"Security"},"Lp":{"name":"Least Privilege","group":"Security"},"Tq":{"name":"Trust via Quorum","group":"Security"},"Cf":{"name":"Conservative Defaults","group":"Security"},"Sa":{"name":"Safety by Construction","group":"Security"}};
+        PRINCIPLES.Un = { name: 'Adversarial Unpredictability', group: 'Security' };
+        PRINCIPLES.Ls = { name: 'Leakage Shaping', group: 'Security' };
         const GROUP_ORDER = ["Structure","Efficiency","Semantics","Distribution","Planning","Operability","Reliability","Security"];
         const GROUP_COLORS = {
             Structure: { bg: '#eef6ff', border: '#bfd8f7', ink: '#1c5d99' },
@@ -673,8 +699,12 @@
             return '--tag-bg: ' + colors.bg + '; --tag-border: ' + colors.border + '; --tag-ink: ' + colors.ink + ';';
         }
 
+        function paperCollection(paper) {
+            return paper && (paper.collection || paper.conference) || '';
+        }
+
         function availableConferences() {
-            return Array.from(new Set(PAPERS.map(function(paper) { return paper.conference; }).filter(Boolean))).sort();
+            return Array.from(new Set(PAPERS.map(paperCollection).filter(Boolean))).sort();
         }
 
         function conferenceStyle(conference) {
@@ -728,9 +758,10 @@
             const card = paperCard(paper);
             const values = [
                 paper.title,
-                paper.conference,
+                paperCollection(paper),
                 paper.paper_label,
-                paper.paper_number
+                paper.paper_number,
+                paper.publication_year
             ];
             collectSearchValues(card, values);
             paper.search_text = normalizeSearchText(values.join(' '));
@@ -824,7 +855,7 @@
             if ((tags.length === 0 && query === '') || conferences.size === 0) return [];
             const mode = matchMode();
             return PAPERS.filter(function(paper) {
-                if (!conferences.has(paper.conference)) return false;
+                if (!conferences.has(paperCollection(paper))) return false;
                 if (!paperMatchesSearch(paper)) return false;
                 if (tags.length === 0) return true;
                 const matches = matchingTagCount(paper);
@@ -837,10 +868,11 @@
             const copy = papers.slice();
             copy.sort(function(a, b) {
                 if (mode === 'title') return a.title.localeCompare(b.title);
-                if (mode === 'conference') return a.conference.localeCompare(b.conference) || a.title.localeCompare(b.title);
+                if (mode === 'conference') return paperCollection(a).localeCompare(paperCollection(b)) || a.title.localeCompare(b.title);
+                if (mode === 'year') return Number(b.publication_year || 0) - Number(a.publication_year || 0) || a.title.localeCompare(b.title);
                 return paperSearchScore(b) - paperSearchScore(a) ||
                     matchingTagCount(b) - matchingTagCount(a) ||
-                    a.conference.localeCompare(b.conference) ||
+                    paperCollection(a).localeCompare(paperCollection(b)) ||
                     a.title.localeCompare(b.title);
             });
             return copy;
@@ -905,6 +937,12 @@
             if (Array.isArray(value)) value = value.join(', ');
             if (!value) return '';
             return '<div class="detail-kv"><dt>' + escapeHtml(label) + '</dt><dd>' + escapeHtml(value) + '</dd></div>';
+        }
+
+        function detailLink(label, url, linkText) {
+            if (!url || !/^https?:\/\//i.test(url)) return '';
+            return '<div class="detail-kv"><dt>' + escapeHtml(label) + '</dt><dd><a class="paper-link" href="' +
+                escapeHtml(url) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(linkText) + '</a></dd></div>';
         }
 
         function institutionForCard(card) {
@@ -985,7 +1023,7 @@
 
             let body = '<div class="detail-header"><div>' +
                 '<h2 class="detail-title">' + escapeHtml(paper.title) + '</h2>' +
-                '<div class="detail-meta"><span class="conference-badge" style="' + conferenceStyle(paper.conference) + '">' + escapeHtml(paper.conference) + '</span>' +
+                '<div class="detail-meta"><span class="conference-badge" style="' + conferenceStyle(paperCollection(paper)) + '">' + escapeHtml(paperCollection(paper)) + '</span>' +
                 detailBadgeForPaper(paper, card) +
                 '</div></div>' +
                 '<button class="detail-close" type="button" aria-label="Close paper details" id="close_detail">x</button></div>';
@@ -1013,6 +1051,11 @@
                 detailItem('Primary archetype', card.primary_design_archetype) +
                 '</dl></section>';
 
+            if (card.equation) {
+                body += '<section class="detail-section"><h3>Design Equation</h3><div class="equation-box">' +
+                    escapeHtml(card.equation) + '</div></section>';
+            }
+
             const principleTags = orderedPrincipleTagsForPaper(paper, card);
             if (principleTags.length) {
                 body += '<section class="detail-section"><h3>Principles</h3><div class="paper-tags">' + tagBadges + '</div></section>';
@@ -1027,6 +1070,26 @@
                 body += '<section class="detail-section"><h3>Principle Composition</h3><p>' + escapeHtml(card.principle_composition_rationale) + '</p></section>';
             }
 
+            if (card.physical_properties && card.physical_properties.length) {
+                body += '<section class="detail-section"><h3>System Property Shifts</h3>' +
+                    card.physical_properties.map(function(property) {
+                        const label = [property.property, property.direction].filter(Boolean).join(' / ');
+                        return '<div class="usage-card"><div class="usage-label">' + escapeHtml(label) + '</div>' +
+                            (property.concrete_number ? '<div class="usage-text">' + escapeHtml(property.concrete_number) + '</div>' : '') +
+                            (property.pointer ? '<div class="usage-text">' + escapeHtml(property.pointer) + '</div>' : '') + '</div>';
+                    }).join('') + '</section>';
+            }
+
+            if (card.key_deltas && card.key_deltas.length) {
+                body += '<section class="detail-section"><h3>Design Deltas and Tradeoffs</h3>' +
+                    card.key_deltas.map(function(delta) {
+                        return '<div class="usage-card"><div class="usage-label">' + escapeHtml(delta.delta_id || 'Design delta') + '</div>' +
+                            (delta.summary ? '<div class="usage-text">' + escapeHtml(delta.summary) + '</div>' : '') +
+                            (delta.primary_metric_improved ? '<div><div class="usage-label">Property improved</div><div class="usage-text">' + escapeHtml(delta.primary_metric_improved) + '</div></div>' : '') +
+                            (delta.tradeoffs_or_costs ? '<div><div class="usage-label">Tradeoff</div><div class="usage-text">' + escapeHtml(delta.tradeoffs_or_costs) + '</div></div>' : '') + '</div>';
+                    }).join('') + '</section>';
+            }
+
             if (card.concrete_numbers && card.concrete_numbers.length) {
                 body += '<section class="detail-section"><h3>Reported Numbers</h3>' +
                     card.concrete_numbers.map(function(item) {
@@ -1039,7 +1102,10 @@
             body += '<section class="detail-section"><h3>Paper Metadata</h3><dl class="detail-list">' +
                 detailItem('Authors', card.authors) +
                 detailItem('Institution', institutionForCard(card)) +
+                detailItem('Publication year', card.publication_year) +
                 detailItem('Venue/source', card.venue_or_source) +
+                detailLink('Paper', card.paper_url, 'Open paper') +
+                detailLink('Collection', card.source_url, 'Open collection') +
                 '</dl></section>';
 
             panel.innerHTML = body;
@@ -1101,7 +1167,7 @@
             const conferences = selectedConferences();
             const hasSearchQuery = paperSearchQuery() !== '';
             const base = selectedTags.size === 0 && !hasSearchQuery ?
-                PAPERS.filter(function(paper) { return conferences.has(paper.conference); }) :
+                PAPERS.filter(function(paper) { return conferences.has(paperCollection(paper)); }) :
                 matches;
             const counts = countByTag(base);
             const relatedTags = Object.keys(counts)
@@ -1110,7 +1176,7 @@
                 .slice(0, 18);
 
             note.textContent = selectedTags.size === 0 && !hasSearchQuery ?
-                'Most common tags in the selected conferences.' :
+                'Most common tags in the selected collections.' :
                 'Tags that commonly appear with the current result set.';
             if (relatedTags.length === 0) {
                 related.innerHTML = '<div class="empty-state">No related tags for this selection.</div>';
@@ -1139,8 +1205,8 @@
                 return;
             }
             if (conferences.size === 0) {
-                note.textContent = 'No conferences selected.';
-                results.innerHTML = '<div class="empty-state">Select at least one conference.</div>';
+                note.textContent = 'No collections selected.';
+                results.innerHTML = '<div class="empty-state">Select at least one collection.</div>';
                 return;
             }
             if (matches.length === 0) {
@@ -1172,7 +1238,9 @@
                 const active = activePaperId === paper.paper_id ? ' active' : '';
                 const detailBadge = paperCardsLoaded ? detailBadgeForPaper(paper, card) : '';
                 return '<article class="paper-card' + active + '" role="button" tabindex="0" data-paper-id="' + escapeHtml(paper.paper_id) + '">' +
-                    '<div class="paper-topline"><span class="conference-badge" style="' + conferenceStyle(paper.conference) + '">' + escapeHtml(paper.conference) + '</span><span class="match-badge">' + matchLabel + '</span>' + detailBadge + '</div>' +
+                    '<div class="paper-topline"><span class="conference-badge" style="' + conferenceStyle(paperCollection(paper)) + '">' + escapeHtml(paperCollection(paper)) + '</span>' +
+                    (paper.publication_year ? '<span class="detail-badge muted">' + escapeHtml(paper.publication_year) + '</span>' : '') +
+                    '<span class="match-badge">' + matchLabel + '</span>' + detailBadge + '</div>' +
                     '<h3 class="paper-title">' + escapeHtml(paper.title) + '</h3>' +
                     '<div class="paper-tags">' + tagButtons + '</div>' +
                     '</article>';

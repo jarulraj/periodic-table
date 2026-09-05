@@ -11,8 +11,27 @@ const KNOWN_TAGS = new Set([
     'Ep', 'Cm', 'Cp', 'Gd', 'Bb', 'Ah',
     'Ad', 'Ec', 'Wa', 'Au', 'Ho', 'Ev',
     'Ft', 'Is', 'At', 'Cr',
-    'Sy', 'Ac', 'Lp', 'Tq', 'Cf', 'Sa'
+    'Sy', 'Ac', 'Lp', 'Tq', 'Cf', 'Sa', 'Un', 'Ls'
 ]);
+
+const PUBLISHED_SOURCES = {
+    osdi23: {
+        collection: 'OSDI 2023',
+        collectionType: 'conference',
+        order: 1
+    },
+    vldb2023: {
+        collection: 'VLDB 2023',
+        collectionType: 'conference',
+        order: 2
+    },
+    cs764: {
+        collection: 'CS 764 Reading List',
+        collectionType: 'reading-list',
+        sourceUrl: 'https://pages.cs.wisc.edu/~jignesh/cs764/',
+        order: 3
+    }
+};
 
 const outputPath = path.resolve(__dirname, 'paper-cards.json');
 
@@ -58,6 +77,19 @@ function displayNameFromSource(sourceName) {
     return normalized.replace(/\b[a-z]/g, function(letter) { return letter.toUpperCase(); });
 }
 
+function sourceMetadata(sourceName) {
+    const id = slugify(sourceName);
+    const configured = PUBLISHED_SOURCES[id] || {};
+    return {
+        id,
+        name: sourceName,
+        collection: configured.collection || displayNameFromSource(sourceName),
+        collectionType: configured.collectionType || 'collection',
+        sourceUrl: configured.sourceUrl || '',
+        order: configured.order || 999
+    };
+}
+
 function candidateDataRoots() {
     const roots = [];
     const repoRoot = path.resolve(__dirname, '..', '..');
@@ -83,9 +115,7 @@ function discoverSources() {
                 const resolved = path.resolve(summaryDir);
                 const sourceName = path.basename(path.dirname(resolved));
                 return {
-                    id: slugify(sourceName),
-                    name: sourceName,
-                    conference: displayNameFromSource(sourceName),
+                    ...sourceMetadata(sourceName),
                     summaryDir: resolved
                 };
             });
@@ -95,21 +125,81 @@ function discoverSources() {
         if (!fs.existsSync(root)) continue;
         const sources = fs.readdirSync(root, { withFileTypes: true })
             .filter(function(entry) { return entry.isDirectory(); })
+            .filter(function(entry) { return Boolean(PUBLISHED_SOURCES[slugify(entry.name)]); })
             .map(function(entry) {
                 return {
-                    id: slugify(entry.name),
-                    name: entry.name,
-                    conference: displayNameFromSource(entry.name),
+                    ...sourceMetadata(entry.name),
                     summaryDir: path.join(root, entry.name, 'summaries')
                 };
             })
             .filter(function(source) { return fs.existsSync(source.summaryDir); })
-            .sort(function(a, b) { return a.conference.localeCompare(b.conference); });
+            .sort(function(a, b) { return a.order - b.order || a.collection.localeCompare(b.collection); });
 
         if (sources.length) return sources;
     }
 
     return [];
+}
+
+function parseCsv(text) {
+    const rows = [];
+    let row = [];
+    let field = '';
+    let quoted = false;
+
+    for (let index = 0; index < text.length; index += 1) {
+        const character = text[index];
+        if (quoted) {
+            if (character === '"' && text[index + 1] === '"') {
+                field += '"';
+                index += 1;
+            } else if (character === '"') {
+                quoted = false;
+            } else {
+                field += character;
+            }
+        } else if (character === '"') {
+            quoted = true;
+        } else if (character === ',') {
+            row.push(field);
+            field = '';
+        } else if (character === '\n') {
+            row.push(field.replace(/\r$/, ''));
+            rows.push(row);
+            row = [];
+            field = '';
+        } else {
+            field += character;
+        }
+    }
+
+    if (field || row.length) {
+        row.push(field.replace(/\r$/, ''));
+        rows.push(row);
+    }
+    return rows;
+}
+
+function readPaperManifest(summaryDir) {
+    const manifestPath = path.join(path.dirname(summaryDir), 'papers.csv');
+    if (!fs.existsSync(manifestPath)) return {};
+    const rows = parseCsv(fs.readFileSync(manifestPath, 'utf8'));
+    const headers = rows.shift() || [];
+    const byNumber = {};
+
+    for (const values of rows) {
+        const entry = {};
+        headers.forEach(function(header, index) {
+            entry[header] = values[index] || '';
+        });
+        if (entry.index) byNumber[String(parseInt(entry.index, 10))] = entry;
+    }
+    return byNumber;
+}
+
+function publicationYear(value) {
+    const match = String(value || '').match(/\b(?:19|20)\d{2}\b/);
+    return match ? match[0] : '';
 }
 
 function sanitizePointer(value) {
@@ -211,7 +301,7 @@ function tagsForSummary(summary, entries) {
     ]);
 }
 
-function buildCard(summary, fileNumber, source, paperId, paperLabel) {
+function buildCard(summary, fileNumber, source, paperId, paperLabel, manifestEntry) {
     const identification = summary.section_0_paper_identification || {};
     const goal = summary.section_1_goal_and_primary_metric || {};
     const baseline = summary.section_2_comparison_baseline || {};
@@ -219,6 +309,7 @@ function buildCard(summary, fileNumber, source, paperId, paperLabel) {
     const deltas = asArray(summary.section_4_key_deltas_vs_baseline);
     const section7 = summary.section_7_compound_equation || {};
     const normalized = summary.section_11_normalized_summary || {};
+    const properties = asArray(summary.section_8_physical_properties_summary);
     const entries = principleEntries(summary);
     const usagesByTag = {};
 
@@ -240,10 +331,19 @@ function buildCard(summary, fileNumber, source, paperId, paperLabel) {
         paper_label: paperLabel,
         paper_number: identification.paper_number || String(fileNumber),
         paper_title: identification.paper_title || '',
-        conference: source.conference,
+        collection: source.collection,
+        collection_type: source.collectionType,
+        conference: source.collection,
         source_id: source.id,
+        source_url: source.sourceUrl,
+        paper_url: firstString([
+            manifestEntry && manifestEntry.pdf_url,
+            manifestEntry && manifestEntry.url,
+            manifestEntry && manifestEntry.presentation_url
+        ]),
         authors: asArray(identification.authors),
         venue_or_source: identification.venue_or_source || '',
+        publication_year: publicationYear(identification.year),
         system_or_method_name: identification.system_or_method_name || section7.new_system_name || '',
         problem_domain: identification.problem_domain || '',
         goal: goal.goal || '',
@@ -271,6 +371,14 @@ function buildCard(summary, fileNumber, source, paperId, paperLabel) {
                 tradeoffs_or_costs: delta.tradeoffs_or_costs || ''
             };
         }),
+        physical_properties: properties.map(function(property) {
+            return {
+                property: property.property || '',
+                direction: property.direction || '',
+                concrete_number: property.concrete_number || '',
+                pointer: sanitizePointer(property.pointer)
+            };
+        }),
         usagesByTag
     };
 }
@@ -282,11 +390,12 @@ if (sources.length === 0) {
 
 const cardsById = {};
 const cardIdsByTitle = {};
-const conferenceCounts = {};
+const collectionCounts = {};
 const papers = [];
 const sourceSummaries = [];
 
 for (const source of sources) {
+    const manifestByNumber = readPaperManifest(source.summaryDir);
     const files = fs.readdirSync(source.summaryDir)
         .filter(function(file) { return /^\d+\.json$/.test(file); })
         .sort(function(a, b) { return parseInt(a, 10) - parseInt(b, 10); });
@@ -302,36 +411,42 @@ for (const source of sources) {
         const tags = tagsForSummary(summary, entries);
         const paperNumber = identification.paper_number || String(fileNumber);
         const paperId = source.id + '-' + (slugify(paperNumber) || fileNumber);
-        const paperLabel = source.conference + ' #' + paperNumber;
+        const paperLabel = source.collection + ' #' + paperNumber;
+        const manifestEntry = manifestByNumber[String(parseInt(paperNumber, 10))] || {};
 
         if (!title || tags.length === 0) continue;
 
-        const card = buildCard(summary, fileNumber, source, paperId, paperLabel);
+        const card = buildCard(summary, fileNumber, source, paperId, paperLabel, manifestEntry);
         cardsById[paperId] = card;
         cardIdsByTitle[title] = paperId;
         papers.push({
             title,
-            conference: source.conference,
+            collection: source.collection,
+            conference: source.collection,
             source_id: source.id,
             paper_id: paperId,
             paper_number: card.paper_number,
             paper_label: paperLabel,
+            publication_year: card.publication_year,
             tags
         });
-        conferenceCounts[source.conference] = (conferenceCounts[source.conference] || 0) + 1;
+        collectionCounts[source.collection] = (collectionCounts[source.collection] || 0) + 1;
         sourceCount += 1;
     }
 
     sourceSummaries.push({
         id: source.id,
         name: source.name,
-        conference: source.conference,
+        collection: source.collection,
+        collection_type: source.collectionType,
+        source_url: source.sourceUrl,
+        conference: source.collection,
         paper_count: sourceCount
     });
 }
 
 papers.sort(function(a, b) {
-    return a.conference.localeCompare(b.conference) || Number(a.paper_number) - Number(b.paper_number) || a.title.localeCompare(b.title);
+    return a.collection.localeCompare(b.collection) || Number(a.paper_number) - Number(b.paper_number) || a.title.localeCompare(b.title);
 });
 
 const output = {
@@ -339,7 +454,8 @@ const output = {
     scope: 'Papers with paper cards',
     paper_count: papers.length,
     card_count: Object.keys(cardsById).length,
-    conference_counts: conferenceCounts,
+    collection_counts: collectionCounts,
+    conference_counts: collectionCounts,
     sources: sourceSummaries,
     papers,
     cards_by_id: cardsById,
@@ -351,6 +467,6 @@ console.log(JSON.stringify({
     output: outputPath,
     papers: papers.length,
     cards: Object.keys(cardsById).length,
-    conferences: conferenceCounts,
+    collections: collectionCounts,
     bytes: fs.statSync(outputPath).size
 }, null, 2));
