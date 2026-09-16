@@ -35,7 +35,7 @@
             cursor: pointer;
         }
         .page {
-            width: min(1380px, calc(100% - 32px));
+            width: min(1680px, calc(100% - 28px));
             margin: 0 auto;
             padding: 28px 0 44px;
         }
@@ -269,9 +269,23 @@
             font-size: 0.82rem;
             font-weight: 650;
         }
+        .explorer-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(420px, 540px);
+            gap: 16px;
+            align-items: start;
+        }
+        .search-column {
+            display: grid;
+            min-width: 0;
+            gap: 16px;
+        }
+        .search-column > * {
+            min-width: 0;
+        }
         .content-grid {
             display: grid;
-            grid-template-columns: minmax(240px, 320px) minmax(360px, 1fr) minmax(300px, 420px);
+            grid-template-columns: minmax(190px, 250px) minmax(0, 1fr);
             gap: 16px;
             align-items: start;
         }
@@ -512,21 +526,32 @@
             color: var(--muted);
             font-size: 0.92rem;
         }
-        @media (max-width: 1180px) {
-            .content-grid {
-                grid-template-columns: minmax(240px, 320px) minmax(0, 1fr);
+        @media (max-width: 1320px) {
+            .control-grid {
+                grid-template-columns: 1fr;
             }
-            .paper-detail-panel {
-                grid-column: 1 / -1;
-                position: static;
-                max-height: none;
+            .stats-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            .content-grid {
+                grid-template-columns: 1fr;
             }
         }
-        @media (max-width: 920px) {
+        @media (max-width: 1180px) {
+            .explorer-grid {
+                grid-template-columns: minmax(0, 1fr) minmax(360px, 430px);
+            }
+        }
+        @media (max-width: 760px) {
             .control-grid,
+            .explorer-grid,
             .content-grid,
             .stats-grid {
                 grid-template-columns: 1fr;
+            }
+            .paper-detail-panel {
+                position: static;
+                max-height: none;
             }
             .results-toolbar {
                 align-items: stretch;
@@ -538,7 +563,7 @@
         }
         @media (max-width: 560px) {
             .page {
-                width: min(100% - 20px, 1380px);
+                width: min(100% - 20px, 1680px);
                 padding-top: 18px;
             }
             .control-panel,
@@ -574,63 +599,67 @@
             <p class="intro">Search paper cards and compare how recurring system design principles appear across conferences and reading lists.</p>
         </header>
 
-        <section class="panel control-panel" aria-label="Principle tag controls">
-            <div class="search-row">
-                <label class="label" for="paper_search">Search paper cards</label>
-                <div class="search-input-row">
-                    <input id="paper_search" class="search-input" type="search" autocomplete="off" placeholder="Search title, author, or card text">
-                    <button id="clear_search" class="clear-button" type="button">Clear search</button>
-                </div>
-            </div>
-            <div class="control-grid">
-                <div class="control-block">
-                    <span class="label">Selected principle tags</span>
-                    <div id="selected_tags" class="selected-row"></div>
-                </div>
-                <div class="control-block">
-                    <span class="label">Match mode</span>
-                    <div class="option-row">
-                        <label class="option"><input type="radio" name="match_mode" value="any" checked> Any selected tag</label>
-                        <label class="option"><input type="radio" name="match_mode" value="all"> All selected tags</label>
+        <section class="explorer-grid">
+            <div class="search-column">
+                <section class="panel control-panel" aria-label="Principle tag controls">
+                    <div class="search-row">
+                        <label class="label" for="paper_search">Search paper cards</label>
+                        <div class="search-input-row">
+                            <input id="paper_search" class="search-input" type="search" autocomplete="off" placeholder="Search title, author, or card text">
+                            <button id="clear_search" class="clear-button" type="button">Clear search</button>
+                        </div>
                     </div>
-                </div>
-                <div class="control-block">
-                    <span class="label">Collections</span>
-                    <div id="conference_filters" class="option-row"></div>
-                </div>
-                <button id="clear_tags" class="clear-button" type="button">Clear tags</button>
-            </div>
-            <div id="tag_palette" class="tag-palette"></div>
-        </section>
-
-        <section class="stats-grid" aria-label="Search summary">
-            <div class="stat-card"><span id="stat_matches" class="stat-value">0</span><span class="stat-label">Matching papers</span></div>
-            <div class="stat-card"><span id="stat_cards" class="stat-value">0</span><span class="stat-label">Card-backed papers</span></div>
-            <div class="stat-card"><span id="stat_conferences" class="stat-value">0</span><span class="stat-label">Collections</span></div>
-            <div class="stat-card"><span id="stat_tags" class="stat-value">0</span><span class="stat-label">Selected tags</span></div>
-        </section>
-
-        <section class="content-grid">
-            <aside class="panel side-panel" aria-label="Related principle tags">
-                <h2 class="panel-title">Related Tags</h2>
-                <p id="related_note" class="panel-copy">Select a tag to see what tends to appear with it.</p>
-                <div id="related_tags" class="related-list"></div>
-            </aside>
-            <section class="panel results-panel" aria-label="Matching papers">
-                <div class="results-toolbar">
-                    <div>
-                        <h2 class="panel-title">Papers</h2>
-                        <div id="results_note" class="results-note">Select principle tags to begin.</div>
+                    <div class="control-grid">
+                        <div class="control-block">
+                            <span class="label">Selected principle tags</span>
+                            <div id="selected_tags" class="selected-row"></div>
+                        </div>
+                        <div class="control-block">
+                            <span class="label">Match mode</span>
+                            <div class="option-row">
+                                <label class="option"><input type="radio" name="match_mode" value="any" checked> Any selected tag</label>
+                                <label class="option"><input type="radio" name="match_mode" value="all"> All selected tags</label>
+                            </div>
+                        </div>
+                        <div class="control-block">
+                            <span class="label">Collections</span>
+                            <div id="conference_filters" class="option-row"></div>
+                        </div>
+                        <button id="clear_tags" class="clear-button" type="button">Clear tags</button>
                     </div>
-                    <select id="sort_mode" class="sort-select" aria-label="Sort papers">
-                        <option value="relevance">Sort by tag match</option>
-                        <option value="conference">Sort by collection</option>
-                        <option value="year">Sort by publication year</option>
-                        <option value="title">Sort by title</option>
-                    </select>
-                </div>
-                <div id="paper_results" class="paper-list"></div>
-            </section>
+                    <div id="tag_palette" class="tag-palette"></div>
+                </section>
+
+                <section class="stats-grid" aria-label="Search summary">
+                    <div class="stat-card"><span id="stat_matches" class="stat-value">0</span><span class="stat-label">Matching papers</span></div>
+                    <div class="stat-card"><span id="stat_cards" class="stat-value">0</span><span class="stat-label">Card-backed papers</span></div>
+                    <div class="stat-card"><span id="stat_conferences" class="stat-value">0</span><span class="stat-label">Collections</span></div>
+                    <div class="stat-card"><span id="stat_tags" class="stat-value">0</span><span class="stat-label">Selected tags</span></div>
+                </section>
+
+                <section class="content-grid">
+                    <aside class="panel side-panel" aria-label="Related principle tags">
+                        <h2 class="panel-title">Related Tags</h2>
+                        <p id="related_note" class="panel-copy">Select a tag to see what tends to appear with it.</p>
+                        <div id="related_tags" class="related-list"></div>
+                    </aside>
+                    <section class="panel results-panel" aria-label="Matching papers">
+                        <div class="results-toolbar">
+                            <div>
+                                <h2 class="panel-title">Papers</h2>
+                                <div id="results_note" class="results-note">Select principle tags to begin.</div>
+                            </div>
+                            <select id="sort_mode" class="sort-select" aria-label="Sort papers">
+                                <option value="relevance">Sort by tag match</option>
+                                <option value="conference">Sort by collection</option>
+                                <option value="year">Sort by publication year</option>
+                                <option value="title">Sort by title</option>
+                            </select>
+                        </div>
+                        <div id="paper_results" class="paper-list"></div>
+                    </section>
+                </section>
+            </div>
             <aside id="paper_detail" class="panel side-panel paper-detail-panel" aria-live="polite" aria-label="Paper tag details">
                 <h2 class="panel-title">Paper Details</h2>
                 <p class="detail-empty">Click a paper card to see its principle mappings.</p>
