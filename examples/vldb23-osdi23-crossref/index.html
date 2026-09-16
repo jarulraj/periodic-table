@@ -682,6 +682,7 @@
         let paperCardLoadError = '';
         let requestedConferences = null;
         let activePaperId = '';
+        const DEFAULT_COLLECTION = 'VLDB 2023';
         const CONFERENCE_COLORS = [
             { bg: '#e9f5ff', ink: '#1769aa' },
             { bg: '#fff2e6', ink: '#b45309' },
@@ -822,6 +823,16 @@
             return new Set(checked.map(function(input) { return input.value; }));
         }
 
+        function defaultConferences(conferences) {
+            if (requestedConferences) return requestedConferences;
+            const activePaper = findPaperByIdentifier(activePaperId);
+            if (activePaper && conferences.indexOf(paperCollection(activePaper)) !== -1) {
+                return new Set([paperCollection(activePaper)]);
+            }
+            if (conferences.indexOf(DEFAULT_COLLECTION) !== -1) return new Set([DEFAULT_COLLECTION]);
+            return new Set(conferences);
+        }
+
         function renderConferenceFilters() {
             const container = document.getElementById('conference_filters');
             if (!container) return;
@@ -835,7 +846,7 @@
             const existingInputs = Array.from(container.querySelectorAll('.conference-filter'));
             const currentSelection = existingInputs.length > 0 ?
                 new Set(existingInputs.filter(function(input) { return input.checked; }).map(function(input) { return input.value; })) :
-                (requestedConferences || new Set(conferences));
+                defaultConferences(conferences);
 
             container.innerHTML = conferences.map(function(conference) {
                 const checked = currentSelection.has(conference) ? ' checked' : '';
@@ -865,7 +876,7 @@
             const tags = Array.from(selectedTags);
             const conferences = selectedConferences();
             const query = paperSearchQuery();
-            if ((tags.length === 0 && query === '') || conferences.size === 0) return [];
+            if (conferences.size === 0) return [];
             const mode = matchMode();
             return PAPERS.filter(function(paper) {
                 if (!conferences.has(paperCollection(paper))) return false;
@@ -1211,12 +1222,6 @@
             const conferences = selectedConferences();
             const rawQuery = paperSearchQueryRaw();
             const hasSearchQuery = paperSearchQuery() !== '';
-            if (selectedTags.size === 0 && !hasSearchQuery) {
-                note.textContent = 'Search paper cards or select one or more principle tags to begin.';
-                const loadText = paperCardLoadError ? ' Paper cards could not be loaded: ' + paperCardLoadError : '';
-                results.innerHTML = '<div class="empty-state">Search paper cards or pick principle tags to surface matching papers.' + escapeHtml(loadText) + '</div>';
-                return;
-            }
             if (conferences.size === 0) {
                 note.textContent = 'No collections selected.';
                 results.innerHTML = '<div class="empty-state">Select at least one collection.</div>';
@@ -1232,7 +1237,14 @@
             const pieces = [];
             if (hasSearchQuery) pieces.push('search "' + rawQuery + '"');
             if (selectedTags.size > 0) pieces.push('tags ' + tags + ' using ' + matchMode().toUpperCase() + ' matching');
-            note.textContent = 'Showing ' + matches.length + ' papers for ' + pieces.join(' and ') + '.';
+            if (pieces.length > 0) {
+                note.textContent = 'Showing ' + matches.length + ' papers for ' + pieces.join(' and ') + '.';
+            } else {
+                const selectedCollections = availableConferences().filter(function(conference) {
+                    return conferences.has(conference);
+                });
+                note.textContent = 'Showing ' + matches.length + ' papers in ' + selectedCollections.join(', ') + '.';
+            }
             results.innerHTML = sortedPapers(matches).map(function(paper) {
                 const selectedFirst = paper.tags.slice().sort(function(a, b) {
                     return Number(selectedTags.has(b)) - Number(selectedTags.has(a)) || a.localeCompare(b);
@@ -1246,14 +1258,14 @@
                 }).join('');
                 const matchLabel = selectedTags.size > 0 ?
                     matchingTagCount(paper) + ' of ' + selectedTags.size + ' selected tags' :
-                    'Search match';
+                    (hasSearchQuery ? 'Search match' : '');
                 const card = paperCard(paper);
                 const active = activePaperId === paper.paper_id ? ' active' : '';
                 const detailBadge = paperCardsLoaded ? detailBadgeForPaper(paper, card) : '';
                 return '<article class="paper-card' + active + '" role="button" tabindex="0" data-paper-id="' + escapeHtml(paper.paper_id) + '">' +
                     '<div class="paper-topline"><span class="conference-badge" style="' + conferenceStyle(paperCollection(paper)) + '">' + escapeHtml(paperCollection(paper)) + '</span>' +
                     (paper.publication_year ? '<span class="detail-badge muted">' + escapeHtml(paper.publication_year) + '</span>' : '') +
-                    '<span class="match-badge">' + matchLabel + '</span>' + detailBadge + '</div>' +
+                    (matchLabel ? '<span class="match-badge">' + matchLabel + '</span>' : '') + detailBadge + '</div>' +
                     '<h3 class="paper-title">' + escapeHtml(paper.title) + '</h3>' +
                     '<div class="paper-tags">' + tagButtons + '</div>' +
                     '</article>';
