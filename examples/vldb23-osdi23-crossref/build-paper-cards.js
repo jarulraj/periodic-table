@@ -2,6 +2,8 @@
 
 const fs = require('fs');
 const path = require('path');
+const {sessionFields, similarityFields, readSessions} = require('./paper-metadata');
+const sessionMetadata = readSessions();
 
 const KNOWN_TAGS = new Set([
     'Si', 'Mo', 'Co', 'Ex', 'Pm', 'Gr', 'Pd',
@@ -328,6 +330,8 @@ function buildCard(summary, fileNumber, source, paperId, paperLabel, manifestEnt
 
     return {
         paper_id: paperId,
+        ...sessionFields(paperId, sessionMetadata),
+        ...similarityFields(summary),
         paper_label: paperLabel,
         paper_number: identification.paper_number || String(fileNumber),
         paper_title: identification.paper_title || '',
@@ -428,6 +432,7 @@ for (const source of sources) {
             paper_number: card.paper_number,
             paper_label: paperLabel,
             publication_year: card.publication_year,
+            ...(source.id === 'vldb2023' ? {conference_session_categories: card.conference_session_categories || []} : {}),
             tags
         });
         collectionCounts[source.collection] = (collectionCounts[source.collection] || 0) + 1;

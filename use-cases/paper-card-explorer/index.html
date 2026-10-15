@@ -152,34 +152,28 @@
             color: var(--accent);
             outline: none;
         }
-        .selected-chip,
-        .tag-button,
-        .mini-tag,
-        .related-tag {
+        .principle-button {
             --tag-bg: #eef4ff;
             --tag-border: #cddbf3;
             --tag-ink: #2459a6;
             display: inline-flex;
             gap: 6px;
             align-items: center;
-            min-height: 30px;
-            padding: 5px 9px;
+            min-height: 28px;
+            max-width: 100%;
+            padding: 4px 8px;
             border: 1px solid var(--tag-border);
-            border-radius: 999px;
+            border-radius: 4px;
             background: var(--tag-bg);
             color: var(--tag-ink);
-            font-size: 0.82rem;
-            font-weight: 700;
+            font-size: 0.78rem;
+            font-weight: 650;
+            line-height: 1.4;
+            text-align: left;
         }
-        .selected-chip button {
-            width: 20px;
-            height: 20px;
-            border: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.66);
-            color: inherit;
-            font-weight: 800;
-            line-height: 1;
+        .principle-text {
+            min-width: 0;
+            overflow-wrap: anywhere;
         }
         .tag-palette {
             display: grid;
@@ -207,35 +201,20 @@
             flex-wrap: wrap;
             gap: 8px;
         }
-        .tag-button {
-            border-radius: 8px;
-            background: #fff;
-            color: #303743;
+        .principle-button:hover,
+        .principle-button:focus-visible,
+        .session-badge:hover,
+        .session-badge:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
         }
-        .tag-button:hover,
-        .tag-button:focus,
-        .related-tag:hover,
-        .related-tag:focus,
-        .mini-tag:hover,
-        .mini-tag:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(36, 89, 166, 0.12);
-            outline: none;
-        }
-        .tag-button.selected,
-        .mini-tag.selected {
-            background: var(--tag-bg);
-            border-color: var(--tag-border);
-            color: var(--tag-ink);
-            box-shadow: inset 0 0 0 1px var(--tag-border);
-        }
-        .tag-code {
-            font-weight: 850;
-        }
-        .tag-name {
-            font-weight: 600;
+        .principle-button[aria-pressed="true"],
+        .session-badge[aria-pressed="true"] {
+            border-color: currentColor;
+            box-shadow: inset 0 0 0 1px currentColor;
         }
         .tag-count {
+            flex-shrink: 0;
             color: var(--muted);
             font-size: 0.76rem;
             font-weight: 700;
@@ -391,14 +370,6 @@
             flex-wrap: wrap;
             gap: 6px;
         }
-        .mini-tag {
-            min-height: 26px;
-            padding: 3px 7px;
-            border-radius: 7px;
-            background: #fbfcfe;
-            color: #303743;
-            font-size: 0.75rem;
-        }
         .empty-state {
             padding: 22px;
             border: 1px dashed #cbd5e1;
@@ -513,12 +484,65 @@
             color: var(--muted);
             font-size: 0.92rem;
         }
+        .session-select {
+            width: 100%;
+            min-width: 0;
+            min-height: 40px;
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            padding: 8px;
+            background: #fff;
+            color: var(--ink);
+        }
+        .session-category {
+            color: var(--muted);
+            font-size: 0.82rem;
+            overflow-wrap: anywhere;
+        }
+        .session-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 8px 0;
+        }
+        .session-badge {
+            display: inline-block;
+            max-width: 100%;
+            padding: 3px 8px;
+            border: 1px solid var(--session-border);
+            border-radius: 4px;
+            background: var(--session-bg);
+            color: var(--session-ink);
+            font-size: 0.78rem;
+            font-weight: 650;
+            line-height: 1.4;
+            overflow-wrap: anywhere;
+            text-align: left;
+        }
+        .similar-toggle {
+            width: 100%;
+            white-space: normal;
+        }
+        .similar-controls {
+            display: flex;
+            gap: 8px;
+            align-items: start;
+            margin: 12px 0;
+            font-size: 0.87rem;
+        }
+        .similar-controls input { margin-top: 4px; }
+        .similar-results { list-style: none; padding: 0; margin: 0; }
+        .paper-match { padding: 12px 0; border-top: 1px solid var(--line); }
+        .paper-match p { margin: 5px 0 0; font-size: 0.85rem; }
+        .paper-match a { color: var(--accent); font-weight: 650; }
+        .paper-match .paper-tags { margin-top: 8px; }
+        .similar-section { overflow-wrap: anywhere; }
         @media (max-width: 1320px) {
             .explorer-grid {
                 grid-template-columns: minmax(260px, 320px) minmax(300px, 380px) minmax(340px, 1fr);
             }
         }
-        @media (max-width: 980px) {
+        @media (max-width: 1100px) {
             .control-grid,
             .explorer-grid,
             .stats-grid {
@@ -534,6 +558,9 @@
             }
             .sort-select {
                 width: 100%;
+            }
+            .explorer-grid.has-active-paper .paper-detail-panel {
+                grid-row: 1;
             }
         }
         @media (max-width: 560px) {
@@ -553,9 +580,7 @@
             .paper-tags {
                 gap: 6px;
             }
-            .tag-button,
-            .mini-tag,
-            .related-tag {
+            .principle-button {
                 width: 100%;
                 justify-content: space-between;
             }
@@ -587,6 +612,12 @@
                     <div class="control-block">
                         <span class="label">Collections</span>
                         <div id="conference_filters" class="option-row"></div>
+                    </div>
+                    <div class="control-block">
+                        <label class="label" for="session_category">Conference session category</label>
+                        <select id="session_category" class="session-select">
+                            <option value="">All categories</option>
+                        </select>
                     </div>
                     <div class="control-block">
                         <span class="label">Match mode</span>
@@ -644,6 +675,7 @@
         </section>
     </main>
 
+    <script src="similarity.js"></script>
     <script>
         const PRINCIPLES = {"Si":{"name":"Simplicity","group":"Structure"},"Mo":{"name":"Modularity","group":"Structure"},"Co":{"name":"Composability","group":"Structure"},"Ex":{"name":"Extensibility","group":"Structure"},"Pm":{"name":"Policy/Mechanism Separation","group":"Structure"},"Gr":{"name":"Generalized Design","group":"Structure"},"Pd":{"name":"Probabilistic Design","group":"Structure"},"Sc":{"name":"Scalability","group":"Efficiency"},"Rc":{"name":"Reuse of Computation","group":"Efficiency"},"Wv":{"name":"Work Avoidance","group":"Efficiency"},"Cc":{"name":"Common-Case Specialization","group":"Efficiency"},"Bo":{"name":"Bottleneck-Oriented Optimisation","group":"Efficiency"},"Ha":{"name":"Hardware-Aware Design","group":"Efficiency"},"Op":{"name":"Optimistic Design","group":"Efficiency"},"La":{"name":"Learned Approximation","group":"Efficiency"},"Al":{"name":"Abstraction Lifting","group":"Semantics"},"Lu":{"name":"Language Homogeneity","group":"Semantics"},"Se":{"name":"Semantically Explicit Interfaces","group":"Semantics"},"Fs":{"name":"Formal Specification","group":"Semantics"},"Ig":{"name":"Invariant-Guided Transformation","group":"Semantics"},"Lt":{"name":"Location Transparency","group":"Distribution"},"Dc":{"name":"Decentralised Control","group":"Distribution"},"Fp":{"name":"Function Placement","group":"Distribution"},"Lo":{"name":"Locality of Reference","group":"Distribution"},"Cz":{"name":"Coordination Avoidance","group":"Distribution"},"Ep":{"name":"Equivalence-based Planning","group":"Planning"},"Cm":{"name":"Cost-based Planning","group":"Planning"},"Cp":{"name":"Constraint-based Planning","group":"Planning"},"Gd":{"name":"Goal-Directed Planning","group":"Planning"},"Bb":{"name":"Black-Box Tuning","group":"Planning"},"Ah":{"name":"Advisory Hinting","group":"Planning"},"Ad":{"name":"Adaptive Processing","group":"Operability"},"Ec":{"name":"Elasticity","group":"Operability"},"Wa":{"name":"Workload-Aware Optimisation","group":"Operability"},"Au":{"name":"Automation and Autonomy","group":"Operability"},"Ho":{"name":"Human Observability","group":"Operability"},"Ev":{"name":"Evolvability","group":"Operability"},"Ft":{"name":"Fault Tolerance","group":"Reliability"},"Is":{"name":"Isolation for Correctness","group":"Reliability"},"At":{"name":"Atomic Execution","group":"Reliability"},"Cr":{"name":"Consistency Relaxation","group":"Reliability"},"Sy":{"name":"Security via Isolation","group":"Security"},"Ac":{"name":"Access Control and Auditing","group":"Security"},"Lp":{"name":"Least Privilege","group":"Security"},"Tq":{"name":"Trust via Quorum","group":"Security"},"Cf":{"name":"Conservative Defaults","group":"Security"},"Sa":{"name":"Safety by Construction","group":"Security"}};
         PRINCIPLES.Un = { name: 'Adversarial Unpredictability', group: 'Security' };
@@ -668,6 +700,10 @@
         let paperCardLoadError = '';
         let requestedConferences = null;
         let activePaperId = '';
+        let sessionCategory = '';
+        let showSimilar = false;
+        let showSameSession = false;
+        let differentSessionsOnly = true;
         const DEFAULT_COLLECTION = 'VLDB 2023';
         const CONFERENCE_COLORS = [
             { bg: '#e9f5ff', ink: '#1769aa' },
@@ -676,6 +712,16 @@
             { bg: '#f4f0ff', ink: '#6844a3' },
             { bg: '#fff0f8', ink: '#9b3271' },
             { bg: '#f3f5f7', ink: '#4a5564' }
+        ];
+        const SESSION_COLORS = [
+            { bg: '#eaf3ff', border: '#c9ddf5', ink: '#285a88' },
+            { bg: '#e9f6ef', border: '#c5e3d2', ink: '#286245' },
+            { bg: '#fff0e6', border: '#f1d6c1', ink: '#87502c' },
+            { bg: '#fcecf1', border: '#ebcad6', ink: '#8a3e59' },
+            { bg: '#f1edfb', border: '#dcd1ef', ink: '#655087' },
+            { bg: '#e8f5f6', border: '#bfdee1', ink: '#28636a' },
+            { bg: '#f7f3df', border: '#e5dcad', ink: '#706022' },
+            { bg: '#eff4e6', border: '#d3dfbb', ink: '#526a30' }
         ];
 
         function escapeHtml(value) {
@@ -845,6 +891,23 @@
             return checked ? checked.value : 'any';
         }
 
+        function renderSessionFilter() {
+            const select = document.getElementById('session_category');
+            const collections = selectedConferences();
+            const counts = {};
+            PAPERS.filter(function(paper) { return collections.has(paperCollection(paper)); }).forEach(function(paper) {
+                (paper.conference_session_categories || []).forEach(function(category) {
+                    counts[category] = (counts[category] || 0) + 1;
+                });
+            });
+            if (paperCardsLoaded && sessionCategory && !counts[sessionCategory]) sessionCategory = '';
+            select.innerHTML = '<option value="">All categories</option>' + Object.keys(counts).sort().map(function(category) {
+                return '<option value="' + escapeHtml(category) + '">' + escapeHtml(category) + ' (' + counts[category] + ')</option>';
+            }).join('');
+            select.value = sessionCategory;
+            select.disabled = !Object.keys(counts).length;
+        }
+
         function sortMode() {
             const select = document.getElementById('sort_mode');
             return select ? select.value : 'relevance';
@@ -866,6 +929,7 @@
             const mode = matchMode();
             return PAPERS.filter(function(paper) {
                 if (!conferences.has(paperCollection(paper))) return false;
+                if (sessionCategory && !(paper.conference_session_categories || []).includes(sessionCategory)) return false;
                 if (!paperMatchesSearch(paper)) return false;
                 if (tags.length === 0) return true;
                 const matches = matchingTagCount(paper);
@@ -911,10 +975,7 @@
         }
 
         function orderedPrincipleTagsForPaper(paper, card) {
-            const tags = principleTagsForPaper(paper, card);
-            const selected = tags.filter(function(tag) { return selectedTags.has(tag); });
-            const rest = tags.filter(function(tag) { return !selectedTags.has(tag); });
-            return selected.concat(rest);
+            return principleTagsForPaper(paper, card).sort();
         }
 
         function loadPaperCards() {
@@ -974,14 +1035,14 @@
             if (usages.length === 0) {
                 const mappedTags = card && card.usagesByTag ? Object.keys(card.usagesByTag).sort() : [];
                 return '<section class="detail-section">' +
-                    '<h3 class="principle-heading"><span>' + escapeHtml(tag + ' - ' + p.name) + '</span>' + selectedBadge + '</h3>' +
+                    '<h3 class="principle-heading">' + principleLabels([tag]) + selectedBadge + '</h3>' +
                     '<p>The paper card lists this principle for the paper, but does not include tag-specific evidence text.</p>' +
                     (mappedTags.length ? '<p>Mapped tags in the card: ' + escapeHtml(mappedTags.join(', ')) + '</p>' : '') +
                     '</section>';
             }
 
             return '<section class="detail-section">' +
-                '<h3 class="principle-heading"><span>' + escapeHtml(tag + ' - ' + p.name) + '</span>' + selectedBadge + '</h3>' +
+                '<h3 class="principle-heading">' + principleLabels([tag]) + selectedBadge + '</h3>' +
                 usages.map(function(usage) {
                     return '<div class="usage-card">' +
                         '<div><span class="usage-label">' + escapeHtml([usage.delta_id, usage.core_or_supporting, usage.evidence_strength].filter(Boolean).join(' / ')) + '</span></div>' +
@@ -991,6 +1052,79 @@
                         '</div>';
                 }).join('') +
                 '</section>';
+        }
+
+        function principleButton(tag, options) {
+            options = options || {};
+            const label = tag + ' (' + principle(tag).name + ')';
+            const selected = selectedTags.has(tag);
+            const title = (selected ? 'Remove filter: ' : 'Filter by principle: ') + label;
+            return '<button type="button" class="principle-button ' + (options.className || 'mini-tag') + '" style="' + tagStyle(tag) + '" data-tag="' + escapeHtml(tag) + '" aria-pressed="' + selected + '" title="' + escapeHtml(title) + '">' +
+                '<span class="principle-text">' + escapeHtml(label) + '</span>' +
+                (options.count === undefined ? '' : '<span class="tag-count">' + options.count + '</span>') + '</button>';
+        }
+
+        function principleLabels(tags) {
+            return Array.from(new Set(tags)).sort().map(function(tag) { return principleButton(tag); }).join('');
+        }
+
+        function sessionBadges(categories) {
+            if (!categories || !categories.length) return '';
+            return '<div class="session-badges" aria-label="Conference session categories">' + categories.map(function(category) {
+                const hash = Array.from(category).reduce(function(value, letter) { return (value * 31 + letter.charCodeAt(0)) >>> 0; }, 0);
+                const colors = SESSION_COLORS[hash % SESSION_COLORS.length];
+                const selected = sessionCategory === category;
+                return '<button type="button" class="session-badge" data-session-category="' + escapeHtml(category) + '" aria-pressed="' + selected + '" title="' + escapeHtml((selected ? 'Remove session filter: ' : 'Filter by session category: ') + category) + '" style="--session-bg:' + colors.bg + ';--session-border:' + colors.border + ';--session-ink:' + colors.ink + '">' + escapeHtml(category) + '</button>';
+            }).join('') + '</div>';
+        }
+
+        function similarPaperUrl(paperId) {
+            const params = new URLSearchParams({paper: paperId});
+            if (!differentSessionsOnly) params.set('different', '0');
+            return window.location.pathname + '?' + params.toString();
+        }
+
+        function renderSimilarPapers(card) {
+            const hasCategory = (card.conference_session_categories || []).length > 0;
+            let html = '<section class="detail-section similar-section">' +
+                '<button type="button" class="clear-button similar-toggle" id="similar_toggle" aria-expanded="' + showSimilar + '" aria-controls="similar_content">Similar papers by design principles</button>';
+            if (!showSimilar) return html + '<div id="similar_content" hidden></div></section>';
+            const matches = PaperSimilarity.rank(card, Object.values(PAPER_CARDS_BY_ID), {
+                differentCategories: differentSessionsOnly && hasCategory,
+                limit: 5
+            });
+            html += '<div id="similar_content"><label class="similar-controls"><input type="checkbox" id="different_sessions"' +
+                (differentSessionsOnly && hasCategory ? ' checked' : '') + (hasCategory ? '' : ' disabled') +
+                '> Other session categories only' + (hasCategory ? '' : ' (session metadata unavailable)') + '</label>' +
+                '<p class="session-category">' + escapeHtml(card.collection) + ' | Core-principle Jaccard | At least two shared principles</p>';
+            if (!matches.length) html += '<p class="detail-empty">No papers meet these criteria.</p>';
+            html += '<ol class="similar-results">' + matches.map(function(match) {
+                const other = match.card;
+                const union = PaperSimilarity.tags(card).length + PaperSimilarity.tags(other).length - match.shared.length;
+                return '<li class="similar-result paper-match"><a href="' + escapeHtml(similarPaperUrl(other.paper_id)) + '">' + escapeHtml(other.paper_title) + '</a>' +
+                    (sessionBadges(other.conference_session_categories) || '<p class="session-category">Session category unavailable</p>') +
+                    '<p><strong>Jaccard ' + match.score.toFixed(2) + '</strong> (' + match.shared.length + ' shared / ' + union + ' distinct principles)</p>' +
+                    '<div class="paper-tags" aria-label="Shared principles">' + principleLabels(match.shared) + '</div>' +
+                    (card.similarity_principle_source !== 'equation_core' || other.similarity_principle_source !== 'equation_core' ? '<p>Includes top-three fallback tags.</p>' : '') + '</li>';
+            }).join('') + '</ol></div></section>';
+            return html;
+        }
+
+        function renderSameSessionPapers(card) {
+            if (!(card.conference_session_categories || []).length) return '';
+            const peers = PaperSimilarity.sameCategoryPapers(card, Object.values(PAPER_CARDS_BY_ID));
+            let html = '<section class="detail-section similar-section">' +
+                '<button type="button" class="clear-button similar-toggle" id="session_peers_toggle" aria-expanded="' + showSameSession + '" aria-controls="session_peers_content">Papers in the same session category (' + peers.length + ')</button>';
+            if (!showSameSession) return html + '<div id="session_peers_content" hidden></div></section>';
+            html += '<div id="session_peers_content">';
+            if (!peers.length) html += '<p class="detail-empty">No other papers in this session category.</p>';
+            html += '<ol class="similar-results">' + peers.map(function(other) {
+                const tags = principleTagsForPaper(findPaperByIdentifier(other.paper_id), other);
+                return '<li class="session-peer paper-match"><a href="' + escapeHtml(similarPaperUrl(other.paper_id)) + '">' + escapeHtml(other.paper_title) + '</a>' +
+                    sessionBadges(other.conference_session_categories) +
+                    '<div class="paper-tags" aria-label="Principles">' + principleLabels(tags) + '</div></li>';
+            }).join('') + '</ol></div></section>';
+            return html;
         }
 
         function renderPaperDetail(identifier) {
@@ -1023,19 +1157,15 @@
 
             activePaperId = paper.paper_id;
             const card = paperCard(paper);
-            const tagBadges = paper.tags.map(function(tag) {
-                const selected = selectedTags.has(tag) ? ' selected' : '';
-                return '<button type="button" class="mini-tag' + selected + '" style="' + tagStyle(tag) + '" data-tag="' + escapeHtml(tag) + '">' +
-                    '<span class="tag-code">' + escapeHtml(tag) + '</span>' +
-                    '<span>' + escapeHtml(principle(tag).name) + '</span>' +
-                    '</button>';
-            }).join('');
+            const tagBadges = principleLabels(principleTagsForPaper(paper, card));
 
             let body = '<div class="detail-header"><div>' +
                 '<h2 class="detail-title">' + escapeHtml(paper.title) + '</h2>' +
                 '<div class="detail-meta"><span class="conference-badge" style="' + conferenceStyle(paperCollection(paper)) + '">' + escapeHtml(paperCollection(paper)) + '</span>' +
                 detailBadgeForPaper(paper, card) +
-                '</div></div>' +
+                '</div>' +
+                (card ? sessionBadges(card.conference_session_categories) : '') +
+                '</div>' +
                 '<button class="detail-close" type="button" aria-label="Close paper details" id="close_detail">x</button></div>';
 
             if (!paperCardsLoaded) {
@@ -1051,7 +1181,10 @@
                 return;
             }
 
+            body += renderSimilarPapers(card);
+            body += renderSameSessionPapers(card);
             body += '<section class="detail-section"><h3>Paper Card</h3><dl class="detail-list">' +
+                ((card.conference_session_categories || []).length ? '<div class="detail-kv"><dt>Conference session category</dt><dd>' + sessionBadges(card.conference_session_categories) + '</dd></div>' : '') +
                 detailItem('Problem domain', card.problem_domain) +
                 detailItem('System or method', card.system_or_method_name) +
                 detailItem('Goal', card.goal) +
@@ -1114,6 +1247,9 @@
                 detailItem('Institution', institutionForCard(card)) +
                 detailItem('Publication year', card.publication_year) +
                 detailItem('Venue/source', card.venue_or_source) +
+                (card.conference_sessions || []).map(function(session) {
+                    return detailLink('Official session ' + session.session_id, session.source_url, session.raw_label);
+                }).join('') +
                 detailLink('Paper', card.paper_url, 'Open paper') +
                 detailLink('Collection', card.source_url, 'Open collection') +
                 '</dl></section>';
@@ -1122,6 +1258,10 @@
         }
 
         function showPaperDetail(identifier, sync) {
+            if (identifier !== activePaperId) {
+                showSimilar = false;
+                showSameSession = false;
+            }
             activePaperId = identifier;
             render(sync);
         }
@@ -1132,13 +1272,8 @@
                 container.innerHTML = '<span class="results-note">No tags selected.</span>';
                 return;
             }
-            container.innerHTML = Array.from(selectedTags).map(function(tag) {
-                const p = principle(tag);
-                return '<span class="selected-chip" style="' + tagStyle(tag) + '">' +
-                    '<span class="tag-code">' + escapeHtml(tag) + '</span>' +
-                    '<span>' + escapeHtml(p.name) + '</span>' +
-                    '<button type="button" aria-label="Remove ' + escapeHtml(tag) + '" data-remove-tag="' + escapeHtml(tag) + '">x</button>' +
-                    '</span>';
+            container.innerHTML = Array.from(selectedTags).sort().map(function(tag) {
+                return principleButton(tag, {className:'selected-chip'});
             }).join('');
         }
 
@@ -1146,16 +1281,10 @@
             const counts = countByTag(PAPERS);
             const container = document.getElementById('tag_palette');
             container.innerHTML = GROUP_ORDER.map(function(group) {
-                const tags = Object.keys(PRINCIPLES).filter(function(tag) { return principle(tag).group === group; });
+                const tags = Object.keys(PRINCIPLES).filter(function(tag) { return principle(tag).group === group; }).sort();
                 const total = tags.reduce(function(sum, tag) { return sum + (counts[tag] || 0); }, 0);
                 const buttons = tags.map(function(tag) {
-                    const p = principle(tag);
-                    const selected = selectedTags.has(tag) ? ' selected' : '';
-                    return '<button type="button" class="tag-button' + selected + '" style="' + tagStyle(tag) + '" data-tag="' + escapeHtml(tag) + '" aria-pressed="' + (selected ? 'true' : 'false') + '">' +
-                        '<span class="tag-code">' + escapeHtml(tag) + '</span>' +
-                        '<span class="tag-name">' + escapeHtml(p.name) + '</span>' +
-                        '<span class="tag-count">' + (counts[tag] || 0) + '</span>' +
-                        '</button>';
+                    return principleButton(tag, {className:'tag-button', count:counts[tag] || 0});
                 }).join('');
                 return '<section class="group-block">' +
                     '<div class="group-header"><span>' + escapeHtml(group) + '</span><span class="group-count">' + total + ' assignments</span></div>' +
@@ -1176,7 +1305,7 @@
             const note = document.getElementById('related_note');
             const conferences = selectedConferences();
             const hasSearchQuery = paperSearchQuery() !== '';
-            const base = selectedTags.size === 0 && !hasSearchQuery ?
+            const base = selectedTags.size === 0 && !hasSearchQuery && !sessionCategory ?
                 PAPERS.filter(function(paper) { return conferences.has(paperCollection(paper)); }) :
                 matches;
             const counts = countByTag(base);
@@ -1185,7 +1314,7 @@
                 .sort(function(a, b) { return counts[b] - counts[a] || a.localeCompare(b); })
                 .slice(0, 18);
 
-            note.textContent = selectedTags.size === 0 && !hasSearchQuery ?
+            note.textContent = selectedTags.size === 0 && !hasSearchQuery && !sessionCategory ?
                 'Most common tags in the selected collections.' :
                 'Tags that commonly appear with the current result set.';
             if (relatedTags.length === 0) {
@@ -1193,12 +1322,7 @@
                 return;
             }
             related.innerHTML = relatedTags.map(function(tag) {
-                const p = principle(tag);
-                return '<button type="button" class="related-tag" style="' + tagStyle(tag) + '" data-tag="' + escapeHtml(tag) + '">' +
-                    '<span class="tag-code">' + escapeHtml(tag) + '</span>' +
-                    '<span>' + escapeHtml(p.name) + '</span>' +
-                    '<span class="tag-count">' + counts[tag] + '</span>' +
-                    '</button>';
+                return principleButton(tag, {className:'related-tag', count:counts[tag]});
             }).join('');
         }
 
@@ -1222,6 +1346,7 @@
             const tags = Array.from(selectedTags).join(' + ');
             const pieces = [];
             if (hasSearchQuery) pieces.push('search "' + rawQuery + '"');
+            if (sessionCategory) pieces.push('session category "' + sessionCategory + '"');
             if (selectedTags.size > 0) pieces.push('tags ' + tags + ' using ' + matchMode().toUpperCase() + ' matching');
             if (pieces.length > 0) {
                 note.textContent = 'Showing ' + matches.length + ' papers for ' + pieces.join(' and ') + '.';
@@ -1232,16 +1357,7 @@
                 note.textContent = 'Showing ' + matches.length + ' papers in ' + selectedCollections.join(', ') + '.';
             }
             results.innerHTML = sortedPapers(matches).map(function(paper) {
-                const selectedFirst = paper.tags.slice().sort(function(a, b) {
-                    return Number(selectedTags.has(b)) - Number(selectedTags.has(a)) || a.localeCompare(b);
-                });
-                const tagButtons = selectedFirst.map(function(tag) {
-                    const selected = selectedTags.has(tag) ? ' selected' : '';
-                    return '<button type="button" class="mini-tag' + selected + '" style="' + tagStyle(tag) + '" data-tag="' + escapeHtml(tag) + '">' +
-                        '<span class="tag-code">' + escapeHtml(tag) + '</span>' +
-                        '<span>' + escapeHtml(principle(tag).name) + '</span>' +
-                        '</button>';
-                }).join('');
+                const tagButtons = principleLabels(paper.tags);
                 const matchLabel = selectedTags.size > 0 ?
                     matchingTagCount(paper) + ' of ' + selectedTags.size + ' selected tags' :
                     (hasSearchQuery ? 'Search match' : '');
@@ -1253,6 +1369,7 @@
                     (paper.publication_year ? '<span class="detail-badge muted">' + escapeHtml(paper.publication_year) + '</span>' : '') +
                     (matchLabel ? '<span class="match-badge">' + matchLabel + '</span>' : '') + detailBadge + '</div>' +
                     '<h3 class="paper-title">' + escapeHtml(paper.title) + '</h3>' +
+                    sessionBadges(paper.conference_session_categories) +
                     '<div class="paper-tags">' + tagButtons + '</div>' +
                     '</article>';
             }).join('');
@@ -1265,6 +1382,10 @@
             if (selectedTags.size > 0) params.set('tags', Array.from(selectedTags).join(','));
             if (matchMode() !== 'any') params.set('mode', matchMode());
             if (activePaperId) params.set('paper', activePaperId);
+            if (sessionCategory) params.set('category', sessionCategory);
+            if (showSimilar) params.set('similar', '1');
+            if (showSameSession) params.set('peers', '1');
+            if (!differentSessionsOnly) params.set('different', '0');
             const allConferences = availableConferences();
             const selected = selectedConferences();
             const conferences = allConferences.filter(function(conference) { return selected.has(conference); });
@@ -1283,6 +1404,10 @@
                 if (PRINCIPLES[tag]) selectedTags.add(tag);
             });
             activePaperId = params.get('paper') || '';
+            sessionCategory = params.get('category') || '';
+            showSimilar = params.get('similar') === '1';
+            showSameSession = params.get('peers') === '1';
+            differentSessionsOnly = params.get('different') !== '0';
             const mode = params.get('mode');
             if (mode === 'all') {
                 const input = document.querySelector('input[name="match_mode"][value="all"]');
@@ -1300,8 +1425,29 @@
             render(true);
         }
 
+        function handleFilterClick(event) {
+            const button = event.target.closest('[data-tag], [data-session-category]');
+            if (!button) return false;
+            const isSession = button.hasAttribute('data-session-category');
+            const attribute = isSession ? 'data-session-category' : 'data-tag';
+            const value = button.getAttribute(attribute);
+            if (isSession) {
+                sessionCategory = sessionCategory === value ? '' : value;
+                render(true);
+            } else {
+                toggleTag(value);
+            }
+            const replacement = Array.from(event.currentTarget.querySelectorAll('[' + attribute + ']')).find(function(candidate) {
+                return candidate.getAttribute(attribute) === value;
+            });
+            const focusTarget = replacement || document.getElementById(isSession ? 'session_category' : 'clear_tags');
+            focusTarget.focus({preventScroll:true});
+            return true;
+        }
+
         function render(sync) {
             renderConferenceFilters();
+            renderSessionFilter();
             const matches = filteredPapers();
             const activePaper = findPaperByIdentifier(activePaperId);
             if (paperCardsLoaded && activePaper) activePaperId = activePaper.paper_id;
@@ -1314,25 +1460,16 @@
             renderRelatedTags(matches);
             renderResults(matches);
             renderPaperDetail(activePaperId);
+            document.querySelector('.explorer-grid').classList.toggle('has-active-paper', Boolean(activePaperId));
             if (sync) updateUrl();
         }
 
         function init() {
             loadUrlState();
-            document.getElementById('tag_palette').addEventListener('click', function(event) {
-                const button = event.target.closest('[data-tag]');
-                if (button) toggleTag(button.getAttribute('data-tag'));
-            });
-            document.getElementById('related_tags').addEventListener('click', function(event) {
-                const button = event.target.closest('[data-tag]');
-                if (button) toggleTag(button.getAttribute('data-tag'));
-            });
+            document.getElementById('tag_palette').addEventListener('click', handleFilterClick);
+            document.getElementById('related_tags').addEventListener('click', handleFilterClick);
             document.getElementById('paper_results').addEventListener('click', function(event) {
-                const button = event.target.closest('[data-tag]');
-                if (button) {
-                    toggleTag(button.getAttribute('data-tag'));
-                    return;
-                }
+                if (handleFilterClick(event)) return;
                 const paperCard = event.target.closest('[data-paper-id]');
                 if (paperCard) {
                     showPaperDetail(paperCard.getAttribute('data-paper-id'), true);
@@ -1340,29 +1477,45 @@
             });
             document.getElementById('paper_results').addEventListener('keydown', function(event) {
                 if (event.key !== 'Enter' && event.key !== ' ') return;
-                if (event.target.closest('[data-tag]')) return;
+                if (event.target.closest('[data-tag], [data-session-category]')) return;
                 const paperCard = event.target.closest('[data-paper-id]');
                 if (!paperCard) return;
                 event.preventDefault();
                 showPaperDetail(paperCard.getAttribute('data-paper-id'), true);
             });
             document.getElementById('paper_detail').addEventListener('click', function(event) {
-                const tagButton = event.target.closest('[data-tag]');
-                if (tagButton) {
-                    toggleTag(tagButton.getAttribute('data-tag'));
+                if (event.target.closest('#session_peers_toggle')) {
+                    showSameSession = !showSameSession;
+                    renderPaperDetail(activePaperId);
+                    updateUrl();
+                    document.getElementById('session_peers_toggle').focus();
                     return;
                 }
+                if (event.target.closest('#similar_toggle')) {
+                    showSimilar = !showSimilar;
+                    renderPaperDetail(activePaperId);
+                    updateUrl();
+                    document.getElementById('similar_toggle').focus();
+                    return;
+                }
+                if (handleFilterClick(event)) return;
                 if (event.target.closest('#close_detail')) {
                     activePaperId = '';
                     render(true);
                 }
             });
-            document.getElementById('selected_tags').addEventListener('click', function(event) {
-                const button = event.target.closest('[data-remove-tag]');
-                if (!button) return;
-                selectedTags.delete(button.getAttribute('data-remove-tag'));
+            document.getElementById('paper_detail').addEventListener('change', function(event) {
+                if (event.target.id !== 'different_sessions') return;
+                differentSessionsOnly = event.target.checked;
+                renderPaperDetail(activePaperId);
+                updateUrl();
+                document.getElementById('different_sessions').focus();
+            });
+            document.getElementById('session_category').addEventListener('change', function(event) {
+                sessionCategory = event.target.value;
                 render(true);
             });
+            document.getElementById('selected_tags').addEventListener('click', handleFilterClick);
             document.getElementById('clear_tags').addEventListener('click', function() {
                 selectedTags.clear();
                 render(true);
