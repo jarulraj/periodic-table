@@ -14,7 +14,7 @@
   "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html",
   "source_retrieved_at": "2026-10-16T18:09:11.502122+00:00",
   "source_html_sha256": "1ea94c91288fb66fe8e08bb5340cc20c9bccb671e9d6231d70a2973389dae9a0",
-  "papers_csv_sha256": "11c74757faf1df3f888776620a2d8c0886939ade2f9c0b561aad3a11e71c6c65",
+  "papers_csv_sha256": "3ef9e5f6abf3ce3dc8630eb9d239cb49c90883d7f1f48770101acf1d7c5d2fd1",
   "independent_count_source": "https://www.vldb.org/archives/website/2003/ressources/Newsletter_11092003.pdf",
   "independent_count": "48 Core + 27 IIS accepted research papers; nine industrial papers excluded",
   "review_status": "Model-generated principle analysis with structural validation and targeted agent review; not exhaustively verified or author-reviewed.",
@@ -1599,5 +1599,7 @@
       "formula_or_code_regions": 0,
       "reviews": []
     }
-  }
+  },
+  "source_papers_csv_sha256": "11c74757faf1df3f888776620a2d8c0886939ade2f9c0b561aad3a11e71c6c65",
+  "inventory_export_note": "papers.csv uses LF line endings; source_papers_csv_sha256 identifies the original CRLF inventory. Field contents are unchanged."
 }
