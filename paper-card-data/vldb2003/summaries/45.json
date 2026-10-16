@@ -1,0 +1,278 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "45",
+    "paper_title": "Adaptive, Hands-Off Stream Mining",
+    "authors": [
+      "Spiros Papadimitriou",
+      "Anthony Brockwell",
+      "Christos Faloutsos"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference",
+    "year": "2003",
+    "system_or_method_name": "AWSOM (Arbitrary Window Stream mOdeling Method)",
+    "problem_domain": "Time-series analysis and pattern discovery on data streams from resource-constrained devices."
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To develop a method for automatic, single-pass, low-memory pattern discovery and forecasting on data streams, without requiring human intervention or pre-specified models.",
+    "primary_optimized_metric": "resource consumption",
+    "secondary_metrics": [
+      "forecasting accuracy",
+      "memory",
+      "CPU time"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "10x",
+        "meaning": "AWSOM outperforms manually set up auto-regressive models by at least 10x in resource consumption.",
+        "pointer": "[p.1]"
+      },
+      {
+        "number_or_delta": "O(lg N)",
+        "meaning": "The space complexity to maintain the model is logarithmic with respect to the number of points N seen so far.",
+        "pointer": "[p.6]"
+      },
+      {
+        "number_or_delta": "O(1)",
+        "meaning": "The amortized time complexity for each update when a new data point arrives is constant.",
+        "pointer": "[p.7]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Traditional statistical time-series models (ARIMA, SARIMA, GARCH)",
+    "why_this_is_the_right_comparison": "These are the state-of-the-art forecasting methods at the time, but they fail to meet the requirements of unsupervised, online operation on resource-constrained devices, which is the target environment.",
+    "limiting_design_assumption": "Time-series modeling requires a human expert to visually inspect the data, identify trends and periodicities, and manually select and fine-tune an appropriate model (e.g., window sizes, differencing). This process is batch-based and computationally intensive.",
+    "pointers": [
+      "[p.1]",
+      "[p.3]"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Online statistical modeling",
+    "specific_tools_or_algorithms": [
+      "Incremental Discrete Wavelet Transform (DWT)",
+      "Recursive Least Squares (RLS)",
+      "F-test for model selection"
+    ],
+    "what_is_being_optimized": "The selection of significant predictive coefficients for a generative model of the time series in the wavelet domain.",
+    "state_or_ir": "The wavelet crest (a set of scaling coefficients) and the matrices (P and q) for the RLS-updated linear regression models at each wavelet scale.",
+    "output": "A generative model consisting of a set of linear equations that capture intra-scale and inter-scale correlations of wavelet coefficients, which can be used for forecasting and outlier detection.",
+    "pointers": [
+      "[p.5]",
+      "[p.6]",
+      "[p.11]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Models the data stream in the wavelet (time-frequency) domain instead of the raw time domain, enabling automatic discovery of arbitrary periodicities and bursts.",
+      "baseline_assumption": "Time-series models operate directly on the raw data values (the time domain). A human is needed to pre-process the data to remove trends and seasonalities to fit the model's assumptions.",
+      "why_baseline_did_not_include_it": "Traditional methods like ARIMA were not designed for automatic feature extraction. They rely on a human to perform the equivalent transformation (e.g., differencing) based on visual inspection of the data and its auto-correlation function.",
+      "mechanism_level_implementation": "The system uses an incremental Discrete Wavelet Transform (DWT) to convert the incoming time-series stream into a multi-resolution representation of wavelet coefficients. This transform is updated in O(1) amortized time and O(lg N) space.",
+      "primary_metric_improved": "forecasting accuracy",
+      "tradeoffs_or_costs": "The model's coefficients are in the wavelet domain, which is less directly interpretable to a human than a time-domain model. It also introduces the time-frequency uncertainty inherent to wavelet transforms.",
+      "pointers": [
+        "[p.5]",
+        "[p.6]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Automates model construction and selection using online updates and statistical tests, eliminating the need for a human expert.",
+      "baseline_assumption": "A trained statistician is required to choose the model structure (e.g., window size, lags) and parameters, often through a computationally intensive, batch-based, trial-and-error process.",
+      "why_baseline_did_not_include_it": "The baseline methods were developed for offline analysis where human expertise and computational cost were acceptable. They lack mechanisms for online, incremental parameter estimation and automatic model selection suitable for streams.",
+      "mechanism_level_implementation": "For each wavelet scale, the system fits a linear regression model to capture correlations between coefficients. It uses Recursive Least Squares (RLS) to update model parameters online as new data arrives. It then uses statistical tests (F-test) to automatically prune insignificant coefficients, avoiding over-fitting.",
+      "primary_metric_improved": "resource consumption",
+      "tradeoffs_or_costs": "The system must pre-specify the maximum possible model order to consider, and the model selection process adds computational overhead to each update, though it is constant time O(k^2).",
+      "pointers": [
+        "[p.3]",
+        "[p.6]",
+        "[p.11]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Al",
+          "name": "Abstraction Lifting",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The use of the Discrete Wavelet Transform (DWT) to represent the time series.",
+          "why_it_applies": "The system lifts the representation from the raw time domain (a sequence of values) to the time-frequency domain (a set of wavelet coefficients). In this new representation, complex patterns like arbitrary periodicities and bursts become simpler, detectable correlations between coefficients, which can be modeled with linear regression.",
+          "justification_if_invented": "",
+          "pointer": "[p.5]"
+        },
+        {
+          "symbol": "Ha",
+          "name": "Hardware-Aware",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The choice of an incremental DWT algorithm and the analysis of space and time complexity.",
+          "why_it_applies": "The entire design is motivated by the resource constraints of sensors (CPU, memory). The mechanisms are explicitly chosen to have low memory overhead (O(lg N) space) and fast, constant-time updates, making the system feasible for embedded devices.",
+          "justification_if_invented": "",
+          "pointer": "[p.1, p.2, p.6]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Mo",
+          "name": "Modularity",
+          "reason_rejected_or_borderline": "The system is modular (DWT stage, then regression stage), but this is a general property of the design rather than a specific principle explaining the core novelty compared to the baseline.",
+          "pointer": "[p.5, p.6]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Au",
+          "name": "Automation",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The combination of RLS for online parameter updates and statistical tests (F-test) for model selection.",
+          "why_it_applies": "This mechanism completely automates the process of model building and tuning, which is explicitly stated as a manual, expert-driven task in the baseline ARIMA methods. The paper's goal is 'hands-off' and 'unsupervised' operation.",
+          "justification_if_invented": "",
+          "pointer": "[p.1, p.2, p.6]"
+        },
+        {
+          "symbol": "Ad",
+          "name": "Adaptive Processing",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The use of Recursive Least Squares (RLS) to update the linear regression models for each new data point.",
+          "why_it_applies": "The system continuously adapts its model parameters online as the stream progresses. This is in direct contrast to the batch-based fitting process of traditional methods, enabling a one-pass algorithm.",
+          "justification_if_invented": "",
+          "pointer": "[p.6, p.11]"
+        },
+        {
+          "symbol": "Cm",
+          "name": "Cost-based",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The F-test used for model selection.",
+          "why_it_applies": "The F-test evaluates whether adding a variable (a coefficient) to the model provides a statistically significant reduction in variance (Sum of Squared Residuals). This is a cost-benefit analysis where the benefit is better fit and the cost is increased model complexity. It's a principled way to choose among different model structures.",
+          "justification_if_invented": "",
+          "pointer": "[p.11]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "reason_rejected_or_borderline": "Model selection prunes coefficients, which avoids computation. However, this changes the model and its output (forecasts). It is a form of principled approximation, not result-preserving work avoidance.",
+          "pointer": "[p.6, p.11]"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Human-Tuned Time-Domain Modeling + Al + Au + Ad -> AWSOM",
+    "baseline_name": "Human-Tuned Time-Domain Modeling (e.g., ARIMA)",
+    "top_3_principle_tags": [
+      "Al",
+      "Au",
+      "Ad"
+    ],
+    "core_principle_tags": [
+      "Al",
+      "Au",
+      "Ad"
+    ],
+    "supporting_principle_tags": [
+      "Ha",
+      "Cm"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Al",
+      "Ha",
+      "Au",
+      "Ad",
+      "Cm"
+    ],
+    "new_system_name": "AWSOM",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "These principles combine to transform a manual, batch-oriented analysis task into an automatic, online one. Abstraction Lifting (Al) first changes the data into a representation where patterns are easier to model. Automation (Au) then replaces the human expert with an algorithmic process for building the model in this new representation. Adaptive Processing (Ad) makes this automated process work continuously on a stream, updating the model with each new data point.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Al",
+          "contribution_to_equation": "Provides a more effective data representation (wavelets) where complex time-domain patterns become simple, modelable correlations."
+        },
+        {
+          "symbol": "Au",
+          "contribution_to_equation": "Replaces the human statistician with an automatic, online mechanism for model construction and selection."
+        },
+        {
+          "symbol": "Ad",
+          "contribution_to_equation": "Enables the model to be updated incrementally and online, satisfying the one-pass requirement for stream processing."
+        }
+      ],
+      "transfer_question": "In what other domains could a change of representation (Al) enable a previously manual analysis task to be fully automated (Au) and run adaptively online (Ad)?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "memory",
+      "direction": "down",
+      "concrete_number": "O(lg N)",
+      "pointer": "[p.6]"
+    },
+    {
+      "property": "CPU time",
+      "direction": "down",
+      "concrete_number": "O(1) amortized per update",
+      "pointer": "[p.7]"
+    },
+    {
+      "property": "resource consumption",
+      "direction": "down",
+      "concrete_number": ">10x improvement vs AR",
+      "pointer": "[p.1]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Gs",
+      "name": "Granularity-Specific Modeling",
+      "definition": "Decomposing a system's logic to operate on different levels of granularity or resolution of the underlying data or state, applying specialized models or policies at each level.",
+      "mechanism_pattern": "The system uses wavelet decomposition to separate a time series into different frequency bands (scales). It then fits distinct linear regression models for each band, effectively creating a specialized model for each level of temporal resolution.",
+      "why_existing_principles_are_insufficient": "Al (Abstraction Lifting) captures the transform to the wavelet domain, but not the subsequent step of treating each scale/level as a separate modeling problem. Mo (Modularity) describes functional decomposition, but not specifically decomposition by data resolution or granularity. Gs captures the design pattern of applying different logic at different zoom levels of the data.",
+      "closest_existing_principles": [
+        "Al",
+        "Mo",
+        "Wa"
+      ],
+      "reusability_beyond_this_paper": "This pattern is common in systems that deal with hierarchical data or multi-resolution analysis, such as multi-grid solvers, hierarchical planning in robotics, or multi-granularity locking in databases. A dedicated principle could capture this recurring design choice.",
+      "confidence": "medium",
+      "pointer": "[p.5, Fig. 3(b)]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "AWSOM transforms an incoming data stream into a multi-resolution wavelet representation and applies online linear regression with automatic model selection at each resolution scale to enable hands-off pattern discovery and forecasting on resource-constrained devices.",
+    "top_3_principles": [
+      "Al",
+      "Au",
+      "Ad"
+    ],
+    "mechanism_family": "stream processing",
+    "specific_tools_or_algorithms": [
+      "Incremental Discrete Wavelet Transform (DWT)",
+      "Recursive Least Squares (RLS)",
+      "F-test for model selection"
+    ],
+    "primary_design_archetype": "granularity rewriting",
+    "principle_mapping_confidence": "high"
+  }
+}

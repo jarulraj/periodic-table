@@ -1,0 +1,297 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "3",
+    "paper_title": "An Efficient and Resilient Approach to Filtering and Disseminating Streaming Data",
+    "authors": [
+      "Shetal Shah",
+      "Shyamshankar Dharmarajan",
+      "Krithi Ramamritham"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference, Berlin, Germany, 2003",
+    "year": "2003",
+    "system_or_method_name": "DiTA",
+    "problem_domain": "Streaming data dissemination"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To design and build a dynamic data distribution system which is coherency-preserving, resilient to failures, and efficient, providing high fidelity for streaming data.",
+    "primary_optimized_metric": "fidelity",
+    "secondary_metrics": [
+      "Number of Messages",
+      "computational delay"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "Order of magnitude lower",
+        "meaning": "For a workload with 20% stringent coherency requirements, the fidelity loss for DiTA is an order of magnitude lower than for the LeLA baseline.",
+        "pointer": "[p.5]"
+      },
+      {
+        "number_or_delta": "0.5-1.25% vs 2.5-9.5%",
+        "meaning": "For a workload with 80% stringent coherency requirements, DiTA has a fidelity loss between 0.5-1.25%, while the LeLA baseline has a loss between 2.5-9.5%.",
+        "pointer": "[p.5]"
+      },
+      {
+        "number_or_delta": "Up to 15%",
+        "meaning": "The proposed scheduling technique improves performance (reduces fidelity loss) by up to 15% compared to a simple algorithm in tight coherency situations.",
+        "pointer": "[p.10]"
+      },
+      {
+        "number_or_delta": "Up to 1%",
+        "meaning": "Adding resiliency can improve fidelity even in non-failure situations.",
+        "pointer": "[p.7]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "LeLA",
+    "why_this_is_the_right_comparison": "LeLA is a previous algorithm from the same authors for the same problem, which was found to be unable to cope with a large number of data items, motivating the need for a more scalable and resilient approach.",
+    "limiting_design_assumption": "A centralized, coherency-unaware algorithm for constructing a single dissemination graph is sufficient for scalable data dissemination. LeLA's approach overloaded nodes and did not scale well with the number of data items.",
+    "pointers": [
+      "[p.2]"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Overlay network construction and scheduling",
+    "specific_tools_or_algorithms": [
+      "DiTA (Data-item-at-a-Time-Algorithm)",
+      "Benefit/cost scheduling",
+      "Relaxed-coherency backup parents"
+    ],
+    "what_is_being_optimized": "The logical structure of the per-data-item dissemination tree and the processing order of updates at each repository.",
+    "state_or_ir": "The dynamic data dissemination tree (d*t) for each data item, and the update queue at each repository.",
+    "output": "A resilient overlay network for data dissemination and a schedule for pushing updates to maintain data coherency.",
+    "pointers": [
+      "[p.2]",
+      "[p.6]",
+      "[p.9]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Constructs a per-data-item dissemination tree (d*t) that places repositories with stricter coherency requirements closer to the source, improving fidelity and scalability.",
+      "baseline_assumption": "A single, less-structured dissemination graph is sufficient for all data items and coherency needs.",
+      "why_baseline_did_not_include_it": "The baseline algorithm, LeLA, was found to be unable to scale to a large number of data items, indicating its construction method was inefficient.",
+      "mechanism_level_implementation": "The DiTA algorithm builds a separate tree for each data item. When inserting a new repository, it recursively searches for a parent at the lowest possible level that can satisfy its coherency requirement. If a repository R has a stricter requirement than a potential parent Q, R can 'push Q down' in the tree and take its place.",
+      "primary_metric_improved": "fidelity",
+      "tradeoffs_or_costs": "The height of the dissemination tree in DiTA can be greater than in LeLA, which can be a disadvantage if link delays are very high and computational delays are negligible.",
+      "pointers": [
+        "[p.2]",
+        "[p.3]",
+        "[p.5]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Improves dissemination efficiency and resilience by introducing active backup parents with relaxed coherency and a cost-based scheduling policy for processing and pushing updates.",
+      "baseline_assumption": "The dissemination network is not fault-tolerant and processes updates in a simple, non-optimized order (e.g., FIFO).",
+      "why_baseline_did_not_include_it": "The baseline focused on the initial construction of the dissemination graph, not its operational resilience or the micro-optimization of update scheduling within repositories.",
+      "mechanism_level_implementation": "1. Resiliency: Each repository Q is assigned a backup parent B that provides data with a relaxed coherency (c_B = k * c, with k=2). This allows Q to detect failure of its primary parent with low overhead. 2. Scheduling: Updates in a repository's queue are processed in descending order of a score = (benefit/cost), where benefit is the number of downstream dependents affected and cost is the number of pushes required. This prioritizes high-impact updates.",
+      "primary_metric_improved": "fidelity",
+      "tradeoffs_or_costs": "The resiliency mechanism increases the number of messages in the network during normal operation (e.g., by 60% in one experiment). The scheduling mechanism requires pre-computing and storing benefit/cost information.",
+      "pointers": [
+        "[p.6]",
+        "[p.9]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Wa",
+          "name": "Workload-Aware",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The DiTA algorithm's logic for inserting a new repository into the dissemination tree.",
+          "why_it_applies": "The structure of the dissemination tree is explicitly determined by the coherency requirements of the repositories, which represent the system's workload. Repositories with more stringent requirements are placed closer to the source.",
+          "justification_if_invented": "",
+          "pointer": "[quote: 'In DiT'A, repositories with more stringent coherency requirements are placed closer to the source in the network...'] [p.2]"
+        },
+        {
+          "symbol": "Fp",
+          "name": "Function Placement",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The DiTA algorithm deciding the parent of a repository in the logical overlay network.",
+          "why_it_applies": "The system places the data dissemination function (i.e., positions repositories in the logical tree) based on the context of coherency requirements to minimize delays and improve fidelity. This is a logical placement of function, not just physical.",
+          "justification_if_invented": "",
+          "pointer": "[quote: 'The subtree is chosen such that the level of R in the dt is the smallest possible and that communication delays between R and its parent are small.'] [p.3]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Mo",
+          "name": "Modularity",
+          "reason_rejected_or_borderline": "The system builds a separate tree per data item, which is a form of modularity. However, the core novelty of DiTA is not just the separation, but the workload-aware structure *within* each tree, which is better captured by Wa and Fp.",
+          "pointer": "[quote: 'in DiT A, we build a dynamic data dissemination tree, d*t, for each data item.'] [p.2]"
+        },
+        {
+          "symbol": "Sc",
+          "name": "Scalability",
+          "reason_rejected_or_borderline": "Scalability is a primary benefit and goal of the DiTA algorithm, but it is not the mechanism itself. Wa and Fp are the mechanisms that lead to better scalability.",
+          "pointer": "[p.2]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Cm",
+          "name": "Cost-based",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The scheduling policy for processing updates from the queue and for pushing updates to dependents.",
+          "why_it_applies": "The system explicitly calculates a benefit/cost ratio for each update and uses this score to determine the optimal processing order to minimize total delay and maximize fidelity. The paper includes a proof of optimality for this ordering.",
+          "justification_if_invented": "",
+          "pointer": "[quote: '...the schedule with no inversions i.e., one ordered by a score = (b(u_i)/C(u_i)), is optimal.'] [p.9]"
+        },
+        {
+          "symbol": "Ft",
+          "name": "Fault Tolerance",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The mechanism of adding backup parents to each repository in the dissemination tree.",
+          "why_it_applies": "The explicit goal of the backup parent mechanism is to handle repository and link failures, ensuring data continues to be disseminated, albeit at a potentially lower coherency.",
+          "justification_if_invented": "",
+          "pointer": "[quote: 'Our approach, presented in Section 4, to handle repository failures as well as the communication link failures is based on adding back-up parents...'] [p.2]"
+        },
+        {
+          "symbol": "Cr",
+          "name": "Consistency Relaxation",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The backup parent is configured to serve data with a less stringent coherency requirement than the primary parent.",
+          "why_it_applies": "This is a deliberate relaxation of the coherency guarantee on the backup path. The purpose is to reduce the communication and computation overhead of the fault tolerance mechanism during normal, failure-free operation.",
+          "justification_if_invented": "",
+          "pointer": "[quote: '...a back-up parent is asked to deliver data with coherency that is less stringent than that associated with the parent. This reduces the overheads of providing resiliency...'] [p.2]"
+        },
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The filtering mechanism that uses pseudo-values and coherency windows.",
+          "why_it_applies": "The system avoids pushing updates for data that oscillates within a pre-established coherency window. This work is avoided because it does not alter the externally observable result, which is the satisfaction of the user's coherency requirement (|P(t) - S(t)| < c).",
+          "justification_if_invented": "",
+          "pointer": "[quote: 'Pushing a pseudo value of 10.2 sets the coherency window to (9.9,10.5) and further oscillations between 10 and 10.3 fall within this window and need not be pushed.'] [p.10]"
+        }
+      ],
+      "rejected_or_borderline_principles": []
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Coherency-unaware overlay (LeLA) + Wa + Cm + Ft -> DiTA System",
+    "baseline_name": "Coherency-unaware overlay (LeLA)",
+    "top_3_principle_tags": [
+      "Wa",
+      "Cm",
+      "Ft"
+    ],
+    "core_principle_tags": [
+      "Wa",
+      "Fp",
+      "Cm",
+      "Ft"
+    ],
+    "supporting_principle_tags": [
+      "Cr",
+      "Wv"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Wa",
+      "Fp",
+      "Cm",
+      "Ft",
+      "Cr",
+      "Wv"
+    ],
+    "new_system_name": "DiTA System",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "The system's design separates structural optimization from operational optimization. First, Workload-Aware (Wa) principles are used to construct a high-fidelity overlay network. Then, this network is operated using Cost-based (Cm) scheduling for efficiency and Fault-Tolerant (Ft) mechanisms for resilience. The static structure created by Wa provides a strong foundation for the dynamic Cm and Ft policies to be effective.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Wa",
+          "contribution_to_equation": "Transforms the generic overlay into one whose topology is optimized for the specific coherency requirements of its participants."
+        },
+        {
+          "symbol": "Cm",
+          "contribution_to_equation": "Replaces a simple FIFO processing policy with an optimal, cost-aware scheduling policy that prioritizes updates to maximize system-wide fidelity."
+        },
+        {
+          "symbol": "Ft",
+          "contribution_to_equation": "Adds resilience to the overlay by introducing a backup mechanism to handle node and link failures."
+        }
+      ],
+      "transfer_question": "Could other overlay networks, such as for peer-to-peer storage or computation, be structured based on workload requirements (like latency SLOs or data popularity) and operated with benefit-cost scheduling?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "fidelity loss",
+      "direction": "down",
+      "concrete_number": "order of magnitude lower than LeLA",
+      "pointer": "[p.5]"
+    },
+    {
+      "property": "Number of Messages",
+      "direction": "mixed",
+      "concrete_number": "DiTA reduces messages vs LeLA, but resiliency adds ~60% overhead, while scheduling can reduce messages at high load.",
+      "pointer": "[p.5, p.6, p.10]"
+    },
+    {
+      "property": "computational load per node",
+      "direction": "down",
+      "concrete_number": "Each node in DiT'A does less work than its counterpart in LeLA.",
+      "pointer": "[p.5]"
+    },
+    {
+      "property": "tree height",
+      "direction": "up",
+      "concrete_number": "DiTA had an average height of 6 and max of 10, vs max of 4 for LeLA at high link delays.",
+      "pointer": "[p.5]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Tr",
+      "name": "Tiered-Fidelity Redundancy",
+      "definition": "Achieve fault tolerance efficiently by pairing a primary, high-fidelity mechanism with a secondary, low-fidelity (and lower-cost) mechanism used for liveness detection and failover.",
+      "mechanism_pattern": "Using a backup parent that serves data with a relaxed coherency (c_B > c) to reduce overhead during normal operation, while allowing failure detection and takeover upon primary parent failure.",
+      "why_existing_principles_are_insufficient": "Ft (Fault Tolerance) is too general and does not specify the mechanism. Cr (Consistency Relaxation) describes the property of the backup channel but not its role in the fault-tolerance pattern. The combination Ft+Cr describes the components, but not the reusable design pattern of using a tiered-fidelity backup channel for efficient resilience.",
+      "closest_existing_principles": [
+        "Ft",
+        "Cr"
+      ],
+      "reusability_beyond_this_paper": "This pattern is common in distributed systems, such as using low-frequency heartbeats (low-fidelity) to monitor a high-throughput data channel, or using a low-resolution video stream as a backup for a high-resolution one.",
+      "confidence": "medium",
+      "pointer": "[p.6]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "Constructs a coherency-aware dissemination tree and uses benefit-cost scheduling and relaxed-consistency backups to deliver high-fidelity, resilient streaming data.",
+    "top_3_principles": [
+      "Wa",
+      "Cm",
+      "Ft"
+    ],
+    "mechanism_family": "stream processing",
+    "specific_tools_or_algorithms": [
+      "DiTA (Data-item-at-a-Time-Algorithm)",
+      "Benefit/cost scheduling"
+    ],
+    "primary_design_archetype": "other",
+    "principle_mapping_confidence": "high"
+  }
+}

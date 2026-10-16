@@ -32,6 +32,14 @@ const PUBLISHED_SOURCES = {
         collectionType: 'reading-list',
         sourceUrl: 'https://pages.cs.wisc.edu/~jignesh/cs764/',
         order: 3
+    },
+    vldb2003: {
+        collection: 'VLDB 2003',
+        collectionType: 'conference',
+        sourceUrl: 'https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html',
+        provenanceUrl: 'https://jarulraj.github.io/periodic-table/paper-card-data/vldb2003/provenance.json',
+        expectedPaperCount: 75,
+        order: 4
     }
 };
 
@@ -88,6 +96,8 @@ function sourceMetadata(sourceName) {
         collection: configured.collection || displayNameFromSource(sourceName),
         collectionType: configured.collectionType || 'collection',
         sourceUrl: configured.sourceUrl || '',
+        provenanceUrl: configured.provenanceUrl || '',
+        expectedPaperCount: configured.expectedPaperCount,
         order: configured.order || 999
     };
 }
@@ -303,7 +313,7 @@ function tagsForSummary(summary, entries) {
     ]);
 }
 
-function buildCard(summary, fileNumber, source, paperId, paperLabel, manifestEntry) {
+function buildCard(summary, fileNumber, source, paperId, paperLabel, manifestEntry, provenance) {
     const identification = summary.section_0_paper_identification || {};
     const goal = summary.section_1_goal_and_primary_metric || {};
     const baseline = summary.section_2_comparison_baseline || {};
@@ -340,6 +350,11 @@ function buildCard(summary, fileNumber, source, paperId, paperLabel, manifestEnt
         conference: source.collection,
         source_id: source.id,
         source_url: source.sourceUrl,
+        ...(provenance ? {
+            analysis_note: provenance.review_status,
+            analysis_provenance_url: source.provenanceUrl,
+            ...(provenance.papers[paperId].review_note ? {review_note: provenance.papers[paperId].review_note} : {})
+        } : {}),
         paper_url: firstString([
             manifestEntry && manifestEntry.pdf_url,
             manifestEntry && manifestEntry.url,
@@ -360,7 +375,7 @@ function buildCard(summary, fileNumber, source, paperId, paperLabel, manifestEnt
         state_or_ir: tooling.state_or_ir || '',
         output: tooling.output || '',
         equation: section7.equation || '',
-        core_principle_tags: uniqueTags([section7.core_principle_tags, normalized.top_3_principles]),
+        core_principle_tags: uniqueTags([Array.isArray(section7.core_principle_tags) ? section7.core_principle_tags : normalized.top_3_principles]),
         supporting_principle_tags: uniqueTags([section7.supporting_principle_tags]),
         principle_composition_rationale: compositionRationale(section7),
         one_sentence_mechanism: normalized.one_sentence_mechanism || '',
@@ -392,14 +407,26 @@ if (sources.length === 0) {
     throw new Error('No paper card summary folders found. Set PAPER_CARD_DATA_ROOT or PAPER_CARD_SUMMARY_DIRS.');
 }
 
-const cardsById = {};
-const cardIdsByTitle = {};
+const args = process.argv.slice(2);
+if (args.some(arg => arg !== '--merge')) throw new Error('Usage: build-paper-cards.js [--merge]');
+const selected = new Set(sources.map(source => source.id));
+if (selected.size !== sources.length) throw new Error('Duplicate summary sources.');
+const previous = fs.existsSync(outputPath) ? JSON.parse(fs.readFileSync(outputPath, 'utf8')) : {};
+const retainedSources = (previous.sources || []).filter(source => !selected.has(source.id));
+if (retainedSources.length && !args.includes('--merge')) {
+    throw new Error('This build would remove published collections: ' + retainedSources.map(source => source.collection).join(', ') + '. Use --merge to retain them.');
+}
+// Only rebuild selected sources; retain curated cards from all other collections verbatim.
+const cardsById = Object.fromEntries(Object.entries(previous.cards_by_id || {}).filter(([, card]) => !selected.has(card.source_id)));
+const cardIdsByTitle = Object.fromEntries(Object.entries(previous.card_ids_by_title || {}).filter(([, id]) => Object.hasOwn(cardsById, id)));
 const collectionCounts = {};
-const papers = [];
-const sourceSummaries = [];
+const papers = (previous.papers || []).filter(paper => !selected.has(paper.source_id));
+const sourceSummaries = retainedSources;
 
 for (const source of sources) {
     const manifestByNumber = readPaperManifest(source.summaryDir);
+    const provenancePath = path.join(path.dirname(source.summaryDir), 'provenance.json');
+    const provenance = source.provenanceUrl ? JSON.parse(fs.readFileSync(provenancePath, 'utf8')) : null;
     const files = fs.readdirSync(source.summaryDir)
         .filter(function(file) { return /^\d+\.json$/.test(file); })
         .sort(function(a, b) { return parseInt(a, 10) - parseInt(b, 10); });
@@ -420,7 +447,8 @@ for (const source of sources) {
 
         if (!title || tags.length === 0) continue;
 
-        const card = buildCard(summary, fileNumber, source, paperId, paperLabel, manifestEntry);
+        if (Object.hasOwn(cardsById, paperId)) throw new Error('Duplicate paper ID: ' + paperId);
+        const card = buildCard(summary, fileNumber, source, paperId, paperLabel, manifestEntry, provenance);
         cardsById[paperId] = card;
         cardIdsByTitle[title] = paperId;
         papers.push({
@@ -435,10 +463,12 @@ for (const source of sources) {
             ...(card.conference_session_categories ? {conference_session_categories: card.conference_session_categories} : {}),
             tags
         });
-        collectionCounts[source.collection] = (collectionCounts[source.collection] || 0) + 1;
         sourceCount += 1;
     }
 
+    if (!sourceCount || (source.expectedPaperCount && sourceCount !== source.expectedPaperCount)) {
+        throw new Error('Unexpected paper count for ' + source.collection + ': ' + sourceCount);
+    }
     sourceSummaries.push({
         id: source.id,
         name: source.name,
@@ -448,6 +478,10 @@ for (const source of sources) {
         conference: source.collection,
         paper_count: sourceCount
     });
+}
+
+for (const paper of papers) {
+    collectionCounts[paper.collection] = (collectionCounts[paper.collection] || 0) + 1;
 }
 
 papers.sort(function(a, b) {

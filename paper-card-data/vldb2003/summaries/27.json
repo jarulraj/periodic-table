@@ -1,0 +1,259 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "27",
+    "paper_title": "AQuery: Query Language for Ordered Data, Optimization Techniques, and Experiments",
+    "authors": [
+      "Alberto Lerner",
+      "Dennis Shasha"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference, Berlin, Germany, 2003",
+    "year": "2003",
+    "system_or_method_name": "AQuery",
+    "problem_domain": "Database query languages and optimization for ordered data"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To design a data model, query language, and optimizer where order-dependent queries are natural to express and can be optimized far more effectively than in existing systems like SQL:1999.",
+    "primary_optimized_metric": "query time",
+    "secondary_metrics": [
+      "query expressiveness",
+      "query readability"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "8x to 21x faster",
+        "meaning": "Performance improvement of AQuery over a commercial SQL:1999 system for the 'best-profit' query.",
+        "pointer": "[p.9]"
+      },
+      {
+        "number_or_delta": "2x to 3x faster",
+        "meaning": "Performance improvement of AQuery over a commercial SQL:1999 system for the 'network management' query.",
+        "pointer": "[p.9]"
+      },
+      {
+        "number_or_delta": "Orders of magnitude",
+        "meaning": "The performance difference between AQuery's optimized plans and commercial SQL:1999 systems for certain queries.",
+        "pointer": "[p.2]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "SQL:1999 with OLAP extensions",
+    "why_this_is_the_right_comparison": "SQL:1999 was the first commercially accepted standard to provide features for order-dependent queries, such as the OVER...WINDOW construct, making it the state-of-the-art industrial baseline.",
+    "limiting_design_assumption": "The underlying data model is a multiset of records, and order is an 'add-on' property handled by special constructs (like window functions) rather than a first-class concept. This leads to complex query formulations that are difficult to optimize.",
+    "pointers": [
+      "[p.1, quote: 'Query languages based on the relational data model can handle order-dependent queries only through add-ons.']",
+      "[p.1, quote: 'Add-ons make order-dependent queries difficult to write and to optimize.']"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Rule-based optimizer",
+    "primary_tool_specific_type": "Cost-based query optimizer with order-aware algebraic transformations",
+    "specific_tools_or_algorithms": [
+      "Sort-edge optimization",
+      "Sort-splitting transformation",
+      "Sort-embedding transformation",
+      "Edgeby physical operator"
+    ],
+    "what_is_being_optimized": "The execution plan for an order-dependent query.",
+    "state_or_ir": "An algebra based on 'arrables' (ordered tables) where operators have order-preserving and order-cavalier variants.",
+    "output": "An efficient query execution plan.",
+    "pointers": [
+      "[p.6-8]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "AQuery introduces a data model and language where order is a first-class semantic concept, expressed declaratively with an `ASSUMING ORDER` clause, rather than an add-on.",
+      "baseline_assumption": "The relational model is based on unordered multisets, and order is handled procedurally through `ORDER BY` or complex `WINDOW` constructs that are separate from the core algebra.",
+      "why_baseline_did_not_include_it": "The foundational relational model is built on set/multiset theory. Integrating order as a core concept requires a fundamental change to the data model and algebra, which is a significant departure from the SQL standard.",
+      "mechanism_level_implementation": "The system uses 'arrables' (ordered array-tables) as its data structure. The `ASSUMING ORDER` clause declaratively specifies the required order for a query block, which informs the optimizer to use order-preserving variants of algebraic operators and enables column-oriented functions like `mins()` and `prev()` that operate on ordered vectors.",
+      "primary_metric_improved": "query expressiveness",
+      "tradeoffs_or_costs": "Requires a new data model and algebra, moving away from the standard multiset relational model. The optimizer must be redesigned to understand and exploit these new semantics.",
+      "pointers": [
+        "[p.2, quote: 'tables are not viewed as multisets, but rather as ordered entities that we call arrables']",
+        "[p.2, quote: 'a new clause called ASSUMING ORDER which defines the order of the arrables']",
+        "[p.4, quote: 'Semantically, ASSUMING ORDER is translated to a sort after the FROM clause is computed.']"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "AQuery introduces new order-aware query transformations that fuse sorting with other operators, allowing cardinality-reducing operations to be pushed past sort boundaries that are typically optimization barriers.",
+      "baseline_assumption": "Sorting is an expensive, monolithic operator that often blocks other optimizations. Commercial optimizers struggle to rewrite queries by moving selections or projections across complex windowing constructs.",
+      "why_baseline_did_not_include_it": "Without first-class order semantics, it is difficult to formulate general algebraic rules that safely and correctly move operations across sort-like boundaries. The baseline optimizers tested did not perform such optimizations.",
+      "mechanism_level_implementation": "The optimizer uses a set of new algebraic equivalences: 1) `sort-edge` fuses a sort and a top-k selection into one operator. 2) `sort-embedding` pushes a global sort into a group-by, replacing it with smaller per-group sorts. 3) `edgeby` is a physical operator that combines grouping and edge-selection to discard records on-the-fly.",
+      "primary_metric_improved": "query time",
+      "tradeoffs_or_costs": "Increases the complexity of the query optimizer, which must now consider a larger space of possible plans. The effectiveness of some transformations depends on data distribution, requiring a cost model.",
+      "pointers": [
+        "[p.7, Fig. 3]",
+        "[p.8, Fig. 5]",
+        "[p.8, quote: 'An edge-selection applied to groups is an idiom, called Edgeby, that can be highly optimized.']",
+        "[p.9, quote: 'this technique depends on the data distribution, underscoring the need for cost-based optimization.']"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Se",
+          "name": "Semantically Explicit",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The `ASSUMING ORDER` clause.",
+          "why_it_applies": "This clause makes the required data order for a query block a declarative, explicit part of the query's semantics. This allows the optimizer to reason about order as a property, rather than treating sorting as a procedural step, which is the key enabler for all subsequent optimizations.",
+          "justification_if_invented": "",
+          "pointer": "[p.2, quote: 'The main extensions are based on a new clause called ASSUMING ORDER which defines the order...']"
+        },
+        {
+          "symbol": "Lu",
+          "name": "Language Homogeneity",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "Integrating order-dependent functions (e.g., `mins(price)`) directly into standard SQL-like clauses without requiring complex nesting or special window constructs.",
+          "why_it_applies": "AQuery avoids the 'add-on' nature of SQL:1999's window functions, which leads to complex, hard-to-optimize nested queries. By providing a single, unified language where order is a natural property, it simplifies expression and exposes optimization opportunities.",
+          "justification_if_invented": "",
+          "pointer": "[p.1, quote: 'Add-ons make order-dependent queries difficult to write and to optimize.']"
+        }
+      ],
+      "rejected_or_borderline_principles": []
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Ep",
+          "name": "Equivalence-based",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The introduction and application of new query transformation rules, such as sort-splitting, sort-embedding, and commuting selections with sorts.",
+          "why_it_applies": "The core of AQuery's optimization strategy is to rewrite a logical query plan into a more efficient but semantically equivalent one using a catalog of transformation rules. Table 1 explicitly lists these algebraic equivalences.",
+          "justification_if_invented": "",
+          "pointer": "[p.8, Table 1]"
+        },
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The `sort-edge` and `edgeby` operators.",
+          "why_it_applies": "These mechanisms avoid work that is guaranteed not to affect the final result. `sort-edge` avoids a full sort when only the top-k elements are needed. `edgeby` avoids materializing full groups by discarding records 'on-the-fly' as soon as a group satisfies the edge condition (e.g., its first 10 elements have been found). This skipped work does not change the output.",
+          "justification_if_invented": "",
+          "pointer": "[p.7, quote: 'the sort-edge uses a modified heapsort to keep the top (or bottom) n elements']"
+        },
+        {
+          "symbol": "Bo",
+          "name": "Bottleneck-Oriented",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The entire suite of sort-related transformations (sort-edge, sort-splitting, sort-embedding).",
+          "why_it_applies": "The paper's optimization techniques are explicitly designed to mitigate the high cost of sorting, which is treated as a primary performance bottleneck. The goal is to reduce the number of records that need to be sorted or to replace large sorts with cheaper, smaller ones.",
+          "justification_if_invented": "",
+          "pointer": "[p.7, quote: 'delaying the sort reduces the number of records that would need to be sorted.']"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Cm",
+          "name": "Cost-based",
+          "reason_rejected_or_borderline": "The paper focuses on introducing the new transformation rules (which is Ep), not on the cost model used to choose between them. While it acknowledges the need for a cost model, it is not the core contribution.",
+          "pointer": "[p.9]"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "SQL:1999 (Order as add-on) + Se + Ep + Wv -> AQuery",
+    "baseline_name": "SQL:1999 (Order as add-on)",
+    "top_3_principle_tags": [
+      "Se",
+      "Ep",
+      "Wv"
+    ],
+    "core_principle_tags": [
+      "Se",
+      "Ep",
+      "Wv"
+    ],
+    "supporting_principle_tags": [
+      "Lu",
+      "Bo"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Se",
+      "Lu",
+      "Ep",
+      "Wv",
+      "Bo"
+    ],
+    "new_system_name": "AQuery",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "The design works by first making order a Semantically Explicit (Se) property of the language. This declarative clarity enables the optimizer to apply a rich set of Equivalence-based (Ep) transformations that were previously inapplicable. These transformations, in turn, enable Result-Preserving Work Avoidance (Wv) by pushing cardinality-reducing operations across sort boundaries, which are no longer opaque barriers.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Se",
+          "contribution_to_equation": "Provides the declarative foundation (`ASSUMING ORDER`) that makes order a first-class concept for the optimizer to reason about."
+        },
+        {
+          "symbol": "Ep",
+          "contribution_to_equation": "Introduces the formal query rewrite rules (e.g., sort-embedding) that leverage the explicit semantics of order to transform plans."
+        },
+        {
+          "symbol": "Wv",
+          "contribution_to_equation": "Captures the goal of the new transformations: to avoid expensive work like full sorts and full group materialization when only a subset of the data is needed for the final result."
+        }
+      ],
+      "transfer_question": "In what other domains could making an implicit physical property (like order, layout, or partitioning) an explicit, declarative part of the interface enable new equivalence-based optimizations?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "query time",
+      "direction": "down",
+      "concrete_number": "up to 21x",
+      "pointer": "[p.9]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Grw",
+      "name": "Granularity Rewriting",
+      "definition": "Restructuring a computation by changing its operational granularity, such as replacing a monolithic operator with per-group or per-partition applications of a similar operator.",
+      "mechanism_pattern": "The 'sort-embedding' transformation replaces a single large sort over an entire arrable with many smaller sorts, one for each group created by a GROUP BY. The 'edgeby' operator effectively does the same for edge selections within groups.",
+      "why_existing_principles_are_insufficient": "Ep (Equivalence-based) describes that a rewrite is happening, but not the specific pattern of changing granularity. Wv (Work Avoidance) describes the goal, not the mechanism. Fp (Function Placement) is typically about distributed location, not logical operator granularity. This pattern of 'fissioning' an operator to apply it at a finer grain is a recurring optimization technique.",
+      "closest_existing_principles": [
+        "Ep",
+        "Wv",
+        "Fp"
+      ],
+      "reusability_beyond_this_paper": "This pattern is common in parallel and distributed databases (e.g., pushing aggregates or joins to partitions) and in optimizing complex analytics queries where operations can be applied within windows or groups instead of globally.",
+      "confidence": "medium",
+      "pointer": "[p.8, Section 3.3 Sort Embedding]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "AQuery makes data order a first-class, declarative concept in its query language, which enables a new class of equivalence-based optimizations that push cardinality-reducing operations across sort boundaries to avoid unnecessary computation.",
+    "top_3_principles": [
+      "Se",
+      "Ep",
+      "Wv"
+    ],
+    "mechanism_family": "query optimization",
+    "specific_tools_or_algorithms": [
+      "Sort-edge optimization",
+      "Sort-splitting transformation",
+      "Sort-embedding transformation",
+      "Edgeby physical operator"
+    ],
+    "primary_design_archetype": "declarative interface to optimizer",
+    "principle_mapping_confidence": "high"
+  }
+}

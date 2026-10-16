@@ -14,7 +14,8 @@ test('conference-specific metadata retains provenance and keeps VLDB analysis sc
     assert.equal(vldb.source_url,'https://www.vldb.org/2023/?program-schedule');
     assert.ok(vldb.retrieved_on && vldb.category_caveat && vldb.source_html_sha256);
     assert.equal(Object.keys(readSessions('osdi23').papers).length,55);
-    assert.equal(Object.keys(metadata.papers).length,289);
+    assert.equal(Object.keys(readSessions('vldb2003').papers).length,75);
+    assert.equal(Object.keys(metadata.papers).length,364);
     assert.throws(()=>readSessions('unknown'),/Unknown session source/);
 });
 

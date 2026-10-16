@@ -1,0 +1,286 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "31",
+    "paper_title": "Balancing Performance and Data Freshness in Web Database Servers",
+    "authors": [
+      "Alexandros Labrinidis",
+      "Nick Roussopoulos"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference",
+    "year": "2003",
+    "system_or_method_name": "OVIS(@)",
+    "problem_domain": "Dynamic web content serving"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To dynamically select which WebViews to materialize to maximize system performance (minimize response time) while maintaining the freshness of the served data (Quality of Data, QoD) at a user-specified acceptable level.",
+    "primary_optimized_metric": "latency",
+    "secondary_metrics": [
+      "data freshness",
+      "robustness"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "10x",
+        "meaning": "OVIS can have up to ten times better response time than a no-materialization policy.",
+        "pointer": "[p. 9]"
+      },
+      {
+        "number_or_delta": "3 orders of magnitude",
+        "meaning": "Under server lag conditions, OVIS avoids a server crash and has response times three orders of magnitude better than a no-materialization policy.",
+        "pointer": "[p. 10]"
+      },
+      {
+        "number_or_delta": "0.925",
+        "meaning": "Example of a user-specified QoD threshold (@) that the system tries to maintain.",
+        "pointer": "[p. 9]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Static, off-line view selection",
+    "why_this_is_the_right_comparison": "The paper contrasts its dynamic approach with the two static extremes: materializing all WebViews (high performance, low freshness) and materializing none (high freshness, low performance/risk of overload). Traditional view selection for data warehouses is done offline, which is unsuitable for dynamic web workloads.",
+    "limiting_design_assumption": "The set of views to materialize is selected offline based on assumed knowledge of the entire access and update stream, and this set remains fixed during execution. This is unrealistic for web servers with unpredictable, continuously changing workloads.",
+    "pointers": [
+      "[p. 5]",
+      "[p. 9]"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Adaptive control algorithm",
+    "specific_tools_or_algorithms": [
+      "OVIS(@) algorithm",
+      "Greedy selection based on performance/QoD differentials",
+      "Recursive Prediction Error Method"
+    ],
+    "what_is_being_optimized": "The set of materialized WebViews, referred to as the 'materialization plan'.",
+    "state_or_ir": "Per-WebView statistics: estimated access frequency, hit ratio, update ratio, and calculated performance and QoD differentials for changing materialization policy.",
+    "output": "A decision for each WebView whether to be 'materialized' (cached and proactively refreshed) or 'non-materialized' (cached with invalidation).",
+    "pointers": [
+      "[p. 5]",
+      "[p. 6]",
+      "[p. 7]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Introduces an online, adaptive algorithm that dynamically changes the set of materialized views to trade data freshness for performance based on a user-specified freshness threshold and observed workload.",
+      "baseline_assumption": "The set of materialized views is static and determined offline.",
+      "why_baseline_did_not_include_it": "Offline selection cannot cope with the dynamic and unpredictable nature of web workloads. Baselines lack a mechanism to adapt the materialization plan at runtime.",
+      "mechanism_level_implementation": "The OVIS(@) algorithm periodically enters an 'active mode'. It compares the observed Quality of Data (QoD) to a user-defined threshold '@'. If there is a 'QoD surplus' (QoD > @), it materializes non-materialized views that offer the largest performance gain. If there is a 'QoD deficit' (QoD < @), it stops materializing views that offer the largest QoD gain. Decisions are made greedily based on estimated performance and QoD differentials.",
+      "primary_metric_improved": "latency",
+      "tradeoffs_or_costs": "The system achieves lower latency than a high-freshness baseline, but at the cost of potentially serving staler data (though still above the specified threshold). The adaptation mechanism itself has computational overhead.",
+      "pointers": [
+        "[p. 5]",
+        "[p. 8]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Implements a server lag detection mechanism that prevents server overload and crashes by switching to a performance-maximizing strategy when imminent failure is detected.",
+      "baseline_assumption": "A simple caching (non-materialization) system is vulnerable to update surges that cause cache invalidations, leading to a drop in hit rate, request backlog, and potential server crashes.",
+      "why_baseline_did_not_include_it": "Baseline static policies do not have a feedback mechanism to monitor server health (like rate of change of response time) and react to impending overload.",
+      "mechanism_level_implementation": "The system monitors the rate of change of average response time and QoD. If the response time increases too rapidly or QoD decreases too rapidly, it detects 'server lag'. As a 'panic button' response, it makes all WebViews materialized, which decouples request serving from update handling and maximizes performance to alleviate the backlog.",
+      "primary_metric_improved": "robustness",
+      "tradeoffs_or_costs": "When server lag is detected, the system prioritizes availability over the user-specified freshness goal. The emergency action of materializing all views will likely cause the QoD to drop significantly, but it prevents the server from crashing.",
+      "pointers": [
+        "[p. 8]",
+        "[p. 9]",
+        "[p. 10]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Ad",
+          "name": "Adaptive Processing",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The periodic execution of the OVIS(@) algorithm's 'active mode' to re-evaluate and change the materialization plan.",
+          "why_it_applies": "The system's core mechanism is to adapt its behavior (which views to materialize) at runtime in response to changing workload conditions and performance feedback (observed QoD).",
+          "justification_if_invented": "",
+          "pointer": "[p. 5]"
+        },
+        {
+          "symbol": "Wa",
+          "name": "Workload-Aware",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The collection of statistics during the 'passive mode' for access frequency, updates, hit ratios, and freshness ratios.",
+          "why_it_applies": "The adaptive decisions are driven entirely by statistics gathered from the live access and update streams. The system explicitly models and reacts to the current workload.",
+          "justification_if_invented": "",
+          "pointer": "[p. 6]"
+        },
+        {
+          "symbol": "Cm",
+          "name": "Cost-based",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The calculation of performance and QoD differentials (Δ_perf, Δ_QoD) for each WebView to estimate the impact of changing its materialization policy.",
+          "why_it_applies": "The greedy selection process chooses which views to change by comparing their estimated costs and benefits, aiming to maximize performance gain for a given QoD budget or maximize QoD gain for a given performance cost.",
+          "justification_if_invented": "",
+          "pointer": "[p. 7]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Cp",
+          "name": "Constraint-based",
+          "reason_rejected_or_borderline": "The QoD threshold acts like a constraint, but the mechanism is a greedy heuristic, not a formal constraint solver. Cm is more specific to the mechanism of using cost/benefit estimates to guide the heuristic.",
+          "pointer": "[p. 5]"
+        },
+        {
+          "symbol": "La",
+          "name": "Learned Approximation",
+          "reason_rejected_or_borderline": "The system uses the Recursive Prediction Error Method for estimation, which is a simple online estimation technique, but it does not use a learned model in the modern sense to approximate a complex function or decision.",
+          "pointer": "[p. 6]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Ad",
+          "name": "Adaptive Processing",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The detection of server lag based on high rates of change in response time or QoD, which triggers a switch to a 'fully-materialized' policy.",
+          "why_it_applies": "The system adapts its strategy dramatically in response to a detected critical state (imminent overload) to achieve a different goal (survival).",
+          "justification_if_invented": "",
+          "pointer": "[p. 8]"
+        },
+        {
+          "symbol": "Ft",
+          "name": "Fault Tolerance",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The 'panic button' action of materializing all WebViews when server lag is detected.",
+          "why_it_applies": "This mechanism is explicitly designed to tolerate an overload condition ('server lag') and prevent a catastrophic failure ('crash the server'). It keeps the system available, albeit with lower data quality.",
+          "justification_if_invented": "",
+          "pointer": "[p. 8]"
+        },
+        {
+          "symbol": "Au",
+          "name": "Automation",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The automatic detection of server lag and the subsequent automated response.",
+          "why_it_applies": "This mechanism automates a task that would otherwise fall to a human system administrator: monitoring for overload and taking corrective action to prevent a crash.",
+          "justification_if_invented": "",
+          "pointer": "[p. 8]"
+        }
+      ],
+      "rejected_or_borderline_principles": []
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Static Offline View Selection + Ad (Adaptive Processing) + Wa (Workload-Aware) + Cm (Cost-based) -> OVIS(@)",
+    "baseline_name": "Static Offline View Selection",
+    "top_3_principle_tags": [
+      "Ad",
+      "Wa",
+      "Cm"
+    ],
+    "core_principle_tags": [
+      "Ad",
+      "Wa",
+      "Cm",
+      "Ft"
+    ],
+    "supporting_principle_tags": [
+      "Au"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Ad",
+      "Wa",
+      "Cm",
+      "Ft",
+      "Au"
+    ],
+    "new_system_name": "OVIS(@)",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "These principles form an adaptive control loop. The system adapts (Ad) its internal configuration (the materialization plan) by making decisions that are informed by live workload statistics (Wa) and guided by a cost-benefit analysis (Cm) to balance performance and data freshness.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Ad",
+          "contribution_to_equation": "Provides the core runtime feedback loop, allowing the system to change its strategy from a static, offline plan to a dynamic, online one."
+        },
+        {
+          "symbol": "Wa",
+          "contribution_to_equation": "Grounds the adaptive decisions in reality by feeding the control loop with statistics from the actual, current workload, rather than relying on static assumptions."
+        },
+        {
+          "symbol": "Cm",
+          "contribution_to_equation": "Provides the decision logic within the control loop, enabling the system to make rational, quantitative tradeoffs between performance and freshness by estimating the costs and benefits of its actions."
+        }
+      ],
+      "transfer_question": "In what other domains could a system dynamically trade a quality-of-service metric for performance by using a workload-aware, cost-based control loop to stay near a user-defined quality threshold?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "latency",
+      "direction": "down",
+      "concrete_number": "up to 10x improvement",
+      "pointer": "[p. 9]"
+    },
+    {
+      "property": "robustness",
+      "direction": "up",
+      "concrete_number": "avoids server crashes from overload",
+      "pointer": "[p. 8]"
+    },
+    {
+      "property": "scalability",
+      "direction": "up",
+      "concrete_number": "Can serve more users or handle traffic surges",
+      "pointer": "[p. 3]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Qb",
+      "name": "Quality-Budgeted Adaptation",
+      "definition": "Dynamically adapt system behavior to optimize a primary performance metric by treating a secondary quality metric as a budget or currency, spending surpluses and correcting deficits relative to a user-specified threshold.",
+      "mechanism_pattern": "The system monitors a quality metric (QoD). When observed quality is higher than a threshold, it identifies a 'surplus' which it 'invests' to improve performance (by materializing more views). When quality is below the threshold, it identifies a 'deficit' which it must 'compensate' for, even at the cost of performance (by de-materializing views).",
+      "why_existing_principles_are_insufficient": "Ad (Adaptive Processing) is too general. Cm (Cost-based) describes the use of a cost model but not the specific control loop pattern of managing a quality budget around a threshold. Cp (Constraint-based) implies a formal solver, whereas this pattern is often implemented with heuristics. Qb captures the specific design intent of 'spending' a quality surplus.",
+      "closest_existing_principles": [
+        "Ad",
+        "Cm",
+        "Cp"
+      ],
+      "reusability_beyond_this_paper": "This pattern is common in systems that trade accuracy for speed, consistency for latency, or completeness for resource usage. For example, an approximate query processing system could use this to tune its sampling rate to meet an accuracy target, or a distributed system could tune its consistency level to meet a latency SLO.",
+      "confidence": "medium",
+      "pointer": "[p. 5]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "OVIS dynamically materializes web page fragments by using a workload-aware, cost-based adaptive algorithm to maximize performance while staying above a user-specified data freshness threshold.",
+    "top_3_principles": [
+      "Ad",
+      "Wa",
+      "Cm"
+    ],
+    "mechanism_family": "query optimization",
+    "specific_tools_or_algorithms": [
+      "OVIS(@) algorithm",
+      "Greedy selection based on performance/QoD differentials",
+      "Recursive Prediction Error Method"
+    ],
+    "primary_design_archetype": "learned control loop",
+    "principle_mapping_confidence": "high"
+  }
+}

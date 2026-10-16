@@ -1,0 +1,266 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "16",
+    "paper_title": "Projecting XML Documents",
+    "authors": [
+      "Amélie Marian",
+      "Jérôme Siméon"
+    ],
+    "venue_or_source": "VLDB",
+    "year": "2003",
+    "system_or_method_name": "XML Projection in Galax",
+    "problem_domain": "Main-memory XQuery processing"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To reduce memory requirements in main-memory XQuery processors to allow them to process large XML documents that would otherwise not fit in memory.",
+    "primary_optimized_metric": "memory",
+    "secondary_metrics": [
+      "query time",
+      "throughput"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "factor of 20 on average",
+        "meaning": "Reduction in memory requirements due to projection.",
+        "pointer": "[p.1]"
+      },
+      {
+        "number_or_delta": "factor of 5",
+        "meaning": "Minimum increase in the maximal document size that can be processed for every query.",
+        "pointer": "[p.1]"
+      },
+      {
+        "number_or_delta": "1 GB",
+        "meaning": "Size of an XMark document that could be queried on a laptop with 256 MB of memory using projection.",
+        "pointer": "[p.1]"
+      },
+      {
+        "number_or_delta": "< 2%",
+        "meaning": "Size of the projected document relative to the original for XMark Query 1.",
+        "pointer": "[p.3]"
+      },
+      {
+        "number_or_delta": "3-4x",
+        "meaning": "The size of the in-memory data model representation relative to the original XML file size without projection.",
+        "pointer": "[p.2]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Standard main-memory XQuery processors (e.g., Galax without projection, QuiP, Kweelt)",
+    "why_this_is_the_right_comparison": "The paper explicitly targets the limitations of these systems, which cannot process large XML documents due to high memory consumption.",
+    "limiting_design_assumption": "The entire XML document must be parsed and loaded into an in-memory data model before query processing can begin.",
+    "pointers": [
+      "[p.1, quote: \"...implementations load the complete document in memory before processing it.\"]",
+      "[p.1, Table 1]"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Symbolic methods",
+    "primary_tool_specific_type": "Static program analysis",
+    "specific_tools_or_algorithms": [
+      "Static inference algorithm on XQuery Core language"
+    ],
+    "what_is_being_optimized": "The set of nodes from the input XML document that are loaded into memory.",
+    "state_or_ir": "The query is normalized into the XQuery Core language. The analysis produces a set of 'projection paths'.",
+    "output": "A 'projected document', which is a smaller in-memory data model instance containing only the necessary nodes.",
+    "pointers": [
+      "[p.1, quote: \"...a static analysis technique that can identify at compile time which parts of the input document are needed...\"]",
+      "[p.4, quote: \"...the analysis is performed after the query has been normalized in the XQuery core...\"]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Introduces a compile-time static analysis to infer the precise set of paths within an XML document required to correctly answer an arbitrary XQuery.",
+      "baseline_assumption": "It is not feasible to determine which parts of a document a query will access before execution, so the entire document must be loaded.",
+      "why_baseline_did_not_include_it": "The analysis is complex due to XQuery's syntactic variations, use of variables, and arbitrary composability of expressions, which makes tracking data requirements non-trivial.",
+      "mechanism_level_implementation": "A static inference algorithm traverses the normalized XQuery Core AST. It maintains an environment mapping variables to paths and distinguishes between 'returned paths' (which can be further navigated) and 'used paths' (which are needed for predicates but not returned) to ensure correctness.",
+      "primary_metric_improved": "memory",
+      "tradeoffs_or_costs": "Adds a query analysis step at compile time, but this cost is shown to be minimal and often offset by faster loading.",
+      "pointers": [
+        "[p.1, quote: \"The main contribution of the paper is a static inference algorithm which... computes the paths needed by an arbitrary XQuery expression at compile time.\"]",
+        "[p.5]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Implements a projection-aware loader that filters an XML file or stream based on the paths from the static analysis, materializing only the necessary nodes.",
+      "baseline_assumption": "The document loader is query-agnostic and always builds a complete in-memory representation of the input document.",
+      "why_baseline_did_not_include_it": "Without the set of required paths from the static analysis, the loader has no information to guide a selective materialization.",
+      "mechanism_level_implementation": "A SAX-based streaming parser processes the document. For each node, it consults the set of projection paths to decide whether to skip the node and its subtree, keep the node, or keep the node and its entire subtree. Nodes are only created in the data model if required by a projection path.",
+      "primary_metric_improved": "memory",
+      "tradeoffs_or_costs": "The loading logic is more complex than a simple full-document parser, especially for handling the descendant axis (`//`).",
+      "pointers": [
+        "[p.1, quote: \"We present a loading algorithm that takes the resulting information to build a projected document...\"]",
+        "[p.8, Section 5]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The static path analysis algorithm.",
+          "why_it_applies": "The analysis identifies which parts of the document are not needed to answer the query. Avoiding loading these parts is guaranteed to not change the final query result, as stated by the correctness theorem. This is the central goal of the analysis.",
+          "justification_if_invented": "",
+          "pointer": "[p.7, Theorem 1 Correctness]"
+        },
+        {
+          "symbol": "Se",
+          "name": "Semantically Explicit",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The normalization of the input XQuery into the XQuery Core language before analysis.",
+          "why_it_applies": "The analysis is made tractable by first translating the query into the XQuery Core, a subset where 'all implicit operations are made explicit'. This explicit representation of semantics (e.g., navigation steps, context nodes) is what the inference rules operate on.",
+          "justification_if_invented": "",
+          "pointer": "[p.4, quote: \"To address this problem, the analysis is performed after the query has been normalized in the XQuery core [37].\"]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Bo",
+          "name": "Bottleneck-Oriented",
+          "reason_rejected_or_borderline": "While the paper is motivated by the memory bottleneck, Bo is too general. Wv describes the specific mechanism used to address the bottleneck more precisely.",
+          "pointer": "[p.1]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Wa",
+          "name": "Workload-Aware",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The projection-aware loading algorithm.",
+          "why_it_applies": "The loader's behavior is directly adapted based on the workload, which is the specific input query. Instead of being a generic loader, it uses the projection paths derived from the query to selectively materialize data, making its work specific to the query's needs.",
+          "justification_if_invented": "",
+          "pointer": "[p.2, Figure 1(b)]"
+        },
+        {
+          "symbol": "Pm",
+          "name": "Policy/Mechanism Separation",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The two-stage architecture: static analysis followed by loading.",
+          "why_it_applies": "The system has a clean separation between the policy (what to load, determined by the static analysis which outputs projection paths) and the mechanism (how to load it, implemented by the SAX-based loader).",
+          "justification_if_invented": "",
+          "pointer": "[p.2, Figure 1(b)]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Sc",
+          "name": "Scalability",
+          "reason_rejected_or_borderline": "Scalability to larger documents is the primary benefit of the projection mechanism, not the mechanism itself. Wv and Wa better explain how this scalability is achieved.",
+          "pointer": "[p.9, Section 6.3]"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Full Document Loading + Wv + Wa -> Projection-based Loading",
+    "baseline_name": "Full Document Loading",
+    "top_3_principle_tags": [
+      "Wv",
+      "Wa"
+    ],
+    "core_principle_tags": [
+      "Wv",
+      "Wa"
+    ],
+    "supporting_principle_tags": [
+      "Se",
+      "Pm"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Wv",
+      "Se",
+      "Wa",
+      "Pm"
+    ],
+    "new_system_name": "Galax with Projection",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "Wv provides the theoretical foundation, guaranteeing that it is safe to skip loading parts of the document. Wa provides the implementation strategy, making the data loader aware of the specific query's needs as identified by the Wv-based analysis. Together, they transform a generic, full-materialization system into a specialized, partial-materialization system without sacrificing correctness.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Wv",
+          "contribution_to_equation": "Justifies avoiding the work of loading parts of the document by proving they are irrelevant to the final query result."
+        },
+        {
+          "symbol": "Wa",
+          "contribution_to_equation": "Changes the system's loading behavior to be adaptive to the specific query, using the information from the analysis to guide materialization."
+        }
+      ],
+      "transfer_question": "In what other domains could a static analysis of requests be used to create a result-preserving, partial-loading mechanism to overcome memory or I/O bottlenecks?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "memory",
+      "direction": "down",
+      "concrete_number": "20x on average",
+      "pointer": "[p.1]"
+    },
+    {
+      "property": "query time",
+      "direction": "down",
+      "concrete_number": "Not specified in provided text",
+      "pointer": "[p.9, Figure 7]"
+    },
+    {
+      "property": "Maximum document size",
+      "direction": "up",
+      "concrete_number": "5x to 30x",
+      "pointer": "[p.1, p.9]"
+    },
+    {
+      "property": "Parsing and loading time",
+      "direction": "mixed",
+      "concrete_number": "Faster for most queries, slightly slower for queries with descendant axis.",
+      "pointer": "[p.9, Figure 6]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Qs",
+      "name": "Query-Scoped Loading",
+      "definition": "Statically analyzing a query to determine the minimal subset of data required for its correct evaluation, and using this scope to filter data during the loading phase, avoiding materialization of irrelevant data.",
+      "mechanism_pattern": "A compile-time analysis pass infers data access patterns (e.g., paths, columns, keys) from a query. A data loader then uses this 'scope' to selectively materialize only the necessary data from a source (stream, file, or remote storage).",
+      "why_existing_principles_are_insufficient": "Wv is general about avoiding any result-preserving work. Wa is general about adapting to a workload. Qs captures the specific, recurring pattern of using static query analysis to *scope data loading*, which is a powerful form of Wv and Wa applied at the system's data ingestion boundary.",
+      "closest_existing_principles": [
+        "Wv",
+        "Wa"
+      ],
+      "reusability_beyond_this_paper": "This pattern is common in data systems, such as column projection in analytical databases, partition pruning based on query predicates, or GraphQL-style field selection for API calls. Formalizing it as a principle would capture this cross-cutting design choice.",
+      "confidence": "medium",
+      "pointer": "[p.1, p.2]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "Reduces memory usage for XQuery processing by statically analyzing the query to derive a set of required 'projection paths,' then using a custom loader to materialize only those parts of the XML document from a file or stream.",
+    "top_3_principles": [
+      "Wv",
+      "Wa"
+    ],
+    "mechanism_family": "query optimization",
+    "specific_tools_or_algorithms": [
+      "Static inference algorithm on XQuery Core language"
+    ],
+    "primary_design_archetype": "avoid materialization / recomputation",
+    "principle_mapping_confidence": "high"
+  }
+}

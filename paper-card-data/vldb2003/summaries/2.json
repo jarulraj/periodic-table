@@ -1,0 +1,301 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "2",
+    "paper_title": "XSEarch: A Semantic Search Engine for XML",
+    "authors": [
+      "Sara Cohen",
+      "Jonathan Mamou",
+      "Yaron Kanza",
+      "Yehoshua Sagiv"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference",
+    "year": "2003",
+    "system_or_method_name": "XSEarch",
+    "problem_domain": "Semantic search over XML documents"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To create a semantic search engine for XML that returns ranked, semantically related document fragments using a simple query language suitable for naive users.",
+    "primary_optimized_metric": "query time",
+    "secondary_metrics": [
+      "precision",
+      "recall",
+      "index creation time",
+      "index size"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": ">97%",
+        "meaning": "Percentage of 1000 random queries that ran in under 100 milliseconds.",
+        "pointer": "[p.8]"
+      },
+      {
+        "number_or_delta": "35 ms",
+        "meaning": "Average run time for queries with all-pairs semantics on the Sigmod Record document.",
+        "pointer": "[p.8]"
+      },
+      {
+        "number_or_delta": "0.02",
+        "meaning": "Precision of XSEarch for a keyword+tag query over DBLP, compared to ~0.01 for a naive approach.",
+        "pointer": "[p.9]"
+      },
+      {
+        "number_or_delta": "~0.6",
+        "meaning": "Precision@5 for a keyword-only query on DBLP, demonstrating the effectiveness of ranking.",
+        "pointer": "[p.10, Figure 8]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Standard keyword search engines and formal XML query languages (e.g., XQuery)",
+    "why_this_is_the_right_comparison": "The paper positions XSEarch as a middle ground between two extremes: standard search engines that ignore XML structure and are too coarse-grained, and formal query languages like XQuery that are too complex for naive users and lack ranking.",
+    "limiting_design_assumption": "The baseline assumes either (a) the document is the atomic unit of retrieval and keyword co-occurrence implies relevance, ignoring intra-document semantics, or (b) users have precise knowledge of the document schema and can write complex structured queries.",
+    "pointers": [
+      "[p.1]"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Semantic graph-based search with IR ranking",
+    "specific_tools_or_algorithms": [
+      "TF-IDF variant (tfilf)",
+      "Vector space model with cosine similarity",
+      "Dynamic programming for index construction"
+    ],
+    "what_is_being_optimized": "The selection and ranking of XML document fragments that constitute a semantically valid answer to a keyword-based query.",
+    "state_or_ir": "XML document tree, interconnection index, path index, inverted keyword/label indexes.",
+    "output": "A ranked list of query answers, where each answer is a sequence of nodes from the XML document.",
+    "pointers": [
+      "[p.3]",
+      "[p.5]",
+      "[p.6]",
+      "[p.7]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Defines query answers as sets of document fragments (nodes) that are 'semantically related' through a formal 'interconnection' relationship, instead of returning whole documents where keywords may be unrelated.",
+      "baseline_assumption": "A document is the atomic unit of retrieval, and the co-occurrence of keywords within a document is sufficient to establish relevance.",
+      "why_baseline_did_not_include_it": "Standard search engines were designed for less-structured documents like HTML. Defining and efficiently computing a formal notion of 'semantic relatedness' between arbitrary document fragments is a complex problem not addressed by baselines.",
+      "mechanism_level_implementation": "A pair of nodes is defined as 'interconnected' if the shortest path between them in the XML tree does not contain two distinct nodes with the same label (with some exceptions). A query answer is a set of nodes that satisfy the query terms and are mutually interconnected (either all-pairs or star-related).",
+      "primary_metric_improved": "precision",
+      "tradeoffs_or_costs": "Increases computational complexity. Determining if a set of nodes can form an answer is NP-complete in combined complexity for the 'all-pairs' case, necessitating specialized indexing and algorithms.",
+      "pointers": [
+        "[p.1, Example 1.1]",
+        "[p.3]",
+        "[p.4, Theorem 3.2]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Introduces specialized indexes and a multi-factor ranking model to efficiently generate top-k answers in an order similar to their final ranking, avoiding the need to generate and sort all possible answers.",
+      "baseline_assumption": "Systems like XQuery would generate all results before ranking/sorting. Keyword search engines use whole-document ranking signals, not signals based on the structure of the answer fragment itself.",
+      "why_baseline_did_not_include_it": "The baseline lacks the concept of a 'semantically related fragment' to rank. The high cost of checking the interconnection relationship makes a naive generate-then-sort approach infeasible for this new answer definition.",
+      "mechanism_level_implementation": "1. A ranking function combining IR-style content similarity, structural compactness (size of the relationship tree), and structural patterns (ancestor-descendant relationships). 2. An 'interconnection index' to precompute or memoize the expensive interconnection check, built via dynamic programming. 3. A 'path index' to prune the search space and prioritize generating answer candidates that are likely to have a high rank.",
+      "primary_metric_improved": "query time",
+      "tradeoffs_or_costs": "Requires significant pre-processing time and storage space for the indexes. The offline interconnection index can be O(|T|^2) in size, where T is the document.",
+      "pointers": [
+        "[p.6, Section 4.2]",
+        "[p.7, Section 5]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Se",
+          "name": "Semantically Explicit",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The definition of the 'interconnection' relationship (R_i) based on the labels of nodes along the path to their lowest common ancestor.",
+          "why_it_applies": "This mechanism makes the implicit semantic relationship between different parts of an XML document explicit and computable. Instead of relying on simple co-occurrence, it defines what it means for nodes to be 'meaningfully related' based on tree structure.",
+          "justification_if_invented": "",
+          "pointer": "[p.3, Section 3.2, 3.4]"
+        },
+        {
+          "symbol": "Fs",
+          "name": "Formal Specification",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The formal definitions of 'all-pairs R-answer', 'star R-answer', and 'maximal answer'.",
+          "why_it_applies": "The paper provides a precise, mathematical foundation for what constitutes a valid query answer, moving beyond heuristic matching to a system with clear-cut semantics.",
+          "justification_if_invented": "",
+          "pointer": "[p.3, Section 3.3]"
+        },
+        {
+          "symbol": "Gr",
+          "name": "Generalized Design",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The query semantics are defined in terms of a generic relationship R, with the specific 'interconnection' relationship being one possible instantiation.",
+          "why_it_applies": "The system is designed to be extensible to different definitions of semantic relatedness. The paper states, 'it is possible to use a different relationship, with little impact on system efficiency.'",
+          "justification_if_invented": "",
+          "pointer": "[p.3]"
+        }
+      ],
+      "rejected_or_borderline_principles": []
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Cm",
+          "name": "Cost-based",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The ranking function that combines query similarity (sim), relationship tree size (tsize), and ancestor-descendant relationships (anc-des) to score each answer.",
+          "why_it_applies": "This is a model used to estimate the relevance (utility) of each potential answer, allowing the system to rank them. It's a cost/benefit model where smaller tree size and ancestor relationships are better, balanced against content similarity.",
+          "justification_if_invented": "",
+          "pointer": "[p.6, Equation 1]"
+        },
+        {
+          "symbol": "Rc",
+          "name": "Reuse of Computation",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The 'interconnection index', which stores the pre-computed or memoized results of the interconnection check for pairs of nodes.",
+          "why_it_applies": "The paper explicitly states that checking for interconnection online is expensive. The index avoids re-computing this relationship for every query by storing and reusing the result, either from an offline build or an online cache.",
+          "justification_if_invented": "",
+          "pointer": "[p.7, Section 5.1, 5.2]"
+        },
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The path index, which is used to check if a combination of root-to-leaf paths can possibly lead to a set of interconnected nodes.",
+          "why_it_applies": "By checking path compatibility first, the system avoids exploring combinations of nodes that are guaranteed not to form a valid, interconnected answer. This prunes the search space without changing the final set of valid answers.",
+          "justification_if_invented": "",
+          "pointer": "[p.7, Section 5.3]"
+        },
+        {
+          "symbol": "Bo",
+          "name": "Bottleneck-Oriented",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The creation of the interconnection index specifically to mitigate the high cost of the interconnection check.",
+          "why_it_applies": "The paper identifies the interconnection check as a performance bottleneck ('Checking for interconnection of nodes online is expensive' [p.7]) and designs the main index structure (the interconnection index) to directly address this bottleneck.",
+          "justification_if_invented": "",
+          "pointer": "[p.7]"
+        }
+      ],
+      "rejected_or_borderline_principles": []
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Keyword Search on Whole Documents + Se + Cm + Rc -> XSEarch",
+    "baseline_name": "Keyword Search on Whole Documents",
+    "top_3_principle_tags": [
+      "Se",
+      "Cm",
+      "Rc"
+    ],
+    "core_principle_tags": [
+      "Se",
+      "Cm",
+      "Rc"
+    ],
+    "supporting_principle_tags": [
+      "Fs",
+      "Gr",
+      "Wv",
+      "Bo"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Se",
+      "Fs",
+      "Gr",
+      "Cm",
+      "Rc",
+      "Wv",
+      "Bo"
+    ],
+    "new_system_name": "XSEarch",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "This composition transforms document-level keyword search into a fine-grained semantic search. Se first redefines the unit of retrieval from a document to a 'semantically related fragment', providing a meaningful basis for search. Cm then provides a way to rank these new units by relevance. Finally, Rc makes this new, more complex search model practical by pre-computing the expensive semantic relationship checks.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Se",
+          "contribution_to_equation": "Redefines a valid 'answer' by making the implicit structural relationships between XML elements explicit and computable."
+        },
+        {
+          "symbol": "Cm",
+          "contribution_to_equation": "Provides a scoring model to rank the newly defined semantic answers based on a combination of content and structural features."
+        },
+        {
+          "symbol": "Rc",
+          "contribution_to_equation": "Makes the semantic check efficient by pre-computing and reusing the results of the expensive interconnection test via a dedicated index."
+        }
+      ],
+      "transfer_question": "In what other domains could we enable fine-grained search by first defining an explicit structural relationship between sub-components, then ranking them with a cost model, and finally pre-computing the relationship to ensure performance?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "query time",
+      "direction": "down",
+      "concrete_number": "35 ms (average for all-pairs)",
+      "pointer": "[p.8]"
+    },
+    {
+      "property": "precision",
+      "direction": "up",
+      "concrete_number": "e.g., 0.02 vs 0.01 for naive on DBLP",
+      "pointer": "[p.9]"
+    },
+    {
+      "property": "index size",
+      "direction": "up",
+      "concrete_number": "Matrix index for 1.2MB doc is >2GB in memory",
+      "pointer": "[p.8, Figure 5]"
+    },
+    {
+      "property": "index creation time",
+      "direction": "up",
+      "concrete_number": "6.2 seconds for 1.2MB doc (matrix index)",
+      "pointer": "[p.8, Table 1]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Pc",
+      "name": "Path-Constrained Semantics",
+      "definition": "Defining the semantic relationship between two or more entities based on properties or constraints of the path(s) connecting them in an underlying graph or tree structure.",
+      "mechanism_pattern": "The 'interconnection' relationship is defined by a structural constraint on the path between two nodes via their lowest common ancestor: the path cannot contain two distinct nodes with the same label.",
+      "why_existing_principles_are_insufficient": "Se (Semantically Explicit) is too general; it states the goal (making semantics explicit) but not the method. Path-Constrained Semantics describes a specific, reusable pattern for *how* to derive semantics from structure in hierarchical or graph-like data.",
+      "closest_existing_principles": [
+        "Se"
+      ],
+      "reusability_beyond_this_paper": "This pattern is highly reusable for any search problem on structured data, such as finding related functions in a source code AST, related concepts in a knowledge graph, or related entities in a JSON document, by defining relationship constraints on their connecting paths.",
+      "confidence": "medium",
+      "pointer": "[p.4, Section 3.4]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "XSEarch enables semantic search over XML by defining that query keywords must match interconnected document fragments—where interconnection is a structural property of the path between nodes—and uses specialized indexes and a cost-based ranking model to retrieve them efficiently.",
+    "top_3_principles": [
+      "Se",
+      "Cm",
+      "Rc"
+    ],
+    "mechanism_family": "indexing / search structure",
+    "specific_tools_or_algorithms": [
+      "TF-IDF variant (tfilf)",
+      "Vector space model with cosine similarity",
+      "Dynamic programming for index construction"
+    ],
+    "primary_design_archetype": "granularity rewriting",
+    "principle_mapping_confidence": "high"
+  }
+}

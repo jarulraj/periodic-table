@@ -1,0 +1,251 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "48",
+    "paper_title": "Locking Protocols for Materialized Aggregate Join Views",
+    "authors": [
+      "Gang Luo",
+      "Jeffrey F. Naughton",
+      "Curt J. Ellmann",
+      "Michael W. Watzke"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference",
+    "year": "2003",
+    "system_or_method_name": "V+W locking protocol",
+    "problem_domain": "Concurrency control for materialized view maintenance"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To provide a concurrency control mechanism for immediate materialized aggregate join view maintenance that guarantees serializability without incurring high rates of deadlock and lock contention.",
+    "primary_optimized_metric": "throughput",
+    "secondary_metrics": [
+      "deadlock probability"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "18%",
+        "meaning": "Approximate deadlock probability for a single transaction using generic locking with R=3,000 suppliers, m=8 concurrent transactions, and r=32 items per transaction.",
+        "pointer": "[p.1]"
+      },
+      {
+        "number_or_delta": ">3x",
+        "meaning": "The ratio of the throughput of the V lock method to the X lock method is at least 3 when r=64 (items per transaction).",
+        "pointer": "[p.12]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Generic concurrency control (two-phase locking with S and X locks)",
+    "why_this_is_the_right_comparison": "This is the standard, default approach for enforcing transactional consistency in a relational database system. The paper's motivation is that this standard approach performs poorly for immediate materialized view maintenance, leading to high lock contention and deadlocks.",
+    "limiting_design_assumption": "All updates to the materialized view are treated as generic writes that require exclusive (X) locks, which conflict with each other. This ignores the specific semantics of the aggregate update operations (e.g., that they are associative and commutative) which could permit higher concurrency.",
+    "pointers": [
+      "[p.1]"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Concurrency control protocol",
+    "specific_tools_or_algorithms": [
+      "V locks",
+      "W locks"
+    ],
+    "what_is_being_optimized": "Concurrency among transactions that update a materialized aggregate join view.",
+    "state_or_ir": "Database lock table",
+    "output": "A serializable schedule of transactions with reduced lock contention and deadlocks.",
+    "pointers": [
+      "[p.2]",
+      "[p.5]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Introduces a new lock mode, the V lock, for updates to materialized aggregate join views. V locks are compatible with other V locks, exploiting the commutative and associative nature of aggregate updates (COUNT, SUM, AVG) to increase concurrency.",
+      "baseline_assumption": "All updates to the view require exclusive (X) locks, which conflict with each other and serialize updates to the same view tuples.",
+      "why_baseline_did_not_include_it": "Generic locking protocols are unaware of the specific semantics of the operations they are protecting. They treat all writes as potentially conflicting.",
+      "mechanism_level_implementation": "A new 'V' lock mode is added to the lock manager. Its compatibility matrix allows V-V compatibility but makes V conflict with standard S and X locks. Transactions that update the view via commutative operations acquire V locks instead of X locks on the view tuples.",
+      "primary_metric_improved": "throughput",
+      "tradeoffs_or_costs": "Using only V locks is incorrect; it can lead to a 'split group duplicate' problem where concurrent transactions both try to create a new group, violating the view's semantics. This necessitates an additional mechanism.",
+      "pointers": [
+        "[p.2]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Introduces a short-term W lock to prevent the 'split group duplicate' anomaly that arises with V locks. The W lock serializes the creation of new groups while still allowing concurrent updates to existing groups.",
+      "baseline_assumption": "A single, general-purpose exclusive lock (X lock) handles both updates to existing tuples and insertions of new ones. This prevents the anomaly but at the cost of high contention. The V-lock-only approach fails to distinguish these two cases.",
+      "why_baseline_did_not_include_it": "The baseline's coarse-grained X lock prevents the problem by default. The problem only arises as a consequence of introducing the more concurrent V lock.",
+      "mechanism_level_implementation": "Before integrating a new join result tuple, a transaction acquires a short-term W lock. W locks conflict with other W locks (and S/X locks) but are compatible with V locks. After checking for and/or creating the group tuple, the W lock is downgraded to a long-term V lock.",
+      "primary_metric_improved": "Correctness (prevents semantic violations)",
+      "tradeoffs_or_costs": "Adds complexity to the locking protocol and lock manager. Although short-term, W locks must be considered in deadlock detection.",
+      "pointers": [
+        "[p.5]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Se",
+          "name": "Semantically Explicit",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The creation of the V lock mode, whose compatibility is defined based on the associative and commutative properties of COUNT, SUM, and AVG aggregates.",
+          "why_it_applies": "The system makes the semantics of the update operation explicit to the concurrency control manager, allowing it to apply a more permissive locking policy (V-V compatibility) than the default for generic writes.",
+          "justification_if_invented": "",
+          "pointer": "[quote: '...updates to the materialized aggregate join views are associative and commutative, so it really does not matter in which order they are processed.'] [p.2]"
+        },
+        {
+          "symbol": "Cz",
+          "name": "Coordination Avoidance",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The V lock's compatibility with other V locks.",
+          "why_it_applies": "The V lock mechanism is explicitly designed to avoid coordination (i.e., blocking on a lock) between transactions performing commutative updates on the same view tuples. They can proceed concurrently without waiting for each other.",
+          "justification_if_invented": "",
+          "pointer": "[quote: 'V locks conflict with S and X locks but not with each other.'] [p.2]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Cr",
+          "name": "Consistency Relaxation",
+          "reason_rejected_or_borderline": "Rejected because the paper's stated goal is to preserve serializability, not relax it. The protocol is designed to be correct under serializability.",
+          "pointer": "[quote: '...investigating techniques that guarantee immediate update propagation with serializability semantics...'] [p.1]"
+        },
+        {
+          "symbol": "Bo",
+          "name": "Bottleneck-Oriented",
+          "reason_rejected_or_borderline": "Rejected because while lock contention is a bottleneck, the mechanism is more specifically about exploiting operation semantics (Se) to avoid coordination (Cz), which is a more precise explanation than just 'fixing a bottleneck'.",
+          "pointer": "[p.1]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Is",
+          "name": "Isolation for Correctness",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The acquisition of a short-term W lock before checking for or creating a new group tuple in the materialized view.",
+          "why_it_applies": "The W lock isolates the critical 'check-then-insert' operation for a new group to prevent a race condition (the split group duplicate problem). This ensures that the invariant of 'at most one tuple per group' is maintained, which is essential for correctness.",
+          "justification_if_invented": "",
+          "pointer": "[quote: 'The W lock mode guarantees that for each aggregate group, at any time, at most one tuple corresponding to this group exists in the aggregate join view.'] [p.5]"
+        },
+        {
+          "symbol": "Pm",
+          "name": "Policy/Mechanism",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The protocol's use of two different lock types (W and V) for two different phases of an update: W for group creation and V for ongoing updates.",
+          "why_it_applies": "The system separates the mechanism for handling the special case of new group creation (which requires serialization) from the mechanism for the common case of updating existing groups (which can be concurrent). The downgrade from W to V embodies this separation.",
+          "justification_if_invented": "",
+          "pointer": "[quote: 'After integrating the new join result tuple into the aggregate join view AJV, we downgrade the shortterm W lock to a long-term V lock...'] [p.5]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Ig",
+          "name": "Invariant-Guided",
+          "reason_rejected_or_borderline": "Borderline. The W lock is guided by the invariant that there is at most one tuple per group. However, Is is more specific about the mechanism used (isolation) to preserve that invariant, making it a better fit.",
+          "pointer": "[p.5]"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Standard 2PL (X-locks) + Se + Cz + Is -> V+W Locking Protocol",
+    "baseline_name": "Standard 2PL (X-locks)",
+    "top_3_principle_tags": [
+      "Se",
+      "Cz",
+      "Is"
+    ],
+    "core_principle_tags": [
+      "Se",
+      "Cz",
+      "Is"
+    ],
+    "supporting_principle_tags": [
+      "Pm"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Se",
+      "Cz",
+      "Is",
+      "Pm"
+    ],
+    "new_system_name": "V+W Locking Protocol",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "The composition replaces a single, overly-pessimistic locking strategy with a two-part, semantically-aware one. Se makes the commutative nature of updates explicit, which Cz exploits to allow concurrent updates and avoid coordination. However, this introduces a correctness bug for non-commutative 'create' operations. Is solves this by providing targeted, short-term isolation just for the creation phase, enabling the high concurrency of the main protocol without sacrificing correctness.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Se",
+          "contribution_to_equation": "Exposes the commutative semantics of aggregate updates to the concurrency control system."
+        },
+        {
+          "symbol": "Cz",
+          "contribution_to_equation": "Uses the exposed semantics to avoid coordination between concurrent update transactions."
+        },
+        {
+          "symbol": "Is",
+          "contribution_to_equation": "Provides minimal, short-term isolation to correctly handle the non-commutative case of creating a new group, preventing race conditions."
+        }
+      ],
+      "transfer_question": "In what other domains can a general-purpose exclusive lock be replaced by a combination of a semantically-aware concurrent protocol for common-case updates and a minimal isolation mechanism for initialization or creation operations?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "throughput",
+      "direction": "up",
+      "concrete_number": "Ratio > 3",
+      "pointer": "[p.12]"
+    },
+    {
+      "property": "deadlock probability",
+      "direction": "down",
+      "concrete_number": "Not specified",
+      "pointer": "[p.12]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Ld",
+      "name": "Lock Downgrade",
+      "definition": "A concurrency control pattern where a transaction acquires a strong, short-term lock to safely perform a critical state-modifying operation (e.g., creation or structural change) and then downgrades it to a weaker, more concurrent, long-term lock for subsequent operations within the same transaction.",
+      "mechanism_pattern": "The protocol first acquires a short-term W lock to handle the potential creation of a new aggregate group. Once this critical section is complete, the W lock is downgraded to a long-term V lock, which allows high concurrency for the remainder of the transaction's lifetime.",
+      "why_existing_principles_are_insufficient": "Is (Isolation for Correctness) captures the need for the initial strong lock (W lock) but not the full pattern of downgrading it to a weaker lock (V lock). Pm (Policy/Mechanism) is too general. The pattern is specifically about a state transition in the lock mode held by a single transaction to match the changing requirements of its operation.",
+      "closest_existing_principles": [
+        "Is",
+        "Pm"
+      ],
+      "reusability_beyond_this_paper": "This pattern could apply in other areas, such as file systems (exclusive lock on a directory to create a file, then downgrade to a shared lock on the directory or just a lock on the file inode) or memory allocators (exclusive lock on a free list to allocate a block, then no lock needed by that thread on the list itself).",
+      "confidence": "medium",
+      "pointer": "[p.5]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "Increases concurrency for materialized view maintenance by introducing a semantically-aware lock mode (V lock) for commutative aggregate updates, paired with a short-term isolation lock (W lock) to correctly handle the non-commutative creation of new aggregate groups.",
+    "top_3_principles": [
+      "Se",
+      "Cz",
+      "Is"
+    ],
+    "mechanism_family": "transaction / concurrency protocol",
+    "specific_tools_or_algorithms": [
+      "V locks",
+      "W locks"
+    ],
+    "primary_design_archetype": "invariant-preserving shortcut",
+    "principle_mapping_confidence": "high"
+  }
+}

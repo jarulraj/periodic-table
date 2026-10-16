@@ -1,0 +1,297 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "22",
+    "paper_title": "Maximizing the Output Rate of Multi-Way Join Queries over Streaming Information Sources",
+    "authors": [
+      "Stratis D. Viglas",
+      "Jeffrey F. Naughton",
+      "Josef Burger"
+    ],
+    "venue_or_source": "VLDB Conference",
+    "year": "2003",
+    "system_or_method_name": "MJoin",
+    "problem_domain": "Streaming query processing"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To design a multi-way join operator for streaming inputs that produces output tuples sooner than traditional trees of binary operators, especially when input rates are variable and unpredictable.",
+    "primary_optimized_metric": "output rate",
+    "secondary_metrics": [
+      "resilience to input rate fluctuations",
+      "time to first output"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "Higher output rate",
+        "meaning": "MJoin maintained a higher output rate than two different binary tree plans when a key input stream's rate fluctuated significantly.",
+        "pointer": "[p.7, Figure 11]"
+      },
+      {
+        "number_or_delta": "Improved output rate under memory pressure",
+        "meaning": "Using 'coordinated flushing', MJoin significantly outperformed both a non-coordinated MJoin and a binary tree plan in a memory overflow scenario.",
+        "pointer": "[p.9, Figure 15]"
+      },
+      {
+        "number_or_delta": "25% increase in comparisons",
+        "meaning": "Using the wrong internal probing sequence in an MJoin for an inflating join increased the number of key comparisons by almost 25%, degrading performance.",
+        "pointer": "[p.8, Table 1, Figure 12]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Trees of binary join operators",
+    "why_this_is_the_right_comparison": "This is the traditional method for evaluating multi-way joins. The paper specifically compares against trees of modern symmetric, non-blocking binary operators (like XJoin), which represent the state-of-the-art for streaming scenarios.",
+    "limiting_design_assumption": "The core assumption is that a multi-way join must be decomposed into a tree of binary operators. This structure forces a multi-stage pipeline for tuples, creates intermediate results that add overhead, and makes performance highly sensitive to the tree shape and input arrival rates, often requiring complex dynamic plan reorganization.",
+    "pointers": [
+      "[p.1, Introduction]"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Multi-way symmetric hash join operator",
+    "specific_tools_or_algorithms": [
+      "MJoin",
+      "Coordinated Flushing"
+    ],
+    "what_is_being_optimized": "The physical execution strategy for a multi-way join to maximize the rate of output tuple production from streaming inputs.",
+    "state_or_ir": "A set of in-memory hash tables, one for each of the N input streams.",
+    "output": "A stream of joined output tuples.",
+    "pointers": [
+      "[p.2, Section 2]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Replaces a tree of binary join operators with a single, symmetric n-way join operator (MJoin) that can produce a complete output tuple in one step upon an arrival from any input stream.",
+      "baseline_assumption": "Multi-way joins must be executed as a static or dynamically-reordered tree of binary operators.",
+      "why_baseline_did_not_include_it": "The paper states that while it is a simple generalization of symmetric binary joins, such an operator had not been previously considered in the literature for streaming environments.",
+      "mechanism_level_implementation": "The MJoin operator maintains one hash table for each of its N inputs. When a tuple arrives on stream i, it is inserted into hash table i and then used to probe the other N-1 hash tables in a sequence. If matches are found at each step, a final output tuple is generated without creating persistent intermediate results.",
+      "primary_metric_improved": "output rate",
+      "tradeoffs_or_costs": "The operator may re-compute intermediate join results that a binary tree would materialize and reuse. Also, the per-tuple processing cost increases with the number of inputs, which can become a bottleneck if it exceeds the fastest stream's inter-arrival rate.",
+      "pointers": [
+        "[p.1, Introduction]",
+        "[p.2, Section 2.1]",
+        "[p.3, Section 2.3]",
+        "[p.10, Section 3.6]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Introduces 'coordinated flushing' to manage memory overflow in star joins by spilling the same logical data partitions to disk across all streams simultaneously.",
+      "baseline_assumption": "In a tree of binary operators, each operator manages its own memory overflow independently. In a naive multi-way join, partitions would be flushed randomly or based on local criteria for each stream.",
+      "why_baseline_did_not_include_it": "This mechanism is only possible within a single operator that has a global view of all N input streams and their memory pressure. A tree of binary operators lacks this global context.",
+      "mechanism_level_implementation": "For star joins, all inputs are partitioned using a hash function on the common join attribute. When a partition needs to be spilled to disk for one stream, the corresponding partitions (with the same partition ID) for all other streams are also spilled. This keeps the in-memory portions of the hash tables aligned, maximizing the probability that an incoming tuple finds its join partners in memory.",
+      "primary_metric_improved": "output rate",
+      "tradeoffs_or_costs": "The coordinated flushing technique, in the form presented, is only applicable to star joins where all relations are partitioned on the same join attribute. Other join patterns must fall back to less efficient random spilling.",
+      "pointers": [
+        "[p.5, Section 2.5]",
+        "[p.9, Figure 15]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Gr",
+          "name": "Generalized Design",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The creation of the MJoin operator itself.",
+          "why_it_applies": "MJoin is explicitly defined as a generalization of existing symmetric binary join algorithms to handle more than two inputs.",
+          "justification_if_invented": "",
+          "pointer": "[p.1, Introduction: \"by generalizing existing streaming binary join algorithms to produce a multi-way streaming join operator\"]"
+        },
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The single-step, multi-probe process within MJoin that directly produces final output tuples.",
+          "why_it_applies": "MJoin avoids the work of materializing, storing, and propagating intermediate result tuples through the multiple stages of a binary join tree. This avoided work does not change the final set of output tuples.",
+          "justification_if_invented": "",
+          "pointer": "[p.2, Introduction: \"creates a large number of in-flight tuples, causing additional storage and communication overhead.\"]"
+        },
+        {
+          "symbol": "Cm",
+          "name": "Cost-based",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The selection of the probe order for the N-1 hash tables when a new tuple arrives.",
+          "why_it_applies": "The operator chooses a probing sequence by sorting join predicates by selectivity to minimize the number of temporary tuples generated internally during the probe chain. This is a cost-based optimization.",
+          "justification_if_invented": "",
+          "pointer": "[p.3, Section 2.2]"
+        },
+        {
+          "symbol": "Cz",
+          "name": "Coordination Avoidance",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The symmetric design of the MJoin operator.",
+          "why_it_applies": "Because the operator is symmetric with respect to all inputs, it is inherently resilient to fluctuating input rates, reducing or eliminating the need for a separate, complex mechanism for dynamic query plan reorganization.",
+          "justification_if_invented": "",
+          "pointer": "[p.1, Introduction: \"since the operator is completely symmetric with respect to its inputs, there is no need to restructure a query plan in response to changing input arrival rates.\"]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Si",
+          "name": "Simplicity",
+          "reason_rejected_or_borderline": "While the concept is a 'simple generalization' and it simplifies the overall system by removing plan reorganization, the core mechanism is better described by Gr. The operator itself is more complex than a binary one.",
+          "pointer": "[p.1, Introduction]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Lo",
+          "name": "Locality of Reference",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The 'coordinated flushing' mechanism for spilling partitions to disk.",
+          "why_it_applies": "The mechanism explicitly co-locates data that is likely to join. By flushing the same hash-based partition across all streams, it ensures that tuples with matching join keys are kept together in the same storage tier (memory), thus exploiting logical locality to improve performance under memory pressure.",
+          "justification_if_invented": "",
+          "pointer": "[p.5, Section 2.5]"
+        },
+        {
+          "symbol": "Cc",
+          "name": "Common-Case Specialization",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The design of coordinated flushing specifically for star joins.",
+          "why_it_applies": "The coordinated flushing mechanism is a specialized technique that applies only to star joins, which the authors identify as a potentially common and important query pattern in streaming applications.",
+          "justification_if_invented": "",
+          "pointer": "[p.5, Section 2.5: \"Coordinated flushing over all inputs of the join is possible only with 'star joins'\"]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Ha",
+          "name": "Hardware-Aware",
+          "reason_rejected_or_borderline": "The mechanism is aware of the memory/disk hierarchy, but the technique is based on logical partitioning (hashing on join keys), not on exploiting specific hardware features. Lo is more specific to the design intent.",
+          "pointer": "[p.4, Section 2.4]"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Binary Join Trees + Gr (Generalized Design) + Wv (Result-Preserving Work Avoidance) + Lo (Locality of Reference) -> MJoin",
+    "baseline_name": "Binary Join Trees",
+    "top_3_principle_tags": [
+      "Gr",
+      "Wv",
+      "Lo"
+    ],
+    "core_principle_tags": [
+      "Gr",
+      "Wv",
+      "Lo"
+    ],
+    "supporting_principle_tags": [
+      "Cm",
+      "Cz",
+      "Cc"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Gr",
+      "Wv",
+      "Cm",
+      "Cz",
+      "Lo",
+      "Cc"
+    ],
+    "new_system_name": "MJoin",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "The composition replaces a rigid, multi-stage pipeline with a single, flexible operator. Generalization (Gr) creates the n-way operator structure. This structure enables Work Avoidance (Wv) by eliminating the need to materialize and propagate intermediate results. To maintain performance under memory pressure, this generalized operator uses a Locality (Lo) based flushing strategy to keep related data in memory.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Gr",
+          "contribution_to_equation": "Transforms the fundamental unit of execution from a binary operator to an n-ary operator, enabling a single-step join process."
+        },
+        {
+          "symbol": "Wv",
+          "contribution_to_equation": "Explains the primary performance benefit of the n-ary structure: avoiding the overhead of creating and managing intermediate tuples that are not part of the final result."
+        },
+        {
+          "symbol": "Lo",
+          "contribution_to_equation": "Provides the mechanism to sustain high performance when the n-ary operator's state exceeds memory, by logically co-locating join-compatible data."
+        }
+      ],
+      "transfer_question": "In what other domains could replacing a pipeline of binary operations with a single, generalized n-ary operator avoid intermediate state and improve responsiveness?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "output rate",
+      "direction": "up",
+      "concrete_number": "Not specified in provided text",
+      "pointer": "[p.7, Figure 11]"
+    },
+    {
+      "property": "CPU hash operations",
+      "direction": "down",
+      "concrete_number": "35k (MJoin) vs 185k (XJoin)",
+      "pointer": "[p.8, Table 1]"
+    },
+    {
+      "property": "CPU move operations",
+      "direction": "down",
+      "concrete_number": "35k (MJoin) vs 185k (XJoin)",
+      "pointer": "[p.8, Table 1]"
+    },
+    {
+      "property": "CPU comparison operations",
+      "direction": "mixed",
+      "concrete_number": "1.66M (MJoin) vs 1.5M (XJoin)",
+      "pointer": "[p.8, Table 1]"
+    },
+    {
+      "property": "memory for intermediate results",
+      "direction": "down",
+      "concrete_number": "Not specified in provided text",
+      "pointer": "[p.3, Section 2.3: \"significant memory savings by not storing temporary matches\"]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Sm",
+      "name": "Synchronized State Management",
+      "definition": "Managing the state of multiple, logically distinct components (e.g., caches, buffers, partitions) in a coordinated fashion based on a shared semantic property to improve a global objective.",
+      "mechanism_pattern": "The 'coordinated flushing' mechanism synchronizes the eviction policy across N different hash tables. When a partition is flushed from one table, the corresponding partitions in all other tables are also flushed. The shared semantic property is the hash value of the join attribute.",
+      "why_existing_principles_are_insufficient": "Lo (Locality of Reference) describes the goal (keep related data together) but not the specific mechanism of synchronizing the state management policies (eviction) of multiple components to achieve it. Coordinated flushing is a specific pattern of achieving locality that involves active, synchronized control over the state of multiple data structures, which is more specific than just 'exploiting locality'.",
+      "closest_existing_principles": [
+        "Lo",
+        "Cz"
+      ],
+      "reusability_beyond_this_paper": "This pattern could apply to coordinated cache eviction policies in a distributed key-value store, synchronized garbage collection across related microservices, or managing memory for multi-modal machine learning models where different components process related data.",
+      "confidence": "medium",
+      "pointer": "[p.5, Section 2.5]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "Replaces a tree of binary symmetric joins with a single, generalized n-way symmetric hash join operator that produces final results upon any tuple arrival, using coordinated partition flushing to maintain high output rates under memory pressure.",
+    "top_3_principles": [
+      "Gr",
+      "Wv",
+      "Lo"
+    ],
+    "mechanism_family": "query optimization",
+    "specific_tools_or_algorithms": [
+      "MJoin",
+      "Coordinated Flushing"
+    ],
+    "primary_design_archetype": "avoid materialization / recomputation",
+    "principle_mapping_confidence": "high"
+  }
+}

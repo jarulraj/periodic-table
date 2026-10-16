@@ -1,0 +1,286 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "63",
+    "paper_title": "Efficient Approximation of Optimization Queries Under Parametric Aggregation Constraints",
+    "authors": [
+      "Sudipto Guha",
+      "Dimitrios Gunopoulos",
+      "Nick Koudas",
+      "Divesh Srivastava",
+      "Michail Vlachos"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference, Berlin, Germany, 2003",
+    "year": "2003",
+    "system_or_method_name": "OPAC query answering framework",
+    "problem_domain": "Relational database query processing for optimization problems"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To efficiently answer a new class of queries, OPAC (optimization under parametric aggregation constraints), which are instances of NP-hard optimization problems (e.g., multi-attribute knapsack) over database tuples, without solving the problem from scratch for each query.",
+    "primary_optimized_metric": "query time",
+    "secondary_metrics": [
+      "accuracy",
+      "memory",
+      "index construction time"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "< 2",
+        "meaning": "The average number of hyper-rectangles intersected by a query was less than two, contributing to low query response time.",
+        "pointer": "[p.9]"
+      },
+      {
+        "number_or_delta": "Polynomial in 1/epsilon",
+        "meaning": "The index construction time and index size are polynomial in 1/epsilon, quantifying the tradeoff between accuracy and preprocessing cost/space.",
+        "pointer": "[p.8, Theorem 4]"
+      },
+      {
+        "number_or_delta": "AvgAccuracy > 1/(1 + epsilon')",
+        "meaning": "The empirically measured average accuracy of query answers was consistently better than the theoretical worst-case bound.",
+        "pointer": "[p.9]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Per-query exact solver",
+    "why_this_is_the_right_comparison": "This is the naive, direct approach to answering an OPAC query. The paper explicitly states this approach is 'not at all pragmatic' and 'would be far from being interactive'.",
+    "limiting_design_assumption": "Each query must be solved independently and exactly from scratch. This is computationally infeasible for interactive use because the underlying problem (multi-attribute knapsack) is NP-hard.",
+    "pointers": [
+      "[p.2]",
+      "[p.3]"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Approximate index structure",
+    "specific_tools_or_algorithms": [
+      "Multi-attribute knapsack solver (dynamic programming)",
+      "R-tree"
+    ],
+    "what_is_being_optimized": "The time to find an approximate solution for a multi-attribute knapsack problem defined by a query's parameters over a database relation.",
+    "state_or_ir": "A set of hyper-rectangles partitioning the query parameter space, where each rectangle is associated with a precomputed approximate solution (a set of tuple IDs), its profit, and its corresponding constraint vector. This is stored in an R-tree.",
+    "output": "For a given query constraint vector c, an (epsilon, epsilon')-Accurate answer, which is a solution S' for a slightly relaxed constraint vector c' that has a guaranteed-quality profit.",
+    "pointers": [
+      "[p.3]",
+      "[p.6]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Precomputes and indexes approximate solutions for regions of the query parameter space, avoiding the need to solve an NP-hard problem for each query.",
+      "baseline_assumption": "Each query is an independent optimization problem that must be solved on demand.",
+      "why_baseline_did_not_include_it": "The baseline is the naive approach. Precomputation requires a principled strategy for deciding what to precompute and how to handle approximation, which is the paper's main contribution. It also trades upfront cost and space for query latency.",
+      "mechanism_level_implementation": "The `GeneratePartitions` algorithm systematically explores the space of possible constraint vectors, partitioning it into hyper-rectangles. For each rectangle, it stores a single representative solution in an R-tree, which serves as an approximate answer for any query point within that rectangle.",
+      "primary_metric_improved": "query time",
+      "tradeoffs_or_costs": "Introduces a significant upfront index construction time, requires memory for the index, and provides an approximate answer instead of an exact one.",
+      "pointers": [
+        "[p.1]",
+        "[p.6, Algorithm GeneratePartitions]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Partitions the query parameter space based on a user-specified error tolerance `epsilon` to provide guaranteed-quality approximate answers.",
+      "baseline_assumption": "Solutions must be exact, as approximation is not part of the problem definition.",
+      "why_baseline_did_not_include_it": "The baseline solves the exact problem. Introducing approximation requires a formal definition of accuracy (the paper's `(epsilon, epsilon')-Accurate Answers`) and a mechanism to enforce it during precomputation.",
+      "mechanism_level_implementation": "The `LocateSolution` function identifies hyper-rectangles where the profit change is bounded by the `epsilon` parameters. It probes the space at geometrically decreasing intervals (controlled by `1+epsilon`). If the profit drops by more than a `1+epsilon'` factor, it stops extending the rectangle, ensuring the stored solution is a valid approximate answer for any query within it.",
+      "primary_metric_improved": "accuracy",
+      "tradeoffs_or_costs": "The accuracy guarantee controls the index construction time and memory usage. A smaller `epsilon` (higher accuracy) leads to more partitions, increasing preprocessing cost and index size.",
+      "pointers": [
+        "[p.3, Definition 4]",
+        "[p.6, Algorithm LocateSolution]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Rc",
+          "name": "Reuse of Computation",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The use of a pre-built index (R-tree) storing solutions to the knapsack problem for hyper-rectangles of the parameter space.",
+          "why_it_applies": "The system avoids solving the expensive NP-hard knapsack problem from scratch for each query. Instead, it reuses a precomputed solution corresponding to the region the query parameters fall into.",
+          "justification_if_invented": "",
+          "pointer": "[quote: 'any subsequent user query, requires a simple probing into the multidimensional index... Without the presence of such an index the only alternative would have been the execution of the MultiKnapsack algorithm for every new query']"
+        },
+        {
+          "symbol": "Cr",
+          "name": "Consistency Relaxation",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The system returns an `(epsilon, epsilon')-Accurate` answer, not an exact one.",
+          "why_it_applies": "The system deliberately relaxes the requirement for an exact solution to the optimization problem. This relaxation enables the coarse-grained precomputation (one solution per hyper-rectangle) that makes the approach efficient.",
+          "justification_if_invented": "",
+          "pointer": "[quote: 'The answers returned by our indices are not exact, but approximate; however, we give quality guarantees...']"
+        },
+        {
+          "symbol": "Lo",
+          "name": "Locality of Reference",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The use of an R-tree to store the hyper-rectangles and their associated solutions.",
+          "why_it_applies": "The R-tree spatially organizes the hyper-rectangles, exploiting the assumption that queries with similar parameter vectors are close in the n-dimensional parameter space. This allows for efficient lookups.",
+          "justification_if_invented": "",
+          "pointer": "[p.6]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "reason_rejected_or_borderline": "Rejected because the work avoided (solving the exact knapsack problem) changes the result. The system returns an approximate answer, not the exact one.",
+          "pointer": "[p.3, Definition 4]"
+        },
+        {
+          "symbol": "Bo",
+          "name": "Bottleneck-Oriented",
+          "reason_rejected_or_borderline": "Borderline. The entire design is motivated by avoiding the bottleneck of the NP-hard solver. However, Rc is a more specific principle describing the mechanism (precomputation/indexing) used to avoid the bottleneck.",
+          "pointer": "[p.3]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Cp",
+          "name": "Constraint-based",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The `LocateSolution` algorithm's logic for creating hyper-rectangle boundaries, specifically the check `(1+epsilon')P' > p`.",
+          "why_it_applies": "The process of partitioning the parameter space is explicitly guided by the accuracy constraint. The algorithm searches for the largest possible hyper-rectangle that still satisfies the `(epsilon, epsilon')` accuracy guarantee for all points within it.",
+          "justification_if_invented": "",
+          "pointer": "[p.6, Algorithm LocateSolution, line 5]"
+        },
+        {
+          "symbol": "Cr",
+          "name": "Consistency Relaxation",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The formal definition of `(epsilon, epsilon')-Accurate Answers` and its use to control the partitioning process.",
+          "why_it_applies": "This principle is central to the delta. The mechanism is the concrete implementation of the relaxed exactness semantic, providing a tunable trade-off between answer accuracy and index space.",
+          "justification_if_invented": "",
+          "pointer": "[p.3, Definition 4]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Ad",
+          "name": "Adaptive Processing",
+          "reason_rejected_or_borderline": "Rejected because the system is tuned at index construction time via the epsilon parameters, not adapted at runtime based on workload or system conditions.",
+          "pointer": "[p.1]"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Per-query Exact Solver + Rc + Cr + Cp -> OPAC query answering framework",
+    "baseline_name": "Per-query Exact Solver",
+    "top_3_principle_tags": [
+      "Rc",
+      "Cr",
+      "Cp"
+    ],
+    "core_principle_tags": [
+      "Rc",
+      "Cr",
+      "Cp"
+    ],
+    "supporting_principle_tags": [
+      "Lo"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Rc",
+      "Cr",
+      "Lo",
+      "Cp"
+    ],
+    "new_system_name": "OPAC query answering framework",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "The system replaces an expensive on-demand exact solver by precomputing (Rc) a set of approximate (Cr) solutions. This is only feasible because the relaxation of exactness (Cr) allows a coarse-grained partitioning of the infinite parameter space. The partitioning process itself is a search guided by the user-specified accuracy guarantee, which acts as a formal constraint (Cp).",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Rc",
+          "contribution_to_equation": "Provides the core strategy of precomputing solutions to avoid expensive on-demand computation."
+        },
+        {
+          "symbol": "Cr",
+          "contribution_to_equation": "Enables the precomputation strategy by relaxing the need for an exact answer, allowing a single precomputed solution to serve an entire region of the parameter space."
+        },
+        {
+          "symbol": "Cp",
+          "contribution_to_equation": "Provides the mechanism for constructing the precomputed index by using the accuracy guarantee as a constraint to guide the partitioning of the parameter space."
+        }
+      ],
+      "transfer_question": "In what other domains could a continuous parameter space for an expensive, monotonic function be pre-indexed with approximate, bounded-error representatives?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "query time",
+      "direction": "down",
+      "concrete_number": "Not specified in provided text",
+      "pointer": "[p.9, Figures 18, 19]"
+    },
+    {
+      "property": "memory",
+      "direction": "up",
+      "concrete_number": "Not specified in provided text",
+      "pointer": "[p.9, Figures 14-17]"
+    },
+    {
+      "property": "accuracy",
+      "direction": "down",
+      "concrete_number": "Bounded by (epsilon, epsilon')",
+      "pointer": "[p.3, Definition 4]"
+    },
+    {
+      "property": "index construction time",
+      "direction": "up",
+      "concrete_number": "Not specified in provided text",
+      "pointer": "[p.8, Figures 6-13]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Tl",
+      "name": "Bounded-Error Parameter Space Tiling",
+      "definition": "Pre-calculating and indexing representative solutions for partitions of a continuous query parameter space, where partitions are constructed such that the representative is a guaranteed-quality approximate answer for any query whose parameters fall within the partition.",
+      "mechanism_pattern": "For a family of optimization problems parameterized by a vector `c`, partition the space of `c` into regions (e.g., hyper-rectangles). Within each region, the optimal solution's objective value is stable within some `epsilon` bound. Store a single representative solution for each region in a spatial index to answer queries approximately.",
+      "why_existing_principles_are_insufficient": "Rc explains the 'why' (reuse) but not the 'how' of generating artifacts for a continuous parameter space. Cr explains the allowance for approximation but not the geometric partitioning structure. Cp describes the guidance by constraints, but this pattern is a more specific, recurring architectural choice for indexing parametric, approximate queries.",
+      "closest_existing_principles": [
+        "Rc",
+        "Cr",
+        "Cp"
+      ],
+      "reusability_beyond_this_paper": "This pattern is applicable to any system that needs to provide fast, approximate answers to parametric optimization or simulation queries where the objective function is monotonic with respect to the parameters.",
+      "confidence": "medium",
+      "pointer": "[p.6, Algorithm GeneratePartitions]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "Precomputes and indexes approximate solutions to a parametric optimization problem in an R-tree by partitioning the parameter space into hyper-rectangles, each containing a single representative solution with a guaranteed error bound.",
+    "top_3_principles": [
+      "Rc",
+      "Cr",
+      "Cp"
+    ],
+    "mechanism_family": "indexing / search structure",
+    "specific_tools_or_algorithms": [
+      "Multi-attribute knapsack solver (dynamic programming)",
+      "R-tree"
+    ],
+    "primary_design_archetype": "avoid materialization / recomputation",
+    "principle_mapping_confidence": "high"
+  }
+}

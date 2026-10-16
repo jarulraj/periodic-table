@@ -1,0 +1,310 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "58",
+    "paper_title": "Cache Tables: Paving the Way for an Adaptive Database Cache",
+    "authors": [
+      "Mehmet Altınel",
+      "Christof Bornhövd",
+      "Sailesh Krishnamurthy",
+      "C. Mohan",
+      "Hamid Pirahesh",
+      "Berthold Reinwald"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference, Berlin, Germany, 2003",
+    "year": "2003",
+    "system_or_method_name": "DBCache (Cache Tables)",
+    "problem_domain": "Database caching for Transactional Web Applications (TWAs)"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To build a seamless, adaptive database cache to improve the response time, throughput and scalability of transactional web applications.",
+    "primary_optimized_metric": "response time",
+    "secondary_metrics": [
+      "throughput",
+      "scalability"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "<1% - 15%",
+        "meaning": "Overhead of Janus plans in a cache-hit case, for queries ranging from a join to a unique key access.",
+        "pointer": "[p.9, Figure 12-A]"
+      },
+      {
+        "number_or_delta": "<1% - 3%",
+        "meaning": "Overhead of Janus plans in a cache-miss case without on-demand loading, for queries ranging from a join to a non-unique key access.",
+        "pointer": "[p.9, Figure 12-B]"
+      },
+      {
+        "number_or_delta": "6% - 35%",
+        "meaning": "Overhead of Janus plans in a cache-miss case with on-demand loading (MQ message generation), for queries ranging from a join to a unique key access.",
+        "pointer": "[p.9, Figure 12-C]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Materialized Views for Caching",
+    "why_this_is_the_right_comparison": "The paper explicitly positions its work against using materialized views for sub-table caching, arguing that the baseline approach is 'too restrictive and ineffective' for dynamic web applications because it requires static, declarative specification of cache content.",
+    "limiting_design_assumption": "The content of a cache must be specified declaratively and in advance, and cannot change dynamically based on application demand. The decision to use the cache is made at query compilation time.",
+    "pointers": [
+      "[p.2, Section 1.2]"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Query Rewriting and Planning",
+    "specific_tools_or_algorithms": [
+      "Janus (two-headed) query plans",
+      "Probe queries",
+      "Cache Constraints (Cache Keys, Referential Cache Constraints)"
+    ],
+    "what_is_being_optimized": "The decision at runtime whether to execute a query against the local cache or the remote backend database.",
+    "state_or_ir": "A conditional query plan containing a switch operator, a local execution path, a remote execution path, and a probe query.",
+    "output": "A Janus plan that is executed to retrieve query results from either the cache or the backend.",
+    "pointers": [
+      "[p.2, Section 1.3]",
+      "[p.5, Section 4.2]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Introduces 'Janus plans', a new type of conditional query plan that makes a runtime decision to execute a query against either the local cache or the remote backend, enabling the cache to be used adaptively.",
+      "baseline_assumption": "The decision to use a cached table (e.g., a materialized view) to answer a query is made at query compilation time based on static definitions.",
+      "why_baseline_did_not_include_it": "Materialized view matching mechanisms are designed for compile-time optimization based on static view definitions, not for runtime, state-dependent choices of execution location.",
+      "mechanism_level_implementation": "A Janus plan is built with a 'probe query', a 'local query' plan, and a 'remote query' plan, all under a conditional switch operator. At execution, the probe query runs first to check if the needed data is in the cache. Based on the result, the switch operator directs execution to either the local or remote plan.",
+      "primary_metric_improved": "response time",
+      "tradeoffs_or_costs": "Adds runtime overhead due to the execution of the probe query and the switch operator. This overhead is most significant for simple queries, ranging from <1% to 35% depending on the scenario.",
+      "pointers": [
+        "[p.5, Section 4.2, Figure 9]",
+        "[p.9, Section 6.2, Figure 12]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Implements an asynchronous, on-demand cache population mechanism guided by declarative 'cache constraints' to ensure the correctness and logical completeness of the cached data.",
+      "baseline_assumption": "Cache population is based on a static definition (e.g., a materialized view query) and is refreshed as a whole, not triggered by individual query misses to fetch fine-grained, referentially-consistent data slices.",
+      "why_baseline_did_not_include_it": "Traditional materialized view refresh and replication mechanisms are not designed for on-demand, fine-grained population driven by application access patterns while maintaining complex, user-defined completeness properties.",
+      "mechanism_level_implementation": "On a cache miss, the remote query plan uses a UDF to send missing key values via an MQ message to a background 'cache daemon'. The daemon uses pre-defined 'cache constraints' (Cache Keys and Referential Cache Constraints) to construct and execute queries that fetch a 'domain complete' and referentially consistent set of rows from the backend to populate the cache tables.",
+      "primary_metric_improved": "Cache hit rate (over time)",
+      "tradeoffs_or_costs": "Population is asynchronous, introducing a delay. The constraint system can be complex and may cause a 'recursive cache load problem' if misconfigured, potentially loading large amounts of data.",
+      "pointers": [
+        "[p.4, Section 3]",
+        "[p.8, Section 5.2]",
+        "[p.7, Section 3.4]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Ad",
+          "name": "Adaptive Processing",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The Janus plan's switch operator and probe query.",
+          "why_it_applies": "The system adapts its query execution strategy at runtime based on the current state of the cache. The decision to use the local or remote plan is not made at compile time but during execution.",
+          "justification_if_invented": "",
+          "pointer": "[quote: 'The decision on choosing dynamic cache tables over nicknames to answer a query must be done at runtime...'] [p.5]"
+        },
+        {
+          "symbol": "Wa",
+          "name": "Workload-Aware",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The on-demand population triggered by cache misses in Janus plans.",
+          "why_it_applies": "The content of the dynamic cache is not pre-defined but is populated based on the actual queries issued by the application. The Janus plan is the mechanism that detects misses and triggers this workload-driven adaptation.",
+          "justification_if_invented": "",
+          "pointer": "[quote: 'Dynamic cache tables are populated on demand as dictated by the queries issued by the application.'] [p.3]"
+        },
+        {
+          "symbol": "Fp",
+          "name": "Function Placement",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The Janus plan choosing between the local cache database and the remote backend database.",
+          "why_it_applies": "The system decides where to place the query execution. It can execute fully locally, fully remotely, or even partition the local query to be distributed between the cache and backend, placing computation where data resides.",
+          "justification_if_invented": "",
+          "pointer": "[quote: '...it can partition the query into subqueries that can be distributed amongst both databases.'] [p.2]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "reason_rejected_or_borderline": "The remote query is an alternative execution path, not provably unnecessary work. The choice is based on data locality (a cache hit), not on a logical guarantee that the remote work is redundant for the final result.",
+          "pointer": "[p.5]"
+        },
+        {
+          "symbol": "Cm",
+          "name": "Cost-based",
+          "reason_rejected_or_borderline": "The primary switch in the Janus plan is based on data presence for correctness, not a cost model. While the underlying federated query optimizer uses cost models, the core Janus mechanism itself is a correctness-based switch.",
+          "pointer": "[p.2]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Se",
+          "name": "Semantically Explicit",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The definition and use of 'cache constraints': Cache Keys and Referential Cache Constraints (RCCs).",
+          "why_it_applies": "The system relies on explicit, declarative rules about data completeness ('domain completeness') and relationships (RCCs) to guide both query rewriting (for the probe) and the on-demand population process, ensuring correctness.",
+          "justification_if_invented": "",
+          "pointer": "[quote: 'We describe the content of dynamic cache tables with cache constraint definitions.'] [p.4]"
+        },
+        {
+          "symbol": "Ig",
+          "name": "Invariant-Guided",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The on-demand loading algorithm enforcing 'domain completeness' and RCCs.",
+          "why_it_applies": "The cache constraints define invariants that the system must maintain. The population mechanism is explicitly guided by these invariants to ensure that for any cached key, all its related data (as defined by the constraints) is also present.",
+          "justification_if_invented": "",
+          "pointer": "[quote: 'This property [domain completeness] guarantees that for any value of a domain-complete column, the cache table contains all the rows...'] [p.4]"
+        },
+        {
+          "symbol": "Au",
+          "name": "Automation",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The cache daemon that asynchronously populates cache tables upon receiving MQ messages.",
+          "why_it_applies": "The process of identifying needed data, fetching it from the backend, and inserting it into the cache is fully automated, removing the need for a DBA to manually manage the cache content.",
+          "justification_if_invented": "",
+          "pointer": "[quote: 'The daemon runs as a lower priority background process and checks the cache constraints and issues the required insert statements...'] [p.8]"
+        },
+        {
+          "symbol": "Cr",
+          "name": "Consistency Relaxation",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The asynchronous nature of cache population and invalidation.",
+          "why_it_applies": "The system explicitly accepts that cached data may be out-of-date relative to the backend database due to asynchronous updates. This is a deliberate trade-off for performance.",
+          "justification_if_invented": "",
+          "pointer": "[quote: '...the result of a query ... is the same as the result ... at the backend database (modulo the differences due to the cached data base being out-of-date).'] [p.4]"
+        }
+      ],
+      "rejected_or_borderline_principles": []
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Static Caching (Materialized Views) + Ad + Wa + Se -> Adaptive Caching (Cache Tables)",
+    "baseline_name": "Static Caching (Materialized Views)",
+    "top_3_principle_tags": [
+      "Ad",
+      "Wa",
+      "Se"
+    ],
+    "core_principle_tags": [
+      "Ad",
+      "Wa",
+      "Se",
+      "Ig"
+    ],
+    "supporting_principle_tags": [
+      "Fp",
+      "Au",
+      "Cr"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Ad",
+      "Wa",
+      "Fp",
+      "Se",
+      "Ig",
+      "Au",
+      "Cr"
+    ],
+    "new_system_name": "DBCache (Cache Tables)",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "These principles combine to transform a static, pre-defined cache into a dynamic, self-managing one. Ad provides the runtime mechanism (Janus plans) to choose between local and remote execution. Wa uses this mechanism to drive the cache content based on actual application queries. Se provides the explicit rules (cache constraints) that make this dynamic behavior correct, ensuring that the local cache is only used when it can satisfy the query completely.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Ad",
+          "contribution_to_equation": "Provides the runtime decision-making capability via conditional Janus plans, enabling the system to adapt its execution strategy based on the cache's current state."
+        },
+        {
+          "symbol": "Wa",
+          "contribution_to_equation": "Drives the cache content to reflect the application's access patterns by populating data on-demand when cache misses occur."
+        },
+        {
+          "symbol": "Se",
+          "contribution_to_equation": "Establishes the correctness foundation through explicit cache constraints, which define the conditions under which the adaptive local execution is safe."
+        }
+      ],
+      "transfer_question": "In what other domains could a runtime probe, guided by explicit semantic completeness rules, be used to adaptively choose between a local fast-path and a remote full-path computation?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "Janus Plan Overhead",
+      "direction": "up",
+      "concrete_number": "<1% to 35%",
+      "pointer": "[p.9, Figure 12]"
+    },
+    {
+      "property": "Response Time",
+      "direction": "down",
+      "concrete_number": "Not specified in provided text",
+      "pointer": "[p.1, Abstract]"
+    },
+    {
+      "property": "Throughput",
+      "direction": "up",
+      "concrete_number": "Not specified in provided text",
+      "pointer": "[p.1, Abstract]"
+    },
+    {
+      "property": "Scalability",
+      "direction": "up",
+      "concrete_number": "Not specified in provided text",
+      "pointer": "[p.1, Abstract]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Ss",
+      "name": "Subset Sufficiency",
+      "definition": "Guaranteeing that a local subset of data is sufficient to produce a correct result for a given operation, enabling the avoidance of access to the full remote dataset.",
+      "mechanism_pattern": "Defining a completeness property on a local data subset (e.g., 'domain completeness') and using a runtime check (a 'probe query') to verify that a query's access pattern falls within the scope of this property before executing it locally.",
+      "why_existing_principles_are_insufficient": "Ig (Invariant-Guided) describes maintaining a property, but not specifically using it to prove a local subset is sufficient for a query. Wv (Work Avoidance) is about skipping work that is provably irrelevant to the final result, whereas this is about proving the local data is all that's relevant. Ad (Adaptive) describes the runtime choice, but not the specific correctness condition that enables it. Se (Semantically Explicit) describes making the rules explicit, but not the pattern of using them for this sufficiency proof.",
+      "closest_existing_principles": [
+        "Ig",
+        "Wv",
+        "Ad",
+        "Se"
+      ],
+      "reusability_beyond_this_paper": "This pattern could apply in federated learning (proving local data is sufficient for a sub-problem), distributed analytics (using local metadata to answer a query without hitting remote data), or any system with tiered storage that needs to decide if a query can be satisfied by the fast tier.",
+      "confidence": "medium",
+      "pointer": "[p.4, Section 3]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "The system uses a conditional 'Janus' query plan to dynamically check at runtime if a query can be answered correctly by a local, partially-replicated cache, and asynchronously populates the cache based on misses using declarative 'cache constraints' to ensure data completeness.",
+    "top_3_principles": [
+      "Ad",
+      "Wa",
+      "Se"
+    ],
+    "mechanism_family": "query optimization",
+    "specific_tools_or_algorithms": [
+      "Janus (two-headed) query plans",
+      "Probe queries",
+      "Cache Constraints (Cache Keys, Referential Cache Constraints)"
+    ],
+    "primary_design_archetype": "invariant-preserving shortcut",
+    "principle_mapping_confidence": "high"
+  }
+}

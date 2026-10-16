@@ -1,0 +1,280 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "40",
+    "paper_title": "Processing Sliding Window Multi-Joins in Continuous Queries over Data Streams",
+    "authors": [
+      "Lukasz Golab",
+      "M. Tamer Ozsu"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference",
+    "year": "2003",
+    "system_or_method_name": "EAGER MULTI-WAY NLJ, LAZY MULTI-WAY NLJ, GENERAL LAZY MULTI-WAY NLJ, MULTI-WAY HASH JOIN",
+    "problem_domain": "Continuous query processing over data streams"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To continually and efficiently evaluate the exact join of n sliding windows over data streams, assuming the windows fit in main memory.",
+    "primary_optimized_metric": "throughput",
+    "secondary_metrics": [
+      "processing cost per unit time"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "4.8x",
+        "meaning": "The maximum supported input rate (throughput) of the best join plan found by the proposed heuristic compared to the worst plan for an Eager NLJ query (1614 vs 333 tuples/sec).",
+        "pointer": "[p.10, Table 8]"
+      },
+      {
+        "number_or_delta": "7.1x",
+        "meaning": "The maximum supported input rate of the best plan using a hash join versus the best plan using a nested-loop join (11540 vs 1614 tuples/sec).",
+        "pointer": "[p.10, Table 8]"
+      },
+      {
+        "number_or_delta": "1.4x",
+        "meaning": "Performance improvement from allocating more hash buckets to faster streams versus allocating them equally, achieving over 10,000 tuples/sec vs. 7,000 tuples/sec.",
+        "pointer": "[p.11, Figure 4(b)]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "NAIVE MULTI-WAY NLJ",
+    "why_this_is_the_right_comparison": "This baseline represents a straightforward extension of existing binary incremental join algorithms to the multi-way case. The paper's proposed algorithms are explicitly designed to correct the inefficiencies of this naive approach.",
+    "limiting_design_assumption": "The baseline assumes a fixed, static join order for incremental processing. When a new tuple arrives for a stream that is not the outermost relation in the join plan, the algorithm performs unnecessary work by re-evaluating inner joins for every tuple of the outer relations.",
+    "pointers": [
+      "[p.4, Section 3.1]"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Incremental join algorithms",
+    "specific_tools_or_algorithms": [
+      "Multi-way incremental nested loop join (NLJ)",
+      "Multi-way incremental hash join",
+      "Cost-based join ordering heuristics"
+    ],
+    "what_is_being_optimized": "The processing cost per unit time for a continuous multi-way join.",
+    "state_or_ir": "The contents of in-memory sliding windows and associated hash tables.",
+    "output": "A stream of result tuples from the n-way join.",
+    "pointers": [
+      "[p.4, Section 3]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "The system dynamically restructures the join execution plan to always use the newly arrived tuple(s) as the probe in the outermost loop, regardless of the stream they belong to. This avoids the massive redundant computation performed by the naive baseline.",
+      "baseline_assumption": "The baseline uses a fixed join order. When a tuple arrives for an inner relation, it must be joined with the full result of the outer relations, causing significant re-computation.",
+      "why_baseline_did_not_include_it": "The baseline is a simple extension of binary join logic, which does not naturally account for this multi-way optimization opportunity. The inefficiency becomes apparent only in the multi-way context.",
+      "mechanism_level_implementation": "Instead of a fixed plan, the join order effectively changes based on the origin of the incoming tuple. For a new tuple 'k' from stream Si, the algorithm computes the join by iterating through the other windows (S1...Sn) using 'k' as the initial probe, rather than iterating through S1, then S2, etc., and finally probing with 'k'.",
+      "primary_metric_improved": "throughput",
+      "tradeoffs_or_costs": "Slightly more complex control logic in the join operator to handle the dynamic reordering.",
+      "pointers": [
+        "[p.4, Section 3.2]",
+        "[p.4, Table 4]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "The system uses cost-based heuristics to determine a good 'global' join order, which minimizes the processing cost per unit time. This static plan is then used as the basis for the dynamic execution described in Δ1.",
+      "baseline_assumption": "The baseline does not consider join ordering, implicitly assuming an arbitrary or default order. Traditional database join ordering focuses on metrics like I/O, not the continuous per-unit-time cost relevant to streams.",
+      "why_baseline_did_not_include_it": "The problem of join ordering for multi-way joins over sliding windows was not previously studied, as noted by the authors.",
+      "mechanism_level_implementation": "A per-unit-time cost model is developed that counts attribute comparisons. Heuristics use this model to select a join order, primarily by ordering joins by descending selectivity and then promoting streams with high arrival rates towards the top of the plan.",
+      "primary_metric_improved": "throughput",
+      "tradeoffs_or_costs": "The overhead of executing the heuristic, which may need to be re-run if stream characteristics change significantly.",
+      "pointers": [
+        "[p.3, Section 2]",
+        "[p.8, Section 5]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The arrival of a new tuple on any stream.",
+          "why_it_applies": "The proposed algorithm avoids the 'unnecessary work' [p.4] performed by the naive baseline, which re-computes inner joins for each tuple of the outer relations. By making the new tuple the probe, it avoids these redundant computations while producing the same exact join result.",
+          "justification_if_invented": "",
+          "pointer": "[p.4, Section 3.2]"
+        },
+        {
+          "symbol": "Cc",
+          "name": "Common-Case Specialization",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The arrival of a new tuple, which is the fundamental event in an incremental stream processing system.",
+          "why_it_applies": "The entire join algorithm is specialized to handle the common case of a single new tuple arriving. The strategy of 'always iterates over newly arrived tuples in the outer forloop' [p.2] is a direct specialization for this event to maximize efficiency.",
+          "justification_if_invented": "",
+          "pointer": "[p.2, Section 1.2]"
+        },
+        {
+          "symbol": "Ad",
+          "name": "Adaptive Processing",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The arrival of a new tuple on a specific stream.",
+          "why_it_applies": "The effective join order used for processing adapts at runtime based on which stream the new tuple arrives from. This is a runtime adaptation to an event.",
+          "justification_if_invented": "",
+          "pointer": "[p.4, Table 4]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Rc",
+          "name": "Reuse of Computation",
+          "reason_rejected_or_borderline": "The mechanism is about avoiding re-computation, not reusing a previously computed result like a materialized view or cached value.",
+          "pointer": "[p.4]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Cm",
+          "name": "Cost-based",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The need to select a global join order before query execution begins.",
+          "why_it_applies": "The paper explicitly develops and uses a 'main-memory per-unit-time cost model' [p.2] to guide its join ordering heuristics. The goal is to find a plan that minimizes this cost.",
+          "justification_if_invented": "",
+          "pointer": "[p.7, Section 4.2]"
+        },
+        {
+          "symbol": "Wa",
+          "name": "Workload-Aware",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The cost model calculation and heuristic decisions.",
+          "why_it_applies": "The cost model and heuristics are aware of and directly use workload characteristics, such as stream arrival rates ('r_i') and data properties like selectivity (derived from 'v_i'), to make optimization decisions.",
+          "justification_if_invented": "",
+          "pointer": "[p.8, Section 5.1]"
+        },
+        {
+          "symbol": "Ep",
+          "name": "Equivalence-based",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The search for a good join order.",
+          "why_it_applies": "The entire join ordering problem is predicated on the fact that there are n! logically equivalent join plans (extreme right-deep trees) that produce the same result. The optimizer's task is to choose the most efficient one from this equivalence class.",
+          "justification_if_invented": "",
+          "pointer": "[p.8, Section 5.1]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Bo",
+          "name": "Bottleneck-Oriented",
+          "reason_rejected_or_borderline": "While the goal is to improve performance, the paper does not frame the optimization problem around a single, specific bottleneck resource or stage. The cost model is more general.",
+          "pointer": "[p.7]"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Naive Incremental Join + Wv + Cm -> Efficient Sliding Window Multi-Join",
+    "baseline_name": "NAIVE MULTI-WAY NLJ",
+    "top_3_principle_tags": [
+      "Wv",
+      "Cc",
+      "Cm"
+    ],
+    "core_principle_tags": [
+      "Wv",
+      "Cc",
+      "Cm",
+      "Wa"
+    ],
+    "supporting_principle_tags": [
+      "Ad",
+      "Ep"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Wv",
+      "Cc",
+      "Ad",
+      "Cm",
+      "Wa",
+      "Ep"
+    ],
+    "new_system_name": "EAGER/GENERAL MULTI-WAY NLJ/HASH JOIN",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "The naive incremental join is inefficient because it performs redundant work. Wv and Cc provide the core algorithmic insight to restructure the incremental computation by specializing it for new tuple arrivals, making the new tuple the probe to avoid unnecessary work. Cm complements this by providing a planning mechanism to select a globally efficient join order for this restructured computation, based on stream properties, further reducing costs.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Wv",
+          "contribution_to_equation": "Provides the mechanism to avoid redundant inner-loop computations performed by the baseline, without changing the final result."
+        },
+        {
+          "symbol": "Cc",
+          "contribution_to_equation": "Frames the incremental update as the common case and specializes the join algorithm to handle it efficiently by always placing new tuples in the outer loop."
+        },
+        {
+          "symbol": "Cm",
+          "contribution_to_equation": "Introduces a cost model to reason about and select an efficient static join ordering from many equivalent alternatives, which is critical for multi-way joins."
+        }
+      ],
+      "transfer_question": "In what other incremental processing systems can performance be improved by dynamically restructuring the computation to use the 'delta' as the probe, guided by a global cost-based plan?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "throughput",
+      "direction": "up",
+      "concrete_number": "4.8x improvement for best vs worst plan",
+      "pointer": "[p.10, Table 8]"
+    },
+    {
+      "property": "processing cost",
+      "direction": "down",
+      "concrete_number": "Proposed algorithm scales 'considerably better' than naive approach.",
+      "pointer": "[p.7, Figure 2]"
+    },
+    {
+      "property": "memory",
+      "direction": "mixed",
+      "concrete_number": "Lazy expiration requires more memory than eager expiration to store tuples waiting to be expired.",
+      "pointer": "[p.2]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "none",
+      "symbol": "None",
+      "name": "None",
+      "definition": "No plausible new principle candidate.",
+      "mechanism_pattern": "Not applicable",
+      "why_existing_principles_are_insufficient": "Existing principles sufficiently cover the paper's mechanisms. The dynamic restructuring of the join is well-captured by a combination of Wv (Result-Preserving Work Avoidance) and Cc (Common-Case Specialization). The join ordering is a classic application of Cm (Cost-based) and Wa (Workload-Aware).",
+      "closest_existing_principles": [],
+      "reusability_beyond_this_paper": "Not applicable",
+      "confidence": "low",
+      "pointer": "Not specified in provided text"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "The system improves multi-way sliding window join performance by dynamically restructuring the join to always use newly-arrived tuples as the outer probe, avoiding redundant work, and using a cost-model to select an efficient global join order based on stream rates and selectivities.",
+    "top_3_principles": [
+      "Wv",
+      "Cc",
+      "Cm"
+    ],
+    "mechanism_family": "query optimization",
+    "specific_tools_or_algorithms": [
+      "Multi-way incremental nested loop join (NLJ)",
+      "Multi-way incremental hash join",
+      "Cost-based join ordering heuristics"
+    ],
+    "primary_design_archetype": "avoid materialization / recomputation",
+    "principle_mapping_confidence": "high"
+  }
+}

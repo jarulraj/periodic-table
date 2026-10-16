@@ -1,0 +1,237 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "23",
+    "paper_title": "Scheduling for shared window joins over data streams",
+    "authors": [
+      "Moustafa A. Hammad",
+      "Michael J. Franklin",
+      "Walid G. Aref",
+      "Ahmed K. Elmagarmid"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference, Berlin, Germany, 2003",
+    "year": "2003",
+    "system_or_method_name": "Maximum Query Throughput (MQT)",
+    "problem_domain": "Continuous query processing over data streams"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To develop a scheduling algorithm for shared window joins that provides good performance across a range of window sizes, avoiding the performance flaw of prior work that penalizes small-window queries.",
+    "primary_optimized_metric": "latency",
+    "secondary_metrics": [
+      "maximum response time",
+      "memory"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "up to 60% improvement",
+        "meaning": "Improvement in average response time of MQT over the LWO algorithm.",
+        "pointer": "[p.12]"
+      },
+      {
+        "number_or_delta": "up to 30% improvement",
+        "meaning": "Improvement in average response time of MQT over the SWF algorithm.",
+        "pointer": "[p.11]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Largest Window Only (LWO)",
+    "why_this_is_the_right_comparison": "LWO was the state-of-the-art scheduling approach for shared join processing in continuous query systems like CACQ and PSoup at the time. The paper identifies it as the 'only previously published scheduling approach'.",
+    "limiting_design_assumption": "The simplest and most efficient way to share computation for multiple window joins is to execute a single join for the largest window size and route results to all queries. This assumes that delaying the processing of small-window queries is acceptable.",
+    "pointers": [
+      "[p.4]",
+      "[p.5]",
+      "[quote: '...LWO is the only previously published scheduling approach for shared join processing in CQ systems.']"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Dynamic scheduling algorithm",
+    "specific_tools_or_algorithms": [
+      "Greedy scheduling",
+      "Cost-based heuristic (MQT)"
+    ],
+    "what_is_being_optimized": "The execution order of join operations for incoming tuples against partial windows to minimize average response time across all queries.",
+    "state_or_ir": "A list of scheduling queues, one for each distinct window size, holding tuples that are partially processed. An associated matrix stores pre-calculated Maximum Query Throughput (MaxQT) values.",
+    "output": "An ordered stream of join result tuples for each continuous query.",
+    "pointers": [
+      "[p.7]",
+      "[p.8]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Replaces the baseline's fixed, tuple-at-a-time FIFO processing with a preemptive scheduler that can suspend the processing of a tuple's join to handle a newly arrived, higher-priority tuple.",
+      "baseline_assumption": "Arriving tuples are processed completely against the largest window in arrival order. A new tuple must wait for the current tuple to finish processing before it can be scheduled.",
+      "why_baseline_did_not_include_it": "The baseline LWO approach valued simplicity. Preemptive scheduling adds complexity for state management (e.g., tracking where a suspended tuple left off) and requires buffering and reordering output to maintain correctness.",
+      "mechanism_level_implementation": "The system maintains a list of scheduling queues for tuples that are partially processed. When a tuple's processing is suspended, its current state (e.g., a pointer to the next tuple to scan in the other stream) is stored. An output buffer is used to hold and reorder shuffled output tuples before releasing them to queries.",
+      "primary_metric_improved": "latency",
+      "tradeoffs_or_costs": "Increased implementation complexity and memory overhead for scheduling queues and output buffers to reorder results.",
+      "pointers": [
+        "[p.7]",
+        "[p.12]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Introduces a cost-based heuristic, Maximum Query Throughput (MQT), to guide scheduling decisions, balancing the needs of small and large window queries.",
+      "baseline_assumption": "The baseline LWO has no explicit scheduling metric; it uses a fixed policy of processing against the largest window. An alternative, SWF, uses a simple heuristic of always prioritizing the smallest window.",
+      "why_baseline_did_not_include_it": "The baseline's fixed policy did not require a scheduling metric. The paper identifies the tradeoff where LWO favors large windows and SWF favors small windows, motivating a more sophisticated, balanced metric.",
+      "mechanism_level_implementation": "The MQT scheduler selects the waiting tuple that maximizes the ratio of (queries served) / (time to scan), estimated as (Cj - Ci) / (wj - wi) for a partial window. This value is pre-calculated and stored in a matrix for efficient lookup during scheduling.",
+      "primary_metric_improved": "latency",
+      "tradeoffs_or_costs": "Computational overhead to calculate or look up the MQT value for each scheduling decision. The logic is more complex than the simple heuristics of LWO or SWF.",
+      "pointers": [
+        "[p.8]",
+        "[quote: '...MQT is more flexible than either LWO or SWF, choosing at any instant to process the tuple that is likely to serve the maximum number of queries per unit time...']"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Ad",
+          "name": "Adaptive Processing",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The arrival of a new tuple, which triggers the scheduler to re-evaluate which waiting tuple (new or partially processed) to execute next.",
+          "why_it_applies": "The system dynamically adapts its execution order in response to incoming data, rather than following LWO's fixed FIFO processing order. The scheduler can switch between processing different tuples based on the current state of the system.",
+          "justification_if_invented": "",
+          "pointer": "[p.7]"
+        },
+        {
+          "symbol": "Pm",
+          "name": "Policy/Mechanism",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The introduction of a scheduling framework (queues, state management for suspended tuples) that can support multiple scheduling policies (LWO, SWF, MQT).",
+          "why_it_applies": "The paper explicitly separates the mechanism of shared, preemptible join execution from the policy that decides which tuple to schedule. It evaluates three distinct policies (LWO, SWF, MQT) on top of this mechanism.",
+          "justification_if_invented": "",
+          "pointer": "[p.5]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Rc",
+          "name": "Reuse of Computation",
+          "reason_rejected_or_borderline": "While sharing/reusing the join computation is the central goal of the entire paper, it is also a property of the baseline LWO system. This principle describes the problem context, not the delta that distinguishes MQT from LWO.",
+          "pointer": "[p.3]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Cm",
+          "name": "Cost-based",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The MQT algorithm's selection of which tuple to schedule next.",
+          "why_it_applies": "The scheduling decision is driven by an explicit cost-benefit model. The 'cost' is the processing time, proportional to the size of the partial window to be scanned. The 'benefit' is the number of queries that will be serviced. The MQT metric is the ratio of benefit to cost (query throughput).",
+          "justification_if_invented": "",
+          "pointer": "[p.8]"
+        },
+        {
+          "symbol": "Wa",
+          "name": "Workload-Aware",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The calculation of the MQT metric, which depends on the set of active queries.",
+          "why_it_applies": "The scheduling decision explicitly uses properties of the query workload, namely the distribution of window sizes and the number of queries registered for each window size (C_i). The system adapts its behavior to skewed query workloads.",
+          "justification_if_invented": "",
+          "pointer": "[p.8, p.12]"
+        }
+      ],
+      "rejected_or_borderline_principles": []
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "LWO (Fixed FIFO Scheduling) + Ad (Adaptive Processing) + Cm (Cost-based) -> MQT",
+    "baseline_name": "LWO (Fixed FIFO Scheduling)",
+    "top_3_principle_tags": [
+      "Ad",
+      "Cm"
+    ],
+    "core_principle_tags": [
+      "Ad",
+      "Cm"
+    ],
+    "supporting_principle_tags": [
+      "Pm",
+      "Wa"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Ad",
+      "Pm",
+      "Cm",
+      "Wa"
+    ],
+    "new_system_name": "MQT",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "The baseline's fixed policy is replaced by a dynamic one. Adaptive Processing (Ad) provides the mechanism for preemption and dynamic reordering of work. This mechanism is guided by a Cost-based (Cm) policy that optimizes for query throughput, allowing the system to intelligently balance the conflicting performance needs of different queries in the workload.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Ad",
+          "contribution_to_equation": "Introduces the ability to make dynamic, state-dependent scheduling decisions, breaking the rigid FIFO processing of the baseline."
+        },
+        {
+          "symbol": "Cm",
+          "contribution_to_equation": "Provides the logic for the adaptive scheduler, using a cost-benefit model to make decisions that improve the global objective (average response time)."
+        }
+      ],
+      "transfer_question": "In what other domains could a monolithic, FIFO-processed task be decomposed into schedulable sub-tasks governed by a cost-based policy to balance latency for heterogeneous requests?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "average response time",
+      "direction": "down",
+      "concrete_number": "up to 60% vs LWO",
+      "pointer": "[p.12]"
+    },
+    {
+      "property": "memory",
+      "direction": "up",
+      "concrete_number": "small increase; extra buffers <13% of joinBuffer size",
+      "pointer": "[p.12]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Ss",
+      "name": "Schedulable Sub-computation",
+      "definition": "Decomposing a monolithic computation into a sequence of smaller, independently schedulable sub-computations to enable fine-grained, adaptive resource allocation.",
+      "mechanism_pattern": "The monolithic task of joining a tuple against the largest window is decomposed into a series of schedulable sub-tasks: joining against the first partial window (w1), then the second (w2-w1), and so on. The scheduler can interleave these sub-tasks from different incoming tuples.",
+      "why_existing_principles_are_insufficient": "Ad (Adaptive Processing) describes the dynamic nature of the scheduling, but not the structural transformation of the work itself that enables this scheduling. Mo (Modularity) applies to system components, not the decomposition of a single algorithmic operation. This principle captures the key enabling step of making the computation itself preemptible and resumable at well-defined boundaries.",
+      "closest_existing_principles": [
+        "Ad",
+        "Mo"
+      ],
+      "reusability_beyond_this_paper": "This pattern could apply to other iterative algorithms, progressive data loading, or complex query operators where the full computation can be broken into meaningful, incremental steps that can be interleaved to improve responsiveness for short requests.",
+      "confidence": "medium",
+      "pointer": "[p.7]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "Replaces fixed FIFO tuple processing with a dynamic scheduler that uses a query-throughput cost model to preemptively schedule joins over partial windows, balancing response time for both small and large window queries.",
+    "top_3_principles": [
+      "Ad",
+      "Cm"
+    ],
+    "mechanism_family": "query optimization",
+    "specific_tools_or_algorithms": [
+      "Greedy scheduling",
+      "Cost-based heuristic (MQT)"
+    ],
+    "primary_design_archetype": "cost-based planning",
+    "principle_mapping_confidence": "high"
+  }
+}

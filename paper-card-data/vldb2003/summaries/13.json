@@ -1,0 +1,236 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "13",
+    "paper_title": "Phrase Matching in XML",
+    "authors": [
+      "Sihem Amer-Yahia",
+      "Mary Fernandez",
+      "Divesh Srivastava",
+      "Yu Xu"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference",
+    "year": "2003",
+    "system_or_method_name": "PIX",
+    "problem_domain": "XML query processing"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To develop an efficient algorithm for phrase matching in XML that permits dynamic specification of the phrase to be matched and the markup (tags and annotations) to be ignored.",
+    "primary_optimized_metric": "query time",
+    "secondary_metrics": [],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "4x faster",
+        "meaning": "In experiments with nested context nodes, PIX is more than four times faster than the INL baseline.",
+        "pointer": "[p.10]"
+      },
+      {
+        "number_or_delta": "Linear vs Constant",
+        "meaning": "As nesting level of context nodes increases, INL's query time increases linearly, whereas PIX's remains constant.",
+        "pointer": "[p.10, Figure 10(b)]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Indexed Nested-Loop (INL) algorithm",
+    "why_this_is_the_right_comparison": "The paper designs INL as a direct competitor that uses the same set of inverted indices as PIX. It represents a natural, well-understood approach analogous to indexed nested-loop joins in relational databases, providing a clear comparison of the core algorithmic strategy.",
+    "limiting_design_assumption": "The baseline assumes that phrase matches can be found by iterating through occurrences of the first phrase word and then repeatedly probing indices for subsequent words and ignored markup. This leads to redundant work, especially in documents with nested structures, because the same content may be traversed multiple times for each containing context.",
+    "pointers": [
+      "[p.2]",
+      "[p.5]",
+      "[p.10]"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Stack-based merge algorithm",
+    "specific_tools_or_algorithms": [
+      "Stack-based merge algorithm",
+      "Priority queue over inverted indices"
+    ],
+    "what_is_being_optimized": "The search for ordered sequences of phrase words, interspersed with dynamically specified ignored markup, within nested XML contexts.",
+    "state_or_ir": "A stack of (interval, witnessSet, matchSet) tuples. Each matchSet contains a set of partial witnesses, which are lists of intervals representing an incomplete phrase match.",
+    "output": "A set of (context interval, witness set) pairs, where each witness is an ordered list of intervals for a complete phrase match.",
+    "pointers": [
+      "[p.4]",
+      "[p.6]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Replaces the baseline's iterative, probe-based search with a single, ordered scan over all relevant document components (words, tags, contexts), using a stack to manage state.",
+      "baseline_assumption": "A phrase match can be constructed by finding an instance of the first word and then repeatedly probing indices to find subsequent words and ignored markup in a contiguous sequence.",
+      "why_baseline_did_not_include_it": "The baseline adapts a standard relational database technique (indexed nested-loop join). The single-pass merge approach is more complex and specifically tailored to the ordered, hierarchical nature of XML data, which the simpler baseline does not exploit.",
+      "mechanism_level_implementation": "PIX uses a priority queue to merge sorted inverted lists of all phrase words and ignored markup into a single stream, sorted by document position. The algorithm processes this stream exactly once, from beginning to end.",
+      "primary_metric_improved": "query time",
+      "tradeoffs_or_costs": "When the first word of the phrase is very rare, INL's targeted probing can be faster than PIX's scan over the combined lists of all words and markup.",
+      "pointers": [
+        "[p.5]",
+        "[p.6, Figure 5]",
+        "[p.8, Table 3]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Builds all potential matches simultaneously by incrementally extending a shared set of partial witnesses, avoiding the redundant work of constructing each match independently from scratch.",
+      "baseline_assumption": "Each witness can be constructed independently of all other witnesses. The INL algorithm restarts the search for the rest of a phrase for each occurrence of the first word within each context.",
+      "why_baseline_did_not_include_it": "Independent construction is simpler and a natural consequence of a nested-loop design. Sharing and incrementally extending partial results requires a more complex state management mechanism (the stack with sets of partial matches).",
+      "mechanism_level_implementation": "PIX maintains a `matchSet` of active partial witnesses on a stack. As each item from the merged input stream is processed, all applicable partial witnesses in the current context's `matchSet` are extended. This reuses the computation of common match prefixes.",
+      "primary_metric_improved": "query time",
+      "tradeoffs_or_costs": "Requires more memory to store the stack and the sets of partial witnesses, though the paper argues this is bounded by document nesting depth and frequency of the first phrase word.",
+      "pointers": [
+        "[p.5, quote: 'each witness is constructed independently of all other witnesses.']",
+        "[p.6, Figure 5]",
+        "[p.7]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The replacement of INL's repeated index probes with a single scan over a merged, ordered stream of all relevant intervals (words, tags, contexts).",
+          "why_it_applies": "The single scan avoids redundant traversals of document content. INL re-traverses nested content for each enclosing context, while PIX processes each piece of content once. This avoided work is result-preserving because the single ordered scan is guaranteed to find the same set of matches as the redundant traversals.",
+          "justification_if_invented": "",
+          "pointer": "[p.5, quote: 'This may result in redundant work, for example, when a context or annotation interval is nested within another context interval...']"
+        },
+        {
+          "symbol": "Lo",
+          "name": "Locality of Reference",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The use of a priority queue to create a single stream of intervals sorted by their start position.",
+          "why_it_applies": "Processing intervals in sorted order of their start position is equivalent to processing the document's content in document order. This creates a sequential access pattern over the conceptual document, exploiting locality.",
+          "justification_if_invented": "",
+          "pointer": "[p.6, quote: 'The PIX algorithm scans L, the combined list of words and ignored markup in order...']"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Sc",
+          "name": "Scalability",
+          "reason_rejected_or_borderline": "Scalability is a benefit of the PIX algorithm's design, not the mechanism itself. Wv explains the mechanism that leads to better scaling with respect to nesting depth.",
+          "pointer": "[p.10, Figure 10]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Rc",
+          "name": "Reuse of Computation",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The maintenance of a `matchSet` of partial witnesses on the stack, which are extended as new words or markup are encountered.",
+          "why_it_applies": "A partial witness is an intermediate computed result (a prefix of a full match). Instead of re-computing these prefixes from scratch for every potential match (as INL does), PIX stores them and reuses them to build longer matches. This is a direct application of reusing prior computation.",
+          "justification_if_invented": "",
+          "pointer": "[p.6, quote: 'matchSet is a set of matches {m}. A match m is a (partialWitness, matchPos) pair...']"
+        },
+        {
+          "symbol": "Mo",
+          "name": "Modularity",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The use of a stack where each frame corresponds to a context or annotation interval.",
+          "why_it_applies": "The stack modularizes the problem of handling nested structures. Each stack frame encapsulates the state (partial and complete witnesses) for a specific structural scope (a context or annotation), cleanly separating the concerns of different nesting levels.",
+          "justification_if_invented": "",
+          "pointer": "[p.6, Figure 5]"
+        }
+      ],
+      "rejected_or_borderline_principles": []
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Indexed Nested-Loop Probing + Wv (Result-Preserving Work Avoidance) + Rc (Reuse of Computation) -> PIX",
+    "baseline_name": "Indexed Nested-Loop Probing",
+    "top_3_principle_tags": [
+      "Wv",
+      "Rc"
+    ],
+    "core_principle_tags": [
+      "Wv",
+      "Rc"
+    ],
+    "supporting_principle_tags": [
+      "Lo",
+      "Mo"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Wv",
+      "Lo",
+      "Rc",
+      "Mo"
+    ],
+    "new_system_name": "PIX",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "The composition transforms a naive, redundant search into an efficient, single-pass algorithm. Wv provides the single-pass structure by avoiding redundant traversals of the data. Rc makes this single pass productive by reusing the computation of partial match prefixes, allowing all potential matches to be built up simultaneously. Wv creates the opportunity for efficiency, and Rc realizes it through stateful, incremental construction.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Wv",
+          "contribution_to_equation": "Transforms the algorithm from repeated probing to a single, ordered scan, avoiding the redundant work of re-processing nested content for each enclosing context."
+        },
+        {
+          "symbol": "Rc",
+          "contribution_to_equation": "Introduces the mechanism of maintaining and extending a shared set of partial matches, reusing the work of finding common prefixes instead of re-computing them independently for each match."
+        }
+      ],
+      "transfer_question": "In what other domains could a stateful, single-pass scan with incremental result construction (Wv + Rc) replace a naive nested-loop search over hierarchical or sequential data?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "query time",
+      "direction": "down",
+      "concrete_number": "4x faster in nested scenarios",
+      "pointer": "[p.10]"
+    },
+    {
+      "property": "memory",
+      "direction": "up",
+      "concrete_number": "Stack depth bounded by document nesting; number of partial witnesses bounded by occurrences of first phrase word.",
+      "pointer": "[p.7]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Ip",
+      "name": "Incremental Prefixing",
+      "definition": "Decompose a search for complex patterns into a stateful, single-pass process that maintains and extends a set of shared partial patterns (prefixes), avoiding redundant computation of common sub-patterns.",
+      "mechanism_pattern": "The PIX algorithm's use of a `matchSet` on a stack. This set holds all active partial witnesses, and each new item from the input stream is used to extend all applicable partial witnesses in parallel, effectively sharing the work of matching common prefixes.",
+      "why_existing_principles_are_insufficient": "Rc captures the general idea of reusing a computed artifact, but 'Incremental Prefixing' describes a more specific and powerful pattern of dynamic, parallel construction of solutions from shared sub-solutions, common in sequence matching and complex event processing. It's a specific form of dynamic programming applied to stream processing that is more precise than generic 'Reuse of Computation'.",
+      "closest_existing_principles": [
+        "Rc",
+        "Wv"
+      ],
+      "reusability_beyond_this_paper": "This pattern is highly reusable in areas like complex event processing (CEP), bioinformatics sequence alignment, and parsing, where multiple patterns are matched against a single stream of data.",
+      "confidence": "medium",
+      "pointer": "[p.6, `extend-with-word` function]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "PIX replaces a baseline nested-loop probing algorithm with a single-pass, stack-based merge algorithm that processes a unified stream of words and markup to incrementally build all matching phrases in parallel, avoiding redundant work on nested XML structures.",
+    "top_3_principles": [
+      "Wv",
+      "Rc"
+    ],
+    "mechanism_family": "query optimization",
+    "specific_tools_or_algorithms": [
+      "Stack-based merge algorithm",
+      "Priority queue over inverted indices"
+    ],
+    "primary_design_archetype": "avoid materialization / recomputation",
+    "principle_mapping_confidence": "high"
+  }
+}

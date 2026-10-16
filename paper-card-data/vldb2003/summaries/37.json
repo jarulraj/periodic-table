@@ -1,0 +1,254 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "37",
+    "paper_title": "Finding Hierarchical Heavy Hitters in Data Streams",
+    "authors": [
+      "Graham Cormode",
+      "S. Muthukrishnan",
+      "Flip Korn",
+      "Divesh Srivastava"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference",
+    "year": "2003",
+    "system_or_method_name": "Hierarchical Heavy Hitters (HHH) algorithms (Strategies 1-4, Sketch-based approach)",
+    "problem_domain": "Data stream analysis"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To find all nodes in a hierarchy whose descendant counts (after discounting descendant HHHs) exceed a threshold φ of the total stream size, using small space and time in a streaming setting.",
+    "primary_optimized_metric": "memory",
+    "secondary_metrics": [
+      "accuracy",
+      "throughput"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "O((h/ε) log(εN)) space",
+        "meaning": "Upper bound on space for the deterministic sample-based strategies, where h is hierarchy depth and ε is the error parameter.",
+        "pointer": "[p.4]"
+      },
+      {
+        "number_or_delta": "O((h/ε^2) log(1/δ)) space",
+        "meaning": "Space required for the proposed randomized sketch-based algorithm.",
+        "pointer": "[p.8]"
+      },
+      {
+        "number_or_delta": "Significantly less space",
+        "meaning": "The proposed hierarchy-aware sketch method uses significantly less space than the naive sketch method.",
+        "pointer": "[p.8, Table 1]"
+      },
+      {
+        "number_or_delta": "Far fewer updates",
+        "meaning": "The proposed hierarchy-aware sample-based strategies require far fewer update operations than the naive approach.",
+        "pointer": "[p.6, Fig 7]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Naive / Straightforward Approach",
+    "why_this_is_the_right_comparison": "This is the most direct way to solve the problem using existing, non-hierarchical heavy hitter algorithms. The paper explicitly defines and argues against this approach as being inefficient.",
+    "limiting_design_assumption": "The baseline assumes that each prefix in the hierarchy can be treated as an independent item, requiring a separate heavy hitter summary structure for each level of the hierarchy. It is 'hierarchy-oblivious' during the stream processing phase.",
+    "pointers": [
+      "[quote: 'A naive way of computing HHHs, using existing techniques for maintaining heavy hitters, would be to find heavy hitters over all prefixes...']",
+      "[p.2]",
+      "[quote: 'maintain summary information independently for each level in the hierarchy.']",
+      "[p.3]"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Approximate streaming algorithm",
+    "specific_tools_or_algorithms": [
+      "Trie data structure",
+      "Sample-based counting (Lossy Counting variant)",
+      "Sketch-based counting (Random Subset Sums)"
+    ],
+    "what_is_being_optimized": "The space usage of the summary data structure and the number of updates required per stream element, while satisfying correctness guarantees.",
+    "state_or_ir": "For sample-based methods, a trie data structure `T` storing prefixes and their associated frequency bounds. For sketch-based methods, a set of sketch arrays for each level of the hierarchy.",
+    "output": "A set of prefixes identified as ε-approximate Hierarchical Heavy Hitters (HHHs) and their estimated frequencies.",
+    "pointers": [
+      "[p.4]",
+      "[p.8]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Replaces independent, per-level summaries with a single, integrated trie data structure that explicitly models the hierarchy. This allows for more efficient updates and compression by propagating information between parent and child nodes.",
+      "baseline_assumption": "Each level of the hierarchy is independent and requires its own heavy hitter data structure.",
+      "why_baseline_did_not_include_it": "The baseline is a direct application of existing non-hierarchical algorithms, which by definition do not have mechanisms to exploit hierarchical relationships.",
+      "mechanism_level_implementation": "A single trie `T` is maintained. On insertion, prefixes are added only until an existing node is found. During compression, nodes with counts and error bounds below the current threshold (`g_e + Δ_e < b_current`) are pruned, and their information is propagated to parent nodes.",
+      "primary_metric_improved": "memory",
+      "tradeoffs_or_costs": "The insertion and compression logic is more complex than using a black-box heavy hitter algorithm at each level.",
+      "pointers": [
+        "[p.4, Fig 1]",
+        "[p.5, Fig 2, 3, 4]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Replaces a bottom-up, level-by-level HHH computation with a top-down recursive search over the hierarchy. This search uses range-sum queries on sketches to prune entire subtrees that are guaranteed not to contain any HHHs.",
+      "baseline_assumption": "The naive sketch-based approach finds HHHs bottom-up: find heavy hitters at the leaf level, subtract their counts from parents, and repeat up the hierarchy.",
+      "why_baseline_did_not_include_it": "The bottom-up approach is a more direct translation of the HHH definition but is less efficient, requiring more complex sketches (to handle negative counts from subtraction) and separate HH data structures per level.",
+      "mechanism_level_implementation": "A recursive procedure starts at the root. It queries a sketch for the total weight `w` of all leaf descendants. If `w` is below the threshold `φN`, the entire subtree is pruned. Otherwise, it recurses on children to find their HHH weight `W` and checks if the current node's self-weight `w-W` exceeds the threshold.",
+      "primary_metric_improved": "memory",
+      "tradeoffs_or_costs": "The algorithm is probabilistic and provides correctness guarantees with a certain probability (1-δ), dependent on the sketch construction.",
+      "pointers": [
+        "[p.7]",
+        "[p.8, Fig 8]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The compression phase, which deletes nodes `t_e` if `g_e + Δ_e < b_current`.",
+          "why_it_applies": "This condition is equivalent to the maximum possible frequency of the node being less than the error threshold `εN`. Deleting such nodes is guaranteed not to affect the correctness of the final ε-approximate HHH set. This avoids the work of storing and maintaining information for provably irrelevant prefixes.",
+          "justification_if_invented": "",
+          "pointer": "[p.4, Fig 1]"
+        },
+        {
+          "symbol": "Rc",
+          "name": "Reuse of Computation",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The insertion logic in Strategy 3, where a new node `t_e`'s error bound `Δ_e` is initialized from its ancestor's state: `Δ_e = g_a(e) + Δ_a(e)`.",
+          "why_it_applies": "The algorithm reuses the computed frequency and error bound information from an ancestor node to initialize a new descendant node, avoiding a more conservative default initialization and improving bound tightness.",
+          "justification_if_invented": "",
+          "pointer": "[p.5, Fig 3]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Mo",
+          "name": "Modularity",
+          "reason_rejected_or_borderline": "The paper's contribution is to break the modularity of the baseline (which uses independent HH algorithms per level) by creating a single, integrated, 'hierarchy-aware' structure. The design move is away from modularity, not towards it.",
+          "pointer": "[p.2]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The check `if w < |φN| then return 0` in the recursive search algorithm.",
+          "why_it_applies": "If the total weight `w` of a subtree (estimated by the sketch) is less than the HHH threshold, no node within that subtree can be an HHH. The algorithm therefore prunes the entire search of that subtree, avoiding numerous recursive calls and sketch queries while preserving the final result (with high probability).",
+          "justification_if_invented": "",
+          "pointer": "[p.8]"
+        },
+        {
+          "symbol": "Pd",
+          "name": "Probabilistic Design",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The use of sketches (Random Subset Sums) to estimate range sums for the top-down search.",
+          "why_it_applies": "The entire mechanism for handling insertions and deletions relies on probabilistic sketches to provide frequency estimates with high-probability error bounds. This is essential for the Wv pruning to work in the turnstile stream model.",
+          "justification_if_invented": "",
+          "pointer": "[p.7]"
+        }
+      ],
+      "rejected_or_borderline_principles": []
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Independent Per-Level Counting + Wv + Pd -> Hierarchy-Aware HHH Finding",
+    "baseline_name": "Independent Per-Level Counting",
+    "top_3_principle_tags": [
+      "Wv",
+      "Pd"
+    ],
+    "core_principle_tags": [
+      "Wv",
+      "Pd"
+    ],
+    "supporting_principle_tags": [
+      "Rc"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Wv",
+      "Rc",
+      "Pd"
+    ],
+    "new_system_name": "Hierarchy-Aware HHH Finding",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "The core insight is to use the problem's hierarchical structure to enable aggressive, result-preserving pruning (Wv). In the insert-only model, this is done deterministically. In the more complex insert-delete model, probabilistic sketches (Pd) are used to generate the bounds needed to drive the same Wv pruning logic, trading deterministic guarantees for broader applicability.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Wv",
+          "contribution_to_equation": "Provides the primary optimization strategy by using the hierarchy to derive bounds that prove certain computations (updates, storage, recursive searches) are unnecessary to maintain the final approximate answer."
+        },
+        {
+          "symbol": "Pd",
+          "contribution_to_equation": "Enables the system to handle the more general insert-delete (turnstile) stream model by replacing exact counters with probabilistic sketches, which provide the frequency estimates needed for the Wv pruning mechanism."
+        }
+      ],
+      "transfer_question": "In what other streaming problems can explicit domain structure (e.g., graphs, taxonomies, spatial relationships) be used to derive bounds that enable result-preserving work avoidance?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "memory",
+      "direction": "down",
+      "concrete_number": "Strategy 4 (Hybrid) did the best in all cases.",
+      "pointer": "[p.6]"
+    },
+    {
+      "property": "throughput",
+      "direction": "up",
+      "concrete_number": "The naive approach requires far more updates than the other strategies.",
+      "pointer": "[p.6, Fig 7]"
+    },
+    {
+      "property": "accuracy",
+      "direction": "not specified",
+      "concrete_number": "The methods are implemented to guarantee correctness of the output [within ε-bounds].",
+      "pointer": "[p.8]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Scp",
+      "name": "Structural Context Propagation",
+      "definition": "An algorithm that uses a known, explicit structure (like a hierarchy, graph, or lattice) to propagate constraints, bounds, or partial results between related entities to optimize computation.",
+      "mechanism_pattern": "In the sample-based strategies, error bounds and frequency information are propagated between parent and child nodes in the trie. For example, a new node's error bound is initialized based on its ancestor's state (`Δ_e = g_a(e) + Δ_a(e)`), and a deleted node's count is added to its parent's (`g_p(e) += g_e`). This uses the hierarchical structure to share and refine information.",
+      "why_existing_principles_are_insufficient": "Wv describes the outcome (pruning work) but not the mechanism of deriving the bounds via the hierarchy. Rc (Reuse of Computation) is close but 'propagation' better captures the dynamic, structure-guided flow of information (both up and down the hierarchy) used to maintain tighter bounds across the data structure.",
+      "closest_existing_principles": [
+        "Wv",
+        "Rc"
+      ],
+      "reusability_beyond_this_paper": "This pattern is common in algorithms over structured data, such as belief propagation in graphical models, constraint propagation in solvers, or maintaining aggregates in spatial or graph databases.",
+      "confidence": "medium",
+      "pointer": "[p.5, Fig 3]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "The system introduces hierarchy-aware algorithms that use a single trie data structure or a top-down search over sketches to prune unnecessary storage, updates, and search, efficiently finding frequent hierarchical items in data streams.",
+    "top_3_principles": [
+      "Wv",
+      "Pd"
+    ],
+    "mechanism_family": "approximate / probabilistic algorithm",
+    "specific_tools_or_algorithms": [
+      "Trie data structure",
+      "Sample-based counting (Lossy Counting variant)",
+      "Sketch-based counting (Random Subset Sums)"
+    ],
+    "primary_design_archetype": "invariant-preserving shortcut",
+    "principle_mapping_confidence": "high"
+  }
+}

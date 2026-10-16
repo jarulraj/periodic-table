@@ -1,0 +1,317 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "54",
+    "paper_title": "BHUNT: Automatic Discovery of Fuzzy Algebraic Constraints in Relational Data",
+    "authors": [
+      "Paul G. Brown",
+      "Peter J. Haas"
+    ],
+    "venue_or_source": "VLDB",
+    "year": "2003",
+    "system_or_method_name": "BHUNT",
+    "problem_domain": "Automatic discovery of fuzzy algebraic constraints for query optimization"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To automatically discover and exploit hidden, fuzzy algebraic constraints in relational data to speed up query processing.",
+    "primary_optimized_metric": "latency",
+    "secondary_metrics": [
+      "I/O"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "up to a factor of 6.8",
+        "meaning": "Speedup in query processing time.",
+        "pointer": "[p.1, Abstract]"
+      },
+      {
+        "number_or_delta": "up to two orders of magnitude",
+        "meaning": "Reduction in table accesses for a query.",
+        "pointer": "[p.1, Abstract]"
+      },
+      {
+        "number_or_delta": "approximately 4 minutes",
+        "meaning": "Time to discover the algebraic constraints in the experiment.",
+        "pointer": "[p.11]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Standard relational query optimizer",
+    "why_this_is_the_right_comparison": "The paper's goal is to provide new information to the query optimizer to enable more efficient access plans that are otherwise unavailable. The experiments compare query performance with and without the BHUNT-discovered constraints.",
+    "limiting_design_assumption": "The optimizer is only aware of explicitly declared database constraints and does not discover or utilize 'hidden' or 'fuzzy' algebraic relationships that hold for most, but not all, of the data.",
+    "pointers": [
+      "[p.2]",
+      "[p.3]",
+      "[p.11]"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Statistical data mining",
+    "specific_tools_or_algorithms": [
+      "statistical histogramming",
+      "data segmentation",
+      "clustering",
+      "tolerance intervals",
+      "Bernoulli sampling"
+    ],
+    "what_is_being_optimized": "The choice of query access plan, by introducing new predicates derived from discovered constraints.",
+    "state_or_ir": "Fuzzy algebraic constraints represented as disjunctive range predicates.",
+    "output": "A set of fuzzy algebraic constraints and corresponding exception tables.",
+    "pointers": [
+      "[p.1, Abstract]",
+      "[p.3]",
+      "[p.4]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Automatically discovers fuzzy algebraic constraints by sampling column-pair relationships and applying statistical segmentation to identify high-density regions ('bumps'), which are formalized as disjunctive range predicates.",
+      "baseline_assumption": "Relationships between columns must be explicitly declared as constraints (e.g., foreign keys) to be used by the optimizer.",
+      "why_baseline_did_not_include_it": "Standard optimizers are not designed to perform data mining; discovering statistical regularities is typically a manual task for a DBA or analyst.",
+      "mechanism_level_implementation": "BHUNT generates candidate column pairs, samples the distribution of their algebraic combinations (e.g., `a1 - a2`), and uses a cost-based segmentation algorithm on the sorted sample to define intervals covering the data's 'bumps'. Sample size is chosen based on tolerance interval theory to control the exception rate.",
+      "primary_metric_improved": "query time",
+      "tradeoffs_or_costs": "Computational overhead for the discovery phase (sampling and analysis) and potential for finding spurious constraints.",
+      "pointers": [
+        "[p.4]",
+        "[p.7]",
+        "[p.9]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Uses discovered fuzzy constraints to optimize queries by partitioning data into a large 'normal' set that satisfies the constraint and a small 'exception' set that does not. Queries are rewritten to use a specialized, faster plan on the normal data, with results combined with a query on the exception data.",
+      "baseline_assumption": "A query is executed against all data in the relevant tables according to a single plan.",
+      "why_baseline_did_not_include_it": "The baseline lacks the concept of a 'fuzzy' constraint and thus has no mechanism to partition data based on it for specialized processing.",
+      "mechanism_level_implementation": "An exception table is created to store rows violating a fuzzy constraint. An incoming query is rewritten: the discovered constraint is added as a predicate to the query running on the original table, enabling new access paths. The original query is run on the small exception table, and the two result sets are unioned.",
+      "primary_metric_improved": "latency",
+      "tradeoffs_or_costs": "Storage overhead for exception tables, maintenance cost for these tables, and increased query compilation complexity.",
+      "pointers": [
+        "[p.4]",
+        "[p.11]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "La",
+          "name": "Learned Approximation",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The data-driven discovery of an approximate rule (the fuzzy constraint) from data samples.",
+          "why_it_applies": "The system learns a model of a hidden data relationship from a sample, approximating the true relationship with a set of intervals.",
+          "justification_if_invented": "",
+          "pointer": "[quote: '...actively learn about relationships in the data...'] [p.1]"
+        },
+        {
+          "symbol": "Pd",
+          "name": "Probabilistic Design",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "Using sampling and statistical theory (tolerance intervals, beta distribution) to construct the constraints and bound the exception rate.",
+          "why_it_applies": "The entire discovery process is grounded in statistical sampling theory to handle the 'fuzzy' nature of the constraints and provide probabilistic guarantees on their coverage.",
+          "justification_if_invented": "",
+          "pointer": "[quote: '...with probability at least p, the fraction of points...is at most f.'] [p.9]"
+        },
+        {
+          "symbol": "Se",
+          "name": "Semantically Explicit",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "Representing the discovered statistical relationship as a disjunctive range predicate.",
+          "why_it_applies": "It transforms a statistical pattern into a declarative constraint that the query optimizer can understand and use for rewriting.",
+          "justification_if_invented": "",
+          "pointer": "[p.3, 'disjunctive range predicates']"
+        },
+        {
+          "symbol": "Au",
+          "name": "Automation",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The end-to-end BHUNT process for finding and applying constraints.",
+          "why_it_applies": "It automates the traditionally manual task of a DBA or data analyst finding and declaring useful constraints for optimization.",
+          "justification_if_invented": "",
+          "pointer": "[p.1, Abstract, 'automatically discovering']"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Cm",
+          "name": "Cost-based",
+          "reason_rejected_or_borderline": "A cost model is used for the segmentation algorithm, but this is an internal implementation detail of the discovery mechanism, not the main principle explaining the delta's design intent.",
+          "pointer": "[p.7, 'find a segmentation S that minimizes the function c']"
+        },
+        {
+          "symbol": "Cr",
+          "name": "Consistency Relaxation",
+          "reason_rejected_or_borderline": "Rejected because the final query result is correct. The system relaxes the constraint to be 'fuzzy' but compensates by handling exceptions separately, thus preserving correctness.",
+          "pointer": "[p.11]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Cc",
+          "name": "Common-Case Specialization",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "Partitioning data into 'normal' and 'exception' records and using a specialized, faster query plan for the large normal set.",
+          "why_it_applies": "This is a textbook application of specializing for the common case to improve performance, while handling the rare case separately.",
+          "justification_if_invented": "",
+          "pointer": "[p.1, Abstract, 'partition the data into normal and exception records']"
+        },
+        {
+          "symbol": "Ep",
+          "name": "Equivalence-based",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "Rewriting the original query into a new, logically equivalent form that incorporates the discovered constraint.",
+          "why_it_applies": "The optimizer transforms the query Q(T) into an equivalent form Q_modified(T_normal) U Q(T_exception). This is a logic-preserving transformation to enable a better physical plan.",
+          "justification_if_invented": "",
+          "pointer": "[p.4, 'modify the queries to incorporate the constraints']"
+        },
+        {
+          "symbol": "Is",
+          "name": "Isolation for Correctness",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "Storing exception records that violate the fuzzy constraint in a separate table.",
+          "why_it_applies": "This isolates the non-conforming data to ensure it is processed correctly by the original query logic, which is necessary to preserve the overall correctness of the final result.",
+          "justification_if_invented": "",
+          "pointer": "[p.4, 'create 'exception tables' to hold all of the exception records']"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Op",
+          "name": "Optimistic Design",
+          "reason_rejected_or_borderline": "Rejected because Cc is more specific. The system does not speculatively execute and then roll back; it pre-partitions the data into cases it knows how to handle based on the discovered constraint.",
+          "pointer": "[p.4]"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Standard Optimizer + La + Pd + Cc -> BHUNT",
+    "baseline_name": "Standard Optimizer",
+    "top_3_principle_tags": [
+      "La",
+      "Pd",
+      "Cc"
+    ],
+    "core_principle_tags": [
+      "La",
+      "Pd",
+      "Cc",
+      "Ep"
+    ],
+    "supporting_principle_tags": [
+      "Se",
+      "Au",
+      "Is"
+    ],
+    "all_principle_tags_for_deltas": [
+      "La",
+      "Pd",
+      "Se",
+      "Au",
+      "Cc",
+      "Ep",
+      "Is"
+    ],
+    "new_system_name": "BHUNT",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "The system first uses Learned Approximation (La) and Probabilistic Design (Pd) to discover high-coverage, 'fuzzy' rules from data. This learned knowledge is then operationalized via Common-Case Specialization (Cc), which creates a fast path for the majority of data that conforms to the rule, while handling the few exceptions separately to maintain correctness.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "La",
+          "contribution_to_equation": "Contributes the mechanism for learning an approximate model of a hidden data relationship directly from data samples."
+        },
+        {
+          "symbol": "Pd",
+          "contribution_to_equation": "Provides the statistical foundation for the learning process, enabling the use of sampling and providing probabilistic guarantees on the 'fuzziness' or exception rate of the learned rule."
+        },
+        {
+          "symbol": "Cc",
+          "contribution_to_equation": "Provides the architectural pattern for exploiting the fuzzy rule: partition the problem into a large, fast common case and a small, correct exception case."
+        }
+      ],
+      "transfer_question": "In what other domains can we learn an approximate, high-coverage rule from data and use it to build a specialized fast path, while isolating exceptions to preserve correctness?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "latency",
+      "direction": "down",
+      "concrete_number": "up to 6.8x speedup",
+      "pointer": "[p.1, Abstract]"
+    },
+    {
+      "property": "I/O",
+      "direction": "down",
+      "concrete_number": "up to 100x reduction in table accesses",
+      "pointer": "[p.11]"
+    },
+    {
+      "property": "storage",
+      "direction": "up",
+      "concrete_number": "Not specified",
+      "pointer": "[p.4, 'create exception tables']"
+    },
+    {
+      "property": "discovery time",
+      "direction": "up",
+      "concrete_number": "~4 minutes",
+      "pointer": "[p.11]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Fz",
+      "name": "Fuzzy Rule Application",
+      "definition": "Applying a rule that holds for a large fraction of the data to enable optimization, while explicitly handling the non-conforming data via a separate mechanism to maintain correctness.",
+      "mechanism_pattern": "Discover a high-coverage, approximate rule R; partition data D into D_normal (conforming) and D_exception; transform a query Q(D) into an optimized version on D_normal unioned with the original Q on D_exception.",
+      "why_existing_principles_are_insufficient": "This pattern is a powerful composition of La/Pd and Cc. While the individual principles exist, their combination into a 'learn-then-specialize' pattern is a recurring and potent design move that is not captured by a single principle. Cc does not require the rule to be learned or fuzzy, and La/Pd do not prescribe how the learned model is to be used.",
+      "closest_existing_principles": [
+        "Cc",
+        "La",
+        "Pd"
+      ],
+      "reusability_beyond_this_paper": "Applicable in compilers (profile-guided optimization for hot paths), networking (fast paths for common traffic), and other areas where behavior is mostly predictable but has outliers that must be handled correctly.",
+      "confidence": "medium",
+      "pointer": "[p.4]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "BHUNT automatically discovers fuzzy algebraic constraints from data samples using statistical segmentation and then rewrites queries to use these constraints for a fast-path on the common-case data, while handling outliers in a separate exception table to ensure correctness.",
+    "top_3_principles": [
+      "La",
+      "Pd",
+      "Cc"
+    ],
+    "mechanism_family": "query optimization",
+    "specific_tools_or_algorithms": [
+      "statistical histogramming",
+      "data segmentation",
+      "tolerance intervals",
+      "Bernoulli sampling"
+    ],
+    "primary_design_archetype": "invariant-preserving shortcut",
+    "principle_mapping_confidence": "high"
+  }
+}

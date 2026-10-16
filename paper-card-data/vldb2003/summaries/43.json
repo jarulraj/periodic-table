@@ -1,0 +1,270 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "43",
+    "paper_title": "Checks and Balances: Monitoring Data Quality Problems in Network Traffic Databases",
+    "authors": [
+      "Flip Korn",
+      "S. Muthukrishnan",
+      "Yunyue Zhu"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference, Berlin, Germany, 2003",
+    "year": "2003",
+    "system_or_method_name": "PAC-Man",
+    "problem_domain": "Data quality monitoring"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To propose a continuous data quality monitoring approach for network traffic databases that is more flexible than rigid integrity constraints and less ad-hoc than external data cleaning scripts.",
+    "primary_optimized_metric": "robustness",
+    "secondary_metrics": [
+      "automation",
+      "scalability"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "47% vs 3%",
+        "meaning": "On a weekend day, a PAC with fine-grained (weekend-specific) temporal granularity detected 47% of tuples as violations, while a coarse-grained (all-days) PAC detected only 3%, showing the importance of adaptive granularity.",
+        "pointer": "[p.9]"
+      },
+      {
+        "number_or_delta": "85% of polls within [4:30, 5:30]",
+        "meaning": "An example of a learned PAC parameter for polling regularity, where the system found a 'sweet spot' indicating 85% of polls occur within a 30-second tolerance of the 5-minute target.",
+        "pointer": "[p.9]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Traditional database integrity constraints (ICs) and triggers",
+    "why_this_is_the_right_comparison": "The paper explicitly frames its approach as a response to the limitations of traditional ICs, which are the standard database mechanism for enforcing data correctness but are too rigid for noisy network data feeds.",
+    "limiting_design_assumption": "Data quality rules can be expressed as exact, binary (pass/fail), and time-invariant constraints that apply uniformly to all data.",
+    "pointers": [
+      "[p.1, quote: 'In principle, data quality problems can be monitored using traditional integrity constraints (ICs) and triggers... Unfortunately, this approach is too rigid and limited...']"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Probabilistic method",
+    "primary_tool_specific_type": "Statistical parameter estimation from empirical distributions",
+    "specific_tools_or_algorithms": [
+      "Probabilistic Approximate Constraints (PACs)",
+      "Empirical Cumulative Distribution Functions (ECDFs)",
+      "Heuristic threshold selection (finding the 'knee' of an ECDF)"
+    ],
+    "what_is_being_optimized": "The tolerance (epsilon) and likelihood (delta) thresholds for each PAC, and the granularity at which each PAC is applied.",
+    "state_or_ir": "A collection of PACs, where each is defined by a user-template and instantiated with learned parameters (epsilon*, delta*) and an associated data granularity (e.g., per-link, per-day-of-week).",
+    "output": "Alarms indicating significant deviations from the learned PACs in new data.",
+    "pointers": [
+      "[p.4]",
+      "[p.7]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Replaces rigid, binary integrity constraints with flexible, probabilistic, and approximate constraints (PACs) defined by user-specified templates with data-derived tolerance and likelihood parameters.",
+      "baseline_assumption": "Data quality rules must be exact and yield a binary pass/fail decision.",
+      "why_baseline_did_not_include_it": "Traditional ICs are designed for transactional data where correctness is absolute. Network measurement data is inherently noisy and variable, so exact rules are impractical and lead to many false dismissals.",
+      "mechanism_level_implementation": "Users define rule templates (e.g., for polling regularity, traffic smoothness) with open parameters for tolerance (epsilon) and likelihood (delta). A PAC summarizes the likelihood that a constraint is satisfied within a given tolerance as a cumulative distribution function.",
+      "primary_metric_improved": "robustness",
+      "tradeoffs_or_costs": "Requires a training phase to learn parameters. The rules are probabilistic, not deterministic guarantees. The user must still provide the initial semantic rule templates.",
+      "pointers": [
+        "[p.4, quote: 'Whereas traditional ICs exactly define a set of legal values, in contrast PACs are flexible, indicating the likelihood of correctness of a given value.']"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Automates the instantiation and maintenance of PACs by learning their parameters from historical data and automatically selecting the appropriate data granularity.",
+      "baseline_assumption": "Integrity constraints are manually specified, static, and apply uniformly to all data.",
+      "why_baseline_did_not_include_it": "Traditional database administration assumes a human DBA defines static rules. The scale (thousands of network elements) and dynamic nature of network data make manual, static rule-setting for every data partition infeasible.",
+      "mechanism_level_implementation": "The PAC-Man system uses training data to build ECDFs for each PAC at different granularities in a 'group-by lattice' (topological, temporal, etc.). It uses heuristics to find the 'sweet spot' in the ECDF to set thresholds and merges/splits granularities based on distribution similarity and stability.",
+      "primary_metric_improved": "automation",
+      "tradeoffs_or_costs": "The process is heuristic-based and requires a representative training dataset and periodic retraining. The learning process adds computational overhead.",
+      "pointers": [
+        "[p.7, quote: 'PAC-Man will fit the rule-template on different grouping partitions of the training data...']",
+        "[p.7, quote: 'The heuristic algorithm PAC-Man uses to decide the sweet spot...']"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Pd",
+          "name": "Probabilistic Design",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The definition of a PAC as a rule that holds with a certain probability (delta).",
+          "why_it_applies": "The system fundamentally shifts from deterministic checks to probabilistic ones, modeling data quality as a likelihood based on an observed distribution rather than a binary property.",
+          "justification_if_invented": "",
+          "pointer": "[p.4, quote: 'probabilistic, approximate constraints (PACs)... A PAC summarizes the likelihood δ of a constraint being satisfied...']"
+        },
+        {
+          "symbol": "Cr",
+          "name": "Consistency Relaxation",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The inclusion of a tolerance parameter (epsilon) in every PAC.",
+          "why_it_applies": "The system explicitly relaxes the exactness of traditional integrity constraints by allowing for an acceptable margin of error (tolerance), making the rules applicable to noisy, real-world data.",
+          "justification_if_invented": "",
+          "pointer": "[p.4, quote: 'These constraints are expressed as a quantity... to be satisfied within a tolerance of ε.']"
+        },
+        {
+          "symbol": "Se",
+          "name": "Semantically Explicit",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The use of user-defined rule templates that describe the high-level intent of a data quality check.",
+          "why_it_applies": "The user provides the semantic intent of a rule (e.g., 'Left-right Balance Constraint', 'Polling Regularity Constraint'), which the system then uses as a template to learn specific parameters for.",
+          "justification_if_invented": "",
+          "pointer": "[p.4, quote: 'PACs are therefore user-driven rule templates which are specified by the DBA or analyst...']"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "La",
+          "name": "Learned Approximation",
+          "reason_rejected_or_borderline": "The system learns parameters for user-specified rule templates, but it does not learn a model to approximate a complex function or system behavior. The rule structure is fixed.",
+          "pointer": "[p.4]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Au",
+          "name": "Automation",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The PAC-Man system's ability to automatically learn thresholds and select granularity without user intervention for each rule.",
+          "why_it_applies": "The system automates the otherwise infeasible manual task of specifying precise thresholds and applicability scopes for thousands of potential data quality rules.",
+          "justification_if_invented": "",
+          "pointer": "[p.7, quote: 'we rely on a variety of ways to automate this process.']"
+        },
+        {
+          "symbol": "Ad",
+          "name": "Adaptive Processing",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The process of selecting PAC granularity by analyzing the statistical stability and similarity of data distributions across different partitions (e.g., weekdays vs. weekends).",
+          "why_it_applies": "The system adapts the data quality rules (both parameters and granularity) to the observed statistical properties of the data itself, rather than using a one-size-fits-all approach.",
+          "justification_if_invented": "",
+          "pointer": "[p.7, quote: 'PAC-Man will merge the ECDFs... if they are close to each other. Also those ECDFs that are not stable will be separated into finer granularity...']"
+        },
+        {
+          "symbol": "Wa",
+          "name": "Workload-Aware",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The system's analysis of data distributions at different granularities to decide how to apply PACs.",
+          "why_it_applies": "The system is aware of the statistical properties of the data stream (the 'workload' being monitored) and uses this awareness to tailor the monitoring rules, for example by creating different rules for weekdays and weekends.",
+          "justification_if_invented": "",
+          "pointer": "[p.9, Fig. 5]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Cm",
+          "name": "Cost-based",
+          "reason_rejected_or_borderline": "The system does not use an explicit cost model to choose parameters or granularity. Decisions are based on statistical properties like distribution similarity and stability.",
+          "pointer": "[p.7]"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Traditional ICs + Pd + Cr + Au -> PAC-Man",
+    "baseline_name": "Traditional Integrity Constraints",
+    "top_3_principle_tags": [
+      "Pd",
+      "Cr",
+      "Au"
+    ],
+    "core_principle_tags": [
+      "Pd",
+      "Cr",
+      "Au",
+      "Ad"
+    ],
+    "supporting_principle_tags": [
+      "Se",
+      "Wa"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Pd",
+      "Cr",
+      "Se",
+      "Au",
+      "Ad",
+      "Wa"
+    ],
+    "new_system_name": "PAC-Man",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "This composition transforms rigid data validation into robust, adaptive monitoring. Probabilistic Design (Pd) and Consistency Relaxation (Cr) together replace the brittle, binary logic of traditional constraints with a flexible statistical model. This model is made practical at scale by Automation (Au), which learns the specific statistical parameters from data, removing the need for infeasible manual tuning.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Pd",
+          "contribution_to_equation": "Introduces the core idea of treating data quality not as a certainty but as a probability, allowing the system to reason about likelihoods based on data distributions."
+        },
+        {
+          "symbol": "Cr",
+          "contribution_to_equation": "Provides the mechanism for handling noise and natural variation by allowing checks to pass within a specified tolerance, avoiding the false alarms of exact-match constraints."
+        },
+        {
+          "symbol": "Au",
+          "contribution_to_equation": "Makes the probabilistic and approximate framework practical by automatically instantiating rule parameters and selecting rule granularity, which would be impossible to manage manually at scale."
+        }
+      ],
+      "transfer_question": "In what other domains could rigid, deterministic correctness rules be replaced by automatically-tuned probabilistic checks to improve robustness to noisy data?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "detection effectiveness",
+      "direction": "up",
+      "concrete_number": "47% vs 3%",
+      "pointer": "[p.9]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Sg",
+      "name": "Statistically Grounded Semantics",
+      "definition": "A system component's behavior is defined by a high-level, human-specified semantic template, whose concrete operational parameters are automatically and continuously instantiated from statistical models of the data it processes.",
+      "mechanism_pattern": "A user provides a semantic rule template (e.g., 'polling should be regular'). The system then learns the statistical distribution of the relevant data (e.g., polling intervals) and automatically derives the concrete parameters (e.g., tolerance of 30s, likelihood of 85%) that define 'regular' for that specific context.",
+      "why_existing_principles_are_insufficient": "Se captures the human-specified template, and Au/Ad capture the automated instantiation. Pd captures the probabilistic nature. However, no single principle captures the powerful composite pattern of grounding a user's semantic intent in a data-derived statistical reality. This pattern is a specific way of combining human knowledge with machine learning that is increasingly common.",
+      "closest_existing_principles": [
+        "Se",
+        "Au",
+        "Ad",
+        "Pd"
+      ],
+      "reusability_beyond_this_paper": "This pattern is highly reusable. It applies to any system that needs to operationalize vague human goals, such as SLO monitoring (what is 'fast enough'?), anomaly detection (what is 'normal behavior'?), or adaptive resource management (what is 'high load'?).",
+      "confidence": "medium",
+      "pointer": "[p.4, quote: 'PACs are therefore user-driven rule templates which are specified by the DBA or analyst; the parameters are instantiated based on training data.']"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "Replaces rigid, binary database integrity constraints with flexible, probabilistic rules whose tolerance and likelihood parameters are automatically learned from the statistical distribution of historical data at appropriate granularities.",
+    "top_3_principles": [
+      "Pd",
+      "Cr",
+      "Au"
+    ],
+    "mechanism_family": "other",
+    "specific_tools_or_algorithms": [
+      "Probabilistic Approximate Constraints (PACs)",
+      "Empirical Cumulative Distribution Functions (ECDFs)",
+      "Heuristic threshold selection (finding the 'knee' of a ECDF)"
+    ],
+    "primary_design_archetype": "other",
+    "principle_mapping_confidence": "high"
+  }
+}

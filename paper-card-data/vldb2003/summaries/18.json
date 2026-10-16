@@ -1,0 +1,266 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "18",
+    "paper_title": "From Tree Patterns to Generalized Tree Patterns: On Efficient Evaluation of XQuery",
+    "authors": [
+      "Zhimin Chen",
+      "H.V. Jagadish",
+      "Laks V. S. Lakshmanan",
+      "Stelios Paparizos"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference, Berlin, Germany, 2003",
+    "year": "2003",
+    "system_or_method_name": "Generalized Tree Pattern (GTP)",
+    "problem_domain": "XML query processing"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To develop efficient evaluation plans for entire XQuery expressions, including features like joins, quantifiers, grouping, aggregation, and nesting, by representing the whole query in a single structure.",
+    "primary_optimized_metric": "query time",
+    "secondary_metrics": [
+      "scalability"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "1-2 orders of magnitude",
+        "meaning": "GTP-based plans outperform navigational (NAV) and straightforward tree-pattern-based (BASE) plans by one to two orders of magnitude in many cases.",
+        "pointer": "[p.10, Sec 6.2]"
+      },
+      {
+        "number_or_delta": "4.45x speedup",
+        "meaning": "For query XM5, the GTP plan took 0.20s, while the BASE plan took 0.89s.",
+        "pointer": "[p.10, Fig. 15]"
+      },
+      {
+        "number_or_delta": "53.85x speedup",
+        "meaning": "For query XM5, the GTP plan took 0.20s, while the NAV plan took 10.77s.",
+        "pointer": "[p.10, Fig. 15]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Decomposed Tree Pattern Query (TPQ) Evaluation",
+    "why_this_is_the_right_comparison": "This baseline (called 'BASE' in the paper) represents the state-of-the-art set-oriented approach at the time, which decomposes a complex XQuery into a sequence of simpler Tree Pattern Queries (TPQs) that are evaluated individually and then combined. This highlights the inefficiency of a non-holistic approach.",
+    "limiting_design_assumption": "A full XQuery expression can be efficiently evaluated by decomposing it into a sequence of independent Tree Pattern Query (TPQ) evaluations. This leads to repeated matching of similar tree patterns and complex, inefficient plans to stitch the results together.",
+    "pointers": [
+      "[p.2, Example 1]",
+      "[p.10, Sec 6.1, BASE]"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Rule-based optimizer",
+    "primary_tool_specific_type": "Intermediate representation for query optimization",
+    "specific_tools_or_algorithms": [
+      "Algorithm GTP (XQuery to GTP translation)",
+      "Algorithm planGen (GTP to physical plan translation)",
+      "Algorithm pruneGTP (Schema-based GTP simplification)"
+    ],
+    "what_is_being_optimized": "The physical query plan for an entire XQuery expression.",
+    "state_or_ir": "The Generalized Tree Pattern (GTP), a tree structure that extends traditional tree patterns with optional edges (dotted lines), hierarchical group numbers for nesting, and special 'EVERY' edges for universal quantification.",
+    "output": "A directed acyclic graph of physical algebra operators, such as Structural Join, Value Join, Filter, Sort, and Group By.",
+    "pointers": [
+      "[p.3, Definition 1]",
+      "[p.4, Definition 2]",
+      "[p.6, Fig. 10]",
+      "[p.9, Fig. 12]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Introduces the Generalized Tree Pattern (GTP) as a single, holistic intermediate representation for an entire XQuery, capturing mandatory/optional relationships, nesting, and quantifiers in one structure to enable global optimization.",
+      "baseline_assumption": "An XQuery must be decomposed into multiple, independent Tree Pattern Queries (TPQs), which are evaluated separately and their results combined, often via outer-joins.",
+      "why_baseline_did_not_include_it": "Prior research focused on optimizing individual TPQs, which are a core but incomplete part of XQuery evaluation. A unified representation for complex features like optional elements, nesting, and quantifiers was not established.",
+      "mechanism_level_implementation": "The GTP extends TPQs with dotted edges for optional relationships, hierarchical group numbers to capture query block nesting, and special 'EVERY' edges for universal quantifiers. An algorithm translates an XQuery FLWR expression into a single GTP.",
+      "primary_metric_improved": "query time",
+      "tradeoffs_or_costs": "Increased complexity in the query optimizer to construct and translate the more expressive GTP representation.",
+      "pointers": [
+        "[p.1, Abstract]",
+        "[p.3, Sec 3]",
+        "[p.6, Sec 3.4]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Uses schema information to perform logical and physical query optimization by simplifying the GTP and eliminating unnecessary operators from the physical plan.",
+      "baseline_assumption": "Query optimization proceeds without schema knowledge, forcing the query plan to account for all structural possibilities syntactically allowed by the query, even if they are disallowed by the data's schema.",
+      "why_baseline_did_not_include_it": "While schema-based optimization for XPath fragments existed, applying it to a holistic representation of full XQueries was a novel step enabled by the GTP.",
+      "mechanism_level_implementation": "An algorithm, pruneGTP, uses pre-inferred schema constraints (e.g., child, descendant, avoidance constraints) to rewrite the GTP. This includes eliminating redundant internal nodes and identifying nodes with the same tag. These logical simplifications enable physical optimizations like removing sort, group-by, and duplicate elimination operators from the final plan.",
+      "primary_metric_improved": "query time",
+      "tradeoffs_or_costs": "Requires a pre-processing step to infer constraints from the schema. The performance benefit is query- and schema-dependent and can sometimes be small.",
+      "pointers": [
+        "[p.8, Sec 5]",
+        "[p.9, Sec 5.2]",
+        "[p.10, Fig. 13]",
+        "[p.11, Sec 6.4]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Gr",
+          "name": "Generalized Design",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The creation of the Generalized Tree Pattern (GTP) as an extension of the existing Tree Pattern (TPQ) concept.",
+          "why_it_applies": "The paper explicitly proposes the GTP as a generalization of TPQs to cover a much larger and more complex fragment of XQuery, including optional parts, nesting, and quantifiers, which TPQs alone cannot represent.",
+          "justification_if_invented": "",
+          "pointer": "[p.1, quote: 'we propose the notion of a generalized tree pattern (GTP).']"
+        },
+        {
+          "symbol": "Se",
+          "name": "Semantically Explicit",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The use of distinct structural elements within the GTP—dotted edges, hierarchical group numbers, and 'EVERY' edges—to represent specific XQuery semantics.",
+          "why_it_applies": "The GTP makes the semantics of optionality (dotted edges), query nesting/scoping (group numbers), and universal quantification ('EVERY' edges) explicit parts of the intermediate representation. This allows the planner to reason about the entire query holistically.",
+          "justification_if_invented": "",
+          "pointer": "[p.3, Definition 1]"
+        },
+        {
+          "symbol": "Rc",
+          "name": "Reuse of Computation",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The translation of a whole XQuery into a single GTP, which is then processed by a single plan.",
+          "why_it_applies": "A key motivation for the GTP is to avoid the baseline's repeated matching of similar tree patterns. The holistic GTP representation allows shared structural components of the query to be evaluated once, effectively reusing the computation.",
+          "justification_if_invented": "",
+          "pointer": "[p.8, quote: 'we permit the results of a tree pattern evaluation to persist, and thus share with many of the subsequent operators.']"
+        }
+      ],
+      "rejected_or_borderline_principles": []
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Ep",
+          "name": "Equivalence-based",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The `pruneGTP` algorithm, which applies rewrite rules based on schema constraints to simplify the GTP.",
+          "why_it_applies": "The algorithm transforms a GTP into a smaller, but semantically equivalent, GTP given the schema constraints. The paper proves that this process finds a minimal equivalent GTP under certain classes of constraints.",
+          "justification_if_invented": "",
+          "pointer": "[p.10, Theorem 1]"
+        },
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The elimination of nodes from the GTP and operators (sort, group-by, duplicate elimination) from the physical plan based on schema guarantees.",
+          "why_it_applies": "The schema provides formal guarantees that certain work is redundant. For example, if a schema guarantees a path `a -> b -> c`, the join to find `b` can be skipped without changing the result. If a schema guarantees at-most-one cardinality, a duplicate elimination or group-by operator can be skipped. This work is avoided because it is proven not to alter the final, correct result.",
+          "justification_if_invented": "",
+          "pointer": "[p.8, Sec 5.1], [p.9, Sec 5.2]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Cp",
+          "name": "Constraint-based",
+          "reason_rejected_or_borderline": "While the mechanism uses schema constraints, it does not use a general constraint solver. Instead, it uses specific rewrite rules triggered by constraints. Ep (Equivalence-based) is more precise as it describes the rewriting action itself.",
+          "pointer": "[p.10, Fig. 13]"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Decomposed TPQ Evaluation + Gr (Generalized Design) + Se (Semantically Explicit) -> GTP-based Holistic Evaluation",
+    "baseline_name": "Decomposed Tree Pattern Query (TPQ) Evaluation",
+    "top_3_principle_tags": [
+      "Gr",
+      "Se",
+      "Ep"
+    ],
+    "core_principle_tags": [
+      "Gr",
+      "Se",
+      "Ep",
+      "Wv"
+    ],
+    "supporting_principle_tags": [
+      "Rc"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Gr",
+      "Se",
+      "Rc",
+      "Ep",
+      "Wv"
+    ],
+    "new_system_name": "GTP-based Holistic Evaluation",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "The baseline decomposes a query into separate tree patterns. Generalized Design (Gr) provides the mechanism to create a single, unified structure (GTP) that can represent the entire query. Semantically Explicit (Se) design enriches this structure with explicit markers for optionality, nesting, and quantification. This holistic, explicit representation is then amenable to Equivalence-based (Ep) rewriting using schema constraints, which would be impossible to apply globally across the baseline's fragmented representation.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Gr",
+          "contribution_to_equation": "Extends the baseline's core concept (TPQ) into a more powerful, unified representation (GTP) capable of describing a whole query."
+        },
+        {
+          "symbol": "Se",
+          "contribution_to_equation": "Makes the complex semantics of the query explicit within the GTP's structure, enabling a single planner to reason about global properties like optionality and nesting."
+        },
+        {
+          "symbol": "Ep",
+          "contribution_to_equation": "Leverages the holistic GTP representation to apply powerful, schema-driven equivalence transformations that simplify the query before plan generation."
+        }
+      ],
+      "transfer_question": "In what other domains could a holistic, semantically-explicit intermediate representation replace a system of composing results from multiple, independently-optimized sub-problems?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "query time",
+      "direction": "down",
+      "concrete_number": "up to 1-2 orders of magnitude",
+      "pointer": "[p.10, Sec 6.2]"
+    },
+    {
+      "property": "scalability",
+      "direction": "up",
+      "concrete_number": "scales linearly with database size",
+      "pointer": "[p.11, Sec 6.3]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Hr",
+      "name": "Holistic Representation",
+      "definition": "Representing an entire complex query, task, or program in a single, unified data structure to enable global optimization, rather than decomposing it into sub-problems that are optimized and executed independently before their results are combined.",
+      "mechanism_pattern": "The creation of the GTP to represent an entire XQuery, which was previously handled by a sequence of TPQs. This single representation allows the optimizer to see all parts of the query at once, enabling optimizations like common subexpression elimination and better physical planning.",
+      "why_existing_principles_are_insufficient": "Gr (Generalized Design) describes the act of extending a concept (TPQ to GTP) but not the specific intent of creating a unified, global view. Se (Semantically Explicit) describes a property of the representation, not the structural choice to make it holistic. Co (Composability) is the opposite; this principle is about unifying a decomposed representation. Hr captures the specific design move of shifting from local to global optimization by changing the scope of the intermediate representation.",
+      "closest_existing_principles": [
+        "Gr",
+        "Se"
+      ],
+      "reusability_beyond_this_paper": "This pattern appears in other areas, such as whole-program analysis in compilers (vs. per-module analysis), or end-to-end optimization of deep learning models (vs. layer-by-layer optimization).",
+      "confidence": "medium",
+      "pointer": "[p.1, Abstract]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "Unifies the representation of a complex XQuery into a single Generalized Tree Pattern (GTP) with explicit semantics for optionality and nesting, enabling holistic, schema-aware optimization that avoids redundant pattern matching.",
+    "top_3_principles": [
+      "Gr",
+      "Se",
+      "Ep"
+    ],
+    "mechanism_family": "query optimization",
+    "specific_tools_or_algorithms": [
+      "Algorithm GTP (XQuery to GTP translation)",
+      "Algorithm planGen (GTP to physical plan translation)",
+      "Algorithm pruneGTP (Schema-based GTP simplification)"
+    ],
+    "primary_design_archetype": "declarative interface to optimizer",
+    "principle_mapping_confidence": "high"
+  }
+}

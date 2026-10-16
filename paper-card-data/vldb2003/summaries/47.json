@@ -1,0 +1,254 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "47",
+    "paper_title": "Mapping Adaptation under Evolving Schemas",
+    "authors": [
+      "Yannis Velegrakis",
+      "Renée J. Miller",
+      "Lucian Popa"
+    ],
+    "venue_or_source": "VLDB",
+    "year": "2003",
+    "system_or_method_name": "ToMAS (Toronto Mapping Adaptation System)",
+    "problem_domain": "Data integration and mapping management"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To automatically adapt data mappings between evolving source and target schemas, preserving user-specified semantic choices to reduce manual maintenance effort.",
+    "primary_optimized_metric": "user effort",
+    "secondary_metrics": [
+      "correctness",
+      "computation time"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "Advantage > 0",
+        "meaning": "The ToMAS approach always requires less user effort than the baseline of regenerating mappings from scratch. The advantage metric, defined as 1 - (ToMAS outputs) / (Clio outputs + correspondences), is shown to be between ~0.6 and ~0.9 across various schemas and numbers of changes.",
+        "pointer": "[p.12, Figure 5]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Regenerating mappings from scratch",
+    "why_this_is_the_right_comparison": "This represents the state-of-the-art alternative, using a mapping creation tool like Clio to generate new mappings after a schema has changed. This approach highlights the cost of not having an incremental adaptation mechanism, as it requires re-specifying user intent and sifting through many generated mappings.",
+    "limiting_design_assumption": "The baseline assumes that mappings are disposable artifacts that can be regenerated from scratch after a schema change. This assumption ignores and discards the valuable, often manually-provided, semantic decisions embedded in the original mappings.",
+    "pointers": [
+      "[p.1, quote: '...we can ill afford to recreate mappings as schemas change, but should instead reuse previous mappings.']",
+      "[p.2, quote: '...use a mapping creation tool to add semantics... This will produce a mapping from S'' to S which can be composed with the original mapping.']",
+      "[p.12]"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Symbolic methods",
+    "primary_tool_specific_type": "Constraint-based rewriting",
+    "specific_tools_or_algorithms": [
+      "Nested chase algorithm"
+    ],
+    "what_is_being_optimized": "The set of data mappings between two schemas, to maintain their semantic validity and consistency as the schemas undergo structural or constraint-based changes.",
+    "state_or_ir": "Schemas and mappings are represented in a nested relational data model. Mappings are assertions of the form `foreach A^s exists A^t with C`, where A^s and A^t are 'associations' (queries over the schema) and C is a set of correspondences.",
+    "output": "A new, adapted set of 'semantically valid' mappings that are consistent with the evolved schemas.",
+    "pointers": [
+      "[p.6, Definition 3.1]",
+      "[p.7, Definition 4.9]",
+      "[p.9]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Instead of regenerating mappings, the system incrementally adapts them when schema constraints are added or removed by using a chase algorithm to compute new 'logical associations' that satisfy the new set of constraints, thereby preserving user intent.",
+      "baseline_assumption": "When schema constraints change, mappings must be regenerated from scratch, forcing the user to re-specify correspondences and re-select the intended mapping from a potentially large set of generated candidates.",
+      "why_baseline_did_not_include_it": "Baseline mapping generation tools are designed for a one-shot creation process on static schemas, not for tracking and incrementally responding to the evolution of schema semantics over time.",
+      "mechanism_level_implementation": "When a constraint is added, the system identifies affected mappings and re-runs a chase procedure on their source/target 'associations' to incorporate the new semantic information, generating new mappings. When a constraint is removed, it breaks the affected association into its constituent structural parts and re-chases them with the remaining constraints to produce valid, smaller mappings.",
+      "primary_metric_improved": "user effort",
+      "tradeoffs_or_costs": "The adaptation process can generate multiple valid rewritings, which may require a user to choose among them.",
+      "pointers": [
+        "[p.9, Section 5.1, Algorithm 5.1]",
+        "[p.10, Algorithm 5.2]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "The system adapts mappings in response to structural schema changes (move, copy, remove element) by syntactically rewriting the path expressions within the mapping's queries and then re-chasing to ensure semantic consistency in the new context.",
+      "baseline_assumption": "Structural schema changes are treated as a new mapping problem between the old and new schema versions, requiring a heavyweight process of schema matching and mapping generation that does not preserve the logic of the original mapping.",
+      "why_baseline_did_not_include_it": "Baseline tools are not designed to track the identity and semantics of schema elements as they are restructured. They treat the 'before' and 'after' schemas as independent artifacts.",
+      "mechanism_level_implementation": "When a schema element is moved, the system identifies mappings that use it. It rewrites the path queries inside the mapping's 'association' to refer to the new location, removes redundant variables, and then re-runs the chase algorithm to incorporate any new semantic relationships from the element's new context.",
+      "primary_metric_improved": "user effort",
+      "tradeoffs_or_costs": "The complexity of the rewriting and re-chasing logic is higher than for simple constraint changes.",
+      "pointers": [
+        "[p.11, Section 5.3]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Au",
+          "name": "Automation",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "A schema constraint is added or removed, triggering an automated adaptation process.",
+          "why_it_applies": "The central goal is to replace the manual, impractical task of updating mappings with an automated system. The paper explicitly frames the problem as one where manual maintenance is infeasible.",
+          "justification_if_invented": "",
+          "pointer": "[p.1, quote: '...manually maintaining mappings... is becoming impractical. We present a novel framework and a tool (ToMAS) for automatically adapting mappings...']"
+        },
+        {
+          "symbol": "Ig",
+          "name": "Invariant-Guided",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The chase algorithm is triggered by a change in schema constraints. The chase itself is a procedure to enforce data dependencies (invariants) on a set of relations (the association).",
+          "why_it_applies": "The system's goal is to maintain the 'consistency of mappings under schema changes'. A 'semantically valid mapping' is defined relative to the schema's constraints. The adaptation algorithms are explicitly designed to restore this semantic validity (the invariant) after a change.",
+          "justification_if_invented": "",
+          "pointer": "[p.8, Definition 4.11, quote: 'A semantically valid mapping is an expression... where A^s and A^t are logical associations...']"
+        },
+        {
+          "symbol": "Rc",
+          "name": "Reuse of Computation",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The adaptation algorithm starts with the existing mapping, rather than from scratch.",
+          "why_it_applies": "The paper's motivation is to 'reuse previous mappings' and the 'semantic decisions input by these experts'. The incremental adaptation mechanism reuses the existing mapping as the basis for modification, avoiding the cost of full regeneration.",
+          "justification_if_invented": "",
+          "pointer": "[p.1, quote: '...we can ill afford to recreate mappings as schemas change, but should instead reuse previous mappings.']"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Ev",
+          "name": "Evolvability",
+          "reason_rejected_or_borderline": "While the system enables schema evolution, the principle of Evolvability typically refers to the design of the system itself to be easily changed. Here, the system is a tool that facilitates the evolution of external artifacts (schemas and mappings). The core mechanisms are better described by Au and Ig.",
+          "pointer": "[p.9, Section 5]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Au",
+          "name": "Automation",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "A structural schema change (move, copy, remove) triggers an automated mapping rewriting process.",
+          "why_it_applies": "This mechanism automates the complex and error-prone task of rewriting mapping queries when the underlying schema structure is modified, a task that would otherwise be manual.",
+          "justification_if_invented": "",
+          "pointer": "[p.11, Section 5.3]"
+        },
+        {
+          "symbol": "Ig",
+          "name": "Invariant-Guided",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "After syntactically rewriting path expressions, the system re-runs the chase algorithm to ensure the resulting mapping is semantically consistent with constraints in the new structural context.",
+          "why_it_applies": "The system aims to preserve the semantic intent of the original mapping across a structural change. The rewriting and re-chasing process is guided by the invariant that the final mapping must be semantically valid with respect to the new schema.",
+          "justification_if_invented": "",
+          "pointer": "[p.11, quote: 'Hence, we preserve any design choices that might have been made by a human user based on the original schemas.']"
+        },
+        {
+          "symbol": "Ep",
+          "name": "Equivalence-based",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The system rewrites the path queries within a mapping when an element is moved or renamed.",
+          "why_it_applies": "The rewriting of path expressions is a transformation intended to produce a new query that is semantically equivalent (or as close as possible) to the original query, but valid on the new schema. This reflects the spirit of equivalence-based optimization or rewriting.",
+          "justification_if_invented": "",
+          "pointer": "[p.11]"
+        }
+      ],
+      "rejected_or_borderline_principles": []
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Manual Mapping Recreation + Au (Automation) + Ig (Invariant-Guided) + Rc (Reuse of Computation) -> ToMAS",
+    "baseline_name": "Manual Mapping Recreation",
+    "top_3_principle_tags": [
+      "Au",
+      "Ig",
+      "Rc"
+    ],
+    "core_principle_tags": [
+      "Au",
+      "Ig"
+    ],
+    "supporting_principle_tags": [
+      "Rc",
+      "Ep"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Au",
+      "Ig",
+      "Rc",
+      "Ep"
+    ],
+    "new_system_name": "ToMAS",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "The baseline requires expensive manual intervention because it discards prior work. ToMAS combines Automation (Au) with Invariant-Guiding (Ig) to create a system that can react to schema changes. The process is made efficient and intent-preserving by Reusing (Rc) the existing mapping as a specification of user choices, which are treated as part of the invariant to be maintained.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Au",
+          "contribution_to_equation": "Introduces the core capability of automatically handling schema changes, replacing the manual baseline process."
+        },
+        {
+          "symbol": "Ig",
+          "contribution_to_equation": "Provides the semantic foundation for the automation, ensuring that the adapted mappings are not just syntactically correct but consistent with the schema's constraints and the original mapping's intent."
+        },
+        {
+          "symbol": "Rc",
+          "contribution_to_equation": "Makes the adaptation process grounded and efficient by reusing the user's prior semantic decisions encoded in the existing mapping, avoiding a full, from-scratch search."
+        }
+      ],
+      "transfer_question": "In what other domains could we automatically co-evolve a declarative specification with its underlying data model by treating the specification's semantics as an invariant to be preserved?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "user effort",
+      "direction": "down",
+      "concrete_number": "Advantage metric of 0.6-0.9, indicating a 60-90% reduction in the number of items (mappings, correspondences) a user must handle compared to the baseline.",
+      "pointer": "[p.12, Figure 5]"
+    },
+    {
+      "property": "computation time",
+      "direction": "not specified",
+      "concrete_number": "Claimed to be 'very close to the time of Clio'.",
+      "pointer": "[p.12]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "none",
+      "symbol": "None",
+      "name": "None",
+      "definition": "No plausible new principle candidate.",
+      "mechanism_pattern": "Not applicable",
+      "why_existing_principles_are_insufficient": "Existing principles sufficiently cover the paper's mechanisms. The combination of Invariant-Guided (Ig) for preserving semantic consistency, Automation (Au) for replacing manual work, and Reuse of Computation (Rc) for leveraging prior user intent provides a comprehensive explanation of the system's design.",
+      "closest_existing_principles": [],
+      "reusability_beyond_this_paper": "Not applicable",
+      "confidence": "low",
+      "pointer": "Not specified in provided text"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "ToMAS automatically adapts data mappings to schema changes by treating the existing mapping as a specification of user intent, using a chase-based algorithm to incrementally re-establish semantic consistency with new or modified schema constraints and structures.",
+    "top_3_principles": [
+      "Au",
+      "Ig",
+      "Rc"
+    ],
+    "mechanism_family": "other",
+    "specific_tools_or_algorithms": [
+      "Nested chase algorithm"
+    ],
+    "primary_design_archetype": "incremental maintenance",
+    "principle_mapping_confidence": "high"
+  }
+}

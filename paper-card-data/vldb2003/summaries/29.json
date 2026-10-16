@@ -1,0 +1,271 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "29",
+    "paper_title": "SASH: A Self-Adaptive Histogram Set for Dynamically Changing Workloads",
+    "authors": [
+      "Lipyeow Lim",
+      "Min Wang",
+      "Jeffrey Scott Vitter"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference",
+    "year": "2003",
+    "system_or_method_name": "SASH",
+    "problem_domain": "Query selectivity estimation"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To build and tune a set of histograms collectively for multidimensional queries in a self-managed manner based only on query feedback, without scanning the base data.",
+    "primary_optimized_metric": "accuracy",
+    "secondary_metrics": [
+      "estimation error"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "Lower error than DBHist",
+        "meaning": "On a skewed workload (workload 3), SASH consistently achieves lower normalized absolute error than the offline DBHist method across memory constraints from 200 to 2000 bytes.",
+        "pointer": "[p.10, Figure 10]"
+      },
+      {
+        "number_or_delta": "Error reduction from ~0.012 to ~0.008",
+        "meaning": "In the online tuning phase for a workload with 89% similarity to the training workload, the average absolute error for SASH-mdl drops from ~0.012 to ~0.008 after processing 5000 queries.",
+        "pointer": "[p.10, Figure 11]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Offline, data-driven histogram construction",
+    "why_this_is_the_right_comparison": "The paper compares against prior state-of-the-art techniques for multidimensional histograms (like DBHist and PRM-based methods) that build static statistics by scanning the entire database.",
+    "limiting_design_assumption": "The construction of histograms requires a full scan of the underlying data, is oblivious to the query workload, and the resulting histograms are static, requiring expensive rebuilds to adapt to data changes.",
+    "pointers": [
+      "[p.2, quote: \"...it is based on a complete offline scan of the underlying data and does not address online construction and workload-driven tuning.\"]",
+      "[p.2, quote: \"...they build histograms without considering how the histograms are being used (i.e., query workload)...\"]"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Adaptive data structure",
+    "specific_tools_or_algorithms": [
+      "Junction tree graphical models",
+      "Delta rule (gradient descent)",
+      "Minimum Description Length (MDL) scoring"
+    ],
+    "what_is_being_optimized": "The choice of attribute sets for histograms and the memory allocation among them to minimize selectivity estimation error for a given workload.",
+    "state_or_ir": "A histogram set model, represented as a triple (J(S), H, B), consisting of a junction tree structure, a set of clique histograms, and bucket allocations.",
+    "output": "A set of histograms that are dynamically adapted to the query workload.",
+    "pointers": [
+      "[p.4]",
+      "[p.5, Definition 1]",
+      "[p.7, Equation 4.11]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Introduces a periodic 'restructuring phase' that searches for an optimal set of histograms (both attribute sets and memory allocation) using a batch of recent query feedback, without accessing the base data.",
+      "baseline_assumption": "The optimal set of histograms and their memory allocation are determined by scanning the base data, independent of the query workload.",
+      "why_baseline_did_not_include_it": "Baseline methods were designed for offline construction and assumed full data access was necessary and sufficient. They lacked a mechanism to incorporate workload information or operate without data scans.",
+      "mechanism_level_implementation": "A greedy search algorithm iteratively improves a histogram set model (represented as a junction tree). At each step, it considers either making a structural change (e.g., adding a dependency edge) or adding a bucket to an existing histogram. The best change is chosen based on a scoring function (e.g., absolute error or MDL) evaluated on the query feedback batch.",
+      "primary_metric_improved": "accuracy",
+      "tradeoffs_or_costs": "The restructuring phase is computationally expensive and cannot be run for each query; it relies on a representative batch of queries and is activated periodically.",
+      "pointers": [
+        "[p.3, Section 4]",
+        "[p.5, Figure 3]",
+        "[p.6, Section 4.3]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Introduces an 'online tuning phase' that continuously tunes the frequency counts within the existing histogram buckets using the estimation error from each individual query.",
+      "baseline_assumption": "Histograms are static. Once built, their bucket frequencies do not change unless a full, offline rebuild is triggered.",
+      "why_baseline_did_not_include_it": "Baseline methods were designed to be static and offline. While systems like LEO used feedback, they created external adjustment factors rather than modifying the histograms themselves.",
+      "mechanism_level_implementation": "For each incoming query, after observing the true selectivity, the system calculates the estimation error. It then applies the delta rule (a gradient descent update) to adjust the frequency counts of all buckets that participated in the selectivity estimation for that query. The update is proportional to the error and the gradient of the estimation function.",
+      "primary_metric_improved": "accuracy",
+      "tradeoffs_or_costs": "This online tuning only adjusts bucket frequencies and cannot alter the fundamental structure of the histograms (e.g., which attributes are grouped, bucket boundaries). It relies on the restructuring phase for larger changes.",
+      "pointers": [
+        "[p.3, Section 5]",
+        "[p.8, Figure 8]",
+        "[p.8, Equation 4.11]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Cm",
+          "name": "Cost-based",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The search algorithm for the best histogram model during the restructuring phase.",
+          "why_it_applies": "The search for the best histogram structure and memory allocation is guided by a scoring function (e.g., 2-norm absolute error or MDL) that serves as a cost model. The algorithm explicitly chooses the structural or memory change that yields the best score on the batch of query feedback.",
+          "justification_if_invented": "",
+          "pointer": "[p.6, Section 4.3]"
+        },
+        {
+          "symbol": "Wa",
+          "name": "Workload-Aware",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The use of a 'batch of recently seen query feedback' as the sole input for the restructuring phase.",
+          "why_it_applies": "The entire restructuring process is driven by the query workload, not the underlying data distribution. The goal is to find a set of histograms that 'best approximates the given query workload', directly adapting the system's statistics to how they are used.",
+          "justification_if_invented": "",
+          "pointer": "[p.4]"
+        },
+        {
+          "symbol": "Au",
+          "name": "Automation",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The SASH framework automatically addresses the key challenges of choosing attribute sets and distributing memory.",
+          "why_it_applies": "The system automates the traditionally manual or static DBA tasks of deciding which histograms to build and how to allocate a fixed memory budget among them, making the system 'self-managed'.",
+          "justification_if_invented": "",
+          "pointer": "[p.1, quote: '...building and tuning a set of histograms collectively in a self-managed manner...']"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Ad",
+          "name": "Adaptive Processing",
+          "reason_rejected_or_borderline": "While restructuring is a form of adaptation, it is a periodic, batch process. Ad is a better fit for the continuous, online tuning of Δ2. Wa and Cm are more specific to the mechanism of the restructuring phase.",
+          "pointer": "[p.3, quote: 'It is not feasible to run the restructuring phase after each query...']"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Ad",
+          "name": "Adaptive Processing",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The online update algorithm that tunes bucket frequencies in response to each query's estimation error.",
+          "why_it_applies": "The system continuously and dynamically adjusts its internal state (histogram bucket frequencies) at runtime based on feedback from every query. This is a direct implementation of online adaptation to ensure accuracy for the current workload.",
+          "justification_if_invented": "",
+          "pointer": "[p.8, Section 5]"
+        },
+        {
+          "symbol": "Wa",
+          "name": "Workload-Aware",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The use of the estimation error from the 'current query workload' to drive the online updates.",
+          "why_it_applies": "The adaptation is driven by the query workload. Ad is more specific about the online, continuous nature of the mechanism, making it core, while Wa describes the input signal that drives the adaptation.",
+          "justification_if_invented": "",
+          "pointer": "[p.8]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "La",
+          "name": "Learned Approximation",
+          "reason_rejected_or_borderline": "The delta rule is a learning algorithm, but it's used as a simple online optimization method to tune parameters of an existing statistical structure (the histogram). It does not involve a complex learned model replacing a system component. Ad better captures the system-level design intent.",
+          "pointer": "[p.7]"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Offline Histograms + Wa + Cm + Ad -> SASH",
+    "baseline_name": "Offline, Workload-Oblivious Histograms",
+    "top_3_principle_tags": [
+      "Wa",
+      "Cm",
+      "Ad"
+    ],
+    "core_principle_tags": [
+      "Cm",
+      "Wa",
+      "Ad"
+    ],
+    "supporting_principle_tags": [
+      "Au",
+      "Wa"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Cm",
+      "Wa",
+      "Au",
+      "Ad"
+    ],
+    "new_system_name": "SASH",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "These principles create a two-timescale control loop. Workload-Awareness (Wa) provides the essential feedback signal from queries. This signal is used by a slow, periodic Cost-based (Cm) search to optimize the coarse-grained structure of the histograms, and by a fast, online Adaptive (Ad) process to fine-tune the fine-grained parameters (bucket counts) continuously. This combination allows the system to make both large structural changes and rapid, low-cost adjustments.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Wa",
+          "contribution_to_equation": "Provides the core signal (query feedback) that makes the system responsive to usage patterns, replacing the baseline's reliance on static data distribution."
+        },
+        {
+          "symbol": "Cm",
+          "contribution_to_equation": "Enables a principled, batch search for the best histogram structure and memory allocation by defining an objective function over the workload feedback."
+        },
+        {
+          "symbol": "Ad",
+          "contribution_to_equation": "Enables lightweight, continuous tuning of histogram parameters, allowing the system to react quickly to workload drift between expensive restructuring phases."
+        }
+      ],
+      "transfer_question": "In what other domains could a system benefit from combining a periodic, cost-based structural reorganization with a continuous, lightweight parameter adaptation, both driven by workload feedback?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "estimation error",
+      "direction": "down",
+      "concrete_number": "SASH methods are consistently more accurate than the offline DBHist method.",
+      "pointer": "[p.10, Figure 9, 10]"
+    },
+    {
+      "property": "memory",
+      "direction": "mixed",
+      "concrete_number": "The total memory for histograms is a fixed constraint. The system optimizes allocation within this budget. More memory generally leads to lower error.",
+      "pointer": "[p.10, Figure 10]"
+    },
+    {
+      "property": "adaptivity",
+      "direction": "up",
+      "concrete_number": "Online tuning effectively decreases estimation errors over time as more queries are processed, demonstrating adaptation to the workload.",
+      "pointer": "[p.10, Figure 11, 12]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Tt",
+      "name": "Two-Timescale Adaptation",
+      "definition": "A system design that combines a periodic, computationally intensive process for optimizing system structure or coarse-grained policy with a continuous, lightweight process for tuning parameters or fine-grained policy within that structure.",
+      "mechanism_pattern": "SASH employs a slow, batch-based 'restructuring phase' to find the optimal histogram sets (structure) and a fast, per-query 'online tuning phase' to adjust bucket frequencies (parameters).",
+      "why_existing_principles_are_insufficient": "Ad captures the online tuning, and Cm/Au capture the offline restructuring. However, no single principle describes the powerful composition of two adaptation loops operating at different frequencies to manage different aspects of the system's configuration (structure vs. parameters). This hierarchical control is a recurring and powerful pattern in self-tuning systems.",
+      "closest_existing_principles": [
+        "Ad",
+        "Au",
+        "Cm"
+      ],
+      "reusability_beyond_this_paper": "This pattern is highly reusable. Examples include adaptive indexing (periodic index rebuilds vs. online statistics updates), adaptive query optimizers (periodic cost model relearning vs. online plan choice adjustments), and dynamic resource management (periodic VM reprovisioning vs. continuous load balancing).",
+      "confidence": "medium",
+      "pointer": "[p.3, Figure 1]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "SASH makes histograms self-adaptive by using query feedback in a two-phase process: a periodic, cost-based search to restructure the set of histograms, and a continuous, online gradient-descent-based tuning of histogram bucket frequencies.",
+    "top_3_principles": [
+      "Wa",
+      "Cm",
+      "Ad"
+    ],
+    "mechanism_family": "query optimization",
+    "specific_tools_or_algorithms": [
+      "Junction tree graphical models",
+      "Delta rule (gradient descent)",
+      "Minimum Description Length (MDL)"
+    ],
+    "primary_design_archetype": "learned control loop",
+    "principle_mapping_confidence": "high"
+  }
+}

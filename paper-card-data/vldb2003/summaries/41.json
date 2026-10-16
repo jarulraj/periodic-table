@@ -1,0 +1,275 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "41",
+    "paper_title": "Continuous K-Nearest Neighbor Queries for Continuously Moving Points with Updates",
+    "authors": [
+      "Glenn S. Iwerks",
+      "Hanan Samet",
+      "Ken Smith"
+    ],
+    "venue_or_source": "VLDB",
+    "year": "2003",
+    "system_or_method_name": "Continuous Windowing k-NN algorithm (CW)",
+    "problem_domain": "Continuous k-nearest neighbor (k-NN) queries on moving points with updates"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To reduce the cost of maintaining a continuous k-NN query result for moving points when updates are allowed.",
+    "primary_optimized_metric": "number of disk accesses",
+    "secondary_metrics": [
+      "number of events processed",
+      "data structure size"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "nearly an order of magnitude lower",
+        "meaning": "Disk accesses for the CW method compared to the ETP baseline when updates are present.",
+        "pointer": "[p.9, quote: 'CW outperforms ETP by an nearly an order of magnitude when there are updates in our experiments.']"
+      },
+      {
+        "number_or_delta": "over two orders of magnitude higher",
+        "meaning": "Disk accesses for the CW method compared to the ETP baseline when there are no updates.",
+        "pointer": "[p.9, quote: 'ETP outperforms CW by over two orders of magnitude when there are no updates.']"
+      },
+      {
+        "number_or_delta": "Fewer events for ETP",
+        "meaning": "The total number of events processed by the baseline ETP method is less than for the CW method.",
+        "pointer": "[p.10, Fig 19(a)]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Extended TP KNN algorithm (ETP)",
+    "why_this_is_the_right_comparison": "The paper develops ETP as a novel extension of the prior state-of-the-art (TP KNN) to handle updates, and then explicitly compares its proposed CW algorithm against ETP to demonstrate its benefits in the presence of updates.",
+    "limiting_design_assumption": "The baseline assumes that finding the next nearest-neighbor event (nn-event) requires searching a global, on-disk index (a TPR-tree) covering all objects. This index is expensive to maintain under updates, creating a performance bottleneck.",
+    "pointers": [
+      "[p.5, quote: 'In this section we extend the continuous TP KNN algorithm... to support updates... termed the extended TP (ETP) algorithm... we present a new contribution of our own, the Continuous Windowing KNN algorithm (CW) algorithm, and compare it to the ETP algorithm.']",
+      "[p.10, quote: 'The degradation of the ETP algorithm is primarily due to the increased overhead needed to maintain the TPR-tree when updates occur.']"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Event-driven query maintenance",
+    "specific_tools_or_algorithms": [
+      "Continuous within query",
+      "Event priority queue (EB-tree)",
+      "Order change event (oc-event) computation"
+    ],
+    "what_is_being_optimized": "The set of candidate objects that must be considered when computing the next nearest-neighbor change event (nn-event).",
+    "state_or_ir": "An in-memory set of objects 'W' within a window, and a priority queue 'Q' of future events (window-crossing events and the next nn-event).",
+    "output": "A continuously maintained k-NN query result set 'K'.",
+    "pointers": [
+      "[p.7, Fig 12]",
+      "[p.8, Fig 13]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Introduces a continuous 'within' query to filter the objects considered for the more expensive k-NN query. Only objects inside this spatial window are candidates for the next nearest-neighbor event, dramatically reducing the search space from all N objects to a small, in-memory set.",
+      "baseline_assumption": "The baseline assumes that the search for the next nearest-neighbor event must consider all objects, using a hierarchical index (TPR-tree) over the entire dataset to prune the search.",
+      "why_baseline_did_not_include_it": "The baseline focused on optimizing the search over all objects via an index, not on fundamentally reducing the candidate set itself by using a simpler, cheaper query as a preliminary filter.",
+      "mechanism_level_implementation": "A continuous window query is maintained around the k-NN query point. This query maintains an in-memory set 'W' of all objects within a distance 'd'. The k-NN result and the next nearest-neighbor event are computed only from the objects in 'W'.",
+      "primary_metric_improved": "number of disk accesses",
+      "tradeoffs_or_costs": "The system processes more events overall, as it must now handle 'w-events' for objects entering or exiting the window. It also introduces a failure mode where the algorithm must restart if the window contains fewer than k objects.",
+      "pointers": [
+        "[p.1, quote: 'This is achieved by introducing a continuous within query to filter the number of objects that must be taken into account...']",
+        "[p.7, quote: 'The basic approach of the CW algorithm is to filter the number of moving points that need be considered when processing oc-events by maintaining a within query...']",
+        "[p.8, quote: 'if (|W| < k)V(c*xk < |W|) then return false']"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Decouples expensive event computation from the global on-disk index. By using the small, in-memory window 'W', the computation of the next nearest-neighbor event and the handling of updates for nearby objects no longer require traversing the TPR-tree, which is the baseline's main bottleneck.",
+      "baseline_assumption": "The baseline tightly couples event computation and update handling with the global, on-disk TPR-tree. Any event or relevant update forces a traversal of the TPR-tree to find the next nn-event.",
+      "why_baseline_did_not_include_it": "The baseline's design is monolithic, centered on the TPR-tree as the single structure for indexing and event prediction. It did not separate the management of the 'hot' candidate set from the 'cold' bulk of the data.",
+      "mechanism_level_implementation": "The next nn-event is computed by examining only the objects in the in-memory set 'W'. Updates to objects are checked against the window; if an object is inside, 'W' is updated in memory and the nn-event is recomputed from 'W', avoiding disk I/O to the main index.",
+      "primary_metric_improved": "number of disk accesses",
+      "tradeoffs_or_costs": "The system's logic is more complex, managing two types of events (w-events and nn-events) in its priority queue. It also incurs the cost of rebuilding the window and event queue if the window size constraints are violated.",
+      "pointers": [
+        "[p.8, Fig 13, quote: 'This is done by computing all oc-events for the tuples in W...']",
+        "[p.8, Fig 14]",
+        "[p.10, quote: 'The degradation of the ETP algorithm is primarily due to the increased overhead needed to maintain the TPR-tree when updates occur.']"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Cc",
+          "name": "Common-Case Specialization",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The creation of a 'within' window to filter candidates for the k-NN query.",
+          "why_it_applies": "The system specializes for the common case that the k-nearest neighbors are also physically close. It creates a fast path for objects inside the window ('the common case') and a different handling mechanism (w-events) for objects outside. The paper states: 'Conceptually, the data set is divided into two subsets of points: those that are close to the query point, and those that are far away.'",
+          "justification_if_invented": "",
+          "pointer": "[p.7]"
+        },
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The decision to compute the next nn-event using only the objects inside the window 'W', ignoring all objects outside it.",
+          "why_it_applies": "The work of computing order-change events for points outside the window is skipped. This is result-preserving because any point outside the window cannot become part of the k-NN result without first crossing the window boundary, which is an event (w-event) the system already tracks. Therefore, checking for nn-events involving distant points is guaranteed to be unnecessary until a w-event occurs.",
+          "justification_if_invented": "",
+          "pointer": "[p.7, Fig 11]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Bo",
+          "name": "Bottleneck-Oriented",
+          "reason_rejected_or_borderline": "While the design is motivated by the TPR-tree update bottleneck, Cc and Wv more precisely describe the *mechanism* used to solve it, rather than just the motivation.",
+          "pointer": "[p.10]"
+        },
+        {
+          "symbol": "Ad",
+          "name": "Adaptive Processing",
+          "reason_rejected_or_borderline": "The paper proposes adapting the window distance 'd' as future work but the presented CW algorithm uses a fixed 'd'. Therefore, the core mechanism is not adaptive.",
+          "pointer": "[p.10, quote: 'Comparison of these and other techniques for determining d is the next step for future work.']"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Fp",
+          "name": "Function Placement",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "Performing nn-event computation and update handling on the in-memory set 'W' instead of the on-disk TPR-tree.",
+          "why_it_applies": "The function of k-NN maintenance is moved from a context where data access is expensive (disk-based global index) to one where it is cheap (in-memory local subset). This placement is the source of the performance gain.",
+          "justification_if_invented": "",
+          "pointer": "[p.8, quote: 'By our assumption that W fits in main memory, this can be achieved without any disk accesses.']"
+        },
+        {
+          "symbol": "Lo",
+          "name": "Locality of Reference",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The creation and maintenance of the in-memory set 'W' for all k-NN related computations.",
+          "why_it_applies": "The mechanism creates a small, 'hot' set of data ('W') that is kept in memory, exhibiting high temporal and spatial locality for the most frequent operations (nn-event computation). This avoids the poor locality of traversing a large, on-disk tree, especially when updates degrade the tree's structure.",
+          "justification_if_invented": "",
+          "pointer": "[p.8, quote: '...all the objects that need to be examined are already in main memory.']"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Mo",
+          "name": "Modularity",
+          "reason_rejected_or_borderline": "While the system separates concerns for 'hot' and 'cold' data, Fp and Lo are more specific principles that explain the performance implications of this separation.",
+          "pointer": "[p.7]"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Indexed k-NN Search + Cc + Wv + Fp -> Continuous Windowing k-NN",
+    "baseline_name": "Indexed k-NN Search (e.g., ETP)",
+    "top_3_principle_tags": [
+      "Cc",
+      "Wv",
+      "Fp"
+    ],
+    "core_principle_tags": [
+      "Cc",
+      "Wv",
+      "Fp",
+      "Lo"
+    ],
+    "supporting_principle_tags": [],
+    "all_principle_tags_for_deltas": [
+      "Cc",
+      "Wv",
+      "Fp",
+      "Lo"
+    ],
+    "new_system_name": "Continuous Windowing k-NN (CW)",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "The composition uses Common-Case Specialization (Cc) to partition objects into a 'hot' nearby set and a 'cold' distant set. This partitioning is provably correct because Result-Preserving Work Avoidance (Wv) guarantees that distant objects cannot affect the k-NN result without first triggering a cheaper event to enter the hot set. Finally, Function Placement (Fp) moves the expensive k-NN maintenance logic to operate only on the hot set in memory, avoiding the bottleneck of a global on-disk index.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Cc",
+          "contribution_to_equation": "Partitions the problem into a small, 'hot' set of nearby objects and a large, 'cold' set of distant ones, creating a fast path for the common case."
+        },
+        {
+          "symbol": "Wv",
+          "contribution_to_equation": "Provides the correctness argument for ignoring the cold set when computing the next result change, as any relevant object must first trigger a cheaper event to enter the hot set."
+        },
+        {
+          "symbol": "Fp",
+          "contribution_to_equation": "Moves the expensive event computation from a global, on-disk structure to a small, in-memory one that only contains the hot set, dramatically reducing I/O costs."
+        }
+      ],
+      "transfer_question": "In what other continuous query systems could a cheap, coarse-grained filter be used to create a small, in-memory candidate set for an expensive, fine-grained computation?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "disk accesses (with updates)",
+      "direction": "down",
+      "concrete_number": "nearly an order of magnitude",
+      "pointer": "[p.9, quote: 'CW outperforms ETP by an nearly an order of magnitude when there are updates in our experiments.']"
+    },
+    {
+      "property": "disk accesses (without updates)",
+      "direction": "up",
+      "concrete_number": "over two orders of magnitude",
+      "pointer": "[p.9, quote: 'ETP outperforms CW by over two orders of magnitude when there are no updates.']"
+    },
+    {
+      "property": "number of events processed",
+      "direction": "up",
+      "concrete_number": "Not specified in provided text",
+      "pointer": "[p.10, Fig 19(a), quote: 'the total number of events processed using the ETP method is less than for the CW method.']"
+    },
+    {
+      "property": "on-disk data structure size",
+      "direction": "down",
+      "concrete_number": "Not specified in provided text",
+      "pointer": "[p.10, Fig 19(c), quote: 'The size of the CW event queue is smaller than the TPR-tree used by the ETP method...']"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Cf",
+      "name": "Coarse-to-Fine Filtering",
+      "definition": "Reduce the cost of a precise, expensive computation by first applying a cheap, coarse-grained filter to prune the input set, processing the full computation only on the small remaining candidate set.",
+      "mechanism_pattern": "The system uses a cheap spatial 'within' query (coarse filter) to generate a small, in-memory candidate set 'W'. The expensive computation of the next nearest-neighbor event is then performed only on this much smaller set 'W' (fine-grained computation).",
+      "why_existing_principles_are_insufficient": "Cc captures the 'common case' aspect but not the general pattern of multi-stage filtering. Wv explains why the pruning is correct but not the filtering structure itself. Bo describes the motivation (avoiding a bottleneck) but not the mechanism. A dedicated principle would better capture this widely-used, multi-stage refinement pattern.",
+      "closest_existing_principles": [
+        "Cc",
+        "Wv",
+        "Bo"
+      ],
+      "reusability_beyond_this_paper": "This pattern is highly reusable and appears in many domains, such as multi-stage information retrieval (e.g., cheap lexical match followed by expensive semantic re-ranking), cascade classifiers in computer vision, and broad-phase/narrow-phase collision detection in simulations.",
+      "confidence": "medium",
+      "pointer": "[p.1, quote: 'This is achieved by introducing a continuous within query to filter the number of objects that must be taken into account when maintaining a continuous k-NN query.']"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "The system reduces disk I/O for continuous k-NN queries with updates by maintaining a cheap, continuous 'within' query to filter a small, in-memory candidate set, avoiding expensive searches over a global on-disk index for the vast majority of objects.",
+    "top_3_principles": [
+      "Cc",
+      "Wv",
+      "Fp"
+    ],
+    "mechanism_family": "query optimization",
+    "specific_tools_or_algorithms": [
+      "Continuous within query",
+      "Event priority queue (EB-tree)",
+      "Order change event (oc-event) computation"
+    ],
+    "primary_design_archetype": "other",
+    "principle_mapping_confidence": "high"
+  }
+}

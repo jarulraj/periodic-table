@@ -1,0 +1,307 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "33",
+    "paper_title": "Data Morphing: An Adaptive, Cache-Conscious Storage Technique",
+    "authors": [
+      "Richard A. Hankins",
+      "Jignesh M. Patel"
+    ],
+    "venue_or_source": "VLDB",
+    "year": "2003",
+    "system_or_method_name": "Data Morphing (DM)",
+    "problem_domain": "Database physical storage layout for main-memory cache performance"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To improve database system performance for main-memory resident data by dynamically reorganizing the physical layout of attributes on a page to be more cache-efficient for a given query workload.",
+    "primary_optimized_metric": "latency",
+    "secondary_metrics": [
+      "cache misses"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "up to 45% faster",
+        "meaning": "Query performance improvement of Data Morphing over the N-ary storage model for a mixed workload.",
+        "pointer": "[p.2]"
+      },
+      {
+        "number_or_delta": "up to 25% faster",
+        "meaning": "Query performance improvement of Data Morphing over the PAX storage model for a mixed workload.",
+        "pointer": "[p.2]"
+      },
+      {
+        "number_or_delta": "82% fewer cache misses",
+        "meaning": "Reduction in cache misses for a mixed workload (W1, 80-20 ratio) compared to the N-ary model.",
+        "pointer": "[p.9]"
+      },
+      {
+        "number_or_delta": "46% fewer cache misses",
+        "meaning": "Reduction in cache misses for a mixed workload (W1, 80-20 ratio) compared to the PAX model.",
+        "pointer": "[p.9]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "N-ary (row-store) and PAX (page-level columnar) storage models",
+    "why_this_is_the_right_comparison": "N-ary is the traditional, common implementation for record storage. PAX is a recently proposed, state-of-the-art cache-conscious alternative. They represent two fixed design points (fully grouped vs. fully decomposed attributes) that Data Morphing generalizes.",
+    "limiting_design_assumption": "A single, static physical data layout (either fully row-oriented or fully decomposed within a page) is optimal for all queries in a heterogeneous workload.",
+    "pointers": [
+      "[p.1]"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Heuristic search over attribute partitions",
+    "specific_tools_or_algorithms": [
+      "Naive exhaustive search algorithm",
+      "Hill-Climbing (steepest-descent) search algorithm",
+      "Analytical cache-miss cost model"
+    ],
+    "what_is_being_optimized": "The grouping of attributes into 'zones' within a memory page to maximize spatial locality for a given workload.",
+    "state_or_ir": "An attribute partition, which is a collection of attribute groups for a relation.",
+    "output": "A cache-efficient attribute partition to be used as a template for storing data.",
+    "pointers": [
+      "[p.5]",
+      "[p.6]",
+      "[p.7]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Instead of a fixed layout, Data Morphing uses a cost-based search algorithm to find a near-optimal grouping of attributes based on an analysis of the query workload's access patterns.",
+      "baseline_assumption": "A single, static data layout (either all attributes grouped as in N-ary, or all attributes separate as in PAX) is sufficient.",
+      "why_baseline_did_not_include_it": "Baselines opted for simplicity and did not consider that a hybrid, workload-specific grouping of attributes could outperform the fixed extremes for heterogeneous workloads.",
+      "mechanism_level_implementation": "The system uses an analytical cost model to estimate the number of cache misses for a given query and attribute group. It then employs a search algorithm (either exhaustive Naive or heuristic Hill-Climb) to explore the space of all possible attribute partitions and select the one with the lowest total estimated cost for the given workload.",
+      "primary_metric_improved": "latency",
+      "tradeoffs_or_costs": "The partitioning algorithms have computational costs; the Naive algorithm is exponential in the number of attributes. This requires an offline or periodic analysis phase.",
+      "pointers": [
+        "[p.5]",
+        "[p.6]",
+        "[p.7]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "A flexible page architecture is introduced that can represent any attribute partition and supports lazy, on-access reorganization to adapt to changing workloads.",
+      "baseline_assumption": "The page layout is fixed and uniform for all pages in a file.",
+      "why_baseline_did_not_include_it": "Supporting dynamic, heterogeneous layouts adds metadata overhead and implementation complexity not required by a single, static layout.",
+      "mechanism_level_implementation": "The DM slotted-page structure includes metadata arrays (ATT-ZON, ATT-SZ, etc.) that describe the partition local to that page. This allows pages with different layouts to coexist and enables lazy reorganization: when a page is accessed, its partition is compared to a new recommended partition, and if they differ, the page is reorganized.",
+      "primary_metric_improved": "Not specified in provided text",
+      "tradeoffs_or_costs": "Metadata overhead on each page (e.g., 144 bytes for 16 attributes). The cost of page reorganization, which must be performed 'judiciously'.",
+      "pointers": [
+        "[p.4]",
+        "[p.5]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Wa",
+          "name": "Workload-Aware",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The partitioning algorithms take a set of queries, Q, as input, described by attribute access frequencies.",
+          "why_it_applies": "The entire process of choosing an attribute partition is driven by an analysis of the expected query workload to improve its specific performance.",
+          "justification_if_invented": "",
+          "pointer": "[p.5]"
+        },
+        {
+          "symbol": "Cm",
+          "name": "Cost-based",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The system uses an explicit cache miss model (Equation 3) to calculate the cost of each potential attribute group and partition.",
+          "why_it_applies": "The search algorithms (Naive and Hill-Climb) use the output of the cost model to navigate the design space and select the partition with the minimum total cost.",
+          "justification_if_invented": "",
+          "pointer": "[p.5]"
+        },
+        {
+          "symbol": "Ha",
+          "name": "Hardware-Aware",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The cost model is explicitly designed to minimize L2 cache misses and uses the processor's cache line size as a key parameter.",
+          "why_it_applies": "The fundamental goal is to improve performance by creating a data layout that is conscious of the processor's cache hierarchy, specifically by improving spatial locality.",
+          "justification_if_invented": "",
+          "pointer": "[p.5, Equation 1]"
+        },
+        {
+          "symbol": "Lo",
+          "name": "Locality of Reference",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The output of the partitioning algorithm is a set of attribute groups that are stored contiguously in memory.",
+          "why_it_applies": "The mechanism directly manipulates the physical layout to improve spatial locality by co-locating attributes that are frequently accessed together, as determined by the workload analysis.",
+          "justification_if_invented": "",
+          "pointer": "[p.10]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Bo",
+          "name": "Bottleneck-Oriented",
+          "reason_rejected_or_borderline": "While the paper identifies the memory subsystem as the new bottleneck, the mechanism is more specifically about exploiting hardware properties (Ha) and adapting to workloads (Wa), rather than just a generic bottleneck relief strategy.",
+          "pointer": "[p.1]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Ad",
+          "name": "Adaptive Processing",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The system supports lazy, on-access reorganization of a page's layout to match a new, recommended partition if the query workload changes.",
+          "why_it_applies": "The page structure is explicitly designed to allow the physical data layout to adapt over time to changes in the query workload.",
+          "justification_if_invented": "",
+          "pointer": "[p.5]"
+        },
+        {
+          "symbol": "Ex",
+          "name": "Extensibility",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The DM page structure is described as a generalization of the PAX page structure, capable of representing N-ary, PAX, and any intermediate partitioning.",
+          "why_it_applies": "The design extends the concept of page layout from two fixed points (N-ary, PAX) to a flexible framework that can accommodate a much wider range of layouts.",
+          "justification_if_invented": "",
+          "pointer": "[p.4]"
+        },
+        {
+          "symbol": "Pm",
+          "name": "Policy/Mechanism",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The partitioning algorithms (policy) are decoupled from the DM page structure (mechanism). The algorithms decide on a layout, and the page structure can implement any such layout.",
+          "why_it_applies": "This separation allows the policy (e.g., which partitioning algorithm to use) to evolve independently of the underlying mechanism that stores the data according to the chosen policy.",
+          "justification_if_invented": "",
+          "pointer": "[p.4]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Ec",
+          "name": "Elasticity",
+          "reason_rejected_or_borderline": "Elasticity refers to adapting resource allocation (e.g., servers, memory) to demand, whereas this mechanism adapts the data layout to the workload pattern.",
+          "pointer": "Not specified in provided text"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Static Data Layout + Wa + Cm + Ha -> Data Morphing",
+    "baseline_name": "Static Data Layout (N-ary/PAX)",
+    "top_3_principle_tags": [
+      "Wa",
+      "Cm",
+      "Ha"
+    ],
+    "core_principle_tags": [
+      "Wa",
+      "Cm",
+      "Ha",
+      "Ad"
+    ],
+    "supporting_principle_tags": [
+      "Lo",
+      "Ex",
+      "Pm"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Wa",
+      "Cm",
+      "Ha",
+      "Lo",
+      "Ad",
+      "Ex",
+      "Pm"
+    ],
+    "new_system_name": "Data Morphing",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "This composition replaces a static, one-size-fits-all data layout with a dynamically optimized one. Workload-Awareness (Wa) provides the optimization signal (access patterns), Hardware-Awareness (Ha) defines the physical constraints and opportunities (cache lines), and Cost-based (Cm) planning provides the decision framework to translate the signal and constraints into a concrete, superior layout.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Wa",
+          "contribution_to_equation": "It makes the choice of data layout dependent on the actual queries being run, rather than a fixed assumption."
+        },
+        {
+          "symbol": "Cm",
+          "contribution_to_equation": "It provides a quantitative, model-driven way to search the large space of possible layouts and find one that minimizes predicted cache misses."
+        },
+        {
+          "symbol": "Ha",
+          "contribution_to_equation": "It grounds the optimization in the physical properties of the processor cache, ensuring the chosen layout effectively improves spatial locality."
+        }
+      ],
+      "transfer_question": "In what other domains could a workload-aware, cost-based optimization of physical data layout, grounded in hardware specifics, improve performance over a static default?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "Query execution time",
+      "direction": "down",
+      "concrete_number": "up to 45%",
+      "pointer": "[p.9]"
+    },
+    {
+      "property": "L2 cache misses",
+      "direction": "down",
+      "concrete_number": "up to 82%",
+      "pointer": "[p.9]"
+    },
+    {
+      "property": "Metadata overhead per page",
+      "direction": "up",
+      "concrete_number": "144 bytes for 16 attributes",
+      "pointer": "[p.4]"
+    },
+    {
+      "property": "Bulkload time",
+      "direction": "up",
+      "concrete_number": "up to 10%",
+      "pointer": "[p.9]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "none",
+      "symbol": "None",
+      "name": "None",
+      "definition": "No plausible new principle candidate.",
+      "mechanism_pattern": "Not applicable",
+      "why_existing_principles_are_insufficient": "Existing principles sufficiently cover the paper's mechanisms. The combination of Workload-Aware (Wa), Cost-based (Cm), and Hardware-Aware (Ha) provides a strong explanation for the core mechanism of choosing an optimal physical data grouping.",
+      "closest_existing_principles": [],
+      "reusability_beyond_this_paper": "Not applicable",
+      "confidence": "low",
+      "pointer": "Not specified in provided text"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "Data Morphing improves cache performance by using a hardware-aware cost model to find an optimal grouping of attributes on a memory page based on query workload access patterns, and uses a flexible page structure to dynamically apply this layout.",
+    "top_3_principles": [
+      "Wa",
+      "Cm",
+      "Ha"
+    ],
+    "mechanism_family": "hardware-aware data management",
+    "specific_tools_or_algorithms": [
+      "Naive exhaustive search algorithm",
+      "Hill-Climbing (steepest-descent) search algorithm",
+      "Analytical cache-miss cost model"
+    ],
+    "primary_design_archetype": "hardware-conscious layout",
+    "principle_mapping_confidence": "high"
+  }
+}

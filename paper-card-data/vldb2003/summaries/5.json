@@ -1,0 +1,297 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "5",
+    "paper_title": "A Framework for Clustering Evolving Data Streams",
+    "authors": [
+      "Charu C. Aggarwal",
+      "Jiawei Han",
+      "Jianyong Wang",
+      "Philip S. Yu"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference",
+    "year": "2003",
+    "system_or_method_name": "CluStream",
+    "problem_domain": "Clustering of evolving data streams"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To develop a framework for clustering evolving data streams that provides the flexibility to compute high-quality clusters over user-defined time periods in an interactive fashion, addressing the issue that prior methods are dominated by outdated history.",
+    "primary_optimized_metric": "accuracy",
+    "secondary_metrics": [
+      "efficiency",
+      "scalability"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "5 orders of magnitude",
+        "meaning": "CluStream's sum of square distance (SSQ) is up to 5 orders of magnitude smaller (better) than the STREAM baseline on the Network Intrusion dataset.",
+        "pointer": "[p.11, Figure 1]"
+      },
+      {
+        "number_or_delta": "95 snapshots",
+        "meaning": "The number of snapshots required to manage a 100-year data stream with 1-second granularity is only ~95, demonstrating logarithmic storage cost.",
+        "pointer": "[p.5]"
+      },
+      {
+        "number_or_delta": "Linear scalability",
+        "meaning": "The processing time of the micro-clustering process scales linearly with data dimensionality and the number of input clusters.",
+        "pointer": "[p.12, Figures 7, 8]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "One-pass stream clustering algorithms (e.g., STREAM)",
+    "why_this_is_the_right_comparison": "The paper identifies STREAM as 'the best algorithm reported so far for clustering data streams' and explicitly compares against it to demonstrate improvements in quality and functionality.",
+    "limiting_design_assumption": "The baseline assumes clusters are computed over the entire data stream history, which makes it 'blind to the evolution of the data' and results in clusters being 'dominated by the outdated history of the stream'. This design lacks the flexibility to explore clusters over different time windows.",
+    "pointers": [
+      "[p.1]",
+      "[p.10]"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Online/offline stream processing architecture",
+    "specific_tools_or_algorithms": [
+      "Micro-clustering using temporal Cluster Feature (CF) vectors",
+      "Pyramidal Time Frame for snapshot management",
+      "Modified k-means for macro-clustering"
+    ],
+    "what_is_being_optimized": "The storage and retrieval of summary statistics to enable flexible, time-horizon-specific clustering on evolving data.",
+    "state_or_ir": "Micro-clusters, which are (2*d+3) tuples storing sums and sums of squares of data values and timestamps, and the number of points.",
+    "output": "A set of 'k' macro-clusters for a user-specified time horizon 'h'.",
+    "pointers": [
+      "[p.3]",
+      "[p.4]",
+      "[p.8]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Decouples stream processing into an online micro-clustering component for efficient data summarization and an offline macro-clustering component for flexible, user-driven analysis.",
+      "baseline_assumption": "Stream clustering is a monolithic, one-pass process that computes clusters over the entire stream history.",
+      "why_baseline_did_not_include_it": "The baseline viewed the problem as a one-pass algorithm design, not an interactive, exploratory process. Supporting flexible queries over different time horizons with a monolithic design would be computationally infeasible.",
+      "mechanism_level_implementation": "The online component maintains a large number of fine-grained 'micro-clusters' (summary statistics). The offline component takes user inputs (time horizon 'h', number of clusters 'k') and computes 'macro-clusters' from stored snapshots of micro-clusters.",
+      "primary_metric_improved": "accuracy",
+      "tradeoffs_or_costs": "Introduces an offline analysis step, adding latency to user queries, but enables functionality not possible in the baseline. Requires storage for summary statistics.",
+      "pointers": [
+        "[p.1]",
+        "[p.3]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Introduces a 'Pyramidal Time Frame' to store snapshots of micro-clusters at logarithmically decreasing temporal granularities, enabling efficient, bounded-error queries over arbitrary time horizons.",
+      "baseline_assumption": "The system state reflects the entire stream up to the current point. There is no efficient mechanism for managing historical state to answer queries about specific time windows.",
+      "why_baseline_did_not_include_it": "The baseline's goal was not to support historical or evolving queries, so it did not require a sophisticated snapshotting strategy. A naive approach would be computationally and storage-prohibitive.",
+      "mechanism_level_implementation": "Snapshots of micro-clusters are stored at time intervals of α^i for different orders 'i'. Only the last α^l+1 snapshots of each order are kept. The subtractive property of micro-cluster statistics is used to reconstruct the state for a given time window from two snapshots.",
+      "primary_metric_improved": "cost",
+      "tradeoffs_or_costs": "The time horizon for a query is approximated rather than exact, though the error is bounded and tunable. Storage cost is logarithmic with the stream's duration.",
+      "pointers": [
+        "[p.4]",
+        "[p.5]",
+        "[p.8]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Pm",
+          "name": "Policy/Mechanism Separation",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The division of the system into an online micro-clustering component and an offline macro-clustering component.",
+          "why_it_applies": "The online component is a generic, efficient mechanism for collecting summary statistics. The offline component implements the user's policy, specified via parameters like time horizon and number of clusters, to generate the final result. The paper explicitly states this division: 'divide the clustering process into an online component... and an offline component'.",
+          "justification_if_invented": "",
+          "pointer": "[p.1]"
+        },
+        {
+          "symbol": "Mo",
+          "name": "Modularity",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The 'two-phased approach' of online micro-clustering and offline macro-clustering.",
+          "why_it_applies": "The system is decomposed into two distinct modules with a clean interface (the stored micro-cluster snapshots). This modularity enables the flexibility and efficiency goals.",
+          "justification_if_invented": "",
+          "pointer": "[p.3]"
+        },
+        {
+          "symbol": "Ad",
+          "name": "Adaptive Processing",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The online component adapts to the data stream by creating, merging, or deleting micro-clusters. The offline component adapts to user queries.",
+          "why_it_applies": "The system adapts to two different inputs: the evolving data stream (online) and the user's analytical goals (offline). The online part adapts to data locality, while the offline part adapts to user-specified time horizons and granularities.",
+          "justification_if_invented": "",
+          "pointer": "[p.6-7]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Sc",
+          "name": "Scalability",
+          "reason_rejected_or_borderline": "Scalability is a benefit of the design, not the design principle itself. The principles explain *how* scalability is achieved.",
+          "pointer": "[p.12]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Cm",
+          "name": "Cost-based",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The design of the pyramidal time frame, which explicitly trades storage space for temporal approximation accuracy.",
+          "why_it_applies": "The paper presents a formal model where parameters (α, l) control the number of snapshots stored versus the approximation factor for any time horizon. This is an explicit, quantifiable cost-benefit tradeoff. 'This pattern provides an effective tradeoff between the storage requirements and the ability to recall summary statistics'.",
+          "justification_if_invented": "",
+          "pointer": "[p.4, p.5, Lemma 2]"
+        },
+        {
+          "symbol": "Cr",
+          "name": "Consistency Relaxation",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "Using snapshots at discrete, logarithmically spaced intervals to answer queries about arbitrary time horizons.",
+          "why_it_applies": "The system relaxes the requirement of providing an exact answer for any user-specified time horizon 'h'. Instead, it provides an answer for an approximate horizon 'h'' where the error |h-h'| is bounded. This relaxation is what makes the storage scheme feasible.",
+          "justification_if_invented": "",
+          "pointer": "[p.5, Lemma 2]"
+        },
+        {
+          "symbol": "Rc",
+          "name": "Reuse of Computation",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "Storing snapshots of micro-clusters that can be used by multiple offline queries.",
+          "why_it_applies": "The pre-computed summary statistics (snapshots) are reused across different offline macro-clustering queries with different time horizons and granularities, avoiding reprocessing the raw stream data for each query.",
+          "justification_if_invented": "",
+          "pointer": "[p.8]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "reason_rejected_or_borderline": "The work avoidance (not storing every snapshot) is not result-preserving; it leads to an approximation of the time horizon. Therefore, Wv does not apply.",
+          "pointer": "[p.5]"
+        },
+        {
+          "symbol": "Ha",
+          "name": "Hardware-Aware",
+          "reason_rejected_or_borderline": "While the paper mentions storing snapshots on disk and keeping current micro-clusters in memory, this is a standard implementation choice rather than a core design principle driving the pyramidal structure.",
+          "pointer": "[p.5]"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Monolithic Stream Clustering + Pm + Cm + Cr -> CluStream",
+    "baseline_name": "Monolithic Stream Clustering",
+    "top_3_principle_tags": [
+      "Pm",
+      "Cm",
+      "Cr"
+    ],
+    "core_principle_tags": [
+      "Pm",
+      "Cm",
+      "Cr"
+    ],
+    "supporting_principle_tags": [
+      "Mo",
+      "Ad",
+      "Rc"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Pm",
+      "Mo",
+      "Ad",
+      "Cm",
+      "Cr",
+      "Rc"
+    ],
+    "new_system_name": "CluStream",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "The system separates the mechanism of data summarization from the user-defined policy of cluster analysis (Pm). This separation requires storing historical summaries, which is made feasible by a cost-based (Cm) pyramidal scheme that relaxes the need for exact time-horizon answers (Cr), instead providing bounded approximations with logarithmic storage cost.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Pm",
+          "contribution_to_equation": "Provides the core architectural split between an efficient online summarization mechanism and a flexible offline analysis policy engine."
+        },
+        {
+          "symbol": "Cm",
+          "contribution_to_equation": "Governs the design of the historical storage system, explicitly trading storage cost for temporal query accuracy."
+        },
+        {
+          "symbol": "Cr",
+          "contribution_to_equation": "Enables the cost-based tradeoff by relaxing the requirement for exact time-horizon queries, making the storage problem tractable."
+        }
+      ],
+      "transfer_question": "In what other domains could a system separate online data summarization from offline policy-driven analysis by using a cost-optimized, approximate historical snapshotting scheme?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "accuracy",
+      "direction": "up",
+      "concrete_number": "SSQ down by up to 5 orders of magnitude",
+      "pointer": "[p.11]"
+    },
+    {
+      "property": "throughput",
+      "direction": "up",
+      "concrete_number": "Higher stream processing rate than baseline in steady state",
+      "pointer": "[p.12, Figure 5, 6]"
+    },
+    {
+      "property": "memory",
+      "direction": "down",
+      "concrete_number": "Logarithmic storage requirement with respect to stream duration",
+      "pointer": "[p.5]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Hs",
+      "name": "Hierarchical State Compaction",
+      "definition": "Maintain historical state summaries at multiple, logarithmically decreasing granularities to provide efficient, bounded-error access to arbitrary historical time windows.",
+      "mechanism_pattern": "Storing snapshots of system state with decreasing frequency for older data (e.g., every second for the last minute, every minute for the last hour, every hour for the last day). This allows reconstruction of approximate historical states with error bounds that grow with age.",
+      "why_existing_principles_are_insufficient": "Cm captures the cost tradeoff and Cr captures the resulting approximation, but neither describes the specific structural pattern of multi-resolution, logarithmic summarization. This pattern is a reusable technique for managing infinite histories, distinct from general cost-based planning or consistency relaxation.",
+      "closest_existing_principles": [
+        "Cm",
+        "Cr",
+        "Gr"
+      ],
+      "reusability_beyond_this_paper": "This pattern is common in time-series databases (rollups), monitoring systems, and logging frameworks that need to manage long-term historical data under fixed storage budgets.",
+      "confidence": "medium",
+      "pointer": "[p.4]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "Decouples stream clustering into an online component that maintains fine-grained statistical summaries (micro-clusters) and an offline component that uses a multi-resolution 'pyramidal' set of historical snapshots to answer user queries about clusters over arbitrary time horizons.",
+    "top_3_principles": [
+      "Pm",
+      "Cm",
+      "Cr"
+    ],
+    "mechanism_family": "stream processing",
+    "specific_tools_or_algorithms": [
+      "Micro-clustering using temporal Cluster Feature (CF) vectors",
+      "Pyramidal Time Frame for snapshot management",
+      "Modified k-means for macro-clustering"
+    ],
+    "primary_design_archetype": "disaggregation / function placement",
+    "principle_mapping_confidence": "high"
+  }
+}

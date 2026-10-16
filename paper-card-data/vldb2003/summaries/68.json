@@ -1,0 +1,309 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "68",
+    "paper_title": "Operator Scheduling in a Data Stream Manager",
+    "authors": [
+      "Don Carney",
+      "Uğur Çetintemel",
+      "Alex Rasin",
+      "Stan Zdonik",
+      "Mitch Cherniack",
+      "Mike Stonebraker"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference",
+    "year": "2003",
+    "system_or_method_name": "Aurora",
+    "problem_domain": "Data stream management"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To design and evaluate novel operator scheduling approaches for data stream managers that can meet real-time performance expectations under high-volume, time-varying data streams by reducing system overheads and considering application-level Quality of Service (QoS) specifications.",
+    "primary_optimized_metric": "throughput",
+    "secondary_metrics": [
+      "latency",
+      "memory",
+      "QoS"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": ">90%",
+        "meaning": "The superbox-based MC_AAAT scheduling algorithm is able to handle input rates of over 90% of the theoretical system capacity before saturation.",
+        "pointer": "[p.6, Figure 5]"
+      },
+      {
+        "number_or_delta": "~50% reduction",
+        "meaning": "Superbox scheduling (MC) decreased the overall execution time for processing 100K tuples by almost 50% compared to tuple train scheduling (BAAT), from 5.2s to 2.8s.",
+        "pointer": "[p.8, Figure 9]"
+      },
+      {
+        "number_or_delta": "7% improvement",
+        "meaning": "An approximation technique using 20x20 buckets improved measured QoS from 0.796 to 0.85, exceeding the more precise slope-slack method by reducing scheduler overhead.",
+        "pointer": "[p.10, Figure 13]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Thread-per-operator execution model",
+    "why_this_is_the_right_comparison": "This is the traditional model for database servers which the paper explicitly contrasts with its state-based model. It represents the standard approach of delegating scheduling to the operating system, which Aurora argues is not scalable or QoS-aware enough for data streams.",
+    "limiting_design_assumption": "The operating system scheduler is sufficient for managing processor allocation for stream operators, and fine-grained, application-level control over scheduling is unnecessary.",
+    "pointers": [
+      "[p.1, quote: 'any such approach would abdicate the details of scheduling to the operating system, thereby making it impossible to account for application-level constraints (QoS).']",
+      "[p.3, quote: 'The traditional model for structuring database servers is thread-based execution...The basic approach is to assign a thread to each query or operator.']",
+      "[p.3, Figure 3]"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Two-level, state-based scheduler",
+    "specific_tools_or_algorithms": [
+      "Superbox scheduling (operator batching)",
+      "Train scheduling (tuple batching)",
+      "Cost-based superbox traversal (Min-Cost, Min-Latency, Min-Memory)",
+      "QoS-driven priority assignment (p-tuple of utility and urgency)",
+      "Bucketing-based approximation"
+    ],
+    "what_is_being_optimized": "The execution order and granularity of stream operators (boxes).",
+    "state_or_ir": "A network of operators (boxes), their input queues of tuples, and application QoS specifications.",
+    "output": "A scheduling plan, which is a sequence of operators to be executed by worker threads.",
+    "pointers": [
+      "[p.4, quote: 'The outcome of these decisions is a sequence of operators, referred to as a scheduling plan, to be executed one after another.']",
+      "[p.8, quote: 'Our priority assignment approach is to order the boxes in terms of their utility and urgency.']"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Introduces operator and tuple batching to change the granularity of scheduling, amortizing fixed system overheads over larger units of work to improve throughput.",
+      "baseline_assumption": "Each operator is an independent scheduling unit, managed by the OS via its own thread, leading to high context-switching and scheduling overhead.",
+      "why_baseline_did_not_include_it": "The baseline model delegates scheduling to the OS, which operates on threads and lacks the application-level knowledge to group operators or tuples into semantically meaningful, efficient batches.",
+      "mechanism_level_implementation": "A state-based scheduler groups operators into 'superboxes' and tuples into 'trains'. A superbox is a sequence of boxes scheduled as an atomic unit. A train is a batch of tuples processed in a single box call. This reduces the number of scheduler invocations, storage manager accesses, and context switches.",
+      "primary_metric_improved": "throughput",
+      "tradeoffs_or_costs": "Increases scheduler complexity. It requires new decisions, such as the traversal order within a superbox, which creates tradeoffs between throughput (Min-Cost), latency (Min-Latency), and memory (Min-Memory).",
+      "pointers": [
+        "[p.4, quote: 'In order to reduce the scheduling and operator overheads, Aurora heavily relies on batching (i.e., grouping) during scheduling.']",
+        "[p.5, quote: 'We investigate three traversal algorithms that primarily differ in the performance-related metric they strive to optimize: throughput, latency, and memory consumption.']",
+        "[p.6, quote: 'A tuple train (or simply a train) is a sequence of tuples executed as a batch within a single box call.']"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Implements a QoS-aware scheduling policy that prioritizes operators based on application-defined utility curves and the current latency of data, improving overall QoS.",
+      "baseline_assumption": "All processing tasks are equally important, or a generic, QoS-agnostic policy like OS-level fairness or simple round-robin is sufficient.",
+      "why_baseline_did_not_include_it": "The baseline thread-per-operator model abdicates scheduling control to the OS, which is unaware of application-level QoS requirements like the utility of data at different latencies.",
+      "mechanism_level_implementation": "The scheduler computes a priority 'p-tuple' for each box based on (1) utility, defined as the gradient of the application's QoS-latency curve at the tuple's expected output latency, and (2) urgency, defined as the slack time to the nearest critical point on the QoS curve. To scale this, it uses a bucketing scheme to approximate the utility/urgency space, trading precision for lower scheduling overhead.",
+      "primary_metric_improved": "QoS",
+      "tradeoffs_or_costs": "The priority calculation and sorting adds overhead to the scheduler. The bucketing approximation reduces this overhead but introduces imprecision, which can lead to suboptimal scheduling decisions if the number of buckets is too low.",
+      "pointers": [
+        "[p.9, quote: 'Our priority assignment approach is to order the boxes in terms of their utility and urgency.']",
+        "[p.9, quote: 'We improve upon the basic algorithm using a combination of (1) approximation (via bucketing) and (2) pre-computation.']",
+        "[p.10, Figure 13]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Bo",
+          "name": "Bottleneck-Oriented",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The introduction of superbox and train scheduling.",
+          "why_it_applies": "The paper's central argument is that system overheads (scheduling, context switching, storage management) are the primary performance bottleneck, especially compared to the thread-per-box baseline. The batching mechanisms are explicitly designed to reduce these overheads.",
+          "justification_if_invented": "",
+          "pointer": "[p.3, quote: 'the thread-based execution model incurs significant overhead due to cache misses, lock contention, and switching.']"
+        },
+        {
+          "symbol": "Cc",
+          "name": "Common-Case Specialization",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The use of superboxes and trains to group multiple operations or tuples.",
+          "why_it_applies": "Batching amortizes the fixed, per-call overhead of scheduling, memory management, and box invocation over a larger unit of work. This is a form of common-case optimization, where the common case is processing a sequence of operators or a queue of tuples.",
+          "justification_if_invented": "",
+          "pointer": "[p.4, quote: 'they significantly reduce scheduling overheads by scheduling multiple boxes as a single unit...they eliminate the need to access the storage manager for each individual box execution...']"
+        },
+        {
+          "symbol": "Cm",
+          "name": "Cost-based",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The superbox traversal algorithms: Min-Cost (MC), Min-Latency (ML), and Min-Memory (MM).",
+          "why_it_applies": "Once a superbox is selected, the scheduler uses explicit cost models to determine the internal execution order. MC minimizes box calls, ML minimizes estimated output latency, and MM maximizes the rate of memory consumption.",
+          "justification_if_invented": "",
+          "pointer": "[p.5, quote: 'We investigate three traversal algorithms that primarily differ in the performance-related metric they strive to optimize: throughput, latency, and memory consumption.']"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Sc",
+          "name": "Scalability",
+          "reason_rejected_or_borderline": "This is a benefit of the batching mechanisms, not the mechanism itself. The paper shows batching leads to better scalability (Figure 3), but Bo and Cc better explain how that scalability is achieved.",
+          "pointer": "[p.3, Figure 3]"
+        },
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "reason_rejected_or_borderline": "The mechanisms reduce system-level work (scheduler calls, context switches) but do not skip any application-level tuple processing. While the external result is preserved, this pattern of overhead amortization is better and more specifically captured by Bottleneck-Oriented (Bo) and Common-Case Specialization (Cc).",
+          "pointer": "[p.4]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Wa",
+          "name": "Workload-Aware",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The use of application-specific QoS graphs and current tuple latencies to compute scheduling priorities.",
+          "why_it_applies": "The scheduler's decisions are explicitly driven by the workload's characteristics, which include not just the data but also the application's performance requirements (QoS). This is a direct contrast to the workload-agnostic baseline.",
+          "justification_if_invented": "",
+          "pointer": "[p.2, quote: 'Applications define their service expectations using Quality-of-Service (QoS) specifications, which guide Aurora's resource allocation decisions.']"
+        },
+        {
+          "symbol": "Cm",
+          "name": "Cost-based",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The calculation of the priority 'p-tuple' based on utility (QoS gradient) and urgency (slack time).",
+          "why_it_applies": "The scheduler uses a quantitative cost model to make decisions. It estimates the expected output latency and uses the QoS curve to derive a utility value, which forms the basis of the scheduling priority.",
+          "justification_if_invented": "",
+          "pointer": "[p.9, quote: 'This utility function is a measure of the expected QoS (per unit time) that will be lost if the box is not chosen for execution.']"
+        },
+        {
+          "symbol": "Ad",
+          "name": "Adaptive Processing",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The re-computation of priorities at each scheduling point based on the current latencies of tuples in the queues.",
+          "why_it_applies": "The scheduler adapts its priorities dynamically based on the current state of the system (queue latencies), not just static properties. Wa is more specific about the *source* of the information (workload QoS specs), while Ad captures the dynamic, state-responsive nature of the mechanism.",
+          "justification_if_invented": "",
+          "pointer": "[p.9, quote: 'eol(b) is the expected output latency of b. This value is an estimation of where b's tuples currently are on the QoS-latency curve...']"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "La",
+          "name": "Learned Approximation",
+          "reason_rejected_or_borderline": "The bucketing mechanism is an approximation, but it is based on pre-computed, deterministic partitioning of the utility/urgency space, not a learned model.",
+          "pointer": "[p.9]"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Thread-per-operator Scheduling + Bo + Wa + Cm -> Aurora Scheduler",
+    "baseline_name": "Thread-per-operator Scheduling",
+    "top_3_principle_tags": [
+      "Bo",
+      "Wa",
+      "Cm"
+    ],
+    "core_principle_tags": [
+      "Bo",
+      "Cc",
+      "Wa",
+      "Cm"
+    ],
+    "supporting_principle_tags": [
+      "Cm",
+      "Ad"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Bo",
+      "Cc",
+      "Cm",
+      "Wa",
+      "Ad"
+    ],
+    "new_system_name": "Aurora Scheduler",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "This composition explains a shift from OS-level, application-agnostic scheduling to a specialized, in-system scheduler. The Bottleneck-Oriented (Bo) principle provides the motivation: identify and attack system overheads. This is achieved by changing the granularity of work. The Workload-Aware (Wa) principle introduces the application's goals (QoS) as the primary driver for scheduling decisions. The Cost-based (Cm) principle provides the concrete implementation tools for both: cost models are used to decide how to execute batches efficiently (supporting Bo) and how to rank operators to maximize QoS (implementing Wa).",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Bo",
+          "contribution_to_equation": "Identifies system overhead as the key performance bottleneck and motivates mechanisms (batching) to reduce it, improving throughput."
+        },
+        {
+          "symbol": "Wa",
+          "contribution_to_equation": "Incorporates application-specific performance goals (QoS) into the scheduler, shifting from a generic policy to one that maximizes application utility."
+        },
+        {
+          "symbol": "Cm",
+          "contribution_to_equation": "Provides the quantitative models needed to implement both bottleneck reduction (e.g., Min-Cost traversal) and workload-aware prioritization (e.g., utility/urgency calculation)."
+        }
+      ],
+      "transfer_question": "In what other domains could replacing a generic OS scheduler with a specialized, bottleneck-aware and workload-aware scheduler dramatically improve performance?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "throughput",
+      "direction": "up",
+      "concrete_number": "Saturation point moved from <70% to >90% of capacity",
+      "pointer": "[p.6, Figure 5]"
+    },
+    {
+      "property": "latency",
+      "direction": "down",
+      "concrete_number": "ML traversal yields lower latency than MC when box processing cost is high",
+      "pointer": "[p.7, Figure 6]"
+    },
+    {
+      "property": "scheduling overhead",
+      "direction": "down",
+      "concrete_number": "Total execution time for 100K tuples reduced from 10.5s (TAAT) to 2.8s (MC superbox)",
+      "pointer": "[p.8, Figure 9]"
+    },
+    {
+      "property": "memory",
+      "direction": "down",
+      "concrete_number": "MM traversal uses less memory over time compared to MC and ML",
+      "pointer": "[p.7, Figure 7]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Grw",
+      "name": "Operational Granularity Rewriting",
+      "definition": "Statically or dynamically grouping fine-grained operations into coarser-grained execution units to amortize fixed overheads.",
+      "mechanism_pattern": "The paper's 'superbox' (operator batching) and 'train' (tuple batching) mechanisms both rewrite the unit of scheduling from a single operator/tuple to a group, for the explicit purpose of reducing per-unit overhead.",
+      "why_existing_principles_are_insufficient": "Bo (Bottleneck-Oriented) explains the 'why' (to reduce overhead), and Cc (Common-Case Specialization) explains the effect (amortization), but neither describes the specific mechanism of changing the unit of work itself. Grw is more specific about the 'how'—by changing the granularity of what is being scheduled and executed.",
+      "closest_existing_principles": [
+        "Cc",
+        "Bo"
+      ],
+      "reusability_beyond_this_paper": "This pattern is highly reusable. Examples include vectorized query execution in analytical databases, group commit for transactions, network packet batching (e.g., Nagle's algorithm), and processing mini-batches in machine learning systems.",
+      "confidence": "medium",
+      "pointer": "[p.4]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "Aurora replaces the traditional thread-per-operator model with a state-based scheduler that batches operators ('superboxes') and tuples ('trains') to amortize overhead, and prioritizes work using cost models based on application-specific QoS curves to improve throughput and latency.",
+    "top_3_principles": [
+      "Bo",
+      "Wa",
+      "Cm"
+    ],
+    "mechanism_family": "stream processing",
+    "specific_tools_or_algorithms": [
+      "Superbox scheduling (operator batching)",
+      "Train scheduling (tuple batching)",
+      "Cost-based superbox traversal (Min-Cost, Min-Latency, Min-Memory)",
+      "QoS-driven priority assignment (p-tuple of utility and urgency)",
+      "Bucketing-based approximation"
+    ],
+    "primary_design_archetype": "granularity rewriting",
+    "principle_mapping_confidence": "high"
+  }
+}

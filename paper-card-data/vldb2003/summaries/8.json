@@ -1,0 +1,266 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "8",
+    "paper_title": "Distributed Top-N Query Processing with Possibly Uncooperative Local Systems",
+    "authors": [
+      "Clement Yu",
+      "George Philip",
+      "Weiyi Meng"
+    ],
+    "venue_or_source": "VLDB Conference",
+    "year": "2003",
+    "system_or_method_name": "FQ + MOD-MIN-2",
+    "problem_domain": "Distributed top-N query processing"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To efficiently and accurately find the top-N tuples for a query in a distributed environment with many databases, particularly when local database systems are uncooperative and do not share their internal statistics.",
+    "primary_optimized_metric": "accuracy",
+    "secondary_metrics": [
+      "efficiency"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": ">95%",
+        "meaning": "Accuracy of the FQ method for 3-D queries on the forest-cover dataset, while competing methods LA and MHIST-2 were 'too low to be acceptable'.",
+        "pointer": "[p.10, Tables 12-13]"
+      },
+      {
+        "number_or_delta": "95.7% to 97.7%",
+        "meaning": "Accuracy of the FQ method on a mixed workload of queries with different dimensions and distance functions.",
+        "pointer": "[p.10, Table 16]"
+      },
+      {
+        "number_or_delta": "205% -> 146%",
+        "meaning": "Improvement in efficiency (ratio of databases accessed) by using a hybrid merge strategy, with negligible impact on accuracy.",
+        "pointer": "[p.10, Table 16]"
+      },
+      {
+        "number_or_delta": "37.8 msec",
+        "meaning": "Average time overhead to determine the ordering of databases for a query using the FQ method.",
+        "pointer": "[p.10]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Cooperative distributed search (e.g., ILA + Merge-1)",
+    "why_this_is_the_right_comparison": "The paper contrasts with two baselines: a naive 'send-to-all' strategy that is inefficient [p.1], and the state-of-the-art method from [23] (ILA histograms + Merge-1 algorithm) which is the 'most closely related work' but assumes cooperative databases that provide statistics for histogram construction. [p.2, p.5]",
+    "limiting_design_assumption": "To effectively prune the search space of databases, a central site must have access to detailed statistical summaries (histograms) built from the full data of each local database. This implies cooperation from local systems, which is not always available in environments like the internet.",
+    "pointers": [
+      "[p.1]",
+      "[p.2]",
+      "[p.5]"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Workload-based statistical summary",
+    "specific_tools_or_algorithms": [
+      "FQ (Frequent Queries) histogram construction",
+      "MOD-MIN-2 merge algorithm"
+    ],
+    "what_is_being_optimized": "The selection of which databases to query to find the top-N results for a given query.",
+    "state_or_ir": "The FQ 'histogram', which consists of a list of frequent queries (Freq-Q) and a list of the best matched tuples (BMT) returned for those queries from various databases.",
+    "output": "A ranked list of databases to be searched, and a stream of top-N result tuples.",
+    "pointers": [
+      "[p.5]",
+      "[p.7]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Introduces a workload-driven method (FQ) to rank databases without requiring their cooperation by observing query-result pairs from past frequent queries.",
+      "baseline_assumption": "Ranking databases for relevance requires building statistical summaries (histograms) from the full data of each local database, which assumes cooperation.",
+      "why_baseline_did_not_include_it": "Baseline methods were designed for cooperative environments. The paper's focus on e-commerce and the internet introduces the problem of uncooperative data sources that will answer queries but not share internal data distributions.",
+      "mechanism_level_implementation": "The FQ method maintains lists of frequent queries (Freq-Q) and their corresponding best-matched tuples from each database (BMT). For a new query, it uses the nearest neighbors within the BMT list to estimate which databases are most likely to contain the best results, effectively treating each database as a black box.",
+      "primary_metric_improved": "accuracy",
+      "tradeoffs_or_costs": "The method's effectiveness depends on a stable and skewed (e.g., Zipfian) query workload to populate the frequent query lists. It requires a warm-up period and may be less accurate for rare or entirely new queries.",
+      "pointers": [
+        "[p.2]",
+        "[p.5]",
+        "[p.6]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Proposes a more effective merge algorithm (MOD-MIN-2) that improves accuracy by using a more conservative, adaptive threshold for retrieving tuples from ranked databases.",
+      "baseline_assumption": "The baseline Merge-1 algorithm assumes a retrieval threshold based on the maximum distance of the best-matched tuples from all accessed databases is sufficient to find the top-N results.",
+      "why_baseline_did_not_include_it": "The baseline algorithm (Merge-1) prioritized efficiency (accessing fewer databases) at the cost of potentially lower accuracy. The new algorithm makes a different tradeoff to improve effectiveness.",
+      "mechanism_level_implementation": "The MIN-2 algorithm sets the retrieval threshold `d` to the minimum of the best-match distances from the last two accessed databases (`min{d_i, d_{i-1}}`). This is a tighter threshold than Merge-1's. The final MOD-MIN-2 algorithm further improves this by also considering tuples that Merge-1 would have retrieved and taking the better set, ensuring it is at least as effective as the baseline.",
+      "primary_metric_improved": "accuracy",
+      "tradeoffs_or_costs": "The improved algorithm is less efficient, potentially accessing more databases to gather N tuples. The paper mitigates this by proposing a hybrid strategy: use the more expensive algorithm only for query types where it yields a significant accuracy benefit.",
+      "pointers": [
+        "[p.7]",
+        "[p.8]",
+        "[p.10]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Wa",
+          "name": "Workload-Aware",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The FQ method's construction of a 'histogram' based on identifying and storing results for frequently submitted user queries.",
+          "why_it_applies": "The system explicitly adapts its internal state (the FQ and BMT lists) to the observed query distribution, prioritizing accuracy for the common case. The design is predicated on query patterns being uneven (Zipfian).",
+          "justification_if_invented": "",
+          "pointer": "[quote: '...queries usually follow a Zipfian distribution and histograms should be constructed utilizing the uneven query distribution.' p.5]"
+        },
+        {
+          "symbol": "La",
+          "name": "Learned Approximation",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "Using the cache of best-matched tuples (BMT) from past queries to estimate the relevance of databases for a new, unseen query.",
+          "why_it_applies": "The BMT list acts as a learned, data-driven model that approximates the expensive function of querying all databases. It learns from past query-result examples to predict which databases are promising for future queries.",
+          "justification_if_invented": "",
+          "pointer": "[quote: 'If a query is not found in Freq-Q, the N best matched tuples from BMT are obtained. They are sorted... and their corresponding database IDs are used...' p.6]"
+        },
+        {
+          "symbol": "Rc",
+          "name": "Reuse of Computation",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The BMT list stores the best matched tuples from previous queries.",
+          "why_it_applies": "The system reuses the results of previous database probes (the best matched tuples) to inform the database selection for new queries, avoiding the need to re-probe all databases from scratch to make a ranking decision.",
+          "justification_if_invented": "",
+          "pointer": "[p.5]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "reason_rejected_or_borderline": "The work avoidance (not querying all databases) is probabilistic and does not preserve the exact top-N result. Accuracy is a measured outcome, often below 100%, so the skipped work can change the result.",
+          "pointer": "[quote: 'Here, there is no guarantee that all of the top N tuples of the query will be retrieved.' p.6]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Ad",
+          "name": "Adaptive Processing",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The MOD-MIN-2 algorithm dynamically adjusts its tuple retrieval threshold based on the actual best-match distances observed from accessed databases. Also, the paper proposes a hybrid strategy of choosing which merge algorithm to use based on the query type.",
+          "why_it_applies": "The system's behavior is not fixed. The retrieval threshold adapts during query execution based on intermediate results. The overall system strategy adapts by selecting different algorithms for different workload characteristics to balance accuracy and efficiency.",
+          "justification_if_invented": "",
+          "pointer": "[quote: '...the new merge algorithm is used for the former two types of queries and the original merge algorithm is used for the remaining four types of queries.' p.10]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Bo",
+          "name": "Bottleneck-Oriented",
+          "reason_rejected_or_borderline": "While the mechanism aims to reduce querying useless databases (an inefficiency), it is not framed as relieving a single, specific system bottleneck but rather as a general improvement to the search strategy's accuracy and efficiency.",
+          "pointer": "[p.1]"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Cooperative Distributed Search + Wa + La + Ad -> FQ + MOD-MIN-2",
+    "baseline_name": "Cooperative Distributed Search",
+    "top_3_principle_tags": [
+      "Wa",
+      "La",
+      "Ad"
+    ],
+    "core_principle_tags": [
+      "Wa",
+      "La",
+      "Ad"
+    ],
+    "supporting_principle_tags": [
+      "Rc"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Wa",
+      "La",
+      "Rc",
+      "Ad"
+    ],
+    "new_system_name": "FQ + MOD-MIN-2",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "Wa and La work together to solve the database ranking problem in an uncooperative environment. Wa identifies the important parts of the problem space (frequent queries), and La creates an approximate model from observed behavior in that space. Ad then provides a mechanism to consume this ranking more effectively and efficiently, adapting its own behavior based on observed results and workload characteristics to optimize the accuracy/efficiency tradeoff.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Wa",
+          "contribution_to_equation": "Focuses the learning and caching effort on frequent queries, where accuracy matters most, enabling the system to work without full data statistics."
+        },
+        {
+          "symbol": "La",
+          "contribution_to_equation": "Provides the mechanism to generalize from past query results to new queries, approximating the relevance of black-box databases."
+        },
+        {
+          "symbol": "Ad",
+          "contribution_to_equation": "Refines the query execution process by dynamically adjusting the result merging strategy based on observed data and query types, balancing accuracy and cost."
+        }
+      ],
+      "transfer_question": "In other domains with uncooperative, black-box services, could we similarly learn to rank them by observing frequent requests and adaptively probing them based on their responses?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "accuracy",
+      "direction": "up",
+      "concrete_number": ">95%",
+      "pointer": "[p.10, Table 12]"
+    },
+    {
+      "property": "efficiency (databases accessed)",
+      "direction": "down",
+      "concrete_number": "Improved from 205% to 146% with hybrid strategy",
+      "pointer": "[p.10, Table 16]"
+    },
+    {
+      "property": "query time (overhead)",
+      "direction": "up",
+      "concrete_number": "37.8 msec",
+      "pointer": "[p.10]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Bc",
+      "name": "Black-box Characterization",
+      "definition": "Infer the internal properties, contents, or performance characteristics of a system component by observing its external input/output behavior, without requiring privileged access or introspection.",
+      "mechanism_pattern": "The FQ method probes databases with user queries and uses the returned results to build a model of which databases contain relevant tuples. This characterizes the content of each database with respect to the query workload, treating each database as a black box.",
+      "why_existing_principles_are_insufficient": "La (Learned Approximation) captures the use of a learned model, and Wa (Workload-Aware) captures the use of the query stream as input. However, neither specifically captures the pattern of learning about an *opaque* component's properties through observation of its external responses. Bc is a specific pattern of applying La and Wa to characterize an otherwise unknown system.",
+      "closest_existing_principles": [
+        "La",
+        "Wa"
+      ],
+      "reusability_beyond_this_paper": "This pattern is common: inferring network topology from pings, learning the cost model of a third-party database, or characterizing the performance of a black-box microservice under different loads.",
+      "confidence": "medium",
+      "pointer": "[p.5]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "Ranks uncooperative distributed databases for top-N queries by building a cache of best-matched tuples from frequent historical queries, and adaptively merges results using a dynamic threshold.",
+    "top_3_principles": [
+      "Wa",
+      "La",
+      "Ad"
+    ],
+    "mechanism_family": "query optimization",
+    "specific_tools_or_algorithms": [
+      "FQ (Frequent Queries) histogram construction",
+      "MOD-MIN-2 merge algorithm"
+    ],
+    "primary_design_archetype": "learned control loop",
+    "principle_mapping_confidence": "high"
+  }
+}

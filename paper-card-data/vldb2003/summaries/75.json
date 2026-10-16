@@ -1,0 +1,292 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "75",
+    "paper_title": "Privacy-Preserving Indexing of Documents on the Network",
+    "authors": [
+      "Mayank Bawa",
+      "Roberto J. Bayardo Jr.",
+      "Rakesh Agrawal"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference",
+    "year": "2003",
+    "system_or_method_name": "Privacy-Preserving Index (PPI)",
+    "problem_domain": "Privacy-preserving search over distributed, access-controlled content"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To provide an efficient search mechanism over distributed, access-controlled content that respects the privacy concerns of content providers, without requiring a fully trusted central authority.",
+    "primary_optimized_metric": "privacy",
+    "secondary_metrics": [
+      "query time",
+      "I/O"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "0.71",
+        "meaning": "The maximum probability with which an adversarial provider can deduce that its predecessor shares a document with a specific term during index construction.",
+        "pointer": "[p.8, Theorem 5.6]"
+      },
+      {
+        "number_or_delta": "c",
+        "meaning": "The worst-case factor by which the index is less selective than a precise index, where c is the size of the privacy group.",
+        "pointer": "[p.8, Section 5.8]"
+      },
+      {
+        "number_or_delta": "2/3 * c",
+        "meaning": "The approximate performance penalty (increase in sites contacted per query) compared to an optimal non-private index, where c is the privacy group size.",
+        "pointer": "[p.11, Section 6.6]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Centralized Inverted Indexing",
+    "why_this_is_the_right_comparison": "It is the most common and efficient scheme for search over distributed content, but its requirement of a fully trusted central host is the primary problem this paper aims to solve for access-controlled content.",
+    "limiting_design_assumption": "A single, centralized index host can be fully trusted by all participating content providers with the entirety of their content, as the index contains precise information that can be used to reconstruct documents.",
+    "pointers": [
+      "[p.1, Introduction]",
+      "[p.3, Section 3.1]"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Probabilistic distributed algorithm",
+    "specific_tools_or_algorithms": [
+      "Content vectors (Bloom filters)",
+      "Randomized ring-based protocol for distributed aggregation"
+    ],
+    "what_is_being_optimized": "The tradeoff between content privacy (quantified as 'Probable Innocence') and query efficiency (selectivity).",
+    "state_or_ir": "A materialized index (MI) that maps a bit position (representing a term) to a list of provider groups.",
+    "output": "For a given query, a set of providers that includes all true positives and a sufficient number of false positives to provide privacy.",
+    "pointers": [
+      "[p.4, Section 4.2]",
+      "[p.6, Section 5]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Replaces precise term-to-provider mappings with ambiguous term-to-group mappings to provide plausible deniability ('Probable Innocence') for providers.",
+      "baseline_assumption": "An index should be precise, mapping each term to the exact set of providers that have content containing that term.",
+      "why_baseline_did_not_include_it": "The baseline prioritizes search efficiency and precision. Introducing ambiguity in the form of false positives would be considered a defect, as it degrades performance.",
+      "mechanism_level_implementation": "The index is structured so that if any provider in a 'privacy group' of size c has a term, a query for that term returns the entire group. This ensures the number of false positives is at least equal to the number of true positives for queries with selectivity < 0.5.",
+      "primary_metric_improved": "privacy",
+      "tradeoffs_or_costs": "Reduced query efficiency (lower selectivity). A query must be broadcast to all c members of a matching group, increasing network and processing costs. The worst-case loss in selectivity is a factor of c.",
+      "pointers": [
+        "[p.4, Section 4.2]",
+        "[p.5, Section 4.5]",
+        "[p.7, Section 5.6]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Constructs the group-level index using a decentralized, randomized protocol to eliminate the need for a trusted central aggregator.",
+      "baseline_assumption": "A central indexer is a trusted entity that can collect and process content summaries from all providers to build the index.",
+      "why_baseline_did_not_include_it": "Centralized construction is simpler and more efficient. The baseline assumes a trusted third party is available and practical.",
+      "mechanism_level_implementation": "Providers within a privacy group form a ring. They collaboratively compute a group content vector (a logical OR of their individual vectors) by passing a vector around the ring for multiple rounds. In each step, a provider probabilistically flips bits in the vector based on its own content, obfuscating its specific contribution.",
+      "primary_metric_improved": "privacy",
+      "tradeoffs_or_costs": "Increased construction complexity. The protocol provides incomplete privacy against internal adversaries; a provider can learn about its predecessor with up to 0.71 probability, and colluding neighbors can break privacy entirely. This requires arranging providers based on real-world trust.",
+      "pointers": [
+        "[p.6, Section 5]",
+        "[p.8, Section 5.7]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Pd",
+          "name": "Probabilistic Design",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The definition of a Privacy-Preserving Index (PPI) requires that for any provider in a query result, they have at least 'Probable Innocence', meaning the probability they actually have the content is <= 0.5.",
+          "why_it_applies": "The system's core privacy guarantee is probabilistic. It intentionally introduces false positives (ambiguity) to ensure that an adversary's claim about a provider sharing a document is more likely to be false than true.",
+          "justification_if_invented": "",
+          "pointer": "[p.4, Section 4.4]"
+        },
+        {
+          "symbol": "Sy",
+          "name": "Security via Isolation",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The index maps a term not to an individual provider, but to a 'privacy group' of size c. All members of the group are returned if any one member matches.",
+          "why_it_applies": "This mechanism isolates a provider's information within a larger group. An adversary cannot distinguish the true positive provider(s) from the false positives within the group, thus achieving privacy through this isolation.",
+          "justification_if_invented": "",
+          "pointer": "[p.6, Section 5.2]"
+        },
+        {
+          "symbol": "Dc",
+          "name": "Decentralized Control",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "After the index returns a list of potential providers, the searcher must contact each one directly. The providers themselves are responsible for authenticating the searcher and enforcing their own access policies.",
+          "why_it_applies": "The design explicitly moves the point of access control from the central index to the individual content providers, decentralizing the enforcement of security policies.",
+          "justification_if_invented": "",
+          "pointer": "[p.4, Section 4.1]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Cr",
+          "name": "Consistency Relaxation",
+          "reason_rejected_or_borderline": "The index is not providing stale or inconsistent data; it is intentionally imprecise for privacy. The relaxation is in precision, not consistency over time.",
+          "pointer": "[p.4, Section 4.2]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Dc",
+          "name": "Decentralized Control",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The index construction protocol is performed by providers within a group passing a vector along a ring, without a central coordinator aggregating individual content vectors.",
+          "why_it_applies": "The mechanism is explicitly designed to be a decentralized computation to avoid the trust requirement of a central aggregator. Control over the construction process is distributed among the group members.",
+          "justification_if_invented": "",
+          "pointer": "[p.6, Section 5.3]"
+        },
+        {
+          "symbol": "Pd",
+          "name": "Probabilistic Design",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The ring-based protocol involves providers randomly flipping bits in a shared vector with specific probabilities (Pin, Pex). The final group vector is also only correct with a high probability dependent on the number of rounds.",
+          "why_it_applies": "Randomization is the key mechanism used to obfuscate each provider's individual contribution during the distributed construction process. The correctness of the output is also probabilistic.",
+          "justification_if_invented": "",
+          "pointer": "[p.6, Figure 3]"
+        },
+        {
+          "symbol": "Tq",
+          "name": "Trust via Quorum",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The privacy of the construction protocol for a provider can be broken if its two neighbors on the ring collude. The paper suggests providers should arrange themselves based on 'real-world trust relationships'.",
+          "why_it_applies": "The security of a provider depends on the trustworthiness of a subset of its group (a quorum of its two neighbors). This is not a classic availability/correctness quorum, but a trust-based quorum for privacy.",
+          "justification_if_invented": "",
+          "pointer": "[p.8, Section 5.7]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Cz",
+          "name": "Coordination Avoidance",
+          "reason_rejected_or_borderline": "The ring protocol is a form of explicit, ordered coordination, not coordination avoidance.",
+          "pointer": "[p.6, Section 5.3]"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Centralized Indexing + Pd + Dc + Sy -> Privacy-Preserving Index",
+    "baseline_name": "Centralized Indexing with a Trusted Authority",
+    "top_3_principle_tags": [
+      "Pd",
+      "Dc",
+      "Sy"
+    ],
+    "core_principle_tags": [
+      "Pd",
+      "Sy",
+      "Dc"
+    ],
+    "supporting_principle_tags": [
+      "Dc",
+      "Tq"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Pd",
+      "Sy",
+      "Dc",
+      "Tq"
+    ],
+    "new_system_name": "Privacy-Preserving Index (PPI)",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "The baseline's reliance on a trusted central authority is broken by decentralizing control (Dc) over index construction and access policy enforcement. However, a simple decentralized index would still leak information. To provide privacy, the system uses probabilistic design (Pd) to introduce quantifiable ambiguity. This ambiguity is structurally realized through security via isolation (Sy), where individual providers are hidden within larger groups, making attribution of content probabilistic rather than certain.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Pd",
+          "contribution_to_equation": "Replaces deterministic term-to-provider pointers with probabilistic ones, transforming 'Provable Exposure' into 'Probable Innocence' through randomized construction and ambiguous results."
+        },
+        {
+          "symbol": "Dc",
+          "contribution_to_equation": "Eliminates the need for a trusted central authority by distributing the index construction process and shifting final access control enforcement to the individual content providers."
+        },
+        {
+          "symbol": "Sy",
+          "contribution_to_equation": "Provides the concrete mechanism for ambiguity by isolating individual providers within 'privacy groups', making the group the smallest unit of resolution in the index."
+        }
+      ],
+      "transfer_question": "In what other domains could replacing a precise, centralized directory with a decentralized, probabilistically ambiguous one remove the need for a trusted intermediary?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "privacy",
+      "direction": "up",
+      "concrete_number": "Provable Exposure -> Probable Innocence",
+      "pointer": "[p.4, Section 4.4]"
+    },
+    {
+      "property": "query processing cost",
+      "direction": "up",
+      "concrete_number": "factor of ~2/3 * c",
+      "pointer": "[p.11, Section 6.6]"
+    },
+    {
+      "property": "selectivity",
+      "direction": "down",
+      "concrete_number": "worst-case loss factor of c",
+      "pointer": "[p.8, Section 5.8]"
+    },
+    {
+      "property": "trust requirement",
+      "direction": "down",
+      "concrete_number": "central trusted authority eliminated",
+      "pointer": "[p.1, Abstract]"
+    },
+    {
+      "property": "recall",
+      "direction": "down",
+      "concrete_number": "<0.2% loss for epsilon=0.001",
+      "pointer": "[p.11, Section 6.5]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "none",
+      "symbol": "None",
+      "name": "None",
+      "definition": "No plausible new principle candidate.",
+      "mechanism_pattern": "Not applicable",
+      "why_existing_principles_are_insufficient": "Existing principles sufficiently cover the paper's mechanisms. The core mechanism of hiding an individual within a group for privacy is well-captured by Security via Isolation (Sy), and the resulting deniability is well-captured by Probabilistic Design (Pd). Their composition explains the design without needing a new principle.",
+      "closest_existing_principles": [],
+      "reusability_beyond_this_paper": "Not applicable",
+      "confidence": "low",
+      "pointer": "Not specified in provided text"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "Achieves privacy-preserving search by replacing a centralized index's precise term-to-provider pointers with ambiguous pointers to groups of providers, which are constructed via a decentralized, randomized protocol to ensure any single provider has plausible deniability.",
+    "top_3_principles": [
+      "Pd",
+      "Dc",
+      "Sy"
+    ],
+    "mechanism_family": "privacy / security mechanism",
+    "specific_tools_or_algorithms": [
+      "Content vectors (Bloom filters)",
+      "Randomized ring-based protocol for distributed aggregation"
+    ],
+    "primary_design_archetype": "probabilistic privacy reshaping",
+    "principle_mapping_confidence": "high"
+  }
+}

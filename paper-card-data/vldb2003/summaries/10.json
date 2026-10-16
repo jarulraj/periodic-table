@@ -1,0 +1,298 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "10",
+    "paper_title": "Path Queries on Compressed XML",
+    "authors": [
+      "Peter Buneman",
+      "Martin Grohe",
+      "Christoph Koch"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference, Berlin, Germany, 2003",
+    "year": "2003",
+    "system_or_method_name": "Bisimulation-based XML Compression",
+    "problem_domain": "XML query processing"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To demonstrate that XML tree structures can be effectively compressed by sharing common subtrees and that path queries can be evaluated directly and efficiently on these compressed representations in main memory.",
+    "primary_optimized_metric": "query time",
+    "secondary_metrics": [
+      "memory",
+      "degree of decompression"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "< 10%",
+        "meaning": "Size of the compressed skeleton relative to the uncompressed tree in several cases.",
+        "pointer": "[p.2]"
+      },
+      {
+        "number_or_delta": "O(|Q| * |T|)",
+        "meaning": "Query evaluation time on an uncompressed tree instance T.",
+        "pointer": "[p.7]"
+      },
+      {
+        "number_or_delta": "O(2^|Q| * |I|)",
+        "meaning": "Worst-case query evaluation time on a compressed instance I, where decompression is exponential in query size |Q|.",
+        "pointer": "[p.8]"
+      },
+      {
+        "number_or_delta": "10.1%",
+        "meaning": "Ratio of edges in compressed vs. uncompressed skeleton for SwissProt (457.4 MB) dataset, including all tags.",
+        "pointer": "[p.10]"
+      },
+      {
+        "number_or_delta": "1.748s",
+        "meaning": "Query time for Q1 on the compressed SwissProt dataset.",
+        "pointer": "[p.11]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Conventional XML query processors",
+    "why_this_is_the_right_comparison": "These systems represent the standard approaches at the time, which either page subtrees from disk or shred XML into relational databases. Both approaches incur significant I/O for path queries on large documents, which the proposed method aims to eliminate.",
+    "limiting_design_assumption": "The full, uncompressed tree structure (skeleton) of a large XML document is too large to fit in main memory, necessitating fragmentation across secondary storage and I/O-heavy query processing.",
+    "pointers": [
+      "[p.1]"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Graph compression and querying",
+    "specific_tools_or_algorithms": [
+      "Bisimulation-based compression",
+      "XPath algebra on DAGs",
+      "Product construction for common extensions"
+    ],
+    "what_is_being_optimized": "The representation of the XML tree skeleton.",
+    "state_or_ir": "A directed acyclic graph (DAG) where nodes represent equivalence classes of subtrees from the original XML document, formally called a σ-instance.",
+    "output": "A (potentially partially decompressed) DAG representing the set of nodes selected by the query.",
+    "pointers": [
+      "[p.2]",
+      "[p.3]",
+      "[p.4]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Compresses the XML tree skeleton into a directed acyclic graph (DAG) by identifying and merging all identical subtrees, based on the principle of bisimulation.",
+      "baseline_assumption": "The XML tree structure is stored explicitly, either as a tree on disk or shredded into relational tables, without exploiting structural redundancy at a global level.",
+      "why_baseline_did_not_include_it": "This technique was borrowed from symbolic model checking (specifically, OBDDs) and was not a standard approach for database query processing, which focused on indexing or mapping to existing storage models.",
+      "mechanism_level_implementation": "A linear-time algorithm traverses the XML tree in post-order, using a hash table to identify and merge nodes that are roots of identical subtrees. This process is formally equivalent to computing the maximal bisimilarity relation on the tree and forming the quotient graph.",
+      "primary_metric_improved": "memory",
+      "tradeoffs_or_costs": "The resulting data structure is a DAG, not a tree, which requires new query evaluation algorithms. The structure is separated from the string data, which must be handled separately.",
+      "pointers": [
+        "[p.1]",
+        "[p.2]",
+        "[p.4]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Evaluates path queries directly on the compressed DAG, propagating node selections and performing localized, partial decompression only when a query's logic requires distinguishing nodes that were merged during compression.",
+      "baseline_assumption": "Query evaluation requires navigating the explicit, uncompressed tree structure, which incurs I/O costs if the structure is fragmented and stored on disk.",
+      "why_baseline_did_not_include_it": "The baseline systems did not have the compressed DAG representation, so they could not develop algorithms to query it directly.",
+      "mechanism_level_implementation": "An algebra of operators (e.g., child, descendant, parent) is defined to work on the DAG. Downward-axis operators traverse the DAG, and if a shared node is reached via paths requiring different selection states, the node is 'split' (copied), creating a partially decompressed structure. Upward axes do not require decompression.",
+      "primary_metric_improved": "query time",
+      "tradeoffs_or_costs": "Query evaluation can, in the worst case, cause decompression that is exponential in the size of the query, though experiments show this is rare in practice. The complexity is O(2^|Q| * |I|) for compressed size |I|.",
+      "pointers": [
+        "[p.2]",
+        "[p.6]",
+        "[p.7]",
+        "[p.8]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Ep",
+          "name": "Equivalence-based",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The compression algorithm identifies nodes that are roots of identical subtrees and merges them. This is formalized as finding the maximal bisimilarity relation.",
+          "why_it_applies": "The entire compression technique is founded on a formal equivalence relation, bisimulation, which guarantees that the compressed DAG is semantically equivalent to the original tree with respect to path queries.",
+          "justification_if_invented": "",
+          "pointer": "[p.4, Definition 2.1, Proposition 2.3]"
+        },
+        {
+          "symbol": "Rc",
+          "name": "Reuse of Computation",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "Storing a single copy of each unique subtree.",
+          "why_it_applies": "This is structural reuse. By representing each unique subtree only once, the system reuses that structural component for all its occurrences in the original tree. This directly enables computational reuse during querying.",
+          "justification_if_invented": "",
+          "pointer": "[p.1, \"sharing of common subtrees\"]"
+        },
+        {
+          "symbol": "Mo",
+          "name": "Modularity",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "Separating the XML tree structure (skeleton) from the text/string data.",
+          "why_it_applies": "The system operates on the 'bare structure' or 'skeleton' of the document, treating the string data as a separate component that can be accessed when needed. This modularizes the problem into structural navigation and value-based filtering.",
+          "justification_if_invented": "",
+          "pointer": "[p.1, \"separation of the skeleton from string data\"]"
+        },
+        {
+          "symbol": "Si",
+          "name": "Simplicity",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The compression algorithm produces a 'minimal instance' which is the smallest possible equivalent graph under bisimulation.",
+          "why_it_applies": "The goal of the compression is to find the simplest, canonical representation of the tree structure that preserves path information. The minimal instance is this simplest form.",
+          "justification_if_invented": "",
+          "pointer": "[p.4, Proposition 2.5]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "reason_rejected_or_borderline": "Compression changes the data representation to be more efficient; it does not skip parts of the query computation that are proven to be irrelevant to the final result. All necessary work is still performed, just on a smaller data structure.",
+          "pointer": "[p.2]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Rc",
+          "name": "Reuse of Computation",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "When evaluating a query operator on the DAG, the computation for a shared subtree is performed only once.",
+          "why_it_applies": "The compressed representation created in Δ1 is exploited here. Instead of re-evaluating a query fragment on every identical subtree in the original document, the system evaluates it once on the shared representation.",
+          "justification_if_invented": "",
+          "pointer": "[p.2, \"for some computations need to be performed only once on a shared subtree.\"]"
+        },
+        {
+          "symbol": "Ad",
+          "name": "Adaptive Processing",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The query evaluation algorithm splits nodes (partially decompresses the DAG) only when a query's selection logic creates a conflict at a shared node.",
+          "why_it_applies": "The structure of the data representation adapts dynamically in response to the specific query being processed. The amount of decompression is not fixed but depends on the query's operations.",
+          "justification_if_invented": "",
+          "pointer": "[p.6, Fig 4]"
+        },
+        {
+          "symbol": "Op",
+          "name": "Optimistic Design",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The query evaluation algorithm proceeds assuming no decompression is necessary, and only pays the cost of splitting a node when a conflict is detected.",
+          "why_it_applies": "The system is designed around the optimistic assumption that significant decompression will not be needed for typical queries, which is validated by experiments.",
+          "justification_if_invented": "",
+          "pointer": "[p.2, \"the amount of decompression is quite small in practice.\"]"
+        }
+      ],
+      "rejected_or_borderline_principles": []
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Explicit Tree Representation + Ep + Rc -> Queryable Compressed Representation",
+    "baseline_name": "Explicit Tree Representation",
+    "top_3_principle_tags": [
+      "Ep",
+      "Rc"
+    ],
+    "core_principle_tags": [
+      "Ep",
+      "Rc",
+      "Ad"
+    ],
+    "supporting_principle_tags": [
+      "Mo",
+      "Si",
+      "Op"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Ep",
+      "Rc",
+      "Mo",
+      "Si",
+      "Ad",
+      "Op"
+    ],
+    "new_system_name": "Bisimulation-based XML Compression",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "Ep provides the formal foundation (bisimulation) to correctly identify structurally equivalent subtrees that can be merged. This merging creates a compact representation where Rc can be applied, enabling both storage savings (structural reuse) and significant query performance gains by executing computations over shared structures only once (computational reuse). Ep creates the opportunity that Rc exploits.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Ep",
+          "contribution_to_equation": "Defines the correctness of the compression by establishing a formal equivalence between the original tree and the compressed DAG, ensuring no information relevant to path queries is lost."
+        },
+        {
+          "symbol": "Rc",
+          "contribution_to_equation": "Exploits the equivalence identified by Ep to create a shared representation, which reduces storage and allows query computations on repeated structures to be performed only once."
+        }
+      ],
+      "transfer_question": "In what other domains can a formal equivalence relation be used to identify and factor out redundant substructures, enabling both data compression and shared computation during analysis?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "memory",
+      "direction": "down",
+      "concrete_number": "to <10% of original",
+      "pointer": "[p.2]"
+    },
+    {
+      "property": "query time",
+      "direction": "down",
+      "concrete_number": "Not specified",
+      "pointer": "[p.11, Fig 7]"
+    },
+    {
+      "property": "I/O",
+      "direction": "down",
+      "concrete_number": "Not specified",
+      "pointer": "[p.1, \"store and manipulate large portions of the structure of very large XML documents in main memory\"]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Lr",
+      "name": "Lazy Refinement",
+      "definition": "Operate on a compact, abstract, or shared representation of data, and only refine (decompress, instantiate, or un-share) portions of it locally and on-demand when required by the logic of a specific computation.",
+      "mechanism_pattern": "The system queries a compressed DAG where one node represents many tree nodes. When a query requires distinguishing among these tree nodes (e.g., some should be in the result set, others not), the single DAG node is split into multiple new nodes to represent this distinction. This refinement is local and driven by the query.",
+      "why_existing_principles_are_insufficient": "Ad (Adaptive Processing) captures that the system changes based on the query, but not the specific pattern of moving from a shared/abstract representation to a more concrete one. Op (Optimistic Design) captures the hope that refinement isn't needed, but not the mechanism of refinement itself. Rc (Reuse of Computation) is the benefit, not the mechanism of handling cases where reuse breaks down. Lazy Refinement describes the mechanism for managing the boundary of applicability for a compressed/reused representation.",
+      "closest_existing_principles": [
+        "Ad",
+        "Op"
+      ],
+      "reusability_beyond_this_paper": "This pattern appears in symbolic execution (concretizing symbolic values), query processing on compressed data (decompressing blocks on access), and lazy data structure evaluation.",
+      "confidence": "medium",
+      "pointer": "[p.6, Fig 4]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "Compresses XML tree structures by merging identical subtrees into a DAG based on bisimulation, and then evaluates path queries directly on this compact in-memory representation, partially decompressing only when a query requires distinguishing nodes within a shared subtree.",
+    "top_3_principles": [
+      "Ep",
+      "Rc"
+    ],
+    "mechanism_family": "indexing / search structure",
+    "specific_tools_or_algorithms": [
+      "Bisimulation-based compression",
+      "XPath algebra on DAGs",
+      "Product construction for common extensions"
+    ],
+    "primary_design_archetype": "avoid materialization / recomputation",
+    "principle_mapping_confidence": "high"
+  }
+}

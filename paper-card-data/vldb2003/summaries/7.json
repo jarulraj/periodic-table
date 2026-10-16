@@ -1,0 +1,280 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "7",
+    "paper_title": "On the Costs of Multilingualism in Database Systems",
+    "authors": [
+      "A. Kumaran",
+      "Jayant R. Haritsa"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference, Berlin, Germany, 2003",
+    "year": "2003",
+    "system_or_method_name": "Cuniform",
+    "problem_domain": "Performance of multilingual text processing in relational database systems"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To quantify the performance degradation of using standard multilingual character sets (Unicode) in database systems and to propose a compressed internal storage format, Cuniform, to alleviate these performance overheads.",
+    "primary_optimized_metric": "throughput",
+    "secondary_metrics": [
+      "memory",
+      "query time"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "100%",
+        "meaning": "Space overhead for storing multilingual data in Unicode (UTF-16) compared to ASCII.",
+        "pointer": "[p.7]"
+      },
+      {
+        "number_or_delta": "up to 475%",
+        "meaning": "Performance degradation of the Table-scan operator on NChar tables compared to Char tables, including I/O costs.",
+        "pointer": "[p.7]"
+      },
+      {
+        "number_or_delta": "33% to 100%",
+        "meaning": "Range of overall system slowdown in handling multilingual data, based on Multilingual Efficiency (ME) values from 0.76 to 0.57.",
+        "pointer": "[p.8]"
+      },
+      {
+        "number_or_delta": "0.57 to 0.81",
+        "meaning": "Improvement in Multilingual Efficiency (ME) for System A after adopting the Cuniform format.",
+        "pointer": "[p.10]"
+      },
+      {
+        "number_or_delta": "~2%",
+        "meaning": "Space overhead of the Cuniform representation, compared to 100% for NChar.",
+        "pointer": "[p.10]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Commercial database systems using a standard interchange format (Unicode UTF-16) for internal storage of multilingual text (NChar data type).",
+    "why_this_is_the_right_comparison": "The paper's central thesis is that the standard approach to multilingual support in databases—using Unicode directly as the internal format—is inefficient. The entire study is designed to measure this inefficiency and propose an alternative.",
+    "limiting_design_assumption": "The internal storage format for multilingual characters should be a standard, fixed-width encoding like Unicode (UTF-16), which is directly usable for data interchange. This assumption prioritizes compatibility and simplicity over storage and processing efficiency.",
+    "pointers": [
+      "[p.1]",
+      "[p.4]",
+      "[p.9]"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Compressed storage format",
+    "specific_tools_or_algorithms": [
+      "Cuniform compressed storage format"
+    ],
+    "what_is_being_optimized": "Storage space and in-memory processing time for multilingual string operations.",
+    "state_or_ir": "Unicode strings stored in NChar database attributes.",
+    "output": "A compressed representation (Cuniform) consisting of a script identifier and a sequence of character offsets.",
+    "pointers": [
+      "[p.9, Section 7]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Introduces Cuniform, a compressed internal storage format for Unicode strings that factors out the common character block information to reduce storage and processing overheads.",
+      "baseline_assumption": "Multilingual strings are stored in a uniform, fixed-width format like UTF-16, where every character's code point includes its script information, leading to redundancy for single-script strings.",
+      "why_baseline_did_not_include_it": "The baseline prioritizes using a standard interchange format (Unicode) directly for internal storage, likely for simplicity and compatibility, rather than optimizing for the common case where a string's characters all belong to the same script.",
+      "mechanism_level_implementation": "A process called 'skinning' splits a Unicode string into two parts: a Script Identifier (storing the common character block) and a string of offsets for each character within that block. This reduces the per-character storage from 2 bytes to 1 byte for most scripts.",
+      "primary_metric_improved": "memory",
+      "tradeoffs_or_costs": "The format is ineffective for strings with mixed scripts or for scripts with large repertoires (>256 characters) like CJK. It also adds complexity to query processing, which must handle the split representation.",
+      "pointers": [
+        "[p.9, Section 7]",
+        "[p.11, Section 7.3]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Leverages the explicit Script Identifier from the Cuniform format as a first-class piece of metadata to enable new query optimizations and database features.",
+      "baseline_assumption": "The script or language of a string is implicit within the Unicode code points and is not an independently queryable attribute.",
+      "why_baseline_did_not_include_it": "Baseline systems lack an explicit language/script handle at the attribute level, preventing them from using this information for filtering or implementing script-specific functionality.",
+      "mechanism_level_implementation": "The Script Identifier, stored separately in Cuniform, can be used as a query predicate to partition data and improve selectivity. This explicit handle can also be used to implement SQL:1999 features like character set restrictions and new 'multilexical operators'.",
+      "primary_metric_improved": "query time",
+      "tradeoffs_or_costs": "Requires modifications to the database engine's parser, code generator, and optimizer to recognize and utilize the script identifier.",
+      "pointers": [
+        "[p.10, Section 7.2.2]",
+        "[p.11, Section 8]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Cc",
+          "name": "Common-Case Specialization",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The 'skinning' mechanism, which creates a compact representation for strings whose characters come from a single script.",
+          "why_it_applies": "The design is explicitly motivated by the observation that 'a data item stored in NChar field is likely to have all the characters from the same script.' Cuniform is a specialized, efficient format for this common case, while falling back to the original format for the uncommon case of mixed-script strings.",
+          "justification_if_invented": "",
+          "pointer": "[p.9]"
+        },
+        {
+          "symbol": "Ha",
+          "name": "Hardware-Aware",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "Reducing the storage of each character from 2 bytes (UTF-16) to 1 byte plus a shared script ID.",
+          "why_it_applies": "The paper's analysis concludes that the primary reason for performance degradation is the increased data size of Unicode, which impacts both I/O and in-memory processing. Cuniform's compression directly targets this by creating a more compact in-memory and on-disk representation, making it more efficient for memory hierarchies and disk access.",
+          "justification_if_invented": "",
+          "pointer": "[p.9, '...we could effectively isolate the main reasons for the differential performance... primarily, the differential costs associated with the size of the data (> 80%)...']"
+        },
+        {
+          "symbol": "Pm",
+          "name": "Policy/Mechanism",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "Designing Cuniform as an internal format that is 'trivially convertible' to the external Unicode standard.",
+          "why_it_applies": "The system separates the policy of external data interchange (must be Unicode) from the internal mechanism for efficient storage and processing (Cuniform). This allows for internal optimization without breaking external compatibility.",
+          "justification_if_invented": "",
+          "pointer": "[p.9]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Bo",
+          "name": "Bottleneck-Oriented",
+          "reason_rejected_or_borderline": "While the paper analyzes performance to find the cause of the slowdown (data size), the solution is a fundamental change in data representation, not a targeted fix for a specific operator or resource bottleneck. Cc and Ha are more specific to the design insight.",
+          "pointer": "[p.9]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Se",
+          "name": "Semantically Explicit",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "Storing the Script Identifier as a separate, queryable component of a string's representation.",
+          "why_it_applies": "The mechanism makes the script of a string—a property that was implicit in the Unicode code points—an explicit piece of metadata. The paper highlights that this 'explicit availability of character block information' can be used as a query predicate and to build new operators.",
+          "justification_if_invented": "",
+          "pointer": "[p.10, Section 7.2.2]"
+        },
+        {
+          "symbol": "Ex",
+          "name": "Extensibility",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "Using the explicit script identifier to enable new functionality.",
+          "why_it_applies": "The paper explicitly states that the Cuniform representation can be 'extended further to implement the character set restriction specification of SQL:1999 and to richly extend SQL with multilexical operators.' This demonstrates that the new design enables future extensions.",
+          "justification_if_invented": "",
+          "pointer": "[p.11, Section 8]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Al",
+          "name": "Abstraction Lifting",
+          "reason_rejected_or_borderline": "The mechanism doesn't lift an abstraction layer but rather exposes a semantic property (the script) that was previously hidden within an existing representation. Se is a more precise description of this design move.",
+          "pointer": "[p.10]"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Uniform Unicode Storage + Cc + Ha + Se -> Cuniform",
+    "baseline_name": "Database with uniform Unicode (UTF-16) internal storage",
+    "top_3_principle_tags": [
+      "Cc",
+      "Ha",
+      "Se"
+    ],
+    "core_principle_tags": [
+      "Cc",
+      "Ha",
+      "Se"
+    ],
+    "supporting_principle_tags": [
+      "Pm",
+      "Ex"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Cc",
+      "Ha",
+      "Pm",
+      "Se",
+      "Ex"
+    ],
+    "new_system_name": "Cuniform",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "The system identifies a common case (Cc: single-script strings) whose default representation is inefficient for the underlying hardware (Ha). It introduces a new representation that is both hardware-efficient and makes the defining property of the common case (the script) semantically explicit (Se), which in turn enables further optimizations and new functionality.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Cc",
+          "contribution_to_equation": "Drives the decision to create a specialized, compressed representation for the frequent case of single-script strings, rather than using a one-size-fits-all format."
+        },
+        {
+          "symbol": "Ha",
+          "contribution_to_equation": "Guides the design of the new representation to be compact (e.g., 1-byte offsets), directly addressing the storage and processing overheads identified as the primary performance problem."
+        },
+        {
+          "symbol": "Se",
+          "contribution_to_equation": "Transforms the factored-out script information into a first-class, explicit entity, enabling new query optimizations and functionality beyond simple compression."
+        }
+      ],
+      "transfer_question": "In what other domains could factoring out a common, implicit property of a data item into an explicit, hardware-friendly representation improve both performance and system functionality?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "memory",
+      "direction": "down",
+      "concrete_number": "Storage overhead reduced from 100% to ~2%",
+      "pointer": "[p.10]"
+    },
+    {
+      "property": "I/O",
+      "direction": "down",
+      "concrete_number": "Not quantified, but implied by reducing data size which was the primary cause of I/O overhead.",
+      "pointer": "[p.8-9]"
+    },
+    {
+      "property": "throughput",
+      "direction": "up",
+      "concrete_number": "Multilingual Efficiency improved from 0.57 to 0.81, closing performance gap with ASCII by ~56%.",
+      "pointer": "[p.10]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Mh",
+      "name": "Metadata Hoisting",
+      "definition": "Factor a property that is constant across the components of a data structure out of the components and store it once as metadata for the entire structure.",
+      "mechanism_pattern": "A data representation like `[meta+data1, meta+data2, ...]` is transformed into `meta, [data1, data2, ...]`. In this paper, a Unicode string (a sequence of code points, each containing script info) is transformed into a single script ID and a sequence of character offsets.",
+      "why_existing_principles_are_insufficient": "Cc explains *why* this is a good idea (single-script strings are common). Ha explains a *benefit* (smaller data is faster). Se explains another *benefit* (the script ID is now explicit). However, none of these principles describe the specific transformation pattern of factoring out and 'hoisting' common metadata, which seems reusable (e.g., hoisting the domain from a list of URLs, or the date from a list of timestamps).",
+      "closest_existing_principles": [
+        "Cc",
+        "Se",
+        "Ha"
+      ],
+      "reusability_beyond_this_paper": "This pattern could apply to any columnar data where attributes have a common prefix or metadata component, such as URLs, file paths, timestamps, or versioned keys.",
+      "confidence": "medium",
+      "pointer": "[p.9, Figure 6]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "Reduces storage and processing overhead for multilingual text by replacing the standard fixed-width Unicode internal format with Cuniform, a compressed representation that factors out the common script identifier from character offsets.",
+    "top_3_principles": [
+      "Cc",
+      "Ha",
+      "Se"
+    ],
+    "mechanism_family": "hardware-aware data management",
+    "specific_tools_or_algorithms": [
+      "Cuniform compressed storage format"
+    ],
+    "primary_design_archetype": "hardware-conscious layout",
+    "principle_mapping_confidence": "high"
+  }
+}

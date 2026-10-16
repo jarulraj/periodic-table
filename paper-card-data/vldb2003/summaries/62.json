@@ -1,0 +1,274 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "62",
+    "paper_title": "AmPQO: Almost Non-intrusive Parametric Query Optimization for Nonlinear Cost Functions",
+    "authors": [
+      "Arvind Hulgeri",
+      "S. Sudarshan"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference, Berlin, Germany, 2003",
+    "year": "2003",
+    "system_or_method_name": "AniPQO",
+    "problem_domain": "Parametric Query Optimization"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To provide a practical, minimally-intrusive heuristic solution for parametric query optimization (PQO) for the general case of nonlinear and discontinuous cost functions.",
+    "primary_optimized_metric": "query time",
+    "secondary_metrics": [
+      "optimization time"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "3.5%",
+        "meaning": "The maximum performance degradation observed for plans found by AniPQO compared to the actual optimal plan.",
+        "pointer": "[p.2]"
+      },
+      {
+        "number_or_delta": "87 / 134",
+        "meaning": "For one query, the DAG representation covered 87 of the 134 true optimal plans, whereas the initial heuristic search only found 49.",
+        "pointer": "[p.9]"
+      },
+      {
+        "number_or_delta": "1900ms -> 850ms",
+        "meaning": "For a representative query, a tightly integrated implementation reduced optimization time by over a factor of two compared to a loosely integrated one.",
+        "pointer": "[p.10]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Parametric Query Optimization for linear cost functions",
+    "why_this_is_the_right_comparison": "The paper positions itself as a generalization of prior PQO work that was limited to linear or restricted non-linear cost functions, or required intrusive changes to the query optimizer.",
+    "limiting_design_assumption": "Finding the complete set of parametrically optimal plans (POSP) and their regions of optimality requires analytically tractable cost functions (e.g., linear) or substantial, intrusive modifications to the query optimizer.",
+    "pointers": [
+      "[p.1]"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Heuristic parameter space exploration",
+    "specific_tools_or_algorithms": [
+      "Iterative vertex-based parameter space probing",
+      "Recursive hyper-rectangle partitioning for finding equi-cost points",
+      "AND-OR DAG for plan representation"
+    ],
+    "what_is_being_optimized": "The set of candidate query plans to be used at runtime for different parameter values.",
+    "state_or_ir": "The current set of optimal plans (CSOP), the vertices of the parameter space decomposition, and a final AND-OR DAG representing all candidate plans.",
+    "output": "A set of plans (AniPOSP) stored in an AND-OR DAG, which is used at runtime to select a near-optimal plan for given parameter values.",
+    "pointers": [
+      "[p.3, p.8]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Uses a conventional optimizer as a black-box oracle to heuristically explore the parameter space, iteratively discovering new optimal plans by probing at the vertices of the current known optimality regions.",
+      "baseline_assumption": "The boundaries of optimality regions in the parameter space must be computed analytically, which is only practical for linear or simple non-linear cost functions.",
+      "why_baseline_did_not_include_it": "The geometry of optimality regions for general nonlinear cost functions is non-convex and complex, making exact analytical solutions intractable. Prior approaches were either not general or required intrusive optimizer changes.",
+      "mechanism_level_implementation": "The algorithm maintains a set of vertices of the current parameter space decomposition. It calls a conventional optimizer at an unoptimized vertex. If a new plan is found, it identifies 'conflicting edges' in the old decomposition where the new plan is optimal at one end but not the other. It then heuristically searches for a new vertex along this boundary where the plans become equi-cost, using a recursive partitioning search.",
+      "primary_metric_improved": "generality",
+      "tradeoffs_or_costs": "The solution is a heuristic and may not find all optimal plans. Optimization time can grow exponentially with the number of parameters.",
+      "pointers": [
+        "[p.1, p.3, p.6, p.7]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Represents the discovered set of plans in a single AND-OR DAG, enabling the runtime composition of hybrid plans by selecting the best subplan at each equivalence node.",
+      "baseline_assumption": "The output of PQO is a discrete set of complete plans, and the runtime choice is limited to selecting one of these pre-computed plans.",
+      "why_baseline_did_not_include_it": "Prior work focused on the problem of finding the set of optimal plans, not on compact representation or runtime composition of those plans.",
+      "mechanism_level_implementation": "All plans found by the heuristic search (the AniPOSP) are merged into an AND-OR DAG. Common subexpressions across different plans are mapped to a single equivalence node. At runtime, a bottom-up traversal computes the cost of each subplan under an equivalence node for the given parameter values and picks the cheapest one, potentially creating a new composite plan.",
+      "primary_metric_improved": "query time",
+      "tradeoffs_or_costs": "Increases compile-time complexity to build the DAG, but reduces runtime plan selection cost and improves the quality of the chosen plan.",
+      "pointers": [
+        "[p.8, p.9]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Bb",
+          "name": "Black-Box Tuning",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The AniPQO algorithm repeatedly invokes a conventional query optimizer with different parameter values to discover optimal plans.",
+          "why_it_applies": "The algorithm treats the conventional optimizer as a black-box function that returns an optimal plan for a given point in the parameter space. It uses this oracle to explore the space without needing to know the optimizer's internal workings or cost functions.",
+          "justification_if_invented": "",
+          "pointer": "[quote: '...can merely use it as a subroutine (invoking it with different parameter values).' p.1]"
+        },
+        {
+          "symbol": "Cr",
+          "name": "Consistency Relaxation",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The algorithm is explicitly designed as a heuristic that finds a 'good subset' of the optimal plans, rather than guaranteeing the complete Parametric Optimal Set of Plans (POSP).",
+          "why_it_applies": "The system relaxes the goal of finding the complete, exact POSP, which is intractable for nonlinear functions. Instead, it aims for an approximation (AniPOSP) that provides near-optimal performance. The use of an optimality threshold 't' further formalizes this relaxation.",
+          "justification_if_invented": "",
+          "pointer": "[quote: 'we propose to use it as a heuristic when cost functions are nonlinear, and hence it may not find all the plans in POSP.' p.3]"
+        },
+        {
+          "symbol": "Pm",
+          "name": "Policy/Mechanism",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The system's 'almost non-intrusive' design, which separates the high-level PQO algorithm from the underlying conventional optimizer.",
+          "why_it_applies": "AniPQO provides a policy for exploring the parameter space, while using an existing, unmodified optimizer as the mechanism for finding an optimal plan at a single point. This separation is a key design feature.",
+          "justification_if_invented": "",
+          "pointer": "[quote: 'AniPQO is minimally-intrusive in the sense that it does not need to modify the conventional query optimizer...' p.1]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "reason_rejected_or_borderline": "The heuristic nature of the algorithm means it may miss optimal plans; therefore, the work it avoids (exploring the entire parameter space) is not result-preserving.",
+          "pointer": "[p.3]"
+        },
+        {
+          "symbol": "La",
+          "name": "Learned Approximation",
+          "reason_rejected_or_borderline": "The approximation is achieved through a deterministic, heuristic search, not a learned model.",
+          "pointer": "[p.3]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Co",
+          "name": "Composability",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The use of an AND-OR DAG to merge multiple plans, allowing the system to select the best subplan at each equivalence node at runtime.",
+          "why_it_applies": "This mechanism explicitly composes new, 'hybrid' plans from the sub-plans of the originally discovered plans. This composition creates better plans that were not found during the initial search.",
+          "justification_if_invented": "",
+          "pointer": "[quote: '...a hybrid of p1 and p2 (containing s11 and s22) is better than either for the given parameter values.' p.9]"
+        },
+        {
+          "symbol": "Rc",
+          "name": "Reuse of Computation",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "Representing common sub-plans or operators from different plans only once in the AND-OR DAG.",
+          "why_it_applies": "The DAG structure avoids redundant representation and computation. At runtime, the cost of a shared subplan is computed only once, reusing the result for all parent plans that depend on it.",
+          "justification_if_invented": "",
+          "pointer": "[quote: 'In the DAG framework, if two plans share a operator/subplan, we need to cost the operator/subplan only once.' p.8]"
+        },
+        {
+          "symbol": "Si",
+          "name": "Simplicity",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The AND-OR DAG provides a more compact representation than storing a list of full plans.",
+          "why_it_applies": "The paper highlights that the DAG is a 'very compact and efficient way of representing alternative plans, without redundancy,' which simplifies the plan set representation.",
+          "justification_if_invented": "",
+          "pointer": "[p.8]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Ep",
+          "name": "Equivalence-based",
+          "reason_rejected_or_borderline": "While the DAG uses equivalence nodes, the novelty is not in defining plan equivalences (which is standard optimizer technology), but in populating these nodes with alternatives from different parametrically-optimal plans and composing them. Co is more specific to the contribution.",
+          "pointer": "[p.8]"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "PQO for Linear Costs + Bb + Cr + Co -> AniPQO",
+    "baseline_name": "PQO for Linear Costs",
+    "top_3_principle_tags": [
+      "Bb",
+      "Cr",
+      "Co"
+    ],
+    "core_principle_tags": [
+      "Bb",
+      "Cr",
+      "Co",
+      "Rc"
+    ],
+    "supporting_principle_tags": [
+      "Pm",
+      "Si"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Bb",
+      "Cr",
+      "Pm",
+      "Co",
+      "Rc",
+      "Si"
+    ],
+    "new_system_name": "AniPQO",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "AniPQO makes the intractable problem of nonlinear PQO practical by relaxing the need for a complete, exact solution (Cr) and instead using a standard optimizer as a callable oracle (Bb) to heuristically explore the parameter space. The quality of this incomplete plan set is then significantly improved by allowing runtime composition (Co) of their sub-plans, which creates superior hybrid plans that were not explicitly discovered by the search.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Bb",
+          "contribution_to_equation": "Enables a non-intrusive design by treating the complex, existing optimizer as a black-box subroutine to be probed at different parameter points."
+        },
+        {
+          "symbol": "Cr",
+          "contribution_to_equation": "Makes the search tractable by accepting a heuristic, approximate set of optimal plans instead of guaranteeing the complete, exact set."
+        },
+        {
+          "symbol": "Co",
+          "contribution_to_equation": "Recovers plan quality lost by the heuristic search by composing new, hybrid plans at runtime from the building blocks of the discovered plans."
+        }
+      ],
+      "transfer_question": "In what other domains could a black-box, point-wise solver be wrapped in a heuristic search to map a parameter space, with the final solution quality enhanced by composing partial results from different probes?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "Optimization time",
+      "direction": "down",
+      "concrete_number": "1900ms -> 850ms",
+      "pointer": "[p.10]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "BPE",
+      "name": "Boundary-Probing Exploration",
+      "definition": "A search strategy for partitioning a parameter space by iteratively identifying the boundaries (e.g., vertices, facets) of known optimal regions and probing at these boundaries to discover new regions and refine the partition.",
+      "mechanism_pattern": "The AniPQO algorithm explicitly identifies the vertices of the current parameter space decomposition and invokes the conventional optimizer at these points. When a new plan is found, it searches for new vertices along the 'conflicting edges' of the old decomposition.",
+      "why_existing_principles_are_insufficient": "Bb (Black-Box Tuning) describes using an oracle, but not the specific strategy of probing at the boundaries of the known decomposition, which is the core of the search heuristic. Other search principles like Gd are too general. BPE captures the specific geometric intuition of the exploration strategy.",
+      "closest_existing_principles": [
+        "Bb"
+      ],
+      "reusability_beyond_this_paper": "This pattern is applicable in any domain where a parameter space is divided into regions of optimality for different solutions, and a point-wise solver is available. Examples include material science (phase diagrams), controller design, and game theory (finding equilibrium strategies).",
+      "confidence": "medium",
+      "pointer": "[p.3, p.6]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "Approximates the set of parametrically optimal plans for nonlinear cost functions by non-intrusively probing a conventional optimizer at the vertices of an evolving parameter space decomposition, and improves plan quality by composing the discovered plans in an AND-OR DAG to create runtime hybrids.",
+    "top_3_principles": [
+      "Bb",
+      "Cr",
+      "Co"
+    ],
+    "mechanism_family": "query optimization",
+    "specific_tools_or_algorithms": [
+      "Iterative vertex-based parameter space probing",
+      "Recursive hyper-rectangle partitioning for finding equi-cost points",
+      "AND-OR DAG for plan representation"
+    ],
+    "primary_design_archetype": "other",
+    "principle_mapping_confidence": "high"
+  }
+}

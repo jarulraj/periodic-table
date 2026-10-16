@@ -1,0 +1,284 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "26",
+    "paper_title": "Tuple Routing Strategies for Distributed Eddies",
+    "authors": [
+      "Feng Tian",
+      "David J. DeWitt"
+    ],
+    "venue_or_source": "VLDB",
+    "year": "2003",
+    "system_or_method_name": "Distributed Eddies",
+    "problem_domain": "Distributed data stream query optimization"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To propose and evaluate several practical routing policies for a distributed data stream management system to adapt to changes in input stream rates and available computing resources.",
+    "primary_optimized_metric": "throughput",
+    "secondary_metrics": [
+      "latency"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "2x to 3x",
+        "meaning": "Improvement in Maximum Data Rate (MDR) for SCQ and WSCQ policies when using dynamic resource allocation (box splitting/sliding) compared to static allocation.",
+        "pointer": "[p.10, Table 5.3]"
+      },
+      {
+        "number_or_delta": "19.2 vs 37",
+        "meaning": "The WSCQ policy achieved a geometric mean Average Response Time (ART) of 19.2, outperforming the next best policy (SCQ at 37) by nearly 2x in single query simulations.",
+        "pointer": "[p.9, Table 4.11]"
+      },
+      {
+        "number_or_delta": "570",
+        "meaning": "The numerical solution for Maximum Data Rate (MDR) for the DS3 example with dynamic resource allocation, which the best practical policies (SCQ, WSCQ) approach.",
+        "pointer": "[p.10]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Centralized Eddy",
+    "why_this_is_the_right_comparison": "The paper explicitly extends the concept of an eddy, a mechanism for adaptive query processing, from its original centralized design to a distributed environment. The limitations of the centralized approach are the direct motivation for the work.",
+    "limiting_design_assumption": "A single, centralized eddy makes all routing decisions for all tuples. In a distributed system, this centralized coordinator becomes a performance bottleneck and incurs significant network traffic and delays.",
+    "pointers": [
+      "[p.1, quote: '...a centralized eddy cannot be directly employed in a distributed data stream management system without incurring unnecessary network traffic and delays and would almost certainly end up being a bottleneck.']",
+      "[p.2, quote: 'This paper extends the idea of an eddy to a distributed environment.']"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Adaptive tuple routing policy",
+    "specific_tools_or_algorithms": [
+      "Queuing network model (M/M/1)",
+      "SCQ (Selectivity-Cost-Qlength) routing policy",
+      "WSCQ (Weighted Selectivity-Cost-Qlength) routing policy"
+    ],
+    "what_is_being_optimized": "The routing weight function W for each operator, which determines the probability of sending a tuple to each possible next operator.",
+    "state_or_ir": "Each tuple carries its execution history. Each operator maintains local statistics on its queue length (Q), learned selectivity (S), and average service time (C).",
+    "output": "A sequence of routing decisions for each tuple, which dynamically determines the execution order of operators in a distributed query plan.",
+    "pointers": [
+      "[p.3]",
+      "[p.7, Table 4.9]",
+      "[p.8]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Replaces the central eddy router with decentralized routing decisions made by each operator individually, based on local and periodically exchanged statistics.",
+      "baseline_assumption": "A single, centralized component makes all routing decisions for all tuples in the query plan.",
+      "why_baseline_did_not_include_it": "The original Eddy was designed for a single-node system where a central coordinator is efficient and has access to global state. This model does not scale to a distributed environment.",
+      "mechanism_level_implementation": "After an operator processes a tuple, it makes a routing decision based on the tuple's execution history and statistics maintained at the operator. Statistics are exchanged among operators periodically.",
+      "primary_metric_improved": "throughput",
+      "tradeoffs_or_costs": "Decisions are based on local, potentially stale information about other operators' states. It requires a protocol for exchanging statistics, which adds network overhead.",
+      "pointers": [
+        "[p.1, quote: 'After an operator processes a tuple, instead of returning the tuple to a centralized eddy, the operator makes a routing decision...']",
+        "[p.7, quote: 'Operators in a distributed plan learn statistics during execution, which are exchanged among the operators periodically.']"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Introduces new routing policies (SCQ, WSCQ) that combine operator selectivity, processing cost, and current queue length to make more robust routing decisions than prior policies.",
+      "baseline_assumption": "Existing adaptive routing policies for eddies were simpler, focusing primarily on either back-pressure via queue length (Policy Q) or learned selectivity via tickets (Policy T).",
+      "why_baseline_did_not_include_it": "In a distributed system, the interplay between operator cost, selectivity, and load is more complex and critical for performance. Simpler, single-factor policies perform poorly under high load or in multi-query scenarios.",
+      "mechanism_level_implementation": "The WSCQ policy computes a routing weight for each potential next operator `Op_j` using a formula that balances selectivity (S), queue length (Q), and processing cost (C): `W_SCQj = ((1-Op_j.S) / ((1+Op_j.Q) * Op_j.C))^2`. Tuples are routed probabilistically according to these weights.",
+      "primary_metric_improved": "throughput",
+      "tradeoffs_or_costs": "The policy is more complex to compute and requires gathering and exchanging more types of statistics (selectivity, cost) compared to simpler policies.",
+      "pointers": [
+        "[p.7, description of policies Q and T]",
+        "[p.8, description of policies SCQ and WSCQ]",
+        "[p.9, Tables 4.11 and 4.12]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Dc",
+          "name": "Decentralized Control",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The elimination of the central eddy router and the delegation of routing decisions to individual operators.",
+          "why_it_applies": "The core architectural change is the shift from a centralized control point for routing to a distributed one where each operator acts autonomously based on local and shared information.",
+          "justification_if_invented": "",
+          "pointer": "[p.1, quote: '...instead of returning the tuple to a centralized eddy, the operator makes a routing decision based on the execution history of the tuple and statistics maintained at the operator.']"
+        },
+        {
+          "symbol": "Fp",
+          "name": "Function Placement",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The routing logic is moved from a dedicated central node to each of the distributed stream operators.",
+          "why_it_applies": "This is a direct application of function placement, where the routing function is co-located with the operator that has just processed the tuple, avoiding a round-trip to a central coordinator.",
+          "justification_if_invented": "",
+          "pointer": "[p.1, Figure 1.2]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Ad",
+          "name": "Adaptive Processing",
+          "reason_rejected_or_borderline": "Adaptivity is a property of the baseline Eddy system. This delta is about the structural change (decentralization) of the adaptive mechanism, not the introduction of adaptivity itself. Dc is more specific to the change.",
+          "pointer": "[p.1]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Wa",
+          "name": "Workload-Aware",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The SCQ and WSCQ routing policies explicitly incorporate the average input queue length (Q) of downstream operators into their routing benefit calculation.",
+          "why_it_applies": "The system directly measures and reacts to operator load (queue length) to make routing decisions, aiming to avoid congestion and balance workloads. The paper concludes queue length is a 'critical' and 'most important factor'.",
+          "justification_if_invented": "",
+          "pointer": "[p.8, quote: 'Benefit_SCQ;= (1-Op;.S) /(1+Op;Q) *Op;C']"
+        },
+        {
+          "symbol": "Cm",
+          "name": "Cost-based",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The SC, WSC, SCQ, and WSCQ policies use the average service time (C or Ts) to process a tuple as a key factor in the routing decision.",
+          "why_it_applies": "The routing policies use an explicit cost model (processing time per tuple) to evaluate the 'benefit' of sending a tuple to a particular operator, guiding the system towards more efficient execution paths.",
+          "justification_if_invented": "",
+          "pointer": "[p.7, Table 4.9 and Policy SC]"
+        },
+        {
+          "symbol": "Pd",
+          "name": "Probabilistic Design",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The WSC and WSCQ policies route tuples to the next operator with a probability proportional to a calculated weight, rather than always picking the best one.",
+          "why_it_applies": "This probabilistic routing allows multiple execution paths to be active simultaneously, which the paper's analytical model shows is necessary to achieve the optimal Maximum Data Rate (MDR) by balancing load, a key difference from centralized eddy optimization.",
+          "justification_if_invented": "",
+          "pointer": "[p.7, quote: 'Policy WSC mimics the analytic solution by routing a tuple to Opj with probability proportional to weight W_SCj...']"
+        },
+        {
+          "symbol": "Ad",
+          "name": "Adaptive Processing",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The statistics used for routing (Selectivity S, Cost C, Queue Length Q) are learned and updated during query execution.",
+          "why_it_applies": "The routing policies continuously adapt to changing stream rates and system conditions by using up-to-date, learned statistics. For example, selectivity is updated using a moving average: `Snew = 0.8*Sold + 0.2*Sinterval`.",
+          "justification_if_invented": "",
+          "pointer": "[p.7, Table 4.9]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Bo",
+          "name": "Bottleneck-Oriented",
+          "reason_rejected_or_borderline": "While using queue length helps avoid bottlenecks, the policy is a general load-balancing mechanism across all operators, not a specific strategy to identify and alleviate a single, primary bottleneck. Wa is more accurate.",
+          "pointer": "[p.2]"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Centralized Eddy + Dc + Wa + Cm -> Distributed Eddies",
+    "baseline_name": "Centralized Eddy",
+    "top_3_principle_tags": [
+      "Dc",
+      "Wa",
+      "Cm"
+    ],
+    "core_principle_tags": [
+      "Dc",
+      "Wa",
+      "Cm"
+    ],
+    "supporting_principle_tags": [
+      "Fp",
+      "Pd",
+      "Ad"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Dc",
+      "Fp",
+      "Wa",
+      "Cm",
+      "Pd",
+      "Ad"
+    ],
+    "new_system_name": "Distributed Eddies",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "The system's core transformation is to decentralize (Dc) the adaptive routing of a centralized eddy. This structural change necessitates a new, more sophisticated routing mechanism. The new mechanism achieves high performance by being both workload-aware (Wa), to balance load and prevent congestion, and cost-based (Cm), to prioritize efficient operators. Together, these principles enable scalable, adaptive query processing in a distributed environment.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Dc",
+          "contribution_to_equation": "Provides the architectural shift from a single-point-of-control to distributed, autonomous routing agents, eliminating the central bottleneck."
+        },
+        {
+          "symbol": "Wa",
+          "contribution_to_equation": "Enables the decentralized agents to make intelligent routing decisions by considering the real-time load (queue lengths) of downstream operators, which is critical for maximizing throughput (MDR)."
+        },
+        {
+          "symbol": "Cm",
+          "contribution_to_equation": "Allows the decentralized agents to factor in operator processing cost and selectivity, guiding tuples towards paths that reduce overall work and minimize response time (ART)."
+        }
+      ],
+      "transfer_question": "In what other domains could a centralized, adaptive scheduler be replaced by a collection of decentralized agents that make probabilistic decisions using a shared model of system load and processing costs?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "throughput",
+      "direction": "up",
+      "concrete_number": "2-3x",
+      "pointer": "[p.10, Table 5.3]"
+    },
+    {
+      "property": "latency",
+      "direction": "down",
+      "concrete_number": "19.2 (GM ART for WSCQ)",
+      "pointer": "[p.9, Table 4.11]"
+    },
+    {
+      "property": "resource utilization",
+      "direction": "mixed",
+      "concrete_number": "Not specified",
+      "pointer": "[p.10, Figure 5.3 shows that different policies lead to very different resource allocation strategies, with some being more balanced and others more aggressive.]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "none",
+      "symbol": "None",
+      "name": "None",
+      "definition": "No plausible new principle candidate.",
+      "mechanism_pattern": "Not applicable",
+      "why_existing_principles_are_insufficient": "Existing principles sufficiently cover the paper's mechanisms. The composition of Decentralized Control (Dc), Workload-Aware (Wa), Cost-based (Cm), and Probabilistic Design (Pd) effectively describes the shift to distributed, autonomous operators that route tuples probabilistically based on a multi-factor benefit score.",
+      "closest_existing_principles": [],
+      "reusability_beyond_this_paper": "Not applicable",
+      "confidence": "low",
+      "pointer": "Not specified in provided text"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "Decentralizes adaptive query routing by having each operator probabilistically forward tuples based on a learned, multi-factor benefit score that combines downstream operator selectivity, processing cost, and queue length.",
+    "top_3_principles": [
+      "Dc",
+      "Wa",
+      "Cm"
+    ],
+    "mechanism_family": "query optimization",
+    "specific_tools_or_algorithms": [
+      "Queuing network model (M/M/1)",
+      "SCQ (Selectivity-Cost-Qlength) routing policy",
+      "WSCQ (Weighted Selectivity-Cost-Qlength) routing policy"
+    ],
+    "primary_design_archetype": "learned control loop",
+    "principle_mapping_confidence": "high"
+  }
+}

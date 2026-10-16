@@ -1,0 +1,296 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "25",
+    "paper_title": "Querying the Internet with PIER",
+    "authors": [
+      "Ryan Huebsch",
+      "Joseph M. Hellerstein",
+      "Nick Lanham",
+      "Ion Stoica",
+      "Boon Thau Loo",
+      "Scott Shenker"
+    ],
+    "venue_or_source": "VLDB",
+    "year": "2003",
+    "system_or_method_name": "PIER (Peer-to-Peer Information Exchange and Retrieval)",
+    "problem_domain": "Massively distributed query processing"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To design and evaluate a massively distributed query engine that can scale to thousands of nodes for querying Internet-based data in situ, without requiring data to be loaded into a central warehouse.",
+    "primary_optimized_metric": "latency",
+    "secondary_metrics": [
+      "scalability (degree of distribution)",
+      "network traffic",
+      "recall"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "4x",
+        "meaning": "The performance (time to receive 30th tuple) degrades by a factor of 4 when the network size and load increase from 2 to 10,000 nodes.",
+        "pointer": "[p.8]"
+      },
+      {
+        "number_or_delta": "96%",
+        "meaning": "Average query recall achieved in a 4096-node system with a node failure rate of 240 nodes/minute and a 60-second data refresh period.",
+        "pointer": "[p.9, Figure 6]"
+      },
+      {
+        "number_or_delta": "10,000 nodes",
+        "meaning": "The system is demonstrated to scale up to 10,000 nodes in simulation.",
+        "pointer": "[p.8, Figure 3]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Traditional distributed database systems",
+    "why_this_is_the_right_comparison": "The paper explicitly frames its contribution against traditional database systems, which it claims 'do not excel on one important scalability dimension: the degree of distribution' and are limited to 'at most a few hundred nodes'.",
+    "limiting_design_assumption": "Traditional distributed databases assume strong (ACID) consistency, centralized administration (data centers), and that data must be loaded into the database. These assumptions are identified as 'insurmountable barriers to massive distribution'.",
+    "pointers": [
+      "[p.1]",
+      "[p.3]"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Distributed query engine on an overlay network",
+    "specific_tools_or_algorithms": [
+      "Distributed Hash Table (DHT)",
+      "Content Addressable Network (CAN)",
+      "Symmetric hash join",
+      "Fetch Matches join",
+      "Symmetric semi-join",
+      "Bloom join"
+    ],
+    "what_is_being_optimized": "The placement of data and routing of query messages and intermediate results to execute relational queries across a large, dynamic set of nodes.",
+    "state_or_ir": "Relational tuples are stored in the DHT, identified by a key derived from a namespace (relation) and a resourceID (attribute value). Query plans are dataflow graphs of operators.",
+    "output": "Query result tuples.",
+    "pointers": [
+      "[p.1]",
+      "[p.5]",
+      "[p.6]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Replaces the tightly-coupled architecture of traditional distributed databases with a decentralized query engine built on a Distributed Hash Table (DHT) overlay network, enabling query execution to scale to thousands of nodes.",
+      "baseline_assumption": "Distributed query processing requires a relatively small, static set of nodes with centralized coordination or global knowledge for membership and data location.",
+      "why_baseline_did_not_include_it": "Traditional systems were not designed for the scale, dynamism, and churn of Internet environments. DHTs were a recent technology from the networking community, not yet integrated into database architectures.",
+      "mechanism_level_implementation": "PIER uses a DHT (specifically CAN) for data placement, routing, and as an 'exchange' mechanism. For joins, tuples are rehashed on the join key and `put` into a new DHT namespace, routing them to the correct node for processing without central coordination.",
+      "primary_metric_improved": "scalability",
+      "tradeoffs_or_costs": "Increased latency for individual operations due to multi-hop routing in the overlay network (e.g., n^(1/4) hops in CAN).",
+      "pointers": [
+        "[p.1, 'PIER is built on top of a Distributed Hash Table']",
+        "[p.5, 'DHTs can serve as \"exchange\" mechanisms']",
+        "[p.6, 'put into a new unique DHT namespace']",
+        "[p.8, 'the number of overlay hops for each lookup increases as the network size increases']"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Abandons strong transactional consistency in favor of a 'soft state' model to achieve high availability and tolerance to network partitions, which are common in Internet-scale systems.",
+      "baseline_assumption": "Database systems must provide strong consistency guarantees, typically ACID transactions.",
+      "why_baseline_did_not_include_it": "Traditional databases prioritize consistency over availability in the face of partitions (per the CAP theorem), which is unsuitable for Internet systems that must remain highly available.",
+      "mechanism_level_implementation": "Data items are published with a finite 'lifetime' and must be periodically renewed via a `renew` call. If not refreshed, items expire and are deleted. This provides a 'best effort' data semantic called a 'dilated-reachable snapshot'.",
+      "primary_metric_improved": "availability",
+      "tradeoffs_or_costs": "Loss of transactional consistency. Query results are best-effort and may be incomplete (measured by recall) if nodes fail between data renewal periods.",
+      "pointers": [
+        "[p.3, 'Relaxed Consistency']",
+        "[p.3, 'CAP Conjecture']",
+        "[p.5, 'PIER uses the common Internet approach of soft state']",
+        "[p.5, 'dilated-reachable snapshot']",
+        "[p.9, Figure 6]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Dc",
+          "name": "Decentralized Control",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The use of a DHT for routing and data placement.",
+          "why_it_applies": "The DHT routes requests and maps keys to nodes without any central coordinator or global knowledge of the system state. Each node makes local routing decisions.",
+          "justification_if_invented": "",
+          "pointer": "[p.5, 'This is done without any global knowledge — or permanent assignment — of the mapping of keys to machines.']"
+        },
+        {
+          "symbol": "Fp",
+          "name": "Function Placement",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "Executing join logic on the nodes designated by the DHT based on the join key.",
+          "why_it_applies": "The system places data (tuples) on nodes by hashing a key. The computation (e.g., probing a hash table for a join) is then executed on the node where the data is stored, co-locating computation with data.",
+          "justification_if_invented": "",
+          "pointer": "[p.6, 'Probing of hash tables is a local operation that occurs at the nodes in N_j']"
+        },
+        {
+          "symbol": "Lt",
+          "name": "Location Transparency",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The DHT's `lookup` API.",
+          "why_it_applies": "The query processor can request data for a given key via the DHT without needing to know the IP address of the node currently responsible for that key. The DHT abstracts away the physical location.",
+          "justification_if_invented": "",
+          "pointer": "[p.4, Table 1, 'lookup(key, callback)']"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Sc",
+          "name": "Scalability",
+          "reason_rejected_or_borderline": "This is the goal and outcome of the design, not the mechanism itself. Dc and Fp are the principles that explain *how* scalability is achieved.",
+          "pointer": "[p.1]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Cr",
+          "name": "Consistency Relaxation",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The adoption of 'soft state' data management with explicit lifetimes and renewal, and the 'dilated-reachable snapshot' semantics.",
+          "why_it_applies": "The paper explicitly rejects ACID consistency as a barrier to scale and availability, and instead adopts a best-effort model where data can be temporarily stale or missing.",
+          "justification_if_invented": "",
+          "pointer": "[p.3, 'a) Relaxed Consistency']"
+        },
+        {
+          "symbol": "Ft",
+          "name": "Fault Tolerance",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The soft-state mechanism of periodic data renewal.",
+          "why_it_applies": "The soft-state model is explicitly designed to handle frequent node failures and disconnections. Lost data is eventually restored to the system when the original publisher renews it, making the system tolerant to transient faults.",
+          "justification_if_invented": "",
+          "pointer": "[p.5, 'soft state to achieve reliability and limit overheads in the face of frequent failures or disconnections']"
+        }
+      ],
+      "rejected_or_borderline_principles": []
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Traditional Distributed DB + Dc + Fp + Cr -> PIER",
+    "baseline_name": "Traditional Distributed Databases",
+    "top_3_principle_tags": [
+      "Dc",
+      "Fp",
+      "Cr"
+    ],
+    "core_principle_tags": [
+      "Dc",
+      "Fp",
+      "Cr"
+    ],
+    "supporting_principle_tags": [
+      "Lt",
+      "Ft"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Dc",
+      "Fp",
+      "Lt",
+      "Cr",
+      "Ft"
+    ],
+    "new_system_name": "PIER",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "The architecture's viability hinges on the combination of these principles. Decentralized Control (Dc) and Function Placement (Fp) via the DHT provide the mechanism for massive scale, but this would be brittle in a dynamic Internet environment without Consistency Relaxation (Cr), which makes the system tolerant to the inevitable churn and partitions.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Dc",
+          "contribution_to_equation": "Replaces centralized coordination with a scalable, peer-to-peer routing and membership protocol, removing the central bottleneck."
+        },
+        {
+          "symbol": "Fp",
+          "contribution_to_equation": "Uses the DHT's key-based routing to co-locate data and computation, enabling distributed query execution algorithms like hash join to run efficiently at scale."
+        },
+        {
+          "symbol": "Cr",
+          "contribution_to_equation": "Abandons strict consistency for a soft-state model, which provides the necessary availability and fault tolerance for the system to operate in a large, unreliable network."
+        }
+      ],
+      "transfer_question": "In what other domains could a combination of decentralized control, function placement, and relaxed consistency enable scalable, in-situ processing on large, dynamic collections of devices?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "scalability (nodes)",
+      "direction": "up",
+      "concrete_number": "from 'a few hundred' to 10,000+",
+      "pointer": "[p.1, p.8]"
+    },
+    {
+      "property": "latency",
+      "direction": "up",
+      "concrete_number": "degrades by 4x over a 5000x increase in nodes",
+      "pointer": "[p.8]"
+    },
+    {
+      "property": "consistency",
+      "direction": "down",
+      "concrete_number": "from ACID to 'dilated-reachable snapshot'",
+      "pointer": "[p.3, p.5]"
+    },
+    {
+      "property": "availability",
+      "direction": "up",
+      "concrete_number": "designed to tolerate network partitions",
+      "pointer": "[p.3]"
+    },
+    {
+      "property": "recall",
+      "direction": "down",
+      "concrete_number": "can be < 100% (e.g., 96%) under churn",
+      "pointer": "[p.9]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "On",
+      "name": "Overlay-Native Processing",
+      "definition": "Designing data processing algorithms to directly leverage the primitives of an underlying overlay network (e.g., key-based routing, multicast) for data exchange, placement, and state management.",
+      "mechanism_pattern": "Adapting traditional database join algorithms (e.g., symmetric hash join) to use the DHT's `put` and `get` operations as the fundamental data exchange and placement mechanism, rather than a generic message passing layer.",
+      "why_existing_principles_are_insufficient": "Fp describes placing functions and Dc describes the lack of central control, but neither captures the specific act of redesigning algorithms to fit the native API of a structured overlay. This principle highlights the co-design of the query execution layer and the overlay substrate.",
+      "closest_existing_principles": [
+        "Fp",
+        "Dc",
+        "Ha"
+      ],
+      "reusability_beyond_this_paper": "This pattern is applicable to other systems that build data processing on structured overlays, such as in-network aggregation systems or distributed stream processors that use the overlay's topology for their dataflow.",
+      "confidence": "medium",
+      "pointer": "[p.5-6]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "PIER achieves massive scalability for in-situ Internet queries by replacing traditional database architecture with a decentralized query engine built on a Distributed Hash Table (DHT), which manages data placement and query execution while relaxing consistency to a soft-state model.",
+    "top_3_principles": [
+      "Dc",
+      "Fp",
+      "Cr"
+    ],
+    "mechanism_family": "query optimization",
+    "specific_tools_or_algorithms": [
+      "Distributed Hash Table (DHT)",
+      "Content Addressable Network (CAN)",
+      "Symmetric hash join",
+      "Fetch Matches join",
+      "Symmetric semi-join",
+      "Bloom join"
+    ],
+    "primary_design_archetype": "disaggregation / function placement",
+    "principle_mapping_confidence": "high"
+  }
+}

@@ -1239,6 +1239,9 @@
                 }).join('') +
                 detailLink('Paper', card.paper_url, 'Open paper') +
                 detailLink('Collection', card.source_url, 'Open collection') +
+                detailItem('Analysis status', card.analysis_note) +
+                detailItem('Principle review', card.review_note) +
+                detailLink('Analysis provenance', card.analysis_provenance_url, 'View corpus provenance') +
                 '</dl></section>';
 
             panel.innerHTML = body;

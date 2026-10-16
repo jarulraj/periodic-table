@@ -1,0 +1,274 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "44",
+    "paper_title": "Systematic Development of Data Mining-Based Data Quality Tools",
+    "authors": [
+      "Dominik Luebbers",
+      "Udo Grimmer",
+      "Matthias Jarke"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference, Berlin, Germany, 2003",
+    "year": "2003",
+    "system_or_method_name": "Data Auditing Tool with Test Generator",
+    "problem_domain": "Data quality and data cleaning"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To systematically develop and calibrate data auditing tools by using an artificial test data generator to simulate the application domain, because the quality of real databases is a-priori unknown, making it hard to measure the tool's effectiveness.",
+    "primary_optimized_metric": "sensitivity",
+    "secondary_metrics": [
+      "specificity",
+      "quality of correction"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "up to ~30%",
+        "meaning": "Sensitivity achieved on synthetic data, meaning the tool could identify almost 30% of the true errors.",
+        "pointer": "[p.10, Fig 3, Fig 4]"
+      },
+      {
+        "number_or_delta": "~99%",
+        "meaning": "Specificity achieved on synthetic data with a minimal error confidence of 80%, meaning 99% of error-free records were correctly identified as such.",
+        "pointer": "[p.10]"
+      },
+      {
+        "number_or_delta": "21 minutes",
+        "meaning": "Time to run the error detection process on a QUIS sample of ~200,000 records.",
+        "pointer": "[p.11]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Ad-hoc application of data mining for data auditing",
+    "why_this_is_the_right_comparison": "The paper's main contribution is a systematic method for developing and calibrating data auditing tools, which contrasts with the standard approach of applying a generic data mining algorithm to a real database of unknown quality without a reliable way to measure its performance.",
+    "limiting_design_assumption": "A data mining expert can effectively select, parameterize, and validate a data auditing tool directly on a real-world database, even though the ground truth (i.e., which records are actually errors) is unknown and unavailable for automatic calculation.",
+    "pointers": [
+      "[p.3, quote: \"The automatic calculation requires the availability of the data source in a clean state that is normally unavailable.\"]",
+      "[p.3, quote: \"An experienced data mining expert with sufficient business domain knowledge is needed to guide the selection and later run the analysis.\"]"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Test data generator",
+    "specific_tools_or_algorithms": [
+      "Rule-pattern-based test data generator",
+      "C4.5 decision tree inducer (modified)"
+    ],
+    "what_is_being_optimized": "The selection and parameterization of a data mining algorithm to maximize its effectiveness (sensitivity and specificity) for data auditing in a specific domain.",
+    "state_or_ir": "Test Data Generator (TDG) rules, which are used to specify the structure of the synthetic data.",
+    "output": "A calibrated data auditing tool, which in turn outputs a ranked list of suspicious records with associated 'error confidence' scores.",
+    "pointers": [
+      "[p.4]",
+      "[p.7]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Introduces a systematic, domain-driven development process centered around a test data generator. This generator creates an artificial, clean database mimicking the real data's structural properties, pollutes it in a controlled manner, and uses the result as a ground-truth benchmark to evaluate and tune the data auditing tool.",
+      "baseline_assumption": "A data mining algorithm for data quality can be effectively selected and tuned without a ground-truth benchmark that reflects the target domain's characteristics.",
+      "why_baseline_did_not_include_it": "The baseline lacks a method to create a ground-truth benchmark for evaluating error detection when the real data's quality is unknown, making tool calibration an ad-hoc, intuition-driven process.",
+      "mechanism_level_implementation": "A rule-pattern-based test data generator creates a 'natural rule set' of non-contradictory, non-tautological rules. It then generates data conforming to these rules and applies controlled data corruption (e.g., wrong value, null value, switcher polluters) to create a dataset with known errors for benchmarking.",
+      "primary_metric_improved": "The ability to systematically measure and optimize the data auditing tool's sensitivity and specificity before deployment.",
+      "tradeoffs_or_costs": "Requires a domain expert to identify and specify the characteristic structural properties of the real database to parameterize the generator. The synthetic data is only a simulation and may not capture all properties of the real data.",
+      "pointers": [
+        "[p.3, Fig 1]",
+        "[p.4, Section 4.1]",
+        "[p.6, Section 4.2]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Adapts the standard C4.5 decision tree algorithm for the data auditing task by replacing its standard objective function (classification accuracy) with a new 'error confidence' metric. This new metric and a corresponding pruning strategy directly optimize for identifying high-confidence deviations.",
+      "baseline_assumption": "A standard data mining algorithm's objective function, such as minimizing classification error, is sufficient for the data auditing task of finding and ranking suspicious data.",
+      "why_baseline_did_not_include_it": "Standard C4.5 is optimized for general classification accuracy, not for quantifying the confidence of a deviation from an induced model, which is the core requirement for a data auditing tool that presents findings to a human quality engineer.",
+      "mechanism_level_implementation": "Defines a new 'error confidence' metric based on the confidence intervals of the predicted vs. observed class probabilities. Replaces C4.5's pessimistic classification error pruning criterion with a new criterion based on 'expected error confidence', and integrates this into the tree construction phase as a pre-pruning strategy.",
+      "primary_metric_improved": "The tool's ability to produce a more meaningful ranking of potential errors, allowing quality engineers to focus on the most likely problems.",
+      "tradeoffs_or_costs": "The modified C4.5 algorithm is specialized for data auditing and may be less suitable for general-purpose classification tasks. Its effectiveness depends on a user-defined minimal confidence threshold.",
+      "pointers": [
+        "[p.8, Def 7]",
+        "[p.9, Def 9]",
+        "[p.9, Section 5.4]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Au",
+          "name": "Automation",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The creation of the test environment that automatically generates data, pollutes it, runs the auditing tool, and evaluates its performance.",
+          "why_it_applies": "The entire approach is designed to automate the evaluation and calibration of a data auditing tool, a task that would otherwise require expensive manual inspection of a real database by experts.",
+          "justification_if_invented": "",
+          "pointer": "[p.3, quote: \"Because of the size of real databases, a manual inspection of the tool's results is far too expensive.\"]"
+        },
+        {
+          "symbol": "Fs",
+          "name": "Formal Specification",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The definition and use of Test Data Generator (TDG) formulae and 'natural TDG-rules' to describe the structural properties of the data to be generated.",
+          "why_it_applies": "The system relies on a formal language (TDG-rules) to capture domain knowledge about data regularities. This formal specification is the direct input to the test data generator, enabling the automated process.",
+          "justification_if_invented": "",
+          "pointer": "[p.4, Definitions 1-6]"
+        },
+        {
+          "symbol": "Wa",
+          "name": "Workload-Aware",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The parameterization of the test data generator to simulate the specific structural characteristics of the application database (e.g., QUIS).",
+          "why_it_applies": "The system is explicitly 'domain-driven'. The test data generator is made aware of the target 'workload' (the data's structural properties) to create a relevant benchmark for tuning the auditing tool.",
+          "justification_if_invented": "",
+          "pointer": "[p.3, quote: \"...artificially generated test data that mimic structural regularities of the application database.\"]"
+        }
+      ],
+      "rejected_or_borderline_principles": []
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Al",
+          "name": "Abstraction Lifting",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The definition of the 'error confidence' metric.",
+          "why_it_applies": "The system moves beyond the simple binary abstraction of 'correct/incorrect' classification provided by a standard classifier. It lifts the abstraction to a continuous 'error confidence' score, which is more meaningful for the data auditing task of ranking potential errors for human review.",
+          "justification_if_invented": "",
+          "pointer": "[p.8, quote: \"...quantify the degree by which an observed value differs from the expectations and hence the strength of the data auditing tool's belief that an error has been found.\"]"
+        },
+        {
+          "symbol": "Bo",
+          "name": "Bottleneck-Oriented",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "Replacing C4.5's standard pruning criterion (pessimistic classification error) with a new one based on 'expected error confidence'.",
+          "why_it_applies": "The paper identifies that the unadjusted use of C4.5 is 'problematic' because its optimization objective is mismatched with the data auditing goal. The new pruning criterion directly targets this mismatch, which is the bottleneck preventing the standard algorithm from being effective for this task.",
+          "justification_if_invented": "",
+          "pointer": "[p.9, Section 5.4]"
+        },
+        {
+          "symbol": "Cc",
+          "name": "Common-Case Specialization",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The set of adjustments made to C4.5, including the new pruning criterion and pre-pruning strategy.",
+          "why_it_applies": "The paper takes a general-purpose algorithm (C4.5) and specializes it for the specific 'common case' of data auditing. The adjustments make it perform better on this task at the potential cost of generality.",
+          "justification_if_invented": "",
+          "pointer": "[p.9, quote: \"...we again list the above discussed adjustments of the C4.5 algorithm for its use as a structure inducer in the context of the QUIS database...\"]"
+        }
+      ],
+      "rejected_or_borderline_principles": []
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Ad-hoc Data Auditing + Fs + Au + Al -> Systematic Data Auditing Tool",
+    "baseline_name": "Ad-hoc Data Auditing",
+    "top_3_principle_tags": [
+      "Au",
+      "Fs",
+      "Al"
+    ],
+    "core_principle_tags": [
+      "Au",
+      "Fs",
+      "Al",
+      "Bo"
+    ],
+    "supporting_principle_tags": [
+      "Wa",
+      "Cc"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Au",
+      "Fs",
+      "Wa",
+      "Al",
+      "Bo",
+      "Cc"
+    ],
+    "new_system_name": "Systematic Data Auditing Tool",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "This composition transforms ad-hoc data auditing into a systematic, measurable process. Fs provides the formal language to capture domain-specific data structures, which enables Au to automate the generation of a ground-truth benchmark. This benchmark, in turn, allows for the rigorous calibration of a data auditing tool whose internal objective has been refined by Al to match the true goal of identifying high-confidence errors, rather than just maximizing classification accuracy.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Au",
+          "contribution_to_equation": "Automates the expensive and unreliable manual process of tool calibration and validation by creating a synthetic test environment."
+        },
+        {
+          "symbol": "Fs",
+          "contribution_to_equation": "Provides the formal language (TDG-rules) needed to specify the domain's data structure, which is the necessary input for the automated test data generator."
+        },
+        {
+          "symbol": "Al",
+          "contribution_to_equation": "Refines the output of the underlying data mining algorithm from a simple classification to a more meaningful 'error confidence' score, aligning the tool's output with the data quality engineer's needs."
+        }
+      ],
+      "transfer_question": "In what other domains could a formally-specified synthetic data generator be used to automate the calibration of a domain-specific tool where ground truth is unavailable?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "sensitivity",
+      "direction": "up",
+      "concrete_number": "up to 30%",
+      "pointer": "[p.10]"
+    },
+    {
+      "property": "specificity",
+      "direction": "up",
+      "concrete_number": "~99%",
+      "pointer": "[p.10]"
+    },
+    {
+      "property": "manual effort for tool calibration",
+      "direction": "down",
+      "concrete_number": "Not specified",
+      "pointer": "[p.3]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "So",
+      "name": "Surrogate Objective Shaping",
+      "definition": "Replacing a standard, generic optimization objective (e.g., accuracy, MSE) with a surrogate objective that is more closely aligned with the true, often non-differentiable or complex, goal of the end-to-end system task.",
+      "mechanism_pattern": "The system defines a new task-specific metric, 'error confidence', and then derives an 'expected error confidence' to replace C4.5's standard 'pessimistic classification error' as the objective function for the tree pruning algorithm.",
+      "why_existing_principles_are_insufficient": "Al (Abstraction Lifting) captures the creation of the new 'error confidence' metric, but not the crucial step of plugging it back into the optimization loop of the underlying algorithm as the new objective. Bo (Bottleneck-Oriented) identifies that the old objective was a problem, but doesn't describe the general pattern of replacing it with a new, more aligned one. This pattern of modifying an algorithm's internal objective to better match an external system goal is a recurring design move.",
+      "closest_existing_principles": [
+        "Al",
+        "Bo",
+        "Gd"
+      ],
+      "reusability_beyond_this_paper": "This pattern is common in systems that use machine learning components, such as replacing non-differentiable metrics like BLEU score with differentiable approximations in NLP, or optimizing for business metrics instead of just model accuracy in recommendation systems.",
+      "confidence": "medium",
+      "pointer": "[p.9, Definition 9 and Section 5.4]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "Systematically calibrates a data auditing tool by using a formal rule-based generator to create synthetic, domain-specific benchmark data with known errors, and adapts the underlying C4.5 algorithm to optimize for a new 'error confidence' metric instead of classification accuracy.",
+    "top_3_principles": [
+      "Au",
+      "Fs",
+      "Al"
+    ],
+    "mechanism_family": "other",
+    "specific_tools_or_algorithms": [
+      "Rule-pattern-based test data generator",
+      "C4.5 decision tree inducer (modified)"
+    ],
+    "primary_design_archetype": "surrogate objective shaping",
+    "principle_mapping_confidence": "high"
+  }
+}
