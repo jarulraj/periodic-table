@@ -30,35 +30,54 @@ function similarityFields(summary) {
     };
 }
 
-function readSessions() {
-    return JSON.parse(fs.readFileSync(path.join(__dirname, 'vldb2023-sessions.json'), 'utf8'));
+function readSessions(sourceId) {
+    const files = {vldb2023: 'vldb2023-sessions.json', osdi23: 'osdi23-sessions.json'};
+    if (sourceId) {
+        if (!Object.hasOwn(files, sourceId)) throw new Error('Unknown session source: ' + sourceId);
+        return JSON.parse(fs.readFileSync(path.join(__dirname, files[sourceId]), 'utf8'));
+    }
+    const papers = {};
+    for (const file of Object.values(files)) {
+        Object.assign(papers, JSON.parse(fs.readFileSync(path.join(__dirname, file), 'utf8')).papers);
+    }
+    return {papers};
 }
 
-// Enrich the published JSON without rebuilding or replacing author-reviewed card text.
-function enrichPublishedCards(data, dataRoot, metadata) {
+function enrichSessionFields(data, metadata) {
     for (const card of Object.values(data.cards_by_id)) {
-        const summaryPath = path.join(dataRoot, card.source_id, 'summaries', card.paper_number + '.json');
-        if (!fs.existsSync(summaryPath)) throw new Error('Missing source summary: ' + summaryPath);
-        const summary = JSON.parse(fs.readFileSync(summaryPath, 'utf8'));
-        Object.assign(card, sessionFields(card.paper_id, metadata), similarityFields(summary));
+        Object.assign(card, sessionFields(card.paper_id, metadata));
     }
     for (const paper of data.papers) {
         const card = data.cards_by_id[paper.paper_id];
-        if (card.source_id === 'vldb2023') {
+        if (card.conference_session_categories) {
             paper.conference_session_categories = card.conference_session_categories;
         }
     }
     return data;
 }
 
-module.exports = {sessionFields, similarityFields, readSessions, enrichPublishedCards};
+// Enrich the published JSON without rebuilding or replacing author-reviewed card text.
+function enrichPublishedCards(data, dataRoot, metadata) {
+    enrichSessionFields(data, metadata);
+    for (const card of Object.values(data.cards_by_id)) {
+        const summaryPath = path.join(dataRoot, card.source_id, 'summaries', card.paper_number + '.json');
+        if (!fs.existsSync(summaryPath)) throw new Error('Missing source summary: ' + summaryPath);
+        const summary = JSON.parse(fs.readFileSync(summaryPath, 'utf8'));
+        Object.assign(card, similarityFields(summary));
+    }
+    return data;
+}
+
+module.exports = {sessionFields, similarityFields, readSessions, enrichSessionFields, enrichPublishedCards};
 
 if (require.main === module) {
     const dataRoot = process.env.PAPER_CARD_DATA_ROOT;
-    if (!dataRoot) throw new Error('Set PAPER_CARD_DATA_ROOT to the source data directory.');
+    const sessionsOnly = process.argv.includes('--sessions-only');
+    if (!sessionsOnly && !dataRoot) throw new Error('Set PAPER_CARD_DATA_ROOT to the source data directory.');
     const file = path.join(__dirname, 'paper-cards.json');
     const data = JSON.parse(fs.readFileSync(file, 'utf8'));
-    enrichPublishedCards(data, dataRoot, readSessions());
+    if (sessionsOnly) enrichSessionFields(data, readSessions());
+    else enrichPublishedCards(data, dataRoot, readSessions());
     fs.writeFileSync(file, JSON.stringify(data));
     console.log('Enriched ' + data.papers.length + ' cards; existing fields preserved.');
 }

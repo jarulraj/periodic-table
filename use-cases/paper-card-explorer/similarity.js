@@ -28,7 +28,9 @@
     function rank(source, candidates, options) {
         options = options || {};
         return candidates.filter(function(card) {
-            return card.paper_id !== source.paper_id && card.source_id === source.source_id &&
+            const inScope = card.source_id === source.source_id ||
+                (options.acrossConferences && source.collection_type === 'conference' && card.collection_type === 'conference');
+            return card.paper_id !== source.paper_id && inScope &&
                 (!options.differentCategories || differentCategories(source, card));
         }).map(function(card) {
             return {card, ...compare(source, card)};

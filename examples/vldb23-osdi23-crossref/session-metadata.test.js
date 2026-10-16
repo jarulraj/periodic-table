@@ -2,14 +2,24 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
-const {similarityFields, sessionFields, readSessions, enrichPublishedCards} = require('./paper-metadata');
+const {similarityFields, sessionFields, readSessions, enrichSessionFields, enrichPublishedCards} = require('./paper-metadata');
 const {compare, rank, differentCategories, sameCategoryPapers} = require('../../use-cases/paper-card-explorer/similarity');
 const metadata = readSessions();
 const data = JSON.parse(fs.readFileSync(path.join(__dirname, 'paper-cards.json'), 'utf8'));
 const card = (id, tags, categories = ['A']) => ({paper_id: id, source_id: 'vldb2023', similarity_principle_tags: tags, conference_session_categories: categories});
 
+test('conference-specific metadata retains provenance and keeps VLDB analysis scoped', () => {
+    const vldb = readSessions('vldb2023');
+    assert.equal(Object.keys(vldb.papers).length,234);
+    assert.equal(vldb.source_url,'https://www.vldb.org/2023/?program-schedule');
+    assert.ok(vldb.retrieved_on && vldb.category_caveat && vldb.source_html_sha256);
+    assert.equal(Object.keys(readSessions('osdi23').papers).length,55);
+    assert.equal(Object.keys(metadata.papers).length,289);
+    assert.throws(()=>readSessions('unknown'),/Unknown session source/);
+});
+
 test('all 234 VLDB cards have verified PDF-matched sessions', () => {
-    const entries = Object.values(metadata.papers);
+    const entries = Object.entries(metadata.papers).filter(([id]) => id.startsWith('vldb2023-')).map(([, entry]) => entry);
     assert.equal(entries.length, 234);
     for (const entry of entries) {
         assert.equal(entry.status, 'matched');
@@ -20,10 +30,77 @@ test('all 234 VLDB cards have verified PDF-matched sessions', () => {
     }
 });
 test('published list and detail session metadata agree', () => {
-    for (const paper of data.papers.filter(p => p.source_id === 'vldb2023')) {
+    for (const paper of data.papers.filter(p => metadata.papers[p.paper_id])) {
         assert.deepEqual(paper.conference_session_categories, metadata.papers[paper.paper_id].categories);
         const c = data.cards_by_id[paper.paper_id];
         for (const [key, value] of Object.entries(sessionFields(paper.paper_id, metadata))) assert.deepEqual(c[key], value);
+    }
+});
+test('all 55 OSDI cards have exact normalized-title matches and sourced labels', () => {
+    const osdi = JSON.parse(fs.readFileSync(path.join(__dirname, 'osdi23-sessions.json'), 'utf8'));
+    assert.equal(osdi.program_records.length, 55);
+    assert.equal(Object.keys(osdi.papers).length, 55);
+    assert.match(osdi.source_html_sha256, /^[a-f0-9]{64}$/);
+    const normalize = title => title.normalize('NFKD').toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
+    const categories = new Set();
+    for (const [id, entry] of Object.entries(osdi.papers)) {
+        assert.equal(entry.status, 'matched', id);
+        assert.equal(entry.match_method, 'normalized_title');
+        for (const session of entry.sessions) {
+            assert.equal(normalize(session.paper_title), normalize(data.cards_by_id[id].paper_title));
+            assert.equal(session.source_url, osdi.source_url + '#' + session.session_id);
+            assert.ok(session.paper_url.startsWith('https://www.usenix.org/conference/osdi23/presentation/'));
+            categories.add(session.category);
+        }
+    }
+    assert.equal(categories.size, 9);
+    assert.equal(Object.values(osdi.papers).filter(p => p.categories.includes('Secure Your Bits')).length, 10);
+});
+test('cross-conference ranking uses the same scores and excludes reading lists', () => {
+    const source = {...card('vldb2023-1', ['La','Ad']), collection_type:'conference'};
+    const osdi = {...card('osdi23-1', ['Ad','La'], ['B']), source_id:'osdi23', collection_type:'conference'};
+    const weaker = {...card('vldb2023-2', ['Ad','La','Mo'], ['C']), collection_type:'conference'};
+    const reading = {...osdi, paper_id:'cs764-1', source_id:'cs764', collection_type:'reading-list'};
+    const unknown = {...osdi, paper_id:'osdi23-2', conference_session_categories:[]};
+    const candidates = [source, weaker, osdi, reading, unknown];
+    const options = {acrossConferences:true, differentCategories:true};
+    const matches = rank(source,candidates,options);
+    assert.deepEqual(matches.map(m=>m.card.paper_id), ['osdi23-1','vldb2023-2']);
+    assert.equal(matches[0].score,1);
+    assert.deepEqual(rank(source,candidates,{differentCategories:true}).map(m=>m.card.paper_id), ['vldb2023-2']);
+    assert.deepEqual(rank(source,candidates,options),rank(source,candidates.slice().reverse(),options));
+    assert.deepEqual(rank(reading,candidates,{acrossConferences:true}),[]);
+});
+test('same-named categories across conferences are not presumed different', () => {
+    const source = {...card('vldb2023-1',['La','Ad'],['Learning']),collection_type:'conference'};
+    const other = {...source,paper_id:'osdi23-1',source_id:'osdi23'};
+    assert.equal(rank(source,[other],{acrossConferences:true}).length,1);
+    assert.equal(rank(source,[other],{acrossConferences:true,differentCategories:true}).length,0);
+});
+test('OSDI same-session peers stay in OSDI and include both numbered sessions', () => {
+    const source = Object.values(data.cards_by_id).find(c => c.source_id==='osdi23' && c.conference_session_categories.includes('Secure Your Bits'));
+    const peers = sameCategoryPapers(source,Object.values(data.cards_by_id));
+    assert.equal(peers.length,9);
+    assert.ok(peers.every(p=>p.source_id==='osdi23'));
+    assert.equal(new Set([source,...peers].flatMap(p=>p.conference_sessions.map(s=>s.raw_label))).size,2);
+});
+test('session-only enrichment preserves every existing non-session field', () => {
+    const output = structuredClone(data);
+    enrichSessionFields(output,metadata);
+    assert.deepEqual(output,data);
+    for (const c of Object.values(output.cards_by_id)) {
+        delete c.conference_session_status;
+        delete c.conference_session_categories;
+        delete c.conference_sessions;
+    }
+    for (const p of output.papers) delete p.conference_session_categories;
+    const before = structuredClone(output);
+    enrichSessionFields(output,metadata);
+    for (const [id, c] of Object.entries(before.cards_by_id)) {
+        for (const key of Object.keys(c)) assert.deepEqual(output.cards_by_id[id][key],c[key]);
+    }
+    for (let i=0;i<before.papers.length;i++) {
+        for (const key of Object.keys(before.papers[i])) assert.deepEqual(output.papers[i][key],before.papers[i][key]);
     }
 });
 test('core principles are not unioned with top-three or supporting tags', () => {

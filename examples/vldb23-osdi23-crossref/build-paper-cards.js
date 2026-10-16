@@ -432,7 +432,7 @@ for (const source of sources) {
             paper_number: card.paper_number,
             paper_label: paperLabel,
             publication_year: card.publication_year,
-            ...(source.id === 'vldb2023' ? {conference_session_categories: card.conference_session_categories || []} : {}),
+            ...(card.conference_session_categories ? {conference_session_categories: card.conference_session_categories} : {}),
             tags
         });
         collectionCounts[source.collection] = (collectionCounts[source.collection] || 0) + 1;

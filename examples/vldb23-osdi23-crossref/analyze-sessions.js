@@ -7,7 +7,7 @@ const {readSessions} = require('./paper-metadata');
 
 const cardPath = path.join(__dirname, 'paper-cards.json');
 const data = JSON.parse(fs.readFileSync(cardPath, 'utf8'));
-const metadata = readSessions();
+const metadata = readSessions('vldb2023');
 const cards = Object.values(data.cards_by_id).filter(card => card.source_id === 'vldb2023');
 const sha256 = file => crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
 const count = values => values.reduce((result, value) => {result[value] = (result[value] || 0) + 1; return result;}, {});
@@ -78,7 +78,7 @@ const lines = [
     '- Existing author-reviewed text, principle assignments, manuscript, and cluster memberships were not changed.', '',
     metadata.category_caveat, '',
     '## Matching Method', '', output.method, '',
-    'Similarity is a comparison of card annotations, not evidence that the mechanisms are interchangeable. A score of 1 means identical core tag sets, not identical systems. The website initially searches within the selected card\'s collection; session filtering is currently available for VLDB 2023 only.', '',
+    'Similarity is a comparison of card annotations, not evidence that the mechanisms are interchangeable. A score of 1 means identical core tag sets, not identical systems. This report uses within-VLDB rankings. The explorer searches across VLDB 2023 and OSDI 2023 by default and supports session filtering for both conferences.', '',
     '## Selected Cross-Category Matches', '',
     'These are selected examples from the computed rankings, not a separate clustering.', '',
     '| Source | Session category | Match | Session category | Shared principles | Jaccard |',

@@ -732,6 +732,7 @@
         let showSimilar = false;
         let showSameSession = false;
         let differentSessionsOnly = true;
+        let searchAcrossConferences = true;
         const DEFAULT_COLLECTION = 'VLDB 2023';
 
         function escapeHtml(value) {
@@ -1050,39 +1051,46 @@
             return Array.from(new Set(tags)).sort().map(function(tag) { return principleButton(tag); }).join('');
         }
 
-        function sessionBadges(categories) {
+        function sessionBadges(categories, collection) {
             if (!categories || !categories.length) return '';
             return '<div class="session-badges" aria-label="Conference session categories">' + categories.map(function(category) {
                 const selected = sessionCategory === category;
-                return '<button type="button" class="session-badge" data-session-category="' + escapeHtml(category) + '" aria-pressed="' + selected + '" title="' + escapeHtml((selected ? 'Remove session filter: ' : 'Filter by session category: ') + category) + '">' + escapeHtml(category) + '</button>';
+                return '<button type="button" class="session-badge" data-session-category="' + escapeHtml(category) + '" data-session-collection="' + escapeHtml(collection || '') + '" aria-pressed="' + selected + '" title="' + escapeHtml((selected ? 'Remove session filter: ' : 'Filter by session category: ') + category) + '">' + escapeHtml(category) + '</button>';
             }).join('') + '</div>';
         }
 
         function similarPaperUrl(paperId) {
             const params = new URLSearchParams({paper: paperId});
             if (!differentSessionsOnly) params.set('different', '0');
+            if (!searchAcrossConferences) params.set('across', '0');
             return window.location.pathname + '?' + params.toString();
         }
 
         function renderSimilarPapers(card) {
             const hasCategory = (card.conference_session_categories || []).length > 0;
+            const isConference = card.collection_type === 'conference';
             let html = '<section class="detail-section similar-section">' +
                 '<button type="button" class="clear-button similar-toggle" id="similar_toggle" aria-expanded="' + showSimilar + '" aria-controls="similar_content">Similar papers by design principles</button>';
             if (!showSimilar) return html + '<div id="similar_content" hidden></div></section>';
             const matches = PaperSimilarity.rank(card, Object.values(PAPER_CARDS_BY_ID), {
+                acrossConferences: searchAcrossConferences,
                 differentCategories: differentSessionsOnly && hasCategory,
                 limit: 5
             });
-            html += '<div id="similar_content"><label class="similar-controls"><input type="checkbox" id="different_sessions"' +
+            html += '<div id="similar_content">' +
+                (isConference ? '<label class="similar-controls"><input type="checkbox" id="across_conferences"' +
+                    (searchAcrossConferences ? ' checked' : '') + '> Search across conferences</label>' : '') +
+                '<label class="similar-controls"><input type="checkbox" id="different_sessions"' +
                 (differentSessionsOnly && hasCategory ? ' checked' : '') + (hasCategory ? '' : ' disabled') +
                 '> Other session categories only' + (hasCategory ? '' : ' (session metadata unavailable)') + '</label>' +
-                '<p class="session-category">' + escapeHtml(card.collection) + ' | Core-principle Jaccard | At least two shared principles</p>';
+                '<p class="session-category">' + (isConference && searchAcrossConferences ? 'All conferences' : escapeHtml(card.collection)) + ' | Core-principle Jaccard | At least two shared principles</p>';
             if (!matches.length) html += '<p class="detail-empty">No papers meet these criteria.</p>';
             html += '<ol class="similar-results">' + matches.map(function(match) {
                 const other = match.card;
                 const union = PaperSimilarity.tags(card).length + PaperSimilarity.tags(other).length - match.shared.length;
                 return '<li class="similar-result paper-match"><a href="' + escapeHtml(similarPaperUrl(other.paper_id)) + '">' + escapeHtml(other.paper_title) + '</a>' +
-                    (sessionBadges(other.conference_session_categories) || '<p class="session-category">Session category unavailable</p>') +
+                    '<div class="paper-topline"><span class="conference-badge">' + escapeHtml(paperCollection(other)) + '</span></div>' +
+                    (sessionBadges(other.conference_session_categories, paperCollection(other)) || '<p class="session-category">Session category unavailable</p>') +
                     '<p><strong>Jaccard ' + match.score.toFixed(2) + '</strong> (' + match.shared.length + ' shared / ' + union + ' distinct principles)</p>' +
                     '<div class="paper-tags" aria-label="Shared principles">' + principleLabels(match.shared) + '</div>' +
                     (card.similarity_principle_source !== 'equation_core' || other.similarity_principle_source !== 'equation_core' ? '<p>Includes top-three fallback tags.</p>' : '') + '</li>';
@@ -1101,7 +1109,7 @@
             html += '<ol class="similar-results">' + peers.map(function(other) {
                 const tags = principleTagsForPaper(findPaperByIdentifier(other.paper_id), other);
                 return '<li class="session-peer paper-match"><a href="' + escapeHtml(similarPaperUrl(other.paper_id)) + '">' + escapeHtml(other.paper_title) + '</a>' +
-                    sessionBadges(other.conference_session_categories) +
+                    sessionBadges(other.conference_session_categories, paperCollection(other)) +
                     '<div class="paper-tags" aria-label="Principles">' + principleLabels(tags) + '</div></li>';
             }).join('') + '</ol></div></section>';
             return html;
@@ -1144,7 +1152,7 @@
                 '<div class="detail-meta"><span class="conference-badge">' + escapeHtml(paperCollection(paper)) + '</span>' +
                 detailBadgeForPaper(paper, card) +
                 '</div>' +
-                (card ? sessionBadges(card.conference_session_categories) : '') +
+                (card ? sessionBadges(card.conference_session_categories, paperCollection(card)) : '') +
                 '</div></div>';
 
             if (!paperCardsLoaded) {
@@ -1163,7 +1171,7 @@
             body += renderSimilarPapers(card);
             body += renderSameSessionPapers(card);
             body += '<section class="detail-section"><h3>Paper Card</h3><dl class="detail-list">' +
-                ((card.conference_session_categories || []).length ? '<div class="detail-kv"><dt>Conference session category</dt><dd>' + sessionBadges(card.conference_session_categories) + '</dd></div>' : '') +
+                ((card.conference_session_categories || []).length ? '<div class="detail-kv"><dt>Conference session category</dt><dd>' + sessionBadges(card.conference_session_categories, paperCollection(card)) + '</dd></div>' : '') +
                 detailItem('Problem domain', card.problem_domain) +
                 detailItem('System or method', card.system_or_method_name) +
                 detailItem('Goal', card.goal) +
@@ -1409,6 +1417,7 @@
             if (showSimilar) params.set('similar', '1');
             if (showSameSession) params.set('peers', '1');
             if (!differentSessionsOnly) params.set('different', '0');
+            if (!searchAcrossConferences) params.set('across', '0');
             const allConferences = availableConferences();
             const selected = selectedConferences();
             const conferences = allConferences.filter(function(conference) { return selected.has(conference); });
@@ -1431,6 +1440,7 @@
             showSimilar = params.get('similar') === '1';
             showSameSession = params.get('peers') === '1';
             differentSessionsOnly = params.get('different') !== '0';
+            searchAcrossConferences = params.get('across') !== '0';
             const mode = params.get('mode');
             if (mode === 'all') {
                 const input = document.querySelector('input[name="match_mode"][value="all"]');
@@ -1456,6 +1466,12 @@
             const value = button.getAttribute(attribute);
             if (isSession) {
                 sessionCategory = sessionCategory === value ? '' : value;
+                const collection = button.getAttribute('data-session-collection');
+                if (sessionCategory && collection) {
+                    document.querySelectorAll('.conference-filter').forEach(function(input) {
+                        if (input.value === collection) input.checked = true;
+                    });
+                }
                 render(true);
             } else {
                 toggleTag(value);
@@ -1541,11 +1557,13 @@
                 if (handleFilterClick(event)) return;
             });
             document.getElementById('paper_detail').addEventListener('change', function(event) {
-                if (event.target.id !== 'different_sessions') return;
-                differentSessionsOnly = event.target.checked;
+                const id = event.target.id;
+                if (id === 'different_sessions') differentSessionsOnly = event.target.checked;
+                else if (id === 'across_conferences') searchAcrossConferences = event.target.checked;
+                else return;
                 renderPaperDetail(activePaperId);
                 updateUrl();
-                document.getElementById('different_sessions').focus();
+                document.getElementById(id).focus();
             });
             document.getElementById('session_category').addEventListener('change', function(event) {
                 sessionCategory = event.target.value;

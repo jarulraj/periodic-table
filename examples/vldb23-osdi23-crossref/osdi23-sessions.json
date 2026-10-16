@@ -1,0 +1,1552 @@
+{
+  "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions",
+  "retrieved_on": "2026-10-16",
+  "source_html_sha256": "bd38e2be11ab6ef44606c6c173f919e76e63463a4b96efbb2fd570c732ce8336",
+  "normalization": "Whitespace, ampersand to 'and', trailing Roman/Arabic session number only; original labels retained.",
+  "matching": "Exact normalized title; presentation URLs distinguish ambiguous titles. No fuzzy or topic-inferred matches.",
+  "category_caveat": "Official scheduling labels, not a common research-area taxonomy across conferences.",
+  "program_records": [
+    {
+      "session_id": "node-288608",
+      "raw_label": "Make Your Bits Go Faster",
+      "category": "Make Your Bits Go Faster",
+      "paper_title": "Ship your Critical Section, Not Your Data: Enabling Transparent Delegation with TCLOCKS",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/gupta",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288608"
+    },
+    {
+      "session_id": "node-288608",
+      "raw_label": "Make Your Bits Go Faster",
+      "category": "Make Your Bits Go Faster",
+      "paper_title": "RON: One-Way Circular Shortest Routing to Achieve Efficient and Bounded-waiting Spinlocks",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/lo",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288608"
+    },
+    {
+      "session_id": "node-288608",
+      "raw_label": "Make Your Bits Go Faster",
+      "category": "Make Your Bits Go Faster",
+      "paper_title": "Userspace Bypass: Accelerating Syscall-intensive Applications",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/zhou-zhe",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288608"
+    },
+    {
+      "session_id": "node-288608",
+      "raw_label": "Make Your Bits Go Faster",
+      "category": "Make Your Bits Go Faster",
+      "paper_title": "Triangulating Python Performance Issues with SCALENE",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/berger",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288608"
+    },
+    {
+      "session_id": "node-288608",
+      "raw_label": "Make Your Bits Go Faster",
+      "category": "Make Your Bits Go Faster",
+      "paper_title": "Relational Debugging --- Pinpointing Root Causes of Performance Problems",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/ren",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288608"
+    },
+    {
+      "session_id": "node-288609",
+      "raw_label": "Secure Your Bits I",
+      "category": "Secure Your Bits",
+      "paper_title": "Accountable authentication with privacy protection: The Larch system for universal login",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/dauterman",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288609"
+    },
+    {
+      "session_id": "node-288609",
+      "raw_label": "Secure Your Bits I",
+      "category": "Secure Your Bits",
+      "paper_title": "K9db: Privacy-Compliant Storage For Web Applications By Construction",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/albab",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288609"
+    },
+    {
+      "session_id": "node-288609",
+      "raw_label": "Secure Your Bits I",
+      "category": "Secure Your Bits",
+      "paper_title": "Encrypted Databases Made Secure Yet Maintainable",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/li-mingyu",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288609"
+    },
+    {
+      "session_id": "node-288609",
+      "raw_label": "Secure Your Bits I",
+      "category": "Secure Your Bits",
+      "paper_title": "LVMT: An Efficient Authenticated Storage for Blockchain",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/li-chenxing",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288609"
+    },
+    {
+      "session_id": "node-288609",
+      "raw_label": "Secure Your Bits I",
+      "category": "Secure Your Bits",
+      "paper_title": "Honeycomb: Secure and Efficient GPU Executions via Static Validation",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/mai",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288609"
+    },
+    {
+      "session_id": "node-288614",
+      "raw_label": "Secure Your Bits II",
+      "category": "Secure Your Bits",
+      "paper_title": "An Extensible Orchestration and Protection Framework for Confidential Cloud Computing",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/ahmad",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288614"
+    },
+    {
+      "session_id": "node-288614",
+      "raw_label": "Secure Your Bits II",
+      "category": "Secure Your Bits",
+      "paper_title": "Nimble: Rollback Protection for Confidential Cloud Services",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/angel",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288614"
+    },
+    {
+      "session_id": "node-288614",
+      "raw_label": "Secure Your Bits II",
+      "category": "Secure Your Bits",
+      "paper_title": "Kerveros: Efficient and Scalable Cloud Admission Control",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/sajal",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288614"
+    },
+    {
+      "session_id": "node-288614",
+      "raw_label": "Secure Your Bits II",
+      "category": "Secure Your Bits",
+      "paper_title": "Security and Performance in the Delegated User-level Virtualization",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/chen",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288614"
+    },
+    {
+      "session_id": "node-288614",
+      "raw_label": "Secure Your Bits II",
+      "category": "Secure Your Bits",
+      "paper_title": "Core slicing: closing the gap between leaky confidential VMs and bare-metal cloud",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/zhou-ziqiao",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288614"
+    },
+    {
+      "session_id": "node-288617",
+      "raw_label": "Expanding, Hardening, and Deploying Your Bits",
+      "category": "Expanding, Hardening, and Deploying Your Bits",
+      "paper_title": "ExoFlow: A Universal Workflow System for Exactly-Once DAGs",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/zhuang",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288617"
+    },
+    {
+      "session_id": "node-288617",
+      "raw_label": "Expanding, Hardening, and Deploying Your Bits",
+      "category": "Expanding, Hardening, and Deploying Your Bits",
+      "paper_title": "Hyrax: Fail-in-Place Server Operation in Cloud Platforms",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/lyu",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288617"
+    },
+    {
+      "session_id": "node-288617",
+      "raw_label": "Expanding, Hardening, and Deploying Your Bits",
+      "category": "Expanding, Hardening, and Deploying Your Bits",
+      "paper_title": "NCC: Natural Concurrency Control for Strictly Serializable Datastores by Avoiding the Timestamp-Inversion Pitfall",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/lu",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288617"
+    },
+    {
+      "session_id": "node-288617",
+      "raw_label": "Expanding, Hardening, and Deploying Your Bits",
+      "category": "Expanding, Hardening, and Deploying Your Bits",
+      "paper_title": "Conveyor: One-Tool-Fits-All Continuous Software Deployment at Meta",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/grubic",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288617"
+    },
+    {
+      "session_id": "node-288620",
+      "raw_label": "Query Your Bits",
+      "category": "Query Your Bits",
+      "paper_title": "Chardonnay: Fast and General Datacenter Transactions for On-Disk Databases",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/eldeeb",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288620"
+    },
+    {
+      "session_id": "node-288620",
+      "raw_label": "Query Your Bits",
+      "category": "Query Your Bits",
+      "paper_title": "ScaleDB: A Scalable, Asynchronous In-Memory Database",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/mehdi",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288620"
+    },
+    {
+      "session_id": "node-288620",
+      "raw_label": "Query Your Bits",
+      "category": "Query Your Bits",
+      "paper_title": "VBASE: Unifying Online Vector Similarity Search and Relational Queries via Relaxed Monotonicity",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/zhang-qianxi",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288620"
+    },
+    {
+      "session_id": "node-288620",
+      "raw_label": "Query Your Bits",
+      "category": "Query Your Bits",
+      "paper_title": "Detecting Transactional Bugs in Database Engines via Graph-Based Oracle Construction",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/jiang",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288620"
+    },
+    {
+      "session_id": "node-288620",
+      "raw_label": "Query Your Bits",
+      "category": "Query Your Bits",
+      "paper_title": "Take Out the TraChe: Maximizing (Tra)nsactional Ca(che) Hit Rate",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/cheng",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288620"
+    },
+    {
+      "session_id": "node-288629",
+      "raw_label": "Store Your Bits",
+      "category": "Store Your Bits",
+      "paper_title": "Replicating Persistent Memory Key-Value Stores with Efficient RDMA Abstraction",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/wang-qing",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288629"
+    },
+    {
+      "session_id": "node-288629",
+      "raw_label": "Store Your Bits",
+      "category": "Store Your Bits",
+      "paper_title": "eZNS: An Elastic Zoned Namespace for Commodity ZNS SSDs",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/min",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288629"
+    },
+    {
+      "session_id": "node-288629",
+      "raw_label": "Store Your Bits",
+      "category": "Store Your Bits",
+      "paper_title": "SEPH: Scalable, Efficient, and Predictable Hashing on Persistent Memory",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/wang-chao",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288629"
+    },
+    {
+      "session_id": "node-288629",
+      "raw_label": "Store Your Bits",
+      "category": "Store Your Bits",
+      "paper_title": "No Provisioned Concurrency: Fast RDMA-codesigned Remote Fork for Serverless Computing",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/wei-rdma",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288629"
+    },
+    {
+      "session_id": "node-288634",
+      "raw_label": "Manage Your Bits I",
+      "category": "Manage Your Bits",
+      "paper_title": "Johnny Cache: the End of DRAM Cache Conflicts (in Tiered Main Memory Systems)",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/lepers",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288634"
+    },
+    {
+      "session_id": "node-288634",
+      "raw_label": "Manage Your Bits I",
+      "category": "Manage Your Bits",
+      "paper_title": "TAILCHECK: A Lightweight Heap Overflow Detection Mechanism with Page Protection and Tagged Pointers",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/gopal",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288634"
+    },
+    {
+      "session_id": "node-288634",
+      "raw_label": "Manage Your Bits I",
+      "category": "Manage Your Bits",
+      "paper_title": "SMART: A High-Performance Adaptive Radix Tree for Disaggregated Memory",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/luo",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288634"
+    },
+    {
+      "session_id": "node-288634",
+      "raw_label": "Manage Your Bits I",
+      "category": "Manage Your Bits",
+      "paper_title": "ORC: Increasing Cloud Memory Density via Object Reuse with Capabilities",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/sartakov",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288634"
+    },
+    {
+      "session_id": "node-288637",
+      "raw_label": "Manage Your Bits II",
+      "category": "Manage Your Bits",
+      "paper_title": "Global Capacity Management With Flux",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/eriksen",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288637"
+    },
+    {
+      "session_id": "node-288637",
+      "raw_label": "Manage Your Bits II",
+      "category": "Manage Your Bits",
+      "paper_title": "Defcon: Preventing Overload with Graceful Feature Degradation",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/meza",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288637"
+    },
+    {
+      "session_id": "node-288637",
+      "raw_label": "Manage Your Bits II",
+      "category": "Manage Your Bits",
+      "paper_title": "Cilantro: Performance-Aware Resource Allocation for General Objectives via Online Feedback",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/bhardwaj",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288637"
+    },
+    {
+      "session_id": "node-288637",
+      "raw_label": "Manage Your Bits II",
+      "category": "Manage Your Bits",
+      "paper_title": "Karma: Resource Allocation for Dynamic Demands",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/vuppalapati",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288637"
+    },
+    {
+      "session_id": "node-288644",
+      "raw_label": "Train Your Bits I",
+      "category": "Train Your Bits",
+      "paper_title": "AlpaServe: Statistical Multiplexing with Model Parallelism for Deep Learning Serving",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/li-zhouhan",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288644"
+    },
+    {
+      "session_id": "node-288644",
+      "raw_label": "Train Your Bits I",
+      "category": "Train Your Bits",
+      "paper_title": "Cocktailer: Analyzing and Optimizing Dynamic Control Flow in Deep Learning",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/zhang-chen",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288644"
+    },
+    {
+      "session_id": "node-288644",
+      "raw_label": "Train Your Bits I",
+      "category": "Train Your Bits",
+      "paper_title": "Welder: Scheduling Deep Learning Memory Access via Tile-graph",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/shi",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288644"
+    },
+    {
+      "session_id": "node-288644",
+      "raw_label": "Train Your Bits I",
+      "category": "Train Your Bits",
+      "paper_title": "Effectively Scheduling Computational Graphs of Deep Neural Networks toward Their Domain-Specific Accelerators",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/zhao",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288644"
+    },
+    {
+      "session_id": "node-288649",
+      "raw_label": "Train Your Bits II",
+      "category": "Train Your Bits",
+      "paper_title": "EINNET: Optimizing Tensor Programs with Derivation-Based Transformations",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/zheng",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288649"
+    },
+    {
+      "session_id": "node-288649",
+      "raw_label": "Train Your Bits II",
+      "category": "Train Your Bits",
+      "paper_title": "Hydro: Surrogate-Based Hyperparameter Tuning Service in Datacenters",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/hu",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288649"
+    },
+    {
+      "session_id": "node-288649",
+      "raw_label": "Train Your Bits II",
+      "category": "Train Your Bits",
+      "paper_title": "MGG: Accelerating Graph Neural Networks with Fine-Grained Intra-Kernel Communication-Computation Pipelining on Multi-GPU Platforms",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/wang-yuke",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288649"
+    },
+    {
+      "session_id": "node-288649",
+      "raw_label": "Train Your Bits II",
+      "category": "Train Your Bits",
+      "paper_title": "Optimizing Dynamic Neural Networks with Brainstorm",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/cui",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288649"
+    },
+    {
+      "session_id": "node-288649",
+      "raw_label": "Train Your Bits II",
+      "category": "Train Your Bits",
+      "paper_title": "AdaEmbed: Adaptive Embedding for Large-Scale Recommendation Models",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/lai",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288649"
+    },
+    {
+      "session_id": "node-288652",
+      "raw_label": "Verify Your Bits",
+      "category": "Verify Your Bits",
+      "paper_title": "BWoS: Formally Verified Block-based Work Stealing for Parallel Processing",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/wang-jiawei",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288652"
+    },
+    {
+      "session_id": "node-288652",
+      "raw_label": "Verify Your Bits",
+      "category": "Verify Your Bits",
+      "paper_title": "Spoq: Scaling Machine-Checkable Systems Verification in Coq",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/li-xupeng",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288652"
+    },
+    {
+      "session_id": "node-288652",
+      "raw_label": "Verify Your Bits",
+      "category": "Verify Your Bits",
+      "paper_title": "Verifying vMVCC, a high-performance transaction library using multi-version concurrency control",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/chang",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288652"
+    },
+    {
+      "session_id": "node-288652",
+      "raw_label": "Verify Your Bits",
+      "category": "Verify Your Bits",
+      "paper_title": "Automated Verification of Idempotence for Stateful Serverless Applications",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/ding",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288652"
+    },
+    {
+      "session_id": "node-288652",
+      "raw_label": "Verify Your Bits",
+      "category": "Verify Your Bits",
+      "paper_title": "Sharding the State Machine: Automated Modular Reasoning for Complex Concurrent Systems",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/hance",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288652"
+    },
+    {
+      "session_id": "node-288661",
+      "raw_label": "Transfer Your Bits",
+      "category": "Transfer Your Bits",
+      "paper_title": "Flor: An Open High Performance RDMA Framework Over Heterogeneous RNICs",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/li-qiang",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288661"
+    },
+    {
+      "session_id": "node-288661",
+      "raw_label": "Transfer Your Bits",
+      "category": "Transfer Your Bits",
+      "paper_title": "ShRing: Networking with Shared Receive Rings",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/pismenny",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288661"
+    },
+    {
+      "session_id": "node-288661",
+      "raw_label": "Transfer Your Bits",
+      "category": "Transfer Your Bits",
+      "paper_title": "ServiceRouter: Hyperscale and Minimal Cost Service Mesh at Meta",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/saokar",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288661"
+    },
+    {
+      "session_id": "node-288661",
+      "raw_label": "Transfer Your Bits",
+      "category": "Transfer Your Bits",
+      "paper_title": "Characterizing Off-path SmartNIC for Accelerating Distributed Systems",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/wei-smartnic",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288661"
+    },
+    {
+      "session_id": "node-288661",
+      "raw_label": "Transfer Your Bits",
+      "category": "Transfer Your Bits",
+      "paper_title": "Ensō: A Streaming Interface for NIC-Application Communication",
+      "paper_url": "https://www.usenix.org/conference/osdi23/presentation/sadok",
+      "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288661"
+    }
+  ],
+  "papers": {
+    "osdi23-1": {
+      "paper_title": "Ship your Critical Section, Not Your Data: Enabling Transparent Delegation with TCLocks",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-gupta.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288608",
+          "raw_label": "Make Your Bits Go Faster",
+          "category": "Make Your Bits Go Faster",
+          "paper_title": "Ship your Critical Section, Not Your Data: Enabling Transparent Delegation with TCLOCKS",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/gupta",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288608"
+        }
+      ],
+      "categories": [
+        "Make Your Bits Go Faster"
+      ],
+      "candidates": []
+    },
+    "osdi23-2": {
+      "paper_title": "RON: One-Way Circular Shortest Routing to Achieve Efficient and Bounded-waiting Spinlocks",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-lo.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288608",
+          "raw_label": "Make Your Bits Go Faster",
+          "category": "Make Your Bits Go Faster",
+          "paper_title": "RON: One-Way Circular Shortest Routing to Achieve Efficient and Bounded-waiting Spinlocks",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/lo",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288608"
+        }
+      ],
+      "categories": [
+        "Make Your Bits Go Faster"
+      ],
+      "candidates": []
+    },
+    "osdi23-3": {
+      "paper_title": "Userspace Bypass: Accelerating Syscall-intensive Applications",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-zhou-zhe.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288608",
+          "raw_label": "Make Your Bits Go Faster",
+          "category": "Make Your Bits Go Faster",
+          "paper_title": "Userspace Bypass: Accelerating Syscall-intensive Applications",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/zhou-zhe",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288608"
+        }
+      ],
+      "categories": [
+        "Make Your Bits Go Faster"
+      ],
+      "candidates": []
+    },
+    "osdi23-4": {
+      "paper_title": "Triangulating Python Performance Issues with Scalene",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-berger.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288608",
+          "raw_label": "Make Your Bits Go Faster",
+          "category": "Make Your Bits Go Faster",
+          "paper_title": "Triangulating Python Performance Issues with SCALENE",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/berger",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288608"
+        }
+      ],
+      "categories": [
+        "Make Your Bits Go Faster"
+      ],
+      "candidates": []
+    },
+    "osdi23-5": {
+      "paper_title": "Relational Debugging - Pinpointing Root Causes of Performance Problems",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-ren.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288608",
+          "raw_label": "Make Your Bits Go Faster",
+          "category": "Make Your Bits Go Faster",
+          "paper_title": "Relational Debugging --- Pinpointing Root Causes of Performance Problems",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/ren",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288608"
+        }
+      ],
+      "categories": [
+        "Make Your Bits Go Faster"
+      ],
+      "candidates": []
+    },
+    "osdi23-6": {
+      "paper_title": "Accountable authentication with privacy protection: The Larch system for universal login",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-dauterman.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288609",
+          "raw_label": "Secure Your Bits I",
+          "category": "Secure Your Bits",
+          "paper_title": "Accountable authentication with privacy protection: The Larch system for universal login",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/dauterman",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288609"
+        }
+      ],
+      "categories": [
+        "Secure Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-7": {
+      "paper_title": "K9db: Privacy-Compliant Storage For Web Applications By Construction",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-albab.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288609",
+          "raw_label": "Secure Your Bits I",
+          "category": "Secure Your Bits",
+          "paper_title": "K9db: Privacy-Compliant Storage For Web Applications By Construction",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/albab",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288609"
+        }
+      ],
+      "categories": [
+        "Secure Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-8": {
+      "paper_title": "Encrypted Databases Made Secure Yet Maintainable",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-li-mingyu.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288609",
+          "raw_label": "Secure Your Bits I",
+          "category": "Secure Your Bits",
+          "paper_title": "Encrypted Databases Made Secure Yet Maintainable",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/li-mingyu",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288609"
+        }
+      ],
+      "categories": [
+        "Secure Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-9": {
+      "paper_title": "LVMT: An Efficient Authenticated Storage for Blockchain",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-li-chenxing.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288609",
+          "raw_label": "Secure Your Bits I",
+          "category": "Secure Your Bits",
+          "paper_title": "LVMT: An Efficient Authenticated Storage for Blockchain",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/li-chenxing",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288609"
+        }
+      ],
+      "categories": [
+        "Secure Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-10": {
+      "paper_title": "Honeycomb: Secure and Efficient GPU Executions via Static Validation",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-mai.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288609",
+          "raw_label": "Secure Your Bits I",
+          "category": "Secure Your Bits",
+          "paper_title": "Honeycomb: Secure and Efficient GPU Executions via Static Validation",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/mai",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288609"
+        }
+      ],
+      "categories": [
+        "Secure Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-11": {
+      "paper_title": "An Extensible Orchestration and Protection Framework for Confidential Cloud Computing",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-ahmad.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288614",
+          "raw_label": "Secure Your Bits II",
+          "category": "Secure Your Bits",
+          "paper_title": "An Extensible Orchestration and Protection Framework for Confidential Cloud Computing",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/ahmad",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288614"
+        }
+      ],
+      "categories": [
+        "Secure Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-12": {
+      "paper_title": "Nimble: Rollback Protection for Confidential Cloud Services",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-angel.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288614",
+          "raw_label": "Secure Your Bits II",
+          "category": "Secure Your Bits",
+          "paper_title": "Nimble: Rollback Protection for Confidential Cloud Services",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/angel",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288614"
+        }
+      ],
+      "categories": [
+        "Secure Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-13": {
+      "paper_title": "Kerveros : Efficient and Scalable Cloud Admission Control",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-sajal.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288614",
+          "raw_label": "Secure Your Bits II",
+          "category": "Secure Your Bits",
+          "paper_title": "Kerveros: Efficient and Scalable Cloud Admission Control",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/sajal",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288614"
+        }
+      ],
+      "categories": [
+        "Secure Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-14": {
+      "paper_title": "Security and Performance in the Delegated User-level Virtualization",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-chen.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288614",
+          "raw_label": "Secure Your Bits II",
+          "category": "Secure Your Bits",
+          "paper_title": "Security and Performance in the Delegated User-level Virtualization",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/chen",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288614"
+        }
+      ],
+      "categories": [
+        "Secure Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-15": {
+      "paper_title": "Core slicing: closing the gap between leaky confidential VMs and bare-metal cloud",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-zhou-ziqiao.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288614",
+          "raw_label": "Secure Your Bits II",
+          "category": "Secure Your Bits",
+          "paper_title": "Core slicing: closing the gap between leaky confidential VMs and bare-metal cloud",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/zhou-ziqiao",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288614"
+        }
+      ],
+      "categories": [
+        "Secure Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-16": {
+      "paper_title": "ExoFlow: A Universal Workflow System for Exactly-Once DAGs",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-zhuang.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288617",
+          "raw_label": "Expanding, Hardening, and Deploying Your Bits",
+          "category": "Expanding, Hardening, and Deploying Your Bits",
+          "paper_title": "ExoFlow: A Universal Workflow System for Exactly-Once DAGs",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/zhuang",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288617"
+        }
+      ],
+      "categories": [
+        "Expanding, Hardening, and Deploying Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-17": {
+      "paper_title": "Hyrax: Fail-in-Place Server Operation in Cloud Platforms",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-lyu.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288617",
+          "raw_label": "Expanding, Hardening, and Deploying Your Bits",
+          "category": "Expanding, Hardening, and Deploying Your Bits",
+          "paper_title": "Hyrax: Fail-in-Place Server Operation in Cloud Platforms",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/lyu",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288617"
+        }
+      ],
+      "categories": [
+        "Expanding, Hardening, and Deploying Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-18": {
+      "paper_title": "NCC: Natural Concurrency Control for Strictly Serializable Datastores by Avoiding the Timestamp-Inversion Pitfall",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-lu.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288617",
+          "raw_label": "Expanding, Hardening, and Deploying Your Bits",
+          "category": "Expanding, Hardening, and Deploying Your Bits",
+          "paper_title": "NCC: Natural Concurrency Control for Strictly Serializable Datastores by Avoiding the Timestamp-Inversion Pitfall",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/lu",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288617"
+        }
+      ],
+      "categories": [
+        "Expanding, Hardening, and Deploying Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-19": {
+      "paper_title": "Conveyor: One-Tool-Fits-All Continuous Software Deployment at Meta",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-grubic.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288617",
+          "raw_label": "Expanding, Hardening, and Deploying Your Bits",
+          "category": "Expanding, Hardening, and Deploying Your Bits",
+          "paper_title": "Conveyor: One-Tool-Fits-All Continuous Software Deployment at Meta",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/grubic",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288617"
+        }
+      ],
+      "categories": [
+        "Expanding, Hardening, and Deploying Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-20": {
+      "paper_title": "Chardonnay: Fast and General Datacenter Transactions for On-Disk Databases",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-eldeeb.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288620",
+          "raw_label": "Query Your Bits",
+          "category": "Query Your Bits",
+          "paper_title": "Chardonnay: Fast and General Datacenter Transactions for On-Disk Databases",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/eldeeb",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288620"
+        }
+      ],
+      "categories": [
+        "Query Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-21": {
+      "paper_title": "ScaleDB: A Scalable, Asynchronous In-Memory Database",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-mehdi.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288620",
+          "raw_label": "Query Your Bits",
+          "category": "Query Your Bits",
+          "paper_title": "ScaleDB: A Scalable, Asynchronous In-Memory Database",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/mehdi",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288620"
+        }
+      ],
+      "categories": [
+        "Query Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-22": {
+      "paper_title": "VBase : Unifying Online Vector Similarity Search and Relational Queries via Relaxed Monotonicity",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-zhang-qianxi_1.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288620",
+          "raw_label": "Query Your Bits",
+          "category": "Query Your Bits",
+          "paper_title": "VBASE: Unifying Online Vector Similarity Search and Relational Queries via Relaxed Monotonicity",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/zhang-qianxi",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288620"
+        }
+      ],
+      "categories": [
+        "Query Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-23": {
+      "paper_title": "Detecting Transactional Bugs in Database Engines via Graph-Based Oracle Construction",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-jiang.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288620",
+          "raw_label": "Query Your Bits",
+          "category": "Query Your Bits",
+          "paper_title": "Detecting Transactional Bugs in Database Engines via Graph-Based Oracle Construction",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/jiang",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288620"
+        }
+      ],
+      "categories": [
+        "Query Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-24": {
+      "paper_title": "Take Out the TraChe: Maximizing (Tra)nsactional Ca(che) Hit Rate",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-cheng.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288620",
+          "raw_label": "Query Your Bits",
+          "category": "Query Your Bits",
+          "paper_title": "Take Out the TraChe: Maximizing (Tra)nsactional Ca(che) Hit Rate",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/cheng",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288620"
+        }
+      ],
+      "categories": [
+        "Query Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-25": {
+      "paper_title": "Replicating Persistent Memory Key-Value Stores with Efficient RDMA Abstraction",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-wang-qing.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288629",
+          "raw_label": "Store Your Bits",
+          "category": "Store Your Bits",
+          "paper_title": "Replicating Persistent Memory Key-Value Stores with Efficient RDMA Abstraction",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/wang-qing",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288629"
+        }
+      ],
+      "categories": [
+        "Store Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-26": {
+      "paper_title": "eZNS: An Elastic Zoned Namespace for Commodity ZNS SSDs",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-min.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288629",
+          "raw_label": "Store Your Bits",
+          "category": "Store Your Bits",
+          "paper_title": "eZNS: An Elastic Zoned Namespace for Commodity ZNS SSDs",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/min",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288629"
+        }
+      ],
+      "categories": [
+        "Store Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-27": {
+      "paper_title": "SEPH: Scalable, Efficient, and Predictable Hashing on Persistent Memory",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-wang-chao.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288629",
+          "raw_label": "Store Your Bits",
+          "category": "Store Your Bits",
+          "paper_title": "SEPH: Scalable, Efficient, and Predictable Hashing on Persistent Memory",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/wang-chao",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288629"
+        }
+      ],
+      "categories": [
+        "Store Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-28": {
+      "paper_title": "No Provisioned Concurrency: Fast RDMA-codesigned Remote Fork for Serverless Computing",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-wei-rdma.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288629",
+          "raw_label": "Store Your Bits",
+          "category": "Store Your Bits",
+          "paper_title": "No Provisioned Concurrency: Fast RDMA-codesigned Remote Fork for Serverless Computing",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/wei-rdma",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288629"
+        }
+      ],
+      "categories": [
+        "Store Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-29": {
+      "paper_title": "Johnny Cache: the End of DRAM Cache Conflicts (in Tiered Main Memory Systems)",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-lepers.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288634",
+          "raw_label": "Manage Your Bits I",
+          "category": "Manage Your Bits",
+          "paper_title": "Johnny Cache: the End of DRAM Cache Conflicts (in Tiered Main Memory Systems)",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/lepers",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288634"
+        }
+      ],
+      "categories": [
+        "Manage Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-30": {
+      "paper_title": "TailCheCk : A Lightweight Heap Overflow Detection Mechanism with Page Protection and Tagged Pointers",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-gopal.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288634",
+          "raw_label": "Manage Your Bits I",
+          "category": "Manage Your Bits",
+          "paper_title": "TAILCHECK: A Lightweight Heap Overflow Detection Mechanism with Page Protection and Tagged Pointers",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/gopal",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288634"
+        }
+      ],
+      "categories": [
+        "Manage Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-31": {
+      "paper_title": "SMART: A High-Performance Adaptive Radix Tree for Disaggregated Memory",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-luo.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288634",
+          "raw_label": "Manage Your Bits I",
+          "category": "Manage Your Bits",
+          "paper_title": "SMART: A High-Performance Adaptive Radix Tree for Disaggregated Memory",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/luo",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288634"
+        }
+      ],
+      "categories": [
+        "Manage Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-32": {
+      "paper_title": "ORC: Increasing Cloud Memory Density via Object Reuse with Capabilities",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-sartakov.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288634",
+          "raw_label": "Manage Your Bits I",
+          "category": "Manage Your Bits",
+          "paper_title": "ORC: Increasing Cloud Memory Density via Object Reuse with Capabilities",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/sartakov",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288634"
+        }
+      ],
+      "categories": [
+        "Manage Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-33": {
+      "paper_title": "Global Capacity Management With Flux",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-eriksen.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288637",
+          "raw_label": "Manage Your Bits II",
+          "category": "Manage Your Bits",
+          "paper_title": "Global Capacity Management With Flux",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/eriksen",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288637"
+        }
+      ],
+      "categories": [
+        "Manage Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-34": {
+      "paper_title": "Defcon: Preventing Overload with Graceful Feature Degradation",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-meza.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288637",
+          "raw_label": "Manage Your Bits II",
+          "category": "Manage Your Bits",
+          "paper_title": "Defcon: Preventing Overload with Graceful Feature Degradation",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/meza",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288637"
+        }
+      ],
+      "categories": [
+        "Manage Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-35": {
+      "paper_title": "Cilantro: Performance-Aware Resource Allocation for General Objectives via Online Feedback",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-bhardwaj.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288637",
+          "raw_label": "Manage Your Bits II",
+          "category": "Manage Your Bits",
+          "paper_title": "Cilantro: Performance-Aware Resource Allocation for General Objectives via Online Feedback",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/bhardwaj",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288637"
+        }
+      ],
+      "categories": [
+        "Manage Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-36": {
+      "paper_title": "Karma: Resource Allocation for Dynamic Demands",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-vuppalapati.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288637",
+          "raw_label": "Manage Your Bits II",
+          "category": "Manage Your Bits",
+          "paper_title": "Karma: Resource Allocation for Dynamic Demands",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/vuppalapati",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288637"
+        }
+      ],
+      "categories": [
+        "Manage Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-37": {
+      "paper_title": "AlpaServe: Statistical Multiplexing with Model Parallelism for Deep Learning Serving",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-li-zhuohan.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288644",
+          "raw_label": "Train Your Bits I",
+          "category": "Train Your Bits",
+          "paper_title": "AlpaServe: Statistical Multiplexing with Model Parallelism for Deep Learning Serving",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/li-zhouhan",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288644"
+        }
+      ],
+      "categories": [
+        "Train Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-38": {
+      "paper_title": "Cocktailer: Analyzing and Optimizing Dynamic Control Flow in Deep Learning",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-zhang-chen.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288644",
+          "raw_label": "Train Your Bits I",
+          "category": "Train Your Bits",
+          "paper_title": "Cocktailer: Analyzing and Optimizing Dynamic Control Flow in Deep Learning",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/zhang-chen",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288644"
+        }
+      ],
+      "categories": [
+        "Train Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-39": {
+      "paper_title": "Welder: Scheduling Deep Learning Memory Access via Tile-graph",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-shi.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288644",
+          "raw_label": "Train Your Bits I",
+          "category": "Train Your Bits",
+          "paper_title": "Welder: Scheduling Deep Learning Memory Access via Tile-graph",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/shi",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288644"
+        }
+      ],
+      "categories": [
+        "Train Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-40": {
+      "paper_title": "Effectively Scheduling Computational Graphs of Deep Neural Networks toward Their Domain-Specific Accelerators",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-zhao.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288644",
+          "raw_label": "Train Your Bits I",
+          "category": "Train Your Bits",
+          "paper_title": "Effectively Scheduling Computational Graphs of Deep Neural Networks toward Their Domain-Specific Accelerators",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/zhao",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288644"
+        }
+      ],
+      "categories": [
+        "Train Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-41": {
+      "paper_title": "EINNET: Optimizing Tensor Programs with Derivation-Based Transformations",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-zheng.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288649",
+          "raw_label": "Train Your Bits II",
+          "category": "Train Your Bits",
+          "paper_title": "EINNET: Optimizing Tensor Programs with Derivation-Based Transformations",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/zheng",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288649"
+        }
+      ],
+      "categories": [
+        "Train Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-42": {
+      "paper_title": "Hydro: Surrogate-Based Hyperparameter Tuning Service in Datacenters",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-hu.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288649",
+          "raw_label": "Train Your Bits II",
+          "category": "Train Your Bits",
+          "paper_title": "Hydro: Surrogate-Based Hyperparameter Tuning Service in Datacenters",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/hu",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288649"
+        }
+      ],
+      "categories": [
+        "Train Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-43": {
+      "paper_title": "MGG: Accelerating Graph Neural Networks with Fine-Grained Intra-Kernel Communication-Computation Pipelining on Multi-GPU Platforms",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-wang-yuke.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288649",
+          "raw_label": "Train Your Bits II",
+          "category": "Train Your Bits",
+          "paper_title": "MGG: Accelerating Graph Neural Networks with Fine-Grained Intra-Kernel Communication-Computation Pipelining on Multi-GPU Platforms",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/wang-yuke",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288649"
+        }
+      ],
+      "categories": [
+        "Train Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-44": {
+      "paper_title": "Optimizing Dynamic Neural Networks with Brainstorm",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-cui.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288649",
+          "raw_label": "Train Your Bits II",
+          "category": "Train Your Bits",
+          "paper_title": "Optimizing Dynamic Neural Networks with Brainstorm",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/cui",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288649"
+        }
+      ],
+      "categories": [
+        "Train Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-45": {
+      "paper_title": "AdaEmbed: Adaptive Embedding for Large-Scale Recommendation Models",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-lai.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288649",
+          "raw_label": "Train Your Bits II",
+          "category": "Train Your Bits",
+          "paper_title": "AdaEmbed: Adaptive Embedding for Large-Scale Recommendation Models",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/lai",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288649"
+        }
+      ],
+      "categories": [
+        "Train Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-46": {
+      "paper_title": "BWoS: Formally Verified Block-based Work Stealing for Parallel Processing",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-wang-jiawei.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288652",
+          "raw_label": "Verify Your Bits",
+          "category": "Verify Your Bits",
+          "paper_title": "BWoS: Formally Verified Block-based Work Stealing for Parallel Processing",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/wang-jiawei",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288652"
+        }
+      ],
+      "categories": [
+        "Verify Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-47": {
+      "paper_title": "Spoq: Scaling Machine-Checkable Systems Verification in Coq",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-li-xupeng.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288652",
+          "raw_label": "Verify Your Bits",
+          "category": "Verify Your Bits",
+          "paper_title": "Spoq: Scaling Machine-Checkable Systems Verification in Coq",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/li-xupeng",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288652"
+        }
+      ],
+      "categories": [
+        "Verify Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-48": {
+      "paper_title": "Verifying vMVCC, a high-performance transaction library using multi-version concurrency control",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-chang.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288652",
+          "raw_label": "Verify Your Bits",
+          "category": "Verify Your Bits",
+          "paper_title": "Verifying vMVCC, a high-performance transaction library using multi-version concurrency control",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/chang",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288652"
+        }
+      ],
+      "categories": [
+        "Verify Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-49": {
+      "paper_title": "Automated Verification of Idempotence for Stateful Serverless Applications",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-ding.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288652",
+          "raw_label": "Verify Your Bits",
+          "category": "Verify Your Bits",
+          "paper_title": "Automated Verification of Idempotence for Stateful Serverless Applications",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/ding",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288652"
+        }
+      ],
+      "categories": [
+        "Verify Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-50": {
+      "paper_title": "Sharding the State Machine: Automated Modular Reasoning for Complex Concurrent Systems",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-hance.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288652",
+          "raw_label": "Verify Your Bits",
+          "category": "Verify Your Bits",
+          "paper_title": "Sharding the State Machine: Automated Modular Reasoning for Complex Concurrent Systems",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/hance",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288652"
+        }
+      ],
+      "categories": [
+        "Verify Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-51": {
+      "paper_title": "Flor: An Open High Performance RDMA Framework Over Heterogeneous RNICs",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-li-qiang.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288661",
+          "raw_label": "Transfer Your Bits",
+          "category": "Transfer Your Bits",
+          "paper_title": "Flor: An Open High Performance RDMA Framework Over Heterogeneous RNICs",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/li-qiang",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288661"
+        }
+      ],
+      "categories": [
+        "Transfer Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-52": {
+      "paper_title": "ShRing: Networking with Shared Receive Rings",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-pismenny.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288661",
+          "raw_label": "Transfer Your Bits",
+          "category": "Transfer Your Bits",
+          "paper_title": "ShRing: Networking with Shared Receive Rings",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/pismenny",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288661"
+        }
+      ],
+      "categories": [
+        "Transfer Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-53": {
+      "paper_title": "ServiceRouter: Hyperscale and Minimal Cost Service Mesh at Meta",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-saokar.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288661",
+          "raw_label": "Transfer Your Bits",
+          "category": "Transfer Your Bits",
+          "paper_title": "ServiceRouter: Hyperscale and Minimal Cost Service Mesh at Meta",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/saokar",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288661"
+        }
+      ],
+      "categories": [
+        "Transfer Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-54": {
+      "paper_title": "Characterizing Off-path SmartNIC for Accelerating Distributed Systems",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-wei-smartnic.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288661",
+          "raw_label": "Transfer Your Bits",
+          "category": "Transfer Your Bits",
+          "paper_title": "Characterizing Off-path SmartNIC for Accelerating Distributed Systems",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/wei-smartnic",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288661"
+        }
+      ],
+      "categories": [
+        "Transfer Your Bits"
+      ],
+      "candidates": []
+    },
+    "osdi23-55": {
+      "paper_title": "Ensō : A Streaming Interface for NIC-Application Communication",
+      "paper_url": "https://www.usenix.org/system/files/osdi23-sadok.pdf",
+      "status": "matched",
+      "match_method": "normalized_title",
+      "sessions": [
+        {
+          "session_id": "node-288661",
+          "raw_label": "Transfer Your Bits",
+          "category": "Transfer Your Bits",
+          "paper_title": "Ensō: A Streaming Interface for NIC-Application Communication",
+          "paper_url": "https://www.usenix.org/conference/osdi23/presentation/sadok",
+          "source_url": "https://www.usenix.org/conference/osdi23/technical-sessions#node-288661"
+        }
+      ],
+      "categories": [
+        "Transfer Your Bits"
+      ],
+      "candidates": []
+    }
+  }
+}

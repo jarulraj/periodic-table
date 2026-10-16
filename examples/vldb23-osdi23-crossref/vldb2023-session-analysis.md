@@ -17,7 +17,7 @@ Conference session categories are scheduling labels, not validated research area
 
 Direct Jaccard over equation core-principle sets; at least two shared principles; same collection; known, disjoint session categories; top five; ties by shared count then numeric paper ID. No clustering is recomputed.
 
-Similarity is a comparison of card annotations, not evidence that the mechanisms are interchangeable. A score of 1 means identical core tag sets, not identical systems. The website initially searches within the selected card's collection; session filtering is currently available for VLDB 2023 only.
+Similarity is a comparison of card annotations, not evidence that the mechanisms are interchangeable. A score of 1 means identical core tag sets, not identical systems. This report uses within-VLDB rankings. The explorer searches across VLDB 2023 and OSDI 2023 by default and supports session filtering for both conferences.
 
 ## Selected Cross-Category Matches
 
