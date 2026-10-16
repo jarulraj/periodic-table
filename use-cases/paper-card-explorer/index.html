@@ -6,19 +6,22 @@
     <title>Systems Paper Card Explorer</title>
     <style>
         :root {
-            --bg: #f5f7fb;
+            --bg: #fafafa;
             --panel: #ffffff;
-            --ink: #20242a;
-            --muted: #667085;
-            --line: #d9e0ea;
-            --line-strong: #b8c3d4;
-            --accent: #2459a6;
-            --accent-soft: #eef4ff;
-            --shadow: 0 12px 34px rgba(31, 41, 55, 0.08);
+            --ink: #202020;
+            --muted: #626262;
+            --line: #d9d9d9;
+            --line-strong: #999999;
+            --accent: #242424;
+            --accent-soft: #f2f2f2;
+            --link: #2459a6;
+            --shadow: none;
         }
         * {
             box-sizing: border-box;
         }
+        html { scrollbar-gutter: stable; }
+        html.drawer-open { overflow: hidden; }
         body {
             margin: 0;
             color: var(--ink);
@@ -33,6 +36,16 @@
         }
         button {
             cursor: pointer;
+        }
+        input {
+            accent-color: var(--accent);
+        }
+        button:focus-visible,
+        input:focus-visible,
+        select:focus-visible,
+        a:focus-visible {
+            outline: 2px solid var(--ink);
+            outline-offset: 2px;
         }
         .page {
             width: min(1680px, calc(100% - 28px));
@@ -53,7 +66,7 @@
         h1 {
             max-width: 980px;
             margin-bottom: 0;
-            font-size: clamp(2rem, 4vw, 3.45rem);
+            font-size: clamp(1.65rem, 3vw, 2.3rem);
             line-height: 1.05;
             letter-spacing: 0;
         }
@@ -66,12 +79,20 @@
         .panel {
             background: var(--panel);
             border: 1px solid var(--line);
-            border-radius: 10px;
+            border-radius: 6px;
             box-shadow: var(--shadow);
         }
         .control-panel {
-            padding: 18px;
+            padding: 0;
         }
+        .control-panel > summary {
+            padding: 16px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .filter-summary-count { font-weight: 400; color: var(--muted); }
+        .filter-content { padding: 0 16px 16px; }
+        .corpus-note { margin: 16px 0 0; color: var(--muted); font-size: 0.8rem; }
         .search-row {
             display: grid;
             gap: 8px;
@@ -84,17 +105,17 @@
         }
         .search-input {
             width: 100%;
+            min-width: 0;
             min-height: 40px;
             padding: 8px 11px;
             border: 1px solid var(--line);
             border-radius: 8px;
             background: #fff;
-            color: #303743;
+            color: var(--ink);
         }
         .search-input:focus {
             border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(36, 89, 166, 0.12);
-            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.12);
         }
         .control-grid {
             display: grid;
@@ -108,7 +129,7 @@
             gap: 8px;
         }
         .label {
-            color: #303743;
+            color: var(--ink);
             font-size: 0.84rem;
             font-weight: 750;
         }
@@ -126,8 +147,8 @@
             padding: 7px 10px;
             border: 1px solid var(--line);
             border-radius: 999px;
-            background: #fbfcfe;
-            color: #303743;
+            background: #fafafa;
+            color: var(--ink);
             white-space: nowrap;
         }
         .option input {
@@ -139,7 +160,7 @@
             border: 1px solid var(--line-strong);
             border-radius: 8px;
             background: #fff;
-            color: #303743;
+            color: var(--ink);
             font-weight: 650;
             white-space: nowrap;
         }
@@ -150,22 +171,18 @@
         .clear-button:focus {
             border-color: var(--accent);
             color: var(--accent);
-            outline: none;
         }
         .principle-button {
-            --tag-bg: #eef4ff;
-            --tag-border: #cddbf3;
-            --tag-ink: #2459a6;
             display: inline-flex;
             gap: 6px;
             align-items: center;
             min-height: 28px;
             max-width: 100%;
             padding: 4px 8px;
-            border: 1px solid var(--tag-border);
+            border: 1px solid var(--line);
             border-radius: 4px;
-            background: var(--tag-bg);
-            color: var(--tag-ink);
+            background: var(--accent-soft);
+            color: var(--ink);
             font-size: 0.78rem;
             font-weight: 650;
             line-height: 1.4;
@@ -181,21 +198,24 @@
         }
         .group-block {
             padding-top: 14px;
-            border-top: 1px solid #edf1f6;
+            border-top: 1px solid var(--line);
         }
         .group-header {
             display: flex;
             justify-content: space-between;
             gap: 12px;
             margin-bottom: 8px;
-            color: #303743;
+            color: var(--ink);
             font-size: 0.9rem;
             font-weight: 800;
         }
-        .group-count {
+        .principle-button:disabled {
             color: var(--muted);
-            font-weight: 650;
+            background: #fafafa;
+            cursor: not-allowed;
         }
+        .principle-button:disabled:hover { outline: none; }
+        .tag-grid .principle-button { width: 100%; justify-content: space-between; }
         .tag-grid {
             display: flex;
             flex-wrap: wrap;
@@ -210,8 +230,12 @@
         }
         .principle-button[aria-pressed="true"],
         .session-badge[aria-pressed="true"] {
-            border-color: currentColor;
-            box-shadow: inset 0 0 0 1px currentColor;
+            border-color: var(--accent);
+            background: var(--accent);
+            color: #fff;
+        }
+        .principle-button[aria-pressed="true"] .tag-count {
+            color: inherit;
         }
         .tag-count {
             flex-shrink: 0;
@@ -219,43 +243,47 @@
             font-size: 0.76rem;
             font-weight: 700;
         }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 12px;
-            margin: 16px 0;
-        }
-        .stat-card {
-            padding: 14px;
-            border: 1px solid var(--line);
-            border-radius: 10px;
-            background: #fff;
-        }
-        .stat-value {
-            display: block;
-            margin-bottom: 2px;
-            font-size: 1.45rem;
-            font-weight: 850;
-            line-height: 1;
-        }
-        .stat-label {
-            color: var(--muted);
-            font-size: 0.82rem;
-            font-weight: 650;
-        }
         .explorer-grid {
             display: grid;
-            grid-template-columns: minmax(280px, 360px) minmax(320px, 460px) minmax(360px, 1fr);
+            grid-template-columns: 280px minmax(0, 1fr);
             gap: 16px;
             align-items: start;
         }
         .explorer-panel {
             min-width: 0;
+        }
+        .control-panel {
             position: sticky;
             top: 16px;
             max-height: calc(100vh - 32px);
             overflow: auto;
         }
+        .paper-drawer {
+            position: fixed;
+            inset: 0 0 0 auto;
+            width: min(680px, 100%);
+            height: 100dvh;
+            max-width: 100%;
+            max-height: 100%;
+            margin: 0 0 0 auto;
+            padding: 0;
+            border: 0;
+            border-left: 1px solid var(--line-strong);
+            background: var(--panel);
+            color: var(--ink);
+            overflow: hidden;
+        }
+        .paper-drawer[open] { display: flex; flex-direction: column; }
+        .paper-drawer::backdrop { background: rgba(0, 0, 0, 0.24); }
+        .drawer-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--line);
+            flex-shrink: 0;
+        }
+        .paper-detail-panel { flex: 1; overflow-y: auto; min-height: 0; overscroll-behavior: contain; }
         .side-panel,
         .results-panel {
             padding: 16px;
@@ -266,7 +294,7 @@
         }
         .panel-subtitle {
             margin: 16px 0 8px;
-            color: #303743;
+            color: var(--ink);
             font-size: 0.9rem;
         }
         .panel-copy {
@@ -281,7 +309,7 @@
         }
         .related-tag {
             background: #fff;
-            color: #303743;
+            color: var(--ink);
         }
         .results-toolbar {
             display: flex;
@@ -300,7 +328,7 @@
             border: 1px solid var(--line);
             border-radius: 8px;
             background: #fff;
-            color: #303743;
+            color: var(--ink);
         }
         .paper-list {
             display: grid;
@@ -309,16 +337,15 @@
         .paper-card {
             width: 100%;
             padding: 13px 14px;
-            border: 1px solid #e0e6ef;
-            border-radius: 9px;
+            border: 1px solid var(--line);
+            border-radius: 6px;
             background: #fff;
-            cursor: pointer;
+            overflow-wrap: anywhere;
         }
         .paper-card:hover,
         .paper-card:focus {
-            border-color: #b9c8dc;
-            box-shadow: 0 0 0 3px rgba(36, 89, 166, 0.1);
-            outline: none;
+            border-color: var(--line-strong);
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
         }
         .paper-card.active {
             border-color: var(--accent);
@@ -340,31 +367,44 @@
             font-weight: 800;
         }
         .conference-badge {
-            background: var(--conference-bg, #e9f5ff);
-            color: var(--conference-ink, #1769aa);
+            background: var(--accent-soft);
+            color: var(--ink);
         }
         .match-badge {
-            background: #eef4ff;
+            background: #f2f2f2;
             color: var(--accent);
         }
         .detail-badge {
             display: inline-flex;
             padding: 3px 7px;
             border-radius: 999px;
-            background: #eef9f0;
-            color: #256b35;
+            background: #f2f2f2;
+            color: var(--ink);
             font-size: 0.72rem;
             font-weight: 800;
         }
         .detail-badge.muted {
-            background: #f3f5f7;
-            color: #667085;
+            background: #f2f2f2;
+            color: #626262;
         }
         .paper-title {
             margin-bottom: 9px;
             font-size: 1rem;
             line-height: 1.28;
         }
+        .paper-open {
+            padding: 0;
+            border: 0;
+            background: transparent;
+            color: var(--ink);
+            text-align: left;
+            font-weight: 700;
+            line-height: inherit;
+        }
+        .paper-open:hover { text-decoration: underline; text-underline-offset: 3px; }
+        .paper-system { font-weight: 650; }
+        .paper-mechanism { margin: 10px 0 12px; color: #444; font-size: 0.95rem; }
+        .paper-card .principle-button { font-weight: 500; }
         .paper-tags {
             display: flex;
             flex-wrap: wrap;
@@ -372,9 +412,9 @@
         }
         .empty-state {
             padding: 22px;
-            border: 1px dashed #cbd5e1;
-            border-radius: 10px;
-            background: #fbfcfe;
+            border: 1px dashed var(--line-strong);
+            border-radius: 6px;
+            background: #fafafa;
             color: var(--muted);
             text-align: center;
         }
@@ -384,16 +424,6 @@
             gap: 12px;
             align-items: start;
             margin-bottom: 10px;
-        }
-        .detail-close {
-            width: 30px;
-            height: 30px;
-            border: 1px solid var(--line);
-            border-radius: 8px;
-            background: #fff;
-            color: #475467;
-            font-weight: 850;
-            line-height: 1;
         }
         .detail-title {
             margin-bottom: 6px;
@@ -409,16 +439,16 @@
         .detail-section {
             padding-top: 12px;
             margin-top: 12px;
-            border-top: 1px solid #edf1f6;
+            border-top: 1px solid var(--line);
         }
         .detail-section h3 {
             margin-bottom: 7px;
-            color: #303743;
+            color: var(--ink);
             font-size: 0.88rem;
         }
         .detail-section p {
             margin-bottom: 8px;
-            color: #475467;
+            color: #444444;
             font-size: 0.9rem;
         }
         .detail-list {
@@ -427,23 +457,23 @@
             margin: 0;
         }
         .detail-kv dt {
-            color: #303743;
+            color: var(--ink);
             font-size: 0.76rem;
             font-weight: 800;
             text-transform: uppercase;
         }
         .detail-kv dd {
             margin: 2px 0 0;
-            color: #475467;
+            color: #444444;
             font-size: 0.9rem;
         }
         .usage-card {
             display: grid;
             gap: 7px;
             padding: 10px;
-            border: 1px solid #e0e6ef;
+            border: 1px solid var(--line);
             border-radius: 8px;
-            background: #fbfcfe;
+            background: #fafafa;
         }
         .usage-card + .usage-card {
             margin-top: 8px;
@@ -455,27 +485,27 @@
             align-items: center;
         }
         .usage-label {
-            color: #667085;
+            color: #626262;
             font-size: 0.76rem;
             font-weight: 800;
             text-transform: uppercase;
         }
         .usage-text {
-            color: #475467;
+            color: #444444;
             font-size: 0.88rem;
         }
         .equation-box {
             padding: 11px;
             border-left: 3px solid var(--accent);
             background: var(--accent-soft);
-            color: #253858;
+            color: var(--ink);
             font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
             font-size: 0.84rem;
             line-height: 1.55;
             overflow-wrap: anywhere;
         }
         .paper-link {
-            color: var(--accent);
+            color: var(--link);
             font-weight: 700;
             text-decoration-thickness: 1px;
             text-underline-offset: 2px;
@@ -509,10 +539,10 @@
             display: inline-block;
             max-width: 100%;
             padding: 3px 8px;
-            border: 1px solid var(--session-border);
+            border: 1px solid var(--line);
             border-radius: 4px;
-            background: var(--session-bg);
-            color: var(--session-ink);
+            background: var(--accent-soft);
+            color: var(--ink);
             font-size: 0.78rem;
             font-weight: 650;
             line-height: 1.4;
@@ -534,21 +564,16 @@
         .similar-results { list-style: none; padding: 0; margin: 0; }
         .paper-match { padding: 12px 0; border-top: 1px solid var(--line); }
         .paper-match p { margin: 5px 0 0; font-size: 0.85rem; }
-        .paper-match a { color: var(--accent); font-weight: 650; }
+        .paper-match a { color: var(--link); font-weight: 650; }
         .paper-match .paper-tags { margin-top: 8px; }
         .similar-section { overflow-wrap: anywhere; }
-        @media (max-width: 1320px) {
-            .explorer-grid {
-                grid-template-columns: minmax(260px, 320px) minmax(300px, 380px) minmax(340px, 1fr);
-            }
-        }
-        @media (max-width: 1100px) {
+        @media (max-width: 760px) {
+            html.drawer-open { scrollbar-gutter: auto; }
             .control-grid,
-            .explorer-grid,
-            .stats-grid {
+            .explorer-grid {
                 grid-template-columns: 1fr;
             }
-            .explorer-panel {
+            .control-panel {
                 position: static;
                 max-height: none;
             }
@@ -559,16 +584,13 @@
             .sort-select {
                 width: 100%;
             }
-            .explorer-grid.has-active-paper .paper-detail-panel {
-                grid-row: 1;
-            }
+            .paper-drawer { width: 100vw; max-width: 100vw; border: 0; }
         }
         @media (max-width: 560px) {
             .page {
                 width: min(100% - 20px, 1680px);
                 padding-top: 18px;
             }
-            .control-panel,
             .side-panel,
             .results-panel {
                 padding: 12px;
@@ -580,14 +602,13 @@
             .paper-tags {
                 gap: 6px;
             }
-            .principle-button {
-                width: 100%;
-                justify-content: space-between;
-            }
             .search-input-row {
                 align-items: stretch;
                 flex-direction: column;
             }
+        }
+        @media (pointer: coarse) {
+            button, summary, .option { min-height: 44px; }
         }
     </style>
 </head>
@@ -599,15 +620,9 @@
         </header>
 
         <section class="explorer-grid">
-            <section class="panel control-panel explorer-panel" aria-label="Search papers">
-                <h2 class="panel-title">Search Papers</h2>
-                <div class="search-row">
-                    <label class="label" for="paper_search">Search paper cards</label>
-                    <div class="search-input-row">
-                        <input id="paper_search" class="search-input" type="search" autocomplete="off" placeholder="Search title, author, or mechanism">
-                        <button id="clear_search" class="clear-button" type="button">Clear search</button>
-                    </div>
-                </div>
+            <details id="filters_panel" class="panel control-panel explorer-panel" open>
+                <summary>Filters <span class="filter-summary-count">· <span id="stat_matches">0</span> results</span></summary>
+                <div class="filter-content">
                 <div class="control-grid">
                     <div class="control-block">
                         <span class="label">Collections</span>
@@ -615,9 +630,10 @@
                     </div>
                     <div class="control-block">
                         <label class="label" for="session_category">Conference session category</label>
-                        <select id="session_category" class="session-select">
+                        <select id="session_category" class="session-select" aria-describedby="session_count_note">
                             <option value="">All categories</option>
                         </select>
+                        <span id="session_count_note" class="corpus-note">Counts show results after choosing a category.</span>
                     </div>
                     <div class="control-block">
                         <span class="label">Match mode</span>
@@ -627,36 +643,38 @@
                         </div>
                     </div>
                     <div class="control-block">
-                        <span class="label">Selected principle tags</span>
+                        <span class="label">Selected principles (<span id="stat_tags">0</span>)</span>
                         <div id="selected_tags" class="selected-row"></div>
                     </div>
                     <button id="clear_tags" class="clear-button" type="button">Clear tags</button>
                 </div>
 
-                <section class="stats-grid" aria-label="Search summary">
-                    <div class="stat-card"><span id="stat_matches" class="stat-value">0</span><span class="stat-label">Matching papers</span></div>
-                    <div class="stat-card"><span id="stat_cards" class="stat-value">0</span><span class="stat-label">Paper Cards</span></div>
-                    <div class="stat-card"><span id="stat_conferences" class="stat-value">0</span><span class="stat-label">Collections</span></div>
-                    <div class="stat-card"><span id="stat_tags" class="stat-value">0</span><span class="stat-label">Selected tags</span></div>
-                </section>
-
-                <section aria-label="Related principle tags">
-                    <h3 class="panel-subtitle">Related Tags</h3>
-                    <p id="related_note" class="panel-copy">Select a tag to see what tends to appear with it.</p>
-                    <div id="related_tags" class="related-list"></div>
-                </section>
-
                 <section aria-label="Principle tags">
                     <h3 class="panel-subtitle">Principle Tags</h3>
+                    <p id="tag_count_note" class="panel-copy">Counts show total results after adding a principle.</p>
                     <div id="tag_palette" class="tag-palette"></div>
                 </section>
-            </section>
+                <section aria-label="Related principle tags">
+                    <h3 class="panel-subtitle">Related Tags</h3>
+                    <p id="related_note" class="panel-copy">Counts show papers with each tag in the current results.</p>
+                    <div id="related_tags" class="related-list"></div>
+                </section>
+                <p class="corpus-note">Full catalog: <span id="stat_cards">0</span> paper cards in <span id="stat_conferences">0</span> collections.</p>
+                </div>
+            </details>
 
-            <section class="panel results-panel explorer-panel" aria-label="Selected papers">
+            <section class="panel results-panel explorer-panel" aria-label="Matching papers">
+                <div class="search-row">
+                    <label class="label" for="paper_search">Search paper cards</label>
+                    <div class="search-input-row">
+                        <input id="paper_search" class="search-input" type="search" autocomplete="off" placeholder="Search title, author, or mechanism">
+                        <button id="clear_search" class="clear-button" type="button">Clear search</button>
+                    </div>
+                </div>
                 <div class="results-toolbar">
                     <div>
-                        <h2 class="panel-title">Selected Papers</h2>
-                        <div id="results_note" class="results-note">Select principle tags to begin.</div>
+                        <h2 id="results_heading" class="panel-title" tabindex="-1">Matching Papers</h2>
+                        <div id="results_note" class="results-note" role="status">Loading paper cards…</div>
                     </div>
                     <select id="sort_mode" class="sort-select" aria-label="Sort papers">
                         <option value="relevance">Sort by tag match</option>
@@ -668,29 +686,20 @@
                 <div id="paper_results" class="paper-list"></div>
             </section>
 
-            <aside id="paper_detail" class="panel side-panel paper-detail-panel explorer-panel" aria-live="polite" aria-label="Paper cards">
-                <h2 class="panel-title">Paper Cards</h2>
-                <p class="detail-empty">Click a paper card to see its principle mappings.</p>
-            </aside>
         </section>
     </main>
+    <dialog id="paper_dialog" class="paper-drawer" aria-label="Paper details" aria-labelledby="detail_title">
+        <div class="drawer-toolbar"><span>Paper details</span><button class="clear-button" type="button" id="close_detail" autofocus>Close details</button></div>
+        <div id="paper_detail" class="side-panel paper-detail-panel"></div>
+    </dialog>
 
     <script src="similarity.js"></script>
+    <script src="filters.js"></script>
     <script>
         const PRINCIPLES = {"Si":{"name":"Simplicity","group":"Structure"},"Mo":{"name":"Modularity","group":"Structure"},"Co":{"name":"Composability","group":"Structure"},"Ex":{"name":"Extensibility","group":"Structure"},"Pm":{"name":"Policy/Mechanism Separation","group":"Structure"},"Gr":{"name":"Generalized Design","group":"Structure"},"Pd":{"name":"Probabilistic Design","group":"Structure"},"Sc":{"name":"Scalability","group":"Efficiency"},"Rc":{"name":"Reuse of Computation","group":"Efficiency"},"Wv":{"name":"Work Avoidance","group":"Efficiency"},"Cc":{"name":"Common-Case Specialization","group":"Efficiency"},"Bo":{"name":"Bottleneck-Oriented Optimisation","group":"Efficiency"},"Ha":{"name":"Hardware-Aware Design","group":"Efficiency"},"Op":{"name":"Optimistic Design","group":"Efficiency"},"La":{"name":"Learned Approximation","group":"Efficiency"},"Al":{"name":"Abstraction Lifting","group":"Semantics"},"Lu":{"name":"Language Homogeneity","group":"Semantics"},"Se":{"name":"Semantically Explicit Interfaces","group":"Semantics"},"Fs":{"name":"Formal Specification","group":"Semantics"},"Ig":{"name":"Invariant-Guided Transformation","group":"Semantics"},"Lt":{"name":"Location Transparency","group":"Distribution"},"Dc":{"name":"Decentralised Control","group":"Distribution"},"Fp":{"name":"Function Placement","group":"Distribution"},"Lo":{"name":"Locality of Reference","group":"Distribution"},"Cz":{"name":"Coordination Avoidance","group":"Distribution"},"Ep":{"name":"Equivalence-based Planning","group":"Planning"},"Cm":{"name":"Cost-based Planning","group":"Planning"},"Cp":{"name":"Constraint-based Planning","group":"Planning"},"Gd":{"name":"Goal-Directed Planning","group":"Planning"},"Bb":{"name":"Black-Box Tuning","group":"Planning"},"Ah":{"name":"Advisory Hinting","group":"Planning"},"Ad":{"name":"Adaptive Processing","group":"Operability"},"Ec":{"name":"Elasticity","group":"Operability"},"Wa":{"name":"Workload-Aware Optimisation","group":"Operability"},"Au":{"name":"Automation and Autonomy","group":"Operability"},"Ho":{"name":"Human Observability","group":"Operability"},"Ev":{"name":"Evolvability","group":"Operability"},"Ft":{"name":"Fault Tolerance","group":"Reliability"},"Is":{"name":"Isolation for Correctness","group":"Reliability"},"At":{"name":"Atomic Execution","group":"Reliability"},"Cr":{"name":"Consistency Relaxation","group":"Reliability"},"Sy":{"name":"Security via Isolation","group":"Security"},"Ac":{"name":"Access Control and Auditing","group":"Security"},"Lp":{"name":"Least Privilege","group":"Security"},"Tq":{"name":"Trust via Quorum","group":"Security"},"Cf":{"name":"Conservative Defaults","group":"Security"},"Sa":{"name":"Safety by Construction","group":"Security"}};
         PRINCIPLES.Un = { name: 'Adversarial Unpredictability', group: 'Security' };
         PRINCIPLES.Ls = { name: 'Leakage Shaping', group: 'Security' };
         const GROUP_ORDER = ["Structure","Efficiency","Semantics","Distribution","Planning","Operability","Reliability","Security"];
-        const GROUP_COLORS = {
-            Structure: { bg: '#eef6ff', border: '#bfd8f7', ink: '#1c5d99' },
-            Efficiency: { bg: '#eef9f0', border: '#b9dfc1', ink: '#256b35' },
-            Semantics: { bg: '#fff1f1', border: '#f2c0c0', ink: '#9d2525' },
-            Distribution: { bg: '#f4f0ff', border: '#d4c4f5', ink: '#6844a3' },
-            Planning: { bg: '#fff7e8', border: '#efd09a', ink: '#8a5a13' },
-            Operability: { bg: '#fff0f8', border: '#edbadd', ink: '#9b3271' },
-            Reliability: { bg: '#f3f5f7', border: '#ccd3db', ink: '#4a5564' },
-            Security: { bg: '#f4f7df', border: '#d9de99', ink: '#656b12' }
-        };
 
         let PAPERS = [];
         const selectedTags = new Set();
@@ -700,29 +709,12 @@
         let paperCardLoadError = '';
         let requestedConferences = null;
         let activePaperId = '';
+        let returnPaperId = '';
         let sessionCategory = '';
         let showSimilar = false;
         let showSameSession = false;
         let differentSessionsOnly = true;
         const DEFAULT_COLLECTION = 'VLDB 2023';
-        const CONFERENCE_COLORS = [
-            { bg: '#e9f5ff', ink: '#1769aa' },
-            { bg: '#fff2e6', ink: '#b45309' },
-            { bg: '#eef9f0', ink: '#256b35' },
-            { bg: '#f4f0ff', ink: '#6844a3' },
-            { bg: '#fff0f8', ink: '#9b3271' },
-            { bg: '#f3f5f7', ink: '#4a5564' }
-        ];
-        const SESSION_COLORS = [
-            { bg: '#eaf3ff', border: '#c9ddf5', ink: '#285a88' },
-            { bg: '#e9f6ef', border: '#c5e3d2', ink: '#286245' },
-            { bg: '#fff0e6', border: '#f1d6c1', ink: '#87502c' },
-            { bg: '#fcecf1', border: '#ebcad6', ink: '#8a3e59' },
-            { bg: '#f1edfb', border: '#dcd1ef', ink: '#655087' },
-            { bg: '#e8f5f6', border: '#bfdee1', ink: '#28636a' },
-            { bg: '#f7f3df', border: '#e5dcad', ink: '#706022' },
-            { bg: '#eff4e6', border: '#d3dfbb', ink: '#526a30' }
-        ];
 
         function escapeHtml(value) {
             return String(value == null ? '' : value).replace(/[&<>"']/g, function(match) {
@@ -740,29 +732,12 @@
             return PRINCIPLES[tag] || { name: tag, group: 'Other' };
         }
 
-        function tagStyle(tag) {
-            const colors = GROUP_COLORS[principle(tag).group] || GROUP_COLORS.Structure;
-            return '--tag-bg: ' + colors.bg + '; --tag-border: ' + colors.border + '; --tag-ink: ' + colors.ink + ';';
-        }
-
         function paperCollection(paper) {
             return paper && (paper.collection || paper.conference) || '';
         }
 
         function availableConferences() {
             return Array.from(new Set(PAPERS.map(paperCollection).filter(Boolean))).sort();
-        }
-
-        function conferenceStyle(conference) {
-            const conferences = availableConferences();
-            let index = conferences.indexOf(conference);
-            if (index < 0) {
-                index = String(conference || '').split('').reduce(function(sum, letter) {
-                    return sum + letter.charCodeAt(0);
-                }, 0);
-            }
-            const colors = CONFERENCE_COLORS[index % CONFERENCE_COLORS.length];
-            return '--conference-bg: ' + colors.bg + '; --conference-ink: ' + colors.ink + ';';
         }
 
         function normalizeSearchText(value) {
@@ -841,13 +816,7 @@
         }
 
         function countByTag(papers) {
-            const counts = {};
-            for (const paper of papers) {
-                for (const tag of paper.tags) {
-                    counts[tag] = (counts[tag] || 0) + 1;
-                }
-            }
-            return counts;
+            return PaperFilters.occurrences(papers);
         }
 
         function selectedConferences() {
@@ -876,9 +845,8 @@
             }
 
             const existingInputs = Array.from(container.querySelectorAll('.conference-filter'));
-            const currentSelection = existingInputs.length > 0 ?
-                new Set(existingInputs.filter(function(input) { return input.checked; }).map(function(input) { return input.value; })) :
-                defaultConferences(conferences);
+            if (existingInputs.length) return;
+            const currentSelection = defaultConferences(conferences);
 
             container.innerHTML = conferences.map(function(conference) {
                 const checked = currentSelection.has(conference) ? ' checked' : '';
@@ -893,19 +861,16 @@
 
         function renderSessionFilter() {
             const select = document.getElementById('session_category');
-            const collections = selectedConferences();
-            const counts = {};
-            PAPERS.filter(function(paper) { return collections.has(paperCollection(paper)); }).forEach(function(paper) {
-                (paper.conference_session_categories || []).forEach(function(category) {
-                    counts[category] = (counts[category] || 0) + 1;
-                });
-            });
-            if (paperCardsLoaded && sessionCategory && !counts[sessionCategory]) sessionCategory = '';
-            select.innerHTML = '<option value="">All categories</option>' + Object.keys(counts).sort().map(function(category) {
-                return '<option value="' + escapeHtml(category) + '">' + escapeHtml(category) + ' (' + counts[category] + ')</option>';
+            const state = filterState();
+            const context = PaperFilters.sessionCounts(PAPERS, state);
+            const categories = new Set(PAPERS.filter(paper => state.collections.has(paperCollection(paper)))
+                .flatMap(paper => paper.conference_session_categories || []));
+            if (sessionCategory) categories.add(sessionCategory);
+            select.innerHTML = '<option value="">All categories (' + context.total + ')</option>' + [...categories].sort().map(function(category) {
+                return '<option value="' + escapeHtml(category) + '">' + escapeHtml(category) + ' (' + (context.counts[category] || 0) + ')</option>';
             }).join('');
             select.value = sessionCategory;
-            select.disabled = !Object.keys(counts).length;
+            select.disabled = !categories.size;
         }
 
         function sortMode() {
@@ -921,20 +886,13 @@
             return count;
         }
 
+        function filterState() {
+            return {collections: selectedConferences(), tags: Array.from(selectedTags),
+                category: sessionCategory, mode: matchMode(), matchesSearch: paperMatchesSearch};
+        }
+
         function filteredPapers() {
-            const tags = Array.from(selectedTags);
-            const conferences = selectedConferences();
-            const query = paperSearchQuery();
-            if (conferences.size === 0) return [];
-            const mode = matchMode();
-            return PAPERS.filter(function(paper) {
-                if (!conferences.has(paperCollection(paper))) return false;
-                if (sessionCategory && !(paper.conference_session_categories || []).includes(sessionCategory)) return false;
-                if (!paperMatchesSearch(paper)) return false;
-                if (tags.length === 0) return true;
-                const matches = matchingTagCount(paper);
-                return mode === 'all' ? matches === tags.length : matches > 0;
-            });
+            return PaperFilters.filter(PAPERS, filterState());
         }
 
         function sortedPapers(papers) {
@@ -1058,8 +1016,14 @@
             options = options || {};
             const label = tag + ' (' + principle(tag).name + ')';
             const selected = selectedTags.has(tag);
-            const title = (selected ? 'Remove filter: ' : 'Filter by principle: ') + label;
-            return '<button type="button" class="principle-button ' + (options.className || 'mini-tag') + '" style="' + tagStyle(tag) + '" data-tag="' + escapeHtml(tag) + '" aria-pressed="' + selected + '" title="' + escapeHtml(title) + '">' +
+            let title = (selected ? 'Remove filter: ' : 'Filter by principle: ') + label;
+            if (options.count !== undefined) {
+                const noun = options.prospective ? ' result' : ' paper';
+                title += '. ' + options.count + noun + (options.count === 1 ? '' : 's') +
+                    (options.prospective ? ' after adding this principle.' : ' in the current results.');
+            }
+            const disabled = options.prospective && options.count === 0 && !selected;
+            return '<button type="button" class="principle-button ' + (options.className || 'mini-tag') + '" data-tag="' + escapeHtml(tag) + '" aria-pressed="' + selected + '" aria-label="' + escapeHtml(title) + '" title="' + escapeHtml(title) + '"' + (disabled ? ' disabled' : '') + '>' +
                 '<span class="principle-text">' + escapeHtml(label) + '</span>' +
                 (options.count === undefined ? '' : '<span class="tag-count">' + options.count + '</span>') + '</button>';
         }
@@ -1071,10 +1035,8 @@
         function sessionBadges(categories) {
             if (!categories || !categories.length) return '';
             return '<div class="session-badges" aria-label="Conference session categories">' + categories.map(function(category) {
-                const hash = Array.from(category).reduce(function(value, letter) { return (value * 31 + letter.charCodeAt(0)) >>> 0; }, 0);
-                const colors = SESSION_COLORS[hash % SESSION_COLORS.length];
                 const selected = sessionCategory === category;
-                return '<button type="button" class="session-badge" data-session-category="' + escapeHtml(category) + '" aria-pressed="' + selected + '" title="' + escapeHtml((selected ? 'Remove session filter: ' : 'Filter by session category: ') + category) + '" style="--session-bg:' + colors.bg + ';--session-border:' + colors.border + ';--session-ink:' + colors.ink + '">' + escapeHtml(category) + '</button>';
+                return '<button type="button" class="session-badge" data-session-category="' + escapeHtml(category) + '" aria-pressed="' + selected + '" title="' + escapeHtml((selected ? 'Remove session filter: ' : 'Filter by session category: ') + category) + '">' + escapeHtml(category) + '</button>';
             }).join('') + '</div>';
         }
 
@@ -1160,13 +1122,12 @@
             const tagBadges = principleLabels(principleTagsForPaper(paper, card));
 
             let body = '<div class="detail-header"><div>' +
-                '<h2 class="detail-title">' + escapeHtml(paper.title) + '</h2>' +
-                '<div class="detail-meta"><span class="conference-badge" style="' + conferenceStyle(paperCollection(paper)) + '">' + escapeHtml(paperCollection(paper)) + '</span>' +
+                '<h2 id="detail_title" class="detail-title">' + escapeHtml(paper.title) + '</h2>' +
+                '<div class="detail-meta"><span class="conference-badge">' + escapeHtml(paperCollection(paper)) + '</span>' +
                 detailBadgeForPaper(paper, card) +
                 '</div>' +
                 (card ? sessionBadges(card.conference_session_categories) : '') +
-                '</div>' +
-                '<button class="detail-close" type="button" aria-label="Close paper details" id="close_detail">x</button></div>';
+                '</div></div>';
 
             if (!paperCardsLoaded) {
                 body += '<section class="detail-section"><p>Loading paper cards...</p></section>';
@@ -1263,7 +1224,46 @@
                 showSameSession = false;
             }
             activePaperId = identifier;
-            render(sync);
+            returnPaperId = identifier;
+            renderPaperDetail(activePaperId);
+            document.getElementById('paper_detail').scrollTop = 0;
+            syncPaperDrawer();
+            updateActiveResult();
+            if (sync) updateUrl();
+        }
+
+        function updateActiveResult() {
+            document.querySelectorAll('.paper-card').forEach(function(card) {
+                card.classList.toggle('active', card.getAttribute('data-paper-id') === activePaperId);
+            });
+        }
+
+        function restorePaperFocus() {
+            const trigger = Array.from(document.querySelectorAll('[data-open-paper]')).find(function(button) {
+                return button.getAttribute('data-open-paper') === returnPaperId;
+            });
+            (trigger || document.getElementById('results_heading')).focus({preventScroll: true});
+        }
+
+        function syncPaperDrawer() {
+            const dialog = document.getElementById('paper_dialog');
+            const shouldOpen = Boolean(paperCard(findPaperByIdentifier(activePaperId)));
+            if (shouldOpen && !dialog.open) {
+                returnPaperId = activePaperId;
+                document.documentElement.classList.add('drawer-open');
+                dialog.showModal();
+            } else if (!shouldOpen && dialog.open) {
+                dialog.close();
+                document.documentElement.classList.remove('drawer-open');
+                restorePaperFocus();
+            }
+        }
+
+        function closePaperDetail() {
+            activePaperId = '';
+            syncPaperDrawer();
+            updateActiveResult();
+            updateUrl();
         }
 
         function renderSelectedTags() {
@@ -1278,16 +1278,18 @@
         }
 
         function renderTagPalette() {
-            const counts = countByTag(PAPERS);
+            const counts = PaperFilters.tagCounts(PAPERS, filterState(), Object.keys(PRINCIPLES));
             const container = document.getElementById('tag_palette');
+            document.getElementById('tag_count_note').textContent = 'Counts show total results after adding a principle. ' +
+                (matchMode() === 'all' ? 'All mode narrows results.' : 'Any mode can broaden results.');
             container.innerHTML = GROUP_ORDER.map(function(group) {
                 const tags = Object.keys(PRINCIPLES).filter(function(tag) { return principle(tag).group === group; }).sort();
-                const total = tags.reduce(function(sum, tag) { return sum + (counts[tag] || 0); }, 0);
                 const buttons = tags.map(function(tag) {
-                    return principleButton(tag, {className:'tag-button', count:counts[tag] || 0});
+                    return principleButton(tag, {className:'tag-button', prospective:true,
+                        count:selectedTags.has(tag) ? undefined : counts[tag] || 0});
                 }).join('');
                 return '<section class="group-block">' +
-                    '<div class="group-header"><span>' + escapeHtml(group) + '</span><span class="group-count">' + total + ' assignments</span></div>' +
+                    '<div class="group-header"><span>' + escapeHtml(group) + '</span></div>' +
                     '<div class="tag-grid">' + buttons + '</div>' +
                     '</section>';
             }).join('');
@@ -1303,20 +1305,13 @@
         function renderRelatedTags(matches) {
             const related = document.getElementById('related_tags');
             const note = document.getElementById('related_note');
-            const conferences = selectedConferences();
-            const hasSearchQuery = paperSearchQuery() !== '';
-            const base = selectedTags.size === 0 && !hasSearchQuery && !sessionCategory ?
-                PAPERS.filter(function(paper) { return conferences.has(paperCollection(paper)); }) :
-                matches;
-            const counts = countByTag(base);
+            const counts = countByTag(matches);
             const relatedTags = Object.keys(counts)
                 .filter(function(tag) { return !selectedTags.has(tag); })
                 .sort(function(a, b) { return counts[b] - counts[a] || a.localeCompare(b); })
                 .slice(0, 18);
 
-            note.textContent = selectedTags.size === 0 && !hasSearchQuery && !sessionCategory ?
-                'Most common tags in the selected collections.' :
-                'Tags that commonly appear with the current result set.';
+            note.textContent = 'Counts show papers with each tag in the current results.';
             if (relatedTags.length === 0) {
                 related.innerHTML = '<div class="empty-state">No related tags for this selection.</div>';
                 return;
@@ -1332,14 +1327,24 @@
             const conferences = selectedConferences();
             const rawQuery = paperSearchQueryRaw();
             const hasSearchQuery = paperSearchQuery() !== '';
+            if (!paperCardsLoaded) {
+                note.textContent = 'Loading paper cards…';
+                results.innerHTML = '';
+                return;
+            }
+            if (paperCardLoadError) {
+                note.textContent = 'Paper cards could not be loaded.';
+                results.innerHTML = '<div class="empty-state">Please reload the page to try again.</div>';
+                return;
+            }
             if (conferences.size === 0) {
                 note.textContent = 'No collections selected.';
                 results.innerHTML = '<div class="empty-state">Select at least one collection.</div>';
                 return;
             }
             if (matches.length === 0) {
-                note.textContent = hasSearchQuery ? 'No papers match this search.' : 'No papers match this tag combination.';
-                results.innerHTML = '<div class="empty-state">Try a shorter search or relax the tag filters.</div>';
+                note.textContent = 'No papers match the current filters.';
+                results.innerHTML = '<div class="empty-state">Try a shorter search, remove a selected principle, or choose another session category.</div>';
                 return;
             }
 
@@ -1349,12 +1354,12 @@
             if (sessionCategory) pieces.push('session category "' + sessionCategory + '"');
             if (selectedTags.size > 0) pieces.push('tags ' + tags + ' using ' + matchMode().toUpperCase() + ' matching');
             if (pieces.length > 0) {
-                note.textContent = 'Showing ' + matches.length + ' papers for ' + pieces.join(' and ') + '.';
+                note.textContent = 'Showing ' + matches.length + (matches.length === 1 ? ' paper for ' : ' papers for ') + pieces.join(' and ') + '.';
             } else {
                 const selectedCollections = availableConferences().filter(function(conference) {
                     return conferences.has(conference);
                 });
-                note.textContent = 'Showing ' + matches.length + ' papers in ' + selectedCollections.join(', ') + '.';
+                note.textContent = 'Showing ' + matches.length + (matches.length === 1 ? ' paper in ' : ' papers in ') + selectedCollections.join(', ') + '.';
             }
             results.innerHTML = sortedPapers(matches).map(function(paper) {
                 const tagButtons = principleLabels(paper.tags);
@@ -1363,13 +1368,13 @@
                     (hasSearchQuery ? 'Search match' : '');
                 const card = paperCard(paper);
                 const active = activePaperId === paper.paper_id ? ' active' : '';
-                const detailBadge = paperCardsLoaded ? detailBadgeForPaper(paper, card) : '';
-                return '<article class="paper-card' + active + '" role="button" tabindex="0" data-paper-id="' + escapeHtml(paper.paper_id) + '">' +
-                    '<div class="paper-topline"><span class="conference-badge" style="' + conferenceStyle(paperCollection(paper)) + '">' + escapeHtml(paperCollection(paper)) + '</span>' +
+                return '<article class="paper-card' + active + '" data-paper-id="' + escapeHtml(paper.paper_id) + '">' +
+                    '<h3 class="paper-title"><button type="button" class="paper-open" data-open-paper="' + escapeHtml(paper.paper_id) + '" aria-haspopup="dialog">' + escapeHtml(paper.title) + '</button></h3>' +
+                    '<div class="paper-topline">' + (card && card.system_or_method_name ? '<span class="paper-system">' + escapeHtml(card.system_or_method_name) + '</span>' : '') +
+                    '<span class="conference-badge">' + escapeHtml(paperCollection(paper)) + '</span>' +
                     (paper.publication_year ? '<span class="detail-badge muted">' + escapeHtml(paper.publication_year) + '</span>' : '') +
-                    (matchLabel ? '<span class="match-badge">' + matchLabel + '</span>' : '') + detailBadge + '</div>' +
-                    '<h3 class="paper-title">' + escapeHtml(paper.title) + '</h3>' +
-                    sessionBadges(paper.conference_session_categories) +
+                    (matchLabel ? '<span class="match-badge">' + matchLabel + '</span>' : '') + '</div>' +
+                    '<p class="paper-mechanism">' + escapeHtml(card && card.one_sentence_mechanism || 'Mechanism summary unavailable. Open the paper for details.') + '</p>' +
                     '<div class="paper-tags">' + tagButtons + '</div>' +
                     '</article>';
             }).join('');
@@ -1441,7 +1446,8 @@
                 return candidate.getAttribute(attribute) === value;
             });
             const focusTarget = replacement || document.getElementById(isSession ? 'session_category' : 'clear_tags');
-            focusTarget.focus({preventScroll:true});
+            if (event.currentTarget.id === 'paper_detail' && !document.getElementById('paper_dialog').open) restorePaperFocus();
+            else focusTarget.focus({preventScroll:true});
             return true;
         }
 
@@ -1460,28 +1466,44 @@
             renderRelatedTags(matches);
             renderResults(matches);
             renderPaperDetail(activePaperId);
-            document.querySelector('.explorer-grid').classList.toggle('has-active-paper', Boolean(activePaperId));
+            syncPaperDrawer();
             if (sync) updateUrl();
         }
 
         function init() {
             loadUrlState();
+            const mobile = window.matchMedia('(max-width: 760px)');
+            const filterPanel = document.getElementById('filters_panel');
+            filterPanel.open = !mobile.matches;
+            mobile.addEventListener('change', function(event) { filterPanel.open = !event.matches; });
+            document.getElementById('close_detail').addEventListener('click', closePaperDetail);
+            document.getElementById('paper_dialog').addEventListener('cancel', function(event) {
+                event.preventDefault();
+                closePaperDetail();
+            });
+            document.getElementById('paper_dialog').addEventListener('keydown', function(event) {
+                if (event.key !== 'Tab') return;
+                const controls = Array.from(event.currentTarget.querySelectorAll(
+                    'button:not(:disabled), input:not(:disabled), select:not(:disabled), textarea:not(:disabled), a[href], [tabindex]:not([tabindex="-1"])'
+                )).filter(element => element.getClientRects().length);
+                const first = controls[0];
+                const last = controls[controls.length - 1];
+                if (event.shiftKey && document.activeElement === first) {
+                    event.preventDefault();
+                    last.focus();
+                } else if (!event.shiftKey && document.activeElement === last) {
+                    event.preventDefault();
+                    first.focus();
+                }
+            });
             document.getElementById('tag_palette').addEventListener('click', handleFilterClick);
             document.getElementById('related_tags').addEventListener('click', handleFilterClick);
             document.getElementById('paper_results').addEventListener('click', function(event) {
                 if (handleFilterClick(event)) return;
-                const paperCard = event.target.closest('[data-paper-id]');
-                if (paperCard) {
-                    showPaperDetail(paperCard.getAttribute('data-paper-id'), true);
+                const trigger = event.target.closest('[data-open-paper]');
+                if (trigger) {
+                    showPaperDetail(trigger.getAttribute('data-open-paper'), true);
                 }
-            });
-            document.getElementById('paper_results').addEventListener('keydown', function(event) {
-                if (event.key !== 'Enter' && event.key !== ' ') return;
-                if (event.target.closest('[data-tag], [data-session-category]')) return;
-                const paperCard = event.target.closest('[data-paper-id]');
-                if (!paperCard) return;
-                event.preventDefault();
-                showPaperDetail(paperCard.getAttribute('data-paper-id'), true);
             });
             document.getElementById('paper_detail').addEventListener('click', function(event) {
                 if (event.target.closest('#session_peers_toggle')) {
@@ -1499,10 +1521,6 @@
                     return;
                 }
                 if (handleFilterClick(event)) return;
-                if (event.target.closest('#close_detail')) {
-                    activePaperId = '';
-                    render(true);
-                }
             });
             document.getElementById('paper_detail').addEventListener('change', function(event) {
                 if (event.target.id !== 'different_sessions') return;
