@@ -956,7 +956,7 @@
         }
 
         function loadPaperCards() {
-            return fetch('../../examples/vldb23-osdi23-crossref/paper-cards.json')
+            return fetch('../../examples/vldb23-osdi23-crossref/paper-cards.json', {cache: 'no-cache'})
                 .then(function(response) {
                     if (!response.ok) throw new Error('Unable to load paper cards');
                     return response.json();
