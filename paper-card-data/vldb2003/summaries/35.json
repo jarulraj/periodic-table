@@ -1,0 +1,294 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "35",
+    "paper_title": "A Shrinking-Based Approach for Multi-Dimensional Data Analysis",
+    "authors": [
+      "Yong Shi",
+      "Yuqing Song",
+      "Aidong Zhang"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference, Berlin, Germany, 2003",
+    "year": "2003",
+    "system_or_method_name": "Shrinking-based approach",
+    "problem_domain": "Multi-dimensional data clustering"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To propose a data preprocessing technique called 'shrinking' to optimize the inner structure of data, making clusters more condensed and widely-separated, thereby addressing the inadequacies of current clustering algorithms in handling noisy, multi-dimensional data with varied cluster densities and shapes.",
+    "primary_optimized_metric": "accuracy",
+    "secondary_metrics": [
+      "robustness",
+      "query time"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "93.48% precision, 89.58% recall",
+        "meaning": "The accuracy of the proposed algorithm on one of the three clusters in the Wine Recognition dataset.",
+        "pointer": "[Table 1, p.9]"
+      },
+      {
+        "number_or_delta": "Precision improved from 56.52% to 96.55%",
+        "meaning": "For one cluster in the Wine dataset, applying shrinking preprocessing before running the CURE algorithm improved CURE's precision from 56.52% to 96.55%.",
+        "pointer": "[Table 2, p.10 and Table 7, p.11]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Grid-based and density-based clustering algorithms",
+    "why_this_is_the_right_comparison": "These algorithms represent the contemporary approaches that struggle with high-dimensional data due to issues like noise, clusters of various densities, and arbitrary shapes, which the proposed method aims to solve.",
+    "limiting_design_assumption": "A single, fixed scale (e.g., grid-cell size or neighborhood radius) is sufficient to identify clusters directly from the static, original data distribution. This assumption fails when data contains clusters of varying densities or is obscured by noise.",
+    "pointers": [
+      "[p.2]"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Iterative data space transformation",
+    "specific_tools_or_algorithms": [
+      "Iterative point movement based on Newton's Law of Gravitation",
+      "Multi-scale grid processing",
+      "Histogram-based scale selection",
+      "Compactness-based cluster evaluation"
+    ],
+    "what_is_being_optimized": "The spatial distribution of data points to increase intra-cluster density and inter-cluster separation.",
+    "state_or_ir": "The coordinates of data points in a multi-dimensional space.",
+    "output": "A transformed dataset and a set of detected clusters.",
+    "pointers": [
+      "[p.1]",
+      "[p.3]",
+      "[p.5]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Introduces a 'shrinking' preprocessing step that iteratively moves data points towards the centroid of their local dense neighborhood, simulating gravitational attraction. This condenses clusters and isolates outliers, simplifying subsequent cluster detection.",
+      "baseline_assumption": "Data points have fixed positions, and clustering algorithms must operate on the raw spatial distribution.",
+      "why_baseline_did_not_include_it": "This is the paper's core novel contribution. While some prior work like CURE shrinks a few representative points, this approach moves all data points based on local density gradients, fundamentally altering the data space before clustering.",
+      "mechanism_level_implementation": "In each iteration, points within a dense grid cell are moved as a rigid body toward the data centroid of the surrounding dense cells. The movement is proportional to the distance to the surrounding centroid and is only triggered if the surrounding region is denser. Points in sparse cells are ignored.",
+      "primary_metric_improved": "accuracy",
+      "tradeoffs_or_costs": "Adds significant computational cost due to the iterative nature of the shrinking process, with a time complexity of O(T_it * (M^2 + n log n)) per scale, where M is the number of dense cells.",
+      "pointers": [
+        "[p.2]",
+        "[p.5]",
+        "[p.6, Equation 13]",
+        "[p.7]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Employs a multi-scale, interleaved grid approach to overcome the sensitivity to a single, fixed grid-cell size. The shrinking and detection process is run on a sequence of grids of different sizes, and the best clusters are selected using a quality metric.",
+      "baseline_assumption": "A single, user-specified scale (grid size or neighborhood radius) is sufficient to identify all clusters.",
+      "why_baseline_did_not_include_it": "Baseline grid-based or density-based algorithms often have difficulty choosing a proper cell size or radius that can find all clusters, especially when clusters have various densities.",
+      "mechanism_level_implementation": "A sequence of grid scales is automatically determined using a histogram-based analysis of the data. For each scale, two interleaved grids are used to avoid artifacts from points clustered near grid vertices. After running the algorithm at all scales, a 'compactness' score is computed for all detected clusters, and only those exceeding a threshold are selected as the final result.",
+      "primary_metric_improved": "accuracy",
+      "tradeoffs_or_costs": "Increases overall runtime by repeating the shrinking and detection process for multiple scales and two grids per scale.",
+      "pointers": [
+        "[p.2]",
+        "[p.3]",
+        "[p.5]",
+        "[p.8]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Gd",
+          "name": "Goal-Directed",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The iterative data movement process, where each point is moved according to a rule designed to achieve the goal of condensing clusters.",
+          "why_it_applies": "The system does not solve for clusters directly but first transforms the data space towards a goal state where clusters are 'condensed and widely-separated' [p.2]. The movement rule (Equation 13) is the mechanism synthesized to achieve this goal step-by-step.",
+          "justification_if_invented": "",
+          "pointer": "[p.6, Equation 13]"
+        },
+        {
+          "symbol": "Lo",
+          "name": "Locality of Reference",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The calculation of a point's movement vector, which depends only on the data centroid of its 'surrounding cells'.",
+          "why_it_applies": "The 'gravitational' force on a point is determined by its local neighborhood, not the global data distribution. The algorithm explicitly computes the centroid of surrounding dense cells to determine the movement direction.",
+          "justification_if_invented": "",
+          "pointer": "[p.5, Section 4.1]"
+        },
+        {
+          "symbol": "Cc",
+          "name": "Common-Case Specialization",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The differential treatment of dense versus sparse cells.",
+          "why_it_applies": "The system specializes its computation on the common case (dense cells, likely part of a cluster) by performing the movement calculation for them, while avoiding this work for the uncommon case (sparse cells, treated as noise). This is done to realize 'dramatic time savings'.",
+          "justification_if_invented": "",
+          "pointer": "[p.5]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "reason_rejected_or_borderline": "Ignoring sparse cells is a form of noise filtering that explicitly changes the final result (the positions of points and the resulting clusters). It is not result-preserving.",
+          "pointer": "[p.5]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Ad",
+          "name": "Adaptive Processing",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The use of a 'sequence of grids of different cell sizes' to run the clustering process.",
+          "why_it_applies": "The system adapts to datasets with 'clusters of various densities' [p.4] by not committing to a single scale. Instead, it processes the data at multiple scales, which are themselves determined from the data's properties via histograms.",
+          "justification_if_invented": "",
+          "pointer": "[p.3]"
+        },
+        {
+          "symbol": "Cm",
+          "name": "Cost-based",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The final cluster selection step, which evaluates all clusters detected at all scales using a 'compactness' metric.",
+          "why_it_applies": "The system generates multiple candidate clusterings (one for each scale) and uses a quantitative quality model (compactness) to choose among them. 'Those clusters with compactness exceeding a specified threshold will be output as the final result.'",
+          "justification_if_invented": "",
+          "pointer": "[p.8, Section 6.3]"
+        },
+        {
+          "symbol": "Ft",
+          "name": "Fault Tolerance",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The use of 'two interleaved grids for a given cell size'.",
+          "why_it_applies": "This mechanism is explicitly designed to tolerate a specific failure mode ('fault') of grid-based methods: when points forming a cluster fall near a grid vertex and are incorrectly separated into different sparse cells. The interleaved grid ensures that such a cluster will be captured by at least one of the grids.",
+          "justification_if_invented": "",
+          "pointer": "[p.5, Section 4.1]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Bb",
+          "name": "Black-Box Tuning",
+          "reason_rejected_or_borderline": "While multiple scales are tried, the selection of these scales is not black-box; it is guided by a data-driven histogram analysis. The final selection is also based on an explicit quality model (compactness), making Cm a more specific and accurate principle.",
+          "pointer": "[p.3]"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Single-scale, static-point clustering + Gd + Ad + Cm -> Shrinking-based multi-scale clustering",
+    "baseline_name": "Single-scale, static-point clustering",
+    "top_3_principle_tags": [
+      "Gd",
+      "Ad",
+      "Cm"
+    ],
+    "core_principle_tags": [
+      "Gd",
+      "Lo",
+      "Ad",
+      "Cm"
+    ],
+    "supporting_principle_tags": [
+      "Cc",
+      "Ft"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Gd",
+      "Lo",
+      "Cc",
+      "Ad",
+      "Cm",
+      "Ft"
+    ],
+    "new_system_name": "Shrinking-based multi-scale clustering",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "This composition transforms a difficult, direct clustering problem into a simpler one. Gd reshapes the data space to make clusters more obvious. However, this reshaping depends on a scale parameter. Ad addresses this by running the Gd-based process at multiple, data-driven scales, generating multiple candidate clusterings. Finally, Cm provides the decision framework to select the highest-quality clusters from the candidates produced by the adaptive, multi-scale process.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Gd",
+          "contribution_to_equation": "Provides the core mechanism for transforming the data space by iteratively moving points towards a goal state of higher density and separation."
+        },
+        {
+          "symbol": "Ad",
+          "contribution_to_equation": "Makes the goal-directed process robust to clusters of varying densities by applying it across multiple, data-driven scales."
+        },
+        {
+          "symbol": "Cm",
+          "contribution_to_equation": "Introduces a quality model ('compactness') to evaluate and select the best clusters from the multiple candidates generated by the adaptive process."
+        }
+      ],
+      "transfer_question": "In what other domains could a goal-directed data space transformation, applied adaptively at multiple scales and evaluated by a cost model, simplify a hard pattern recognition problem?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "Time complexity (shrinking)",
+      "direction": "up",
+      "concrete_number": "O(T_it * (M^2 + n log n))",
+      "pointer": "[p.7]"
+    },
+    {
+      "property": "Time complexity (detection)",
+      "direction": "up",
+      "concrete_number": "O((m1 + m2)^2)",
+      "pointer": "[p.7]"
+    },
+    {
+      "property": "Time complexity (evaluation)",
+      "direction": "up",
+      "concrete_number": "O(|DC|^2)",
+      "pointer": "[p.8]"
+    },
+    {
+      "property": "Space complexity",
+      "direction": "not specified",
+      "concrete_number": "O(n)",
+      "pointer": "[p.7]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Pa",
+      "name": "Physical Analogy Reshaping",
+      "definition": "Reshaping a problem's state space by iteratively applying update rules derived from an analogy to a physical process (e.g., gravity, diffusion, annealing) to reveal underlying structure or find a low-energy configuration.",
+      "mechanism_pattern": "The paper's 'shrinking' process, where data points are treated as masses that attract each other according to a gravity-like force, causing them to move towards local density centers. This transforms the data distribution into one where clusters are more compact and separated.",
+      "why_existing_principles_are_insufficient": "Gd (Goal-Directed) is too general; it captures the intent to move towards a goal but not the specific, reusable pattern of using a physical analogy to derive the update rules. Lo (Locality of Reference) describes a property of the interaction but not the overall transformation's design origin. Pa is more specific than Gd for this class of heuristic algorithms.",
+      "closest_existing_principles": [
+        "Gd",
+        "Lo"
+      ],
+      "reusability_beyond_this_paper": "This pattern is highly reusable. Simulated annealing is a classic example. Other algorithms in graphics (particle systems), machine learning (energy-based models), and data analysis use physics-based simulations to organize or analyze data.",
+      "confidence": "medium",
+      "pointer": "[p.3, Section 2]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "Improves multi-dimensional clustering by first applying a data preprocessing step that iteratively moves points towards their local density centers, simulating gravitational attraction, to make clusters more compact and separated before detection.",
+    "top_3_principles": [
+      "Gd",
+      "Ad",
+      "Cm"
+    ],
+    "mechanism_family": "other",
+    "specific_tools_or_algorithms": [
+      "Iterative point movement based on Newton's Law of Gravitation",
+      "Multi-scale grid processing",
+      "Histogram-based scale selection",
+      "Compactness-based cluster evaluation"
+    ],
+    "primary_design_archetype": "other",
+    "principle_mapping_confidence": "high"
+  }
+}

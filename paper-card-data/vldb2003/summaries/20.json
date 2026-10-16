@@ -1,0 +1,279 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "20",
+    "paper_title": "Query Processing for High-Volume XML Message Brokering",
+    "authors": [
+      "Yanlei Diao",
+      "Michael Franklin"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference, Berlin, Germany, 2003",
+    "year": "2003",
+    "system_or_method_name": "XML Message Broker with Shared Post-Processing",
+    "problem_domain": "XML message brokering"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To efficiently process a large set of continuous queries over high-volume XML message streams, supporting not just filtering but also customized result generation (transformation) for each query.",
+    "primary_optimized_metric": "throughput",
+    "secondary_metrics": [
+      "scalability"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "472ms",
+        "meaning": "Multi-Query Processing Time (MQPT) to handle 100,000 unique query plans with shared post-processing.",
+        "pointer": "[p.12]"
+      },
+      {
+        "number_or_delta": "Linear growth",
+        "meaning": "Without shared post-processing, MQPT grows linearly with the number of queries, becoming a scalability bottleneck.",
+        "pointer": "[p.12, Fig 11]"
+      },
+      {
+        "number_or_delta": "2985ms",
+        "meaning": "MQPT for 50,000 queries using PathSharing-FWR without shared post-processing.",
+        "pointer": "[p.12, Table 4]"
+      },
+      {
+        "number_or_delta": "317ms",
+        "meaning": "MQPT for 50,000 queries (40,392 unique plans) using PathSharing-FWR with shared post-processing.",
+        "pointer": "[p.12, Table 5]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Shared Path Matching Engine (e.g., YFilter)",
+    "why_this_is_the_right_comparison": "The paper aims to add customized result generation on top of existing high-performance XML filtering systems. These systems excel at shared path matching but do not address result transformation, making them the direct foundation and point of departure for this work.",
+    "limiting_design_assumption": "The primary performance challenge is shared path matching for filtering. Post-processing for result customization can be handled naively on a per-query basis without becoming a bottleneck. The paper refutes this, stating that with an efficient matching engine, \"it is easy for post-processing to become the dominant component of query processing cost\" [p.1].",
+    "pointers": [
+      "[quote: 'XML filtering solutions developed to date have focused on the matching of documents to large numbers of queries but have not addressed the customization of output...']",
+      "[p.1]",
+      "[quote: 'Since shared processing of path expressions has been shown to be an efficient and scalable foundation... we start with such an engine...']",
+      "[p.1]"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Multi-query optimization for stream processing",
+    "specific_tools_or_algorithms": [
+      "Relational-style operators (Selection, DupElim, Semijoin, OuterJoin-Select)",
+      "Hash-based and merge-based join implementations",
+      "Shared query plans with GroupBy operators",
+      "Static analysis of query structure and DTDs"
+    ],
+    "what_is_being_optimized": "The execution plan for a large set of continuous XQuery-like queries over XML streams.",
+    "state_or_ir": "A shared Non-Deterministic Finite Automaton (NFA) for path matching, which produces streams of 'path-tuples'. These streams are then processed by a dataflow graph of relational-style operators.",
+    "output": "Customized XML fragments in a 'groupSequence-listSequence' format.",
+    "pointers": [
+      "[p.2]",
+      "[p.3]",
+      "[p.4]",
+      "[p.8]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Systematically pushes more parts of each query (where and return clauses) into the shared path matching engine and introduces static analysis of queries and DTDs to optimize the resulting complex per-query post-processing plans.",
+      "baseline_assumption": "Only the primary filtering paths (e.g., from 'for' clauses) should be processed in a shared manner. Post-processing is simple and can be done individually per query.",
+      "why_baseline_did_not_include_it": "The baseline focused only on filtering, not transformation. Aggressively sharing more paths creates complex post-processing challenges (e.g., managing duplicates, stream ordering) that require new operators and optimizations not considered by filtering-only systems.",
+      "mechanism_level_implementation": "Introduces three strategies (PathSharing-F, -FW, -FWR) that push more paths into the shared engine. This requires post-processing plans with semijoins and outer joins. To make this efficient, it uses static analysis of query structure (e.g., `//` axes) and DTDs (e.g., recursive elements) to prove when expensive `DupElim` operators can be removed and when cheaper merge-based joins can be used instead of hash-based ones.",
+      "primary_metric_improved": "throughput",
+      "tradeoffs_or_costs": "The most aggressive sharing approach (PathSharing-FWR) introduces the most complex post-processing and performs poorly without the optimizations. There is an inherent tension between aggressive sharing and the complexity of result customization.",
+      "pointers": [
+        "[p.4-5]",
+        "[p.6]",
+        "[p.11, Fig 7]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Shares post-processing work across multiple queries by identifying and merging common operations like joins, selections, and grouping.",
+      "baseline_assumption": "Each query requires its own independent post-processing plan and execution, even if parts of the queries are similar.",
+      "why_baseline_did_not_include_it": "The baseline did not have a sophisticated post-processing stage. This delta addresses the new bottleneck—per-query post-processing costs—that emerges after Δ1's optimizations, which still scale linearly with the number of queries.",
+      "mechanism_level_implementation": "Introduces techniques to share post-processing operators. `GroupBy` operators are shared for common return paths. Selections are pulled up over joins to allow the joins to be shared by queries with the same 'signature' (input paths). Selections with identical signatures are also grouped and executed once. A `tpList` data structure avoids pointer copying for tuple fan-out.",
+      "primary_metric_improved": "scalability",
+      "tradeoffs_or_costs": "Increases the complexity of query plan construction, which must now incrementally merge new queries into a global shared plan, and the execution engine, which must route tuples through the shared graph.",
+      "pointers": [
+        "[p.7-9]",
+        "[p.12, Fig 12]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Rc",
+          "name": "Reuse of Computation",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "Pushing navigation paths from `where` and `return` clauses into the YFilter shared path matching engine.",
+          "why_it_applies": "The design explicitly extends the scope of computation reuse from just the binding paths (PathSharing-F) to predicate and return paths (PathSharing-FW, -FWR), leveraging the shared NFA engine for more parts of the query.",
+          "justification_if_invented": "",
+          "pointer": "[p.4-5]"
+        },
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "Using static analysis of query structure (e.g., number of `//` axes) and DTDs to remove `DupElim` operators and choose merge-based over hash-based join implementations.",
+          "why_it_applies": "The system derives sufficient conditions to prove that duplicates cannot occur or that input streams to a join will be correctly ordered. Based on these proofs, it avoids the work of duplicate elimination or building a hash table, without altering the final query result. This is a canonical example of result-preserving work avoidance.",
+          "justification_if_invented": "",
+          "pointer": "[p.6, Claims 1-5]"
+        },
+        {
+          "symbol": "Se",
+          "name": "Semantically Explicit",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "Inspecting the DTD element graph to check for recursive elements.",
+          "why_it_applies": "The optimizer consumes explicit structural semantics from the DTD (if available) to reason about data properties (e.g., potential for reordering or duplicates), which enables the Wv optimizations. The DTD makes structural constraints explicit for the system to exploit.",
+          "justification_if_invented": "",
+          "pointer": "[p.6]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Cm",
+          "name": "Cost-based",
+          "reason_rejected_or_borderline": "The optimizations are based on rules derived from static analysis (e.g., 'if no `//` axis, then stream is ordered'), not on a quantitative cost model.",
+          "pointer": "[p.6]"
+        },
+        {
+          "symbol": "Bo",
+          "name": "Bottleneck-Oriented",
+          "reason_rejected_or_borderline": "While post-processing is identified as the new bottleneck, the optimizations are general techniques for plan simplification rather than a design focused on alleviating a specific resource bottleneck (like CPU or I/O).",
+          "pointer": "[p.1]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Rc",
+          "name": "Reuse of Computation",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "Merging post-processing operators (joins, selections, GroupBy) that have the same 'signature' across different queries into a single shared operator in the execution plan.",
+          "why_it_applies": "This delta's central theme is extending computation reuse beyond the path matching engine to the post-processing stage itself, which is critical for scalability with the number of queries.",
+          "justification_if_invented": "",
+          "pointer": "[p.7-8]"
+        },
+        {
+          "symbol": "Ep",
+          "name": "Equivalence-based",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "Pulling selection operators up over semijoins to create shared join operators.",
+          "why_it_applies": "The query plan is transformed into a logically equivalent form (selection after join instead of before) specifically to enable a different physical plan that exposes more opportunities for sharing (Rc).",
+          "justification_if_invented": "",
+          "pointer": "[p.8]"
+        },
+        {
+          "symbol": "Sc",
+          "name": "Scalability",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The entire set of sharing techniques for post-processing.",
+          "why_it_applies": "While Rc is the direct mechanism, the design is explicitly motivated by and evaluated on its ability to scale to tens or hundreds of thousands of queries. The sharing mechanisms are the means to achieve this scalability, which is a primary design driver.",
+          "justification_if_invented": "",
+          "pointer": "[p.12, Fig 12]"
+        }
+      ],
+      "rejected_or_borderline_principles": []
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Per-query Post-Processing + Rc + Wv -> Shared XML Query Processor",
+    "baseline_name": "Per-query Post-Processing on a Shared Path-Matching Engine",
+    "top_3_principle_tags": [
+      "Rc",
+      "Wv"
+    ],
+    "core_principle_tags": [
+      "Rc",
+      "Wv"
+    ],
+    "supporting_principle_tags": [
+      "Se",
+      "Ep",
+      "Sc"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Rc",
+      "Wv",
+      "Se",
+      "Ep",
+      "Sc"
+    ],
+    "new_system_name": "Shared XML Query Processor",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "The system achieves scalability by applying Reuse of Computation (Rc) at two levels: first, pushing more query logic into a shared path-matching engine, and second, sharing the post-processing operators themselves. This aggressive reuse creates complexity, which is managed by Result-Preserving Work Avoidance (Wv), using static analysis to prove that expensive correctness operators (like duplicate elimination) are unnecessary, thus making the shared approach viable.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Rc",
+          "contribution_to_equation": "Provides the core mechanism for scalability by executing common computations (both path matching and post-processing operators) once for many queries."
+        },
+        {
+          "symbol": "Wv",
+          "contribution_to_equation": "Makes aggressive reuse practical by using semantic analysis to safely eliminate the overhead (e.g., duplicate elimination, hash table construction) required to handle the complexities introduced by sharing."
+        }
+      ],
+      "transfer_question": "In what other domains with large numbers of standing queries could aggressive, multi-level computation reuse be made practical by using static analysis of queries and schemas to provably eliminate correctness-enforcing overhead?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "throughput",
+      "direction": "up",
+      "concrete_number": "100,000 queries processed in 472ms",
+      "pointer": "[p.12]"
+    },
+    {
+      "property": "scalability",
+      "direction": "up",
+      "concrete_number": "MQPT grows slowly with shared post-processing vs. linearly without it.",
+      "pointer": "[p.12, Fig 12]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "none",
+      "symbol": "None",
+      "name": "None",
+      "definition": "No plausible new principle candidate.",
+      "mechanism_pattern": "Not applicable",
+      "why_existing_principles_are_insufficient": "Existing principles sufficiently cover the paper's mechanisms. The core design move is a composition of aggressive Reuse of Computation (Rc) at multiple system layers, made efficient by Result-Preserving Work Avoidance (Wv) justified by Semantically Explicit (Se) information from schemas. This composition explains the design well.",
+      "closest_existing_principles": [],
+      "reusability_beyond_this_paper": "Not applicable",
+      "confidence": "low",
+      "pointer": "Not specified in provided text"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "Enables scalable, customized XML message brokering by aggressively sharing computation not only for path matching but also for post-processing operators, and using static analysis of queries and schemas to provably eliminate redundant work like duplicate elimination.",
+    "top_3_principles": [
+      "Rc",
+      "Wv"
+    ],
+    "mechanism_family": "query optimization",
+    "specific_tools_or_algorithms": [
+      "Relational-style operators (Selection, DupElim, Semijoin, OuterJoin-Select)",
+      "Hash-based and merge-based join implementations",
+      "Shared query plans with GroupBy operators",
+      "Static analysis of query structure and DTDs"
+    ],
+    "primary_design_archetype": "avoid materialization / recomputation",
+    "principle_mapping_confidence": "high"
+  }
+}

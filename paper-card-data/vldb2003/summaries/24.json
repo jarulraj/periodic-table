@@ -1,0 +1,291 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "24",
+    "paper_title": "Load Shedding in a Data Stream Manager",
+    "authors": [
+      "Nesime Tatbul",
+      "Mitch Cherniack",
+      "Ugur Cetintemel",
+      "Stan Zdonik",
+      "Michael Stonebraker"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference",
+    "year": "2003",
+    "system_or_method_name": "Aurora Load Shedder",
+    "problem_domain": "Data stream management"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To dynamically shed load in a data stream management system when input rates exceed capacity, in order to improve latency with minimal degradation in answer quality (utility).",
+    "primary_optimized_metric": "accuracy",
+    "secondary_metrics": [
+      "latency"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "+22% to +307%",
+        "meaning": "Range of excess load over system capacity tested in experiments.",
+        "pointer": "[p.8]"
+      },
+      {
+        "number_or_delta": "~20% vs ~45% utility loss",
+        "meaning": "At a mean input rate of 0.5 tuples/unit time, the proposed Random-LS algorithm incurred ~20% tuple utility loss, while the baseline Input-Random algorithm incurred ~45% loss.",
+        "pointer": "[p.9, Figure 9]"
+      },
+      {
+        "number_or_delta": "~5% vs ~20% utility loss",
+        "meaning": "At a mean input rate of 0.5 tuples/unit time, the proposed Semantic-LS algorithm incurred ~5% value utility loss, while the Random-LS algorithm incurred ~20% loss.",
+        "pointer": "[p.9, Figure 10]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Classical admission control",
+    "why_this_is_the_right_comparison": "This represents the simplest and most common approach to overload, where load is shed at the system boundary (inputs) without considering the query plan structure or the semantic value of data. This baseline highlights the benefits of the paper's QoS-aware, intra-plan approach.",
+    "limiting_design_assumption": "The baseline assumes that all data tuples are equally important and that load shedding should occur only at the system inputs, ignoring query plan structure and application-specific Quality-of-Service (QoS) requirements.",
+    "pointers": [
+      "[p.8, \"we also developed two other algorithms that effectively simulate classical admission control.\"]",
+      "[p.8, \"Neither algorithm takes QoS information into account; rather, they shed load at the network inputs as necessary.\"]"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Rule-based optimizer",
+    "primary_tool_specific_type": "Greedy cost-based planner",
+    "specific_tools_or_algorithms": [
+      "Load Shedding Road Map (LSRM)",
+      "Loss/Gain ratio calculation"
+    ],
+    "what_is_being_optimized": "The placement and magnitude of 'Drop' operators in a query plan to minimize utility loss for a target reduction in CPU load.",
+    "state_or_ir": "A query network graph with operator costs and selectivities, and application QoS graphs.",
+    "output": "A modified query network containing 'Drop' operators.",
+    "pointers": [
+      "[p.4, \"Our approach depends on a pre-computed, tabular data structure called the Load Shedding Road Map (LSRM).\"]",
+      "[p.6, \"the best network location (i.e., arc) to insert a drop is the one with the minimum Loss/Gain ratio.\"]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Introduces a QoS-aware, cost-based load shedding framework that pre-computes a 'road map' of drop plans. At runtime, it dynamically inserts random drop operators inside the query plan at locations that offer the best tradeoff between utility loss and cycle savings, instead of dropping randomly at the inputs.",
+      "baseline_assumption": "Load shedding is best performed at system inputs, treating all tuples equally and ignoring the internal structure of query plans.",
+      "why_baseline_did_not_include_it": "Admission control is a simpler, generic mechanism that does not require detailed knowledge of query plans, operator costs, or application-specific QoS, which the proposed system requires.",
+      "mechanism_level_implementation": "A Load Shedding Road Map (LSRM) is pre-computed by sorting all potential drop locations (at query inputs and operator fan-out points) by their 'Loss/Gain' ratio. Loss is the utility drop per percentage of tuples dropped (from QoS curves), and Gain is the CPU cycles saved. When overloaded, the system performs a table lookup in the LSRM to find the cheapest plan that sheds the required load.",
+      "primary_metric_improved": "accuracy",
+      "tradeoffs_or_costs": "Requires static analysis to build the LSRM and depends on the accuracy of statistics like operator costs and selectivities. Adds complexity compared to simple admission control.",
+      "pointers": [
+        "[p.4]",
+        "[p.6]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Implements semantic load shedding by using value-based QoS specifications. The system derives loss-tolerance curves from value-based utility and data histograms, allowing it to insert drop operators that filter specific, low-utility tuples based on their content, rather than dropping tuples randomly.",
+      "baseline_assumption": "If tuples must be dropped, it must be done randomly or uniformly, without regard to their content or semantic importance.",
+      "why_baseline_did_not_include_it": "The baseline lacks a mechanism to incorporate or reason about application-level semantics regarding data values. This requires richer QoS specifications and data statistics (histograms) that are not part of a simple admission control model.",
+      "mechanism_level_implementation": "A loss-tolerance QoS graph is derived from a value-based QoS graph and a data value histogram. This allows the Loss/Gain framework from Δ1 to rank drop locations based on semantic importance. When a drop is required, the system synthesizes a predicate (e.g., `value > 25`) to discard tuples from the lowest-utility value intervals first.",
+      "primary_metric_improved": "accuracy",
+      "tradeoffs_or_costs": "Requires more detailed, application-specific QoS information (value-based graphs) and statistics on data distributions (histograms). The predicate generation is restricted to certain forms like ranges.",
+      "pointers": [
+        "[p.7]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Ad",
+          "name": "Adaptive Processing",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "Detection of system overload (input rates exceeding capacity).",
+          "why_it_applies": "The system dynamically adapts to load by inserting or removing Drop operators in the query plan at runtime based on current load conditions.",
+          "justification_if_invented": "",
+          "pointer": "[p.1, \"dynamically inserting and removing drop operators into query plans as required by the current load.\"]"
+        },
+        {
+          "symbol": "Cm",
+          "name": "Cost-based",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The creation of the Load Shedding Road Map (LSRM).",
+          "why_it_applies": "The decision of where to place drops is governed by a cost model that minimizes a 'Loss/Gain' ratio, where Loss is the utility sacrificed and Gain is the processor cycles saved. This ratio explicitly trades off answer quality against resource consumption.",
+          "justification_if_invented": "",
+          "pointer": "[p.6, \"the best network location (i.e., arc) to insert a drop is the one with the minimum Loss/Gain ratio.\"]"
+        },
+        {
+          "symbol": "Fp",
+          "name": "Function Placement",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The 'where to shed load' decision process.",
+          "why_it_applies": "The algorithm explicitly decides where in the distributed query graph to place the 'Drop' functionality, considering locations at inputs and operator fan-out points to optimize the system-wide impact.",
+          "justification_if_invented": "",
+          "pointer": "[p.6, Section 4.3.1, \"Choosing Drop Locations\"]"
+        },
+        {
+          "symbol": "Pd",
+          "name": "Probabilistic Design",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The 'Random Drop' operator.",
+          "why_it_applies": "The mechanism for the random load shedder is explicitly probabilistic, dropping a fraction of tuples by 'tossing a coin that is weighted by p'.",
+          "justification_if_invented": "",
+          "pointer": "[p.3, \"This is implemented by tossing a coin that is weighted by p.\"]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "reason_rejected_or_borderline": "Rejected because dropping tuples explicitly changes the result and degrades accuracy. The paper states this is a tradeoff: 'When we improve utility by shedding load... we necessarily lose utility by producing an approximate answer.'",
+          "pointer": "[p.2]"
+        },
+        {
+          "symbol": "Bo",
+          "name": "Bottleneck-Oriented",
+          "reason_rejected_or_borderline": "Borderline. The system targets the CPU as the bottleneck resource. However, the core novelty is not just relieving the bottleneck, but how it uses a cost model (Cm) to do so with minimal quality degradation. Cm is more specific to the mechanism.",
+          "pointer": "[p.1, \"concentrates on the processor as the limited resource\"]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Se",
+          "name": "Semantically Explicit",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The use of value-based QoS graphs and the creation of 'Semantic Drop' operators.",
+          "why_it_applies": "The system uses an explicit representation of data importance (the value-based QoS graph) to guide load shedding. It translates semantic preferences, like 'extreme values are more interesting', into concrete drop predicates.",
+          "justification_if_invented": "",
+          "pointer": "[p.2, \"the utility of an answer can be a function of the output value, expressing how important each value is for purposes of the application.\"]"
+        },
+        {
+          "symbol": "Al",
+          "name": "Abstraction Lifting",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The derivation of a loss-tolerance QoS graph from a value-based QoS graph and data histograms.",
+          "why_it_applies": "The system lifts the low-level abstraction of 'percentage of tuples to drop' to the higher-level semantic abstraction of 'which values are least important'. It does this by deriving the loss-tolerance graph from the value-based graph, allowing the same cost-based machinery to operate on richer semantic input.",
+          "justification_if_invented": "",
+          "pointer": "[p.7, \"Our approach derives the loss-tolerance QoS graph from a given value-based QoS graph.\"]"
+        }
+      ],
+      "rejected_or_borderline_principles": []
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Admission Control + Ad + Cm + Se -> QoS-Aware Load Shedding",
+    "baseline_name": "Classical admission control",
+    "top_3_principle_tags": [
+      "Ad",
+      "Cm",
+      "Se"
+    ],
+    "core_principle_tags": [
+      "Ad",
+      "Cm",
+      "Se"
+    ],
+    "supporting_principle_tags": [
+      "Fp",
+      "Pd",
+      "Al"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Ad",
+      "Cm",
+      "Fp",
+      "Pd",
+      "Se",
+      "Al"
+    ],
+    "new_system_name": "Aurora Load Shedder",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "The system transforms simple admission control into intelligent, graceful degradation. It achieves this by being Adaptive (Ad) to runtime load, using a Cost-based (Cm) model to make principled tradeoffs between resources and quality. This foundation is then enriched with Semantically Explicit (Se) information, allowing the cost model to make value-aware decisions, thereby minimizing the impact on application-perceived quality.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Ad",
+          "contribution_to_equation": "Provides the dynamic, closed-loop control to react to overload conditions by inserting or removing drops as needed."
+        },
+        {
+          "symbol": "Cm",
+          "contribution_to_equation": "Provides the optimization framework (Loss/Gain) for making rational, efficient decisions about where and how much to drop to minimize quality impact."
+        },
+        {
+          "symbol": "Se",
+          "contribution_to_equation": "Enriches the cost model with application-specific knowledge of data importance, enabling fine-grained, value-directed dropping that significantly outperforms random dropping."
+        }
+      ],
+      "transfer_question": "In what other resource-constrained domains could a pre-computed 'road map' of adaptive, cost-based, and semantically-aware degradation plans be used to manage overload gracefully?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "Tuple Utility Loss",
+      "direction": "down",
+      "concrete_number": "Reduced from ~45% to ~20% vs. baseline at 0.5 mean rate",
+      "pointer": "[p.9, Figure 9]"
+    },
+    {
+      "property": "Value Utility Loss",
+      "direction": "down",
+      "concrete_number": "Reduced from ~20% to ~5% vs. random dropping at 0.5 mean rate",
+      "pointer": "[p.9, Figure 10]"
+    },
+    {
+      "property": "Runtime Overhead",
+      "direction": "down",
+      "concrete_number": "Runtime decision is a 'very cheap' table lookup",
+      "pointer": "[p.10]"
+    },
+    {
+      "property": "Static Analysis Cost",
+      "direction": "up",
+      "concrete_number": "Requires pre-computation of the LSRM",
+      "pointer": "[p.4]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Td",
+      "name": "Tiered Degradation",
+      "definition": "System provides a set of pre-analyzed, ordered operational modes, each offering a different point in a resource-vs-quality tradeoff space, allowing for predictable, graceful degradation under load.",
+      "mechanism_pattern": "The system pre-computes a 'Load Shedding Road Map' (LSRM), which is an ordered table of load shedding plans. Each subsequent plan sheds more load at a higher quality cost. At runtime, the system selects the first plan from this ordered list that meets the required load reduction, making the adaptation a simple and cheap table lookup.",
+      "why_existing_principles_are_insufficient": "Ad captures the dynamic adaptation and Cm captures the use of a cost model, but neither captures the specific, reusable pattern of materializing an ordered sequence of degradation *plans* to make runtime adaptation extremely cheap and predictable. This 'road map' pattern is a concrete implementation strategy for achieving cost-based adaptation.",
+      "closest_existing_principles": [
+        "Ad",
+        "Cm",
+        "Cr"
+      ],
+      "reusability_beyond_this_paper": "This pattern is highly reusable. Examples include selecting from a set of pre-computed video encoding bitrates, levels of detail (LOD) in computer graphics, or consistency levels in a distributed database, based on available bandwidth, processing power, or latency targets.",
+      "confidence": "medium",
+      "pointer": "[p.4, Figure 2]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "The system gracefully handles overload by dynamically inserting pre-planned, cost-optimized 'Drop' operators into the query plan, guided by Quality-of-Service specifications to minimize utility loss.",
+    "top_3_principles": [
+      "Ad",
+      "Cm",
+      "Se"
+    ],
+    "mechanism_family": "query optimization",
+    "specific_tools_or_algorithms": [
+      "Load Shedding Road Map (LSRM)",
+      "Loss/Gain ratio calculation"
+    ],
+    "primary_design_archetype": "cost-based planning",
+    "principle_mapping_confidence": "high"
+  }
+}

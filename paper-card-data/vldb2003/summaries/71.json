@@ -1,0 +1,291 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "71",
+    "paper_title": "Locating Data Sources in Large Distributed Systems",
+    "authors": [
+      "Leonidas Galanis",
+      "Yuan Wang",
+      "Shawn R. Jeffery",
+      "David J. DeWitt"
+    ],
+    "venue_or_source": "VLDB",
+    "year": "2003",
+    "system_or_method_name": "Distributed Catalog Service",
+    "problem_domain": "Distributed query processing and source selection"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To execute queries on all relevant information sources in a scalable fashion by sending queries only to relevant servers and avoiding those that will not provide any results.",
+    "primary_optimized_metric": "throughput",
+    "secondary_metrics": [
+      "latency"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "2x",
+        "meaning": "The split-replicate (SR) load balancing strategy provides double the throughput of the baseline Chord-only (C) approach in a 5000-node network.",
+        "pointer": "[p.12]"
+      },
+      {
+        "number_or_delta": "5x",
+        "meaning": "The split-replicate (SR) strategy provides at least a five times improvement in response times compared to the baseline.",
+        "pointer": "[p.12]"
+      },
+      {
+        "number_or_delta": "< 2.1 sec",
+        "meaning": "Average response time for catalog queries using split-replicate (SR) load balancing, even in a 5000-node network.",
+        "pointer": "[p.11, Graph 1]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "A distributed catalog built on a standard DHT (e.g., Chord) without application-level load balancing.",
+    "why_this_is_the_right_comparison": "This baseline isolates the paper's primary contribution, which is the set of workload-aware load balancing techniques (splitting and replication) layered on top of a standard DHT. The experiments explicitly compare against this 'No load balancing' configuration.",
+    "limiting_design_assumption": "Standard DHTs assume a uniform access pattern for keys to achieve load balancing. This assumption is violated by query workloads where some data elements (and thus their corresponding catalog entries) are accessed far more frequently than others.",
+    "pointers": [
+      "[p.9, quote: 'Current implementations of DHTs balance the load across participating nodes by distributing keys uniformly under the assumption that the keys are accessed uniformly.']",
+      "[p.11, quote: 'We test catalog query processing under the following different settings: 1. No load balancing (C)']"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Distributed catalog / index",
+    "specific_tools_or_algorithms": [
+      "Distributed Hash Table (DHT)",
+      "Chord protocol",
+      "Structure-Based Splitting (SBS)",
+      "Replication"
+    ],
+    "what_is_being_optimized": "The placement and granularity of catalog entries (data summaries) to balance the lookup load across nodes in response to a non-uniform query workload.",
+    "state_or_ir": "A distributed catalog where keys are derived from data content (e.g., XML tags) and values are data summaries (e.g., paths, value histograms) pointing to source nodes.",
+    "output": "A set of relevant data source nodes to which a given query should be sent for execution.",
+    "pointers": [
+      "[p.3]",
+      "[p.9]",
+      "[p.10]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Implements a fully decentralized catalog for source selection by mapping data summaries to keys in a Distributed Hash Table (DHT), avoiding centralized or fully-replicated architectures.",
+      "baseline_assumption": "A catalog service for a distributed system must be either centralized (creating a bottleneck and single point of failure) or fully replicated on each node (incurring O(n^2) maintenance message complexity).",
+      "why_baseline_did_not_include_it": "Centralized and fully-replicated designs were standard in distributed databases but do not scale to thousands of independent nodes. DHTs were a recent technology providing a scalable foundation for a new, fully distributed design.",
+      "mechanism_level_implementation": "Data summaries, which describe the content of a data source (e.g., unique XML paths to an element), are created. The element/attribute names serve as keys. These (key, summary) pairs are stored in a DHT. To find relevant sources for a query, the query is decomposed into lookup keys, the DHT is queried to find the nodes holding the corresponding summaries, and these summaries are evaluated to produce a list of source nodes.",
+      "primary_metric_improved": "scalability",
+      "tradeoffs_or_costs": "Catalog lookups require O(log n) network messages, whereas a centralized catalog requires one and a replicated catalog requires a local lookup. The overall system design is more complex.",
+      "pointers": [
+        "[p.1]",
+        "[p.3]",
+        "[p.5]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Introduces dynamic, workload-aware load balancing by splitting or replicating hot catalog entries to distribute lookup load from popular keys across multiple nodes.",
+      "baseline_assumption": "A standard DHT's uniform key hashing is sufficient for load balancing.",
+      "why_baseline_did_not_include_it": "The baseline DHT is application-agnostic and cannot react to non-uniform access patterns (hot spots) that arise from the query workload, as it treats all keys as opaque identifiers.",
+      "mechanism_level_implementation": "Nodes monitor the request rate for the keys they manage. If a rate exceeds a threshold, the node initiates a load balancing action. The primary mechanism is Structure-Based Splitting (SBS), where a hot key (e.g., 'price') is split into more specific, longer keys based on its structural context in queries (e.g., 'car/price', 'bike/price'). These new, more granular keys and their corresponding summary partitions are then inserted into the DHT, distributing the load to other nodes.",
+      "primary_metric_improved": "throughput",
+      "tradeoffs_or_costs": "Increases system complexity for managing splits/replicas. Updates must be propagated to multiple locations. Some query types may require more messages under the 'split-toss' policy. It also increases storage for metadata about splits.",
+      "pointers": [
+        "[p.9]",
+        "[p.10]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Dc",
+          "name": "Decentralized Control",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The use of a DHT to manage the catalog without any central server or coordinator.",
+          "why_it_applies": "The entire system is designed to be a 'fully decentralized design of a distributed catalog service' that 'does not require any central infrastructure'. The DHT provides the mechanism for decentralized storage and lookup of catalog information.",
+          "justification_if_invented": "",
+          "pointer": "[p.1]"
+        },
+        {
+          "symbol": "Fp",
+          "name": "Function Placement",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The DHT maps a specific key (e.g., an XML tag) to a specific node, which then becomes responsible for storing and processing lookups against the data summaries for that key.",
+          "why_it_applies": "The catalog lookup function for a given key `k` is explicitly placed on the node that the DHT assigns responsibility for `k`. This distributes the overall catalog functionality across the network in a structured way.",
+          "justification_if_invented": "",
+          "pointer": "[p.3, quote: 'The Chord protocol supports just one lookup operation: It maps a given key to a node. Depending on the application this node is responsible for associating the key with the corresponding data item...']"
+        },
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "Using the catalog to identify a subset of nodes that contain relevant data for a query.",
+          "why_it_applies": "The fundamental purpose of the catalog is to avoid sending a query to every node. It prunes the search space to only those nodes that can contribute to the result, avoiding work (query execution on irrelevant nodes) that is guaranteed not to change the final, complete result set.",
+          "justification_if_invented": "",
+          "pointer": "[p.1, quote: '...leaving out nodes that will definitely not produce results.']"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Sc",
+          "name": "Scalability",
+          "reason_rejected_or_borderline": "Scalability is the goal and outcome of the design, not the mechanism itself. Dc and Fp are the principles that explain the mechanism used to achieve scalability.",
+          "pointer": "[p.1]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Ad",
+          "name": "Adaptive Processing",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "Monitoring the request rate for catalog keys and, upon exceeding a threshold, initiating a split or replication action.",
+          "why_it_applies": "The system dynamically changes its own structure (the granularity and placement of catalog entries) in response to the observed query workload to maintain performance. This is a direct implementation of adaptive processing.",
+          "justification_if_invented": "",
+          "pointer": "[p.9, quote: '...allow the redistribution of the catalog query load dynamically based on the global query workload.']"
+        },
+        {
+          "symbol": "Al",
+          "name": "Abstraction Lifting",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The Structure-Based Splitting (SBS) mechanism inspects the content of queries (XML paths) to create new, more specific keys from a single hot key.",
+          "why_it_applies": "The baseline DHT treats keys as opaque identifiers. SBS lifts this abstraction by using the semantic content of the queries and data summaries (the path structure) to intelligently partition a hot key's responsibilities. For example, the opaque key 'price' is split into semantic keys like 'car/price' and 'bike/price'.",
+          "justification_if_invented": "",
+          "pointer": "[p.9, Figure 5]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Wa",
+          "name": "Workload-Aware",
+          "reason_rejected_or_borderline": "This principle applies, but Ad (Adaptive Processing) is more specific to the mechanism, which is an active, dynamic adaptation rather than a static, workload-aware configuration. Ad better captures the runtime nature of the mechanism.",
+          "pointer": "[p.9]"
+        },
+        {
+          "symbol": "Bo",
+          "name": "Bottleneck-Oriented",
+          "reason_rejected_or_borderline": "While the mechanism targets bottlenecks (hot nodes), the core idea is not just identifying and fixing a static bottleneck, but dynamically and continuously adapting to shifting workloads. Ad and Al are more descriptive of the specific mechanism used.",
+          "pointer": "[p.9]"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "DHT Catalog (Uniform Access Assumption) + Ad + Al -> Workload-Aware Distributed Catalog",
+    "baseline_name": "DHT Catalog (Uniform Access Assumption)",
+    "top_3_principle_tags": [
+      "Dc",
+      "Ad",
+      "Al"
+    ],
+    "core_principle_tags": [
+      "Dc",
+      "Fp",
+      "Ad",
+      "Al"
+    ],
+    "supporting_principle_tags": [
+      "Wv"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Dc",
+      "Fp",
+      "Wv",
+      "Ad",
+      "Al"
+    ],
+    "new_system_name": "Workload-Aware Distributed Catalog",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "The system is founded on Decentralized Control (Dc) via a DHT to achieve basic scalability. However, this is insufficient under real-world skewed workloads. Adaptive Processing (Ad) is introduced to react to these skews by rebalancing load. The adaptation is made highly effective through Abstraction Lifting (Al), which allows the system to use query semantics to split work at a fine granularity, directing load away from hotspots with precision.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Dc",
+          "contribution_to_equation": "Provides the foundational scalable, decentralized architecture, replacing centralized or replicated catalogs."
+        },
+        {
+          "symbol": "Ad",
+          "contribution_to_equation": "Enables the system to react to workload hotspots dynamically, which the underlying DHT cannot do alone."
+        },
+        {
+          "symbol": "Al",
+          "contribution_to_equation": "Provides the specific mechanism for intelligent adaptation by exposing query structure to the load-balancing layer, allowing for semantic-aware key splitting."
+        }
+      ],
+      "transfer_question": "In what other decentralized key-value systems could workload-driven, semantic-aware key splitting be used to mitigate hotspots?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "throughput",
+      "direction": "up",
+      "concrete_number": "2x",
+      "pointer": "[p.12]"
+    },
+    {
+      "property": "latency",
+      "direction": "down",
+      "concrete_number": "5x improvement",
+      "pointer": "[p.12]"
+    },
+    {
+      "property": "storage",
+      "direction": "up",
+      "concrete_number": "avg catalog size +2KB, plus 6-35KB for split maps",
+      "pointer": "[p.12]"
+    },
+    {
+      "property": "network messages",
+      "direction": "mixed",
+      "concrete_number": "split-toss policy can increase messages for some queries",
+      "pointer": "[p.10]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Grw",
+      "name": "Granularity Rewriting",
+      "definition": "Dynamically and selectively changing the unit of identification, scheduling, or placement for a resource to match workload characteristics, often by splitting coarse-grained units into finer-grained ones or aggregating them.",
+      "mechanism_pattern": "A system identifies a hot resource (e.g., a key, a data partition, a lock). It inspects the requests targeting that resource and the resource's internal structure. It then partitions the resource into multiple, more fine-grained units and redistributes them to different service points to dissipate the load.",
+      "why_existing_principles_are_insufficient": "Ad (Adaptive Processing) describes the 'why' (reacting to load) and Al (Abstraction Lifting) describes part of the 'how' (using semantics), but neither fully captures the core action of *changing the granularity* of the addressable unit itself. This pattern of dynamic re-sharding or re-keying is a recurring and powerful design move that could merit its own principle.",
+      "closest_existing_principles": [
+        "Ad",
+        "Al",
+        "Fp"
+      ],
+      "reusability_beyond_this_paper": "This pattern appears in various contexts: splitting hot partitions in a database, breaking coarse-grained locks into fine-grained ones based on access patterns, or dynamically re-sharding a key-space in a storage system.",
+      "confidence": "medium",
+      "pointer": "[p.9]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "Achieves scalable query routing in a large distributed system by building a catalog on a DHT and dynamically splitting hot catalog entries based on query structure to balance lookup load.",
+    "top_3_principles": [
+      "Dc",
+      "Ad",
+      "Al"
+    ],
+    "mechanism_family": "indexing / search structure",
+    "specific_tools_or_algorithms": [
+      "Distributed Hash Table (DHT)",
+      "Chord protocol",
+      "Structure-Based Splitting (SBS)",
+      "Replication"
+    ],
+    "primary_design_archetype": "disaggregation / function placement",
+    "principle_mapping_confidence": "high"
+  }
+}

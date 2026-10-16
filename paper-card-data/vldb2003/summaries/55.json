@@ -1,0 +1,249 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "55",
+    "paper_title": "Tabular Placement of Relational Data on MEMS-based Storage Devices",
+    "authors": [
+      "Hailing Yu",
+      "Divyakant Agrawal",
+      "Amr El Abbadi"
+    ],
+    "venue_or_source": "VLDB",
+    "year": "2003",
+    "system_or_method_name": "Flexible Retrieval Model (FRM)",
+    "problem_domain": "Relational database data placement"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To develop a data placement scheme for relational data on MEMS-based storage that exploits its two-dimensional physical characteristics to enable efficient retrieval in both row-wise and column-wise manners, thereby improving I/O utilization and cache performance.",
+    "primary_optimized_metric": "I/O",
+    "secondary_metrics": [
+      "memory",
+      "cache performance"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "2264.2 ms -> 452.95 ms",
+        "meaning": "Total I/O time for a full table scan of a 1.28M record relation with a 1-attribute projection, comparing NSM/PAX baseline to FRM.",
+        "pointer": "[p. 9, Fig 10]"
+      },
+      {
+        "number_or_delta": "93.75%",
+        "meaning": "Memory space saving for FRM compared to NSM/PAX when a query involves one of sixteen attributes.",
+        "pointer": "[p. 8]"
+      },
+      {
+        "number_or_delta": "~3x",
+        "meaning": "FRM and PAX perform about three times better (fewer cache misses) than NSM on a selection query involving one attribute.",
+        "pointer": "[p. 10, Fig 11]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Disk-like mapping of MEMS storage with NSM/PAX layouts",
+    "why_this_is_the_right_comparison": "This represents the standard approach of integrating new storage technologies by abstracting them as traditional disks and using existing data layouts (NSM, PAX) on top of that abstraction.",
+    "limiting_design_assumption": "MEMS-based storage should be abstracted as a one-dimensional, disk-like device, where data is accessed in coarse-grained units like logical blocks or pages. This hides the two-dimensional physical properties of the device.",
+    "pointers": [
+      "[p. 3, quote: '...mapping MEMS-based storage devices into disk-like devices.']",
+      "[p. 4, quote: '...both NSM or PAX bring values of all attributes in a page into the memory.']"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Hardware-aware data layout algorithm",
+    "specific_tools_or_algorithms": [
+      "Flexible Retrieval Model (FRM)"
+    ],
+    "what_is_being_optimized": "The physical placement of relational attributes and records onto the 2D grid of MEMS tip sectors.",
+    "state_or_ir": "The physical data layout on the MEMS media sled.",
+    "output": "A data layout that enables selective retrieval of attribute subsets (columns) by aligning them for parallel access by MEMS tips.",
+    "pointers": [
+      "[p. 6, Section 4.1]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Introduces a 2D-aware data layout (FRM) that stripes records across MEMS tip regions to vertically align attributes, enabling efficient columnar access.",
+      "baseline_assumption": "Data should be laid out in 1D pages or blocks, either record by record (NSM) or with all attributes for a few records grouped in a page (PAX).",
+      "why_baseline_did_not_include_it": "The baseline aimed for compatibility with existing systems by abstracting the MEMS device as a disk, which hides the 2D physical structure necessary for such a layout.",
+      "mechanism_level_implementation": "A relation is striped across tip regions. Each attribute of a record occupies an integer number of consecutive tip sectors. Subsequent records are placed in the same row of tip regions, aligning attributes across records at the same x-coordinates. This pattern is repeated for subsequent rows of tip regions.",
+      "primary_metric_improved": "I/O",
+      "tradeoffs_or_costs": "The layout is more complex than page-based schemes. Cache performance can be worse than PAX in specific low-selectivity, high-projectivity query scenarios.",
+      "pointers": [
+        "[p. 6, Section 4.1, Fig 7]",
+        "[p. 11, Fig 16]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Changes the data access granularity from coarse logical blocks to fine-grained tip sectors, allowing the system to retrieve only the attributes required by a query.",
+      "baseline_assumption": "Data is read from storage in fixed-size units like pages or logical blocks (e.g., 512 bytes), which forces retrieval of all attributes within that block.",
+      "why_baseline_did_not_include_it": "The disk-like abstraction used by the baseline mandates a block-based I/O interface for compatibility with existing operating systems and database engines.",
+      "mechanism_level_implementation": "The data retrieval algorithm activates only the MEMS tips corresponding to the attributes needed for a query. It calculates the number of access passes required based on the number of needed tips versus the hardware limit on concurrently active tips.",
+      "primary_metric_improved": "I/O",
+      "tradeoffs_or_costs": "Requires a custom data retrieval logic that is tightly coupled with the hardware characteristics and the FRM layout, breaking the standard block device abstraction.",
+      "pointers": [
+        "[p. 7, Section 4.2]",
+        "[p. 4, quote: 'data in a complete disk page or a logical block has to be retrieved together.']"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Ha",
+          "name": "Hardware-Aware",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The FRM layout algorithm explicitly models the 2D grid of tip regions, the size of tip sectors, and the seek time characteristics (preferring Y-movement over X-movement).",
+          "why_it_applies": "The entire data placement strategy is designed to directly exploit the physical, two-dimensional architecture of the MEMS device, rather than layering on top of a generic block abstraction.",
+          "justification_if_invented": "",
+          "pointer": "[p. 6, quote: 'we will consider the physical movement property of MEMS-based storage... we should first consider a new row which has the same x coordinate, and y coordinate offset by one...']"
+        },
+        {
+          "symbol": "Al",
+          "name": "Abstraction Lifting",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The system rejects the baseline's disk-like abstraction of MEMS storage.",
+          "why_it_applies": "The paper's central argument is that the 1D disk abstraction is harmful ('MEMS-based storage devices lose their two-dimensional property' [p. 3]). FRM lifts this abstraction to expose the underlying 2D grid and tip-level addressability to the data placement layer to gain performance.",
+          "justification_if_invented": "",
+          "pointer": "[p. 4, quote: 'by treating MEMS-based storage as two-dimensional storage for placing relational data, the gap between the main memory and secondary storage can be reduced notably.']"
+        }
+      ],
+      "rejected_or_borderline_principles": []
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The retrieval mechanism activates only the tips corresponding to attributes present in the query's projection list.",
+          "why_it_applies": "The system avoids the I/O work of reading attributes not required by the query. This skipped work does not change the final query result, as the unused attributes are irrelevant to the computation.",
+          "justification_if_invented": "",
+          "pointer": "[p. 4, quote: 'I/O time is wasted retrieving unnecessary attributes by mapping MEMS-based storage to one-dimensional devices.']"
+        },
+        {
+          "symbol": "Ha",
+          "name": "Hardware-Aware",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The retrieval algorithm explicitly checks if the number of tips needed for the required attributes exceeds the maximum number of concurrently active tips allowed by the hardware.",
+          "why_it_applies": "The retrieval plan (number of passes) is directly determined by a physical hardware constraint (maximum active tips), demonstrating hardware awareness.",
+          "justification_if_invented": "",
+          "pointer": "[p. 7, quote: 'if Na is larger than the maximum number of concurrent tips, then the number of retrievals... is equal to ⌈ Na / the number of maximum concurrent tips ⌉.']"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Bo",
+          "name": "Bottleneck-Oriented",
+          "reason_rejected_or_borderline": "While the paper identifies the I/O gap as a bottleneck, Wv is a more specific principle that describes the mechanism (avoiding I/O for unneeded data) rather than just the motivation.",
+          "pointer": "[p. 1]"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Disk-like Abstraction + Al + Ha + Wv -> FRM",
+    "baseline_name": "Disk-like Abstraction for MEMS",
+    "top_3_principle_tags": [
+      "Ha",
+      "Al",
+      "Wv"
+    ],
+    "core_principle_tags": [
+      "Ha",
+      "Al",
+      "Wv"
+    ],
+    "supporting_principle_tags": [
+      "Ha"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Ha",
+      "Al",
+      "Wv"
+    ],
+    "new_system_name": "FRM",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "The system's performance gain comes from lifting the simplifying disk abstraction (Al) to create a hardware-aware (Ha) data layout. This new layout, in turn, enables a retrieval strategy that avoids result-irrelevant I/O work (Wv) by fetching only the necessary data columns at a fine granularity.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Ha",
+          "contribution_to_equation": "Provides the physical constraints and opportunities (2D grid, concurrent tips, seek costs) that the new data layout and retrieval algorithms are designed to exploit."
+        },
+        {
+          "symbol": "Al",
+          "contribution_to_equation": "Enables the design by rejecting the performance-limiting 1D block device abstraction and exposing the true hardware structure to the database."
+        },
+        {
+          "symbol": "Wv",
+          "contribution_to_equation": "Explains the primary performance benefit: the hardware-aware layout allows the system to provably skip reading unnecessary attributes without affecting query correctness."
+        }
+      ],
+      "transfer_question": "In what other domains could lifting a simplifying hardware abstraction enable a new data layout that avoids unnecessary work by matching access granularity to hardware capabilities?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "I/O",
+      "direction": "down",
+      "concrete_number": "2264.2 ms to 452.95 ms for 1-attr query",
+      "pointer": "[p. 9, Fig 10]"
+    },
+    {
+      "property": "memory",
+      "direction": "down",
+      "concrete_number": "93.75% reduction for 1-of-16 attr query",
+      "pointer": "[p. 8, Fig 9]"
+    },
+    {
+      "property": "cache performance",
+      "direction": "mixed",
+      "concrete_number": "Can be >2x better than NSM, but can be worse than PAX in low selectivity/high projectivity cases.",
+      "pointer": "[p. 11, Fig 12, Fig 16]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Grw",
+      "name": "Granularity Rewriting",
+      "definition": "Restructuring a system's unit of work, storage, or consistency to a finer or coarser grain to better match workload demands or hardware capabilities.",
+      "mechanism_pattern": "The system moves from a coarse-grained unit of storage and access (the logical block) to a fine-grained one (the tip sector). This change in granularity is the enabling mechanism for avoiding work.",
+      "why_existing_principles_are_insufficient": "Ha explains the motivation (hardware has fine-grained tips), Al explains the prerequisite (breaking the block abstraction), and Wv explains the benefit (skipping I/O). None of them capture the core design action of changing the fundamental unit of data management from a block to a tip sector.",
+      "closest_existing_principles": [
+        "Ha",
+        "Al",
+        "Wv"
+      ],
+      "reusability_beyond_this_paper": "This pattern is common. Examples include moving from table-level locks to row-level locks, from monolithic RPCs to fine-grained microservices, or from coarse-grained cache lines to sub-block tracking. It represents a general strategy for improving efficiency and parallelism.",
+      "confidence": "medium",
+      "pointer": "[p. 7, quote: 'data can be accessed by tip sectors instead of logical blocks']"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "FRM exploits the 2D physical structure of MEMS storage by striping relational data at the fine granularity of individual tip sectors, enabling hardware-aware retrieval of only the columns required by a query to avoid unnecessary I/O.",
+    "top_3_principles": [
+      "Ha",
+      "Al",
+      "Wv"
+    ],
+    "mechanism_family": "hardware-aware data management",
+    "specific_tools_or_algorithms": [
+      "Flexible Retrieval Model (FRM)"
+    ],
+    "primary_design_archetype": "hardware-conscious layout",
+    "principle_mapping_confidence": "high"
+  }
+}

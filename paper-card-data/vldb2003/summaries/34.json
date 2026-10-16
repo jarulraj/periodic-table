@@ -1,0 +1,285 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "34",
+    "paper_title": "Combi-Operator - Database Support for Data Mining Applications",
+    "authors": [
+      "Alexander Hinneburg",
+      "Dirk Habich",
+      "Wolfgang Lehner"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference",
+    "year": "2003",
+    "system_or_method_name": "Combi operator",
+    "problem_domain": "Database support for data mining"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To provide efficient, scalable database support for the data-intensive subproblem of aggregating high-dimensional data in all possible low-dimensional projections, a task common to many data mining algorithms.",
+    "primary_optimized_metric": "query time",
+    "secondary_metrics": [
+      "memory"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "up to factor 10",
+        "meaning": "Speedup of the Combi operator over existing methods in commercially available database systems.",
+        "pointer": "[p.1]"
+      },
+      {
+        "number_or_delta": "22x",
+        "meaning": "Speedup of the array-based implementation over the naive GROUP BY approach for a synthetic dataset with 100 attributes.",
+        "pointer": "[p.8]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Existing SQL OLAP extensions (naive GROUP BY, GROUPING SETS)",
+    "why_this_is_the_right_comparison": "These are the standard methods available in commercial database systems at the time for performing the target aggregations. The paper explicitly evaluates against them to show the insufficiency of the state-of-the-art.",
+    "limiting_design_assumption": "The user must either issue a separate SQL query for each projection (leading to multiple, expensive table scans) or explicitly enumerate all projections in a single GROUPING SETS query (leading to impractically large query strings that exceed parser limits for high-dimensional data).",
+    "pointers": [
+      "[p.1]",
+      "[p.3]"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "SQL aggregation operator",
+    "specific_tools_or_algorithms": [
+      "Main memory based algorithm (hash map or array)",
+      "Partitioned algorithm",
+      "Sort based algorithm",
+      "Partial ReScan algorithm"
+    ],
+    "what_is_being_optimized": "The computation of aggregates over all k-dimensional projections of an n-dimensional dataset.",
+    "state_or_ir": "Intermediate aggregates for multiple grouping combinations held in main memory (hash maps or arrays).",
+    "output": "A single result set containing the aggregates for all requested k-dimensional projections.",
+    "pointers": [
+      "[p.6]",
+      "[p.7]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Introduces a new declarative SQL operator, GROUPING COMBINATIONS, to concisely express the computation of aggregates over all k-combinations of attributes without manual enumeration.",
+      "baseline_assumption": "Users must explicitly list all desired grouping combinations, either through many separate GROUP BY queries or a single, very large GROUPING SETS clause.",
+      "why_baseline_did_not_include_it": "Existing OLAP operators like CUBE (all combinations) and ROLLUP (hierarchical combinations) did not address the specific data mining pattern of needing all combinations of a fixed cardinality k. This pattern was not a primary focus for traditional OLAP.",
+      "mechanism_level_implementation": "A new SQL operator, `GROUP BY GROUPING COMBINATIONS((A1,A2, ... ,An), k)`, is defined as a syntactic shortcut for a GROUPING SETS expression with all (n k) combinations of cardinality k. This provides a concise and parsable query format.",
+      "primary_metric_improved": "query expressiveness",
+      "tradeoffs_or_costs": "Requires extending the SQL language and the database query parser and optimizer.",
+      "pointers": [
+        "[p.4]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Implements the Combi operator using memory-aware algorithms that compute many projections simultaneously in a single pass, partitioning work across minimal scans only when memory is constrained.",
+      "baseline_assumption": "Each projection is computed independently via a full table scan (naive GROUP BY), or the database's generic GROUPING SETS implementation is used, which yields only minimal performance gains and is not optimized for this specific access pattern.",
+      "why_baseline_did_not_include_it": "Existing OLAP optimization strategies focused on 'subset stacking' (deriving smaller aggregates from larger ones), which is not applicable for the Combi operator where all combinations have the same cardinality and are computed from the base data.",
+      "mechanism_level_implementation": "The system uses a main memory algorithm to hold intermediate aggregates for as many combinations as fit in memory, processing them in a single scan. If memory is limited, a partitioned algorithm performs multiple scans, each processing a subset of combinations. A sort-based algorithm further reduces memory by exploiting sorted input to evict completed groups early and can perform partial rescans to avoid re-reading the entire table.",
+      "primary_metric_improved": "query time",
+      "tradeoffs_or_costs": "Increases implementation complexity within the query engine. The sort-based algorithm performs best with sorted data or requires an index to support efficient partial rescans.",
+      "pointers": [
+        "[p.6]",
+        "[p.7]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Se",
+          "name": "Semantically Explicit",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The introduction of the `GROUPING COMBINATIONS((A1,...,An), k)` operator.",
+          "why_it_applies": "The operator makes the user's intent—to compute all k-dimensional projections—explicit to the query optimizer. This semantic information allows the system to choose specialized execution strategies (Δ2) instead of treating it as a generic, large list of unrelated grouping sets.",
+          "justification_if_invented": "",
+          "pointer": "[p.4]"
+        },
+        {
+          "symbol": "Gr",
+          "name": "Generalized Design",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The design of the Combi operator as a general primitive for a common data mining task.",
+          "why_it_applies": "The paper identifies a recurring data-intensive task ('aggregating data in all possibles low-dimensional projections') across multiple data mining algorithms and proposes a single, general operator to solve it, fitting it 'seamlessly' into the existing family of OLAP operators.",
+          "justification_if_invented": "",
+          "pointer": "[p.1, p.4]"
+        },
+        {
+          "symbol": "Si",
+          "name": "Simplicity",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The syntax of the Combi operator replacing a potentially massive enumeration in a GROUPING SETS clause.",
+          "why_it_applies": "The operator simplifies the user's query, making it 'reasonable small' and avoiding the complexity and parser limitations of explicitly listing thousands of combinations.",
+          "justification_if_invented": "",
+          "pointer": "[p.1, p.3]"
+        }
+      ],
+      "rejected_or_borderline_principles": []
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Rc",
+          "name": "Reuse of Computation",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The single-scan (or minimal-scan) algorithms that process each tuple from the base table once and update all relevant in-memory aggregates.",
+          "why_it_applies": "The core performance gain comes from reusing the I/O work of scanning the data. Instead of N scans for N projections, the system performs one scan (or a few, if memory is limited) and reuses each tuple read to update many different aggregates simultaneously.",
+          "justification_if_invented": "",
+          "pointer": "[p.6, quote: 'compute as many grouping sets as possible during a single scan of the data']"
+        },
+        {
+          "symbol": "Ad",
+          "name": "Adaptive Processing",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The partitioned and sort-based algorithms that explicitly handle limited main memory.",
+          "why_it_applies": "The system adapts its execution strategy to the available memory. The partitioned algorithm divides the total work into chunks that fit in memory. The sort-based algorithm adapts to data ordering to reduce memory pressure and can trigger partial rescans when memory is exhausted.",
+          "justification_if_invented": "",
+          "pointer": "[p.6, p.7]"
+        },
+        {
+          "symbol": "Bo",
+          "name": "Bottleneck-Oriented",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The design of single-scan algorithms to avoid repeated I/O.",
+          "why_it_applies": "The paper identifies the bottleneck of the naive approach as repeated I/O from multiple scans ('causes the database to read the same data multiple times from the secondary storage'). The proposed algorithms are designed specifically to alleviate this I/O bottleneck.",
+          "justification_if_invented": "",
+          "pointer": "[p.1]"
+        },
+        {
+          "symbol": "Ha",
+          "name": "Hardware-Aware",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The choice between array and hash map containers for intermediate results, and the general focus on memory limits.",
+          "why_it_applies": "The algorithms are explicitly designed to 'take the limited resources of main memory into account'. The paper evaluates the tradeoff between array-based storage (fast access, but potentially wasteful for sparse data) and hash map-based storage (memory-efficient for sparse data), which is a hardware-aware decision about memory layout and usage.",
+          "justification_if_invented": "",
+          "pointer": "[p.1, p.6, p.8]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "reason_rejected_or_borderline": "The system does not skip any work that is proven irrelevant to the final result. It avoids re-doing I/O work (table scans) by sharing one scan across multiple computations, which is better described by Rc (Reuse of Computation).",
+          "pointer": "[p.6]"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Explicit Enumeration of Projections + Se + Rc + Ad -> Combi Operator",
+    "baseline_name": "Explicit Enumeration of Projections",
+    "top_3_principle_tags": [
+      "Se",
+      "Rc",
+      "Ad"
+    ],
+    "core_principle_tags": [
+      "Se",
+      "Gr",
+      "Rc",
+      "Ad"
+    ],
+    "supporting_principle_tags": [
+      "Si",
+      "Bo",
+      "Ha"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Se",
+      "Gr",
+      "Si",
+      "Rc",
+      "Ad",
+      "Bo",
+      "Ha"
+    ],
+    "new_system_name": "Combi Operator",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "The composition enables a declarative-to-imperative optimization. Se provides the declarative hook by allowing users to state their high-level goal (all k-combinations) concisely. This semantic information enables the system to deploy a specialized execution strategy that reuses I/O (Rc) and adapts to hardware memory constraints (Ad), which would be impossible if the query were just an opaque list of many individual grouping sets.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Se",
+          "contribution_to_equation": "Provides the high-level semantic interface (the Combi operator) that makes the user's intent explicit to the optimizer, enabling specialized execution."
+        },
+        {
+          "symbol": "Rc",
+          "contribution_to_equation": "Defines the core execution strategy of sharing the expensive I/O work of a table scan across the computation of many independent aggregates."
+        },
+        {
+          "symbol": "Ad",
+          "contribution_to_equation": "Makes the shared-scan strategy practical by adapting execution (e.g., partitioning the work) to fit within limited main memory resources."
+        }
+      ],
+      "transfer_question": "In what other domains could a common, but complex, multi-query pattern be encapsulated as a new declarative operator to enable specialized, resource-aware execution strategies?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "query time",
+      "direction": "down",
+      "concrete_number": "10x-22x speedup",
+      "pointer": "[p.1, p.8]"
+    },
+    {
+      "property": "memory",
+      "direction": "mixed",
+      "concrete_number": "Not specified in provided text",
+      "pointer": "[p.6, quote: 'handle the problem that not all grouping combinations fit into the main memory']"
+    },
+    {
+      "property": "query string length",
+      "direction": "down",
+      "concrete_number": "O(1) vs O((n k))",
+      "pointer": "[p.3]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "none",
+      "symbol": "None",
+      "name": "None",
+      "definition": "No plausible new principle candidate.",
+      "mechanism_pattern": "Not applicable",
+      "why_existing_principles_are_insufficient": "Existing principles sufficiently cover the paper's mechanisms. The combination of Se (Semantically Explicit) for the new operator, Rc (Reuse of Computation) for the shared scan, and Ad (Adaptive Processing) for memory management captures the core design moves effectively.",
+      "closest_existing_principles": [],
+      "reusability_beyond_this_paper": "Not applicable",
+      "confidence": "low",
+      "pointer": "Not specified in provided text"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "Introduces a new declarative SQL operator, GROUPING COMBINATIONS, to express aggregation over all k-dimensional projections, implemented with memory-aware algorithms that compute many projections in a single pass over the data.",
+    "top_3_principles": [
+      "Se",
+      "Rc",
+      "Ad"
+    ],
+    "mechanism_family": "query optimization",
+    "specific_tools_or_algorithms": [
+      "Main memory based algorithm (hash map or array)",
+      "Partitioned algorithm",
+      "Sort based algorithm",
+      "Partial ReScan algorithm"
+    ],
+    "primary_design_archetype": "declarative interface to optimizer",
+    "principle_mapping_confidence": "high"
+  }
+}

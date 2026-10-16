@@ -1,0 +1,277 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "70",
+    "paper_title": "Merging Models Based on Given Correspondences",
+    "authors": [
+      "Rachel A. Pottinger",
+      "Philip A. Bernstein"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference, Berlin, Germany, 2003",
+    "year": "2003",
+    "system_or_method_name": "Merge operator",
+    "problem_domain": "Model management"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To provide a generic framework and operator (Merge) that can be used to merge models (e.g., database schemas, ontologies) in many different contexts, based on a given set of correspondences.",
+    "primary_optimized_metric": "generality",
+    "secondary_metrics": [
+      "expressiveness",
+      "scalability"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "895,307 elements and 2,032,020 relationships",
+        "meaning": "Size of the Foundational Model of Anatomy (FMA) used in the evaluation.",
+        "pointer": "[p.11]"
+      },
+      {
+        "number_or_delta": "155,307 elements and 569,384 relationships",
+        "meaning": "Size of the GALEN Common Reference Model used in the evaluation.",
+        "pointer": "[p.11]"
+      },
+      {
+        "number_or_delta": "~20 hours",
+        "meaning": "Time taken to merge the FMA and GALEN models on a Pentium III 866 with 1 GB of RAM.",
+        "pointer": "[p.11]"
+      },
+      {
+        "number_or_delta": "338",
+        "meaning": "Number of cycles found in the specialization hierarchy of the merged FMA/GALEN model before conflict resolution.",
+        "pointer": "[p.12]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Data-model-specific merge algorithms and the BDK algorithm",
+    "why_this_is_the_right_comparison": "The paper explicitly states its goal is to abstract away from data-model-specific solutions and that it uses the BDK algorithm as a theoretical base to expand upon.",
+    "limiting_design_assumption": "Previous approaches assume that mappings between models are simple pairwise correspondences (e.g., based on name equality) rather than rich, structured models, and that conflict resolution is either ad-hoc and model-specific or limited to a narrow set of fundamental conflicts.",
+    "pointers": [
+      "[p.2, quote: '...most work on merging schemas is data-model-specific...']",
+      "[p.2, quote: 'We use their [BDK] theoretical algorithm as a base, and expand the range of correspondences, model representations, conflict categories, and applications...']",
+      "[p.4, quote: 'Prior algorithms, whose mappings are not first-class models, cannot express these relationships.']"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Generic model transformation operator",
+    "specific_tools_or_algorithms": [
+      "Merge algorithm",
+      "BDK algorithm customization"
+    ],
+    "what_is_being_optimized": "The structure and correctness of a merged model, ensuring it satisfies a set of Generic Merge Requirements (GMRs) and meta-meta-model constraints.",
+    "state_or_ir": "Models represented as graphs of elements and relationships, conforming to a meta-meta-model.",
+    "output": "A new, merged model that is the 'duplicate-free union' of the input models and mapping, with conflicts resolved.",
+    "pointers": [
+      "[p.2]",
+      "[p.5]",
+      "[p.10]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "The input mapping is elevated from a simple list of correspondences to a first-class model, enabling it to express rich, structural transformations and declaratively resolve representation conflicts.",
+      "baseline_assumption": "Mappings are simple sets of pairwise correspondences between elements in two models.",
+      "why_baseline_did_not_include_it": "Previous work focused more on the schema matching problem (finding correspondences) and treated the subsequent merge as a simpler step, often requiring manual user intervention for complex cases that simple correspondences could not express.",
+      "mechanism_level_implementation": "The Merge operator takes three models as input: A, B, and a mapping MapAB. MapAB is a model itself, containing its own elements (mapping elements) and relationships that can specify not just equality but also structural changes, such as making elements from one model sub-elements of an element in another, or introducing entirely new elements in the merged result.",
+      "primary_metric_improved": "expressiveness",
+      "tradeoffs_or_costs": "The complexity of creating the mapping is increased. A user or a `Match` operator must now generate a structured model, not just a list of pairs.",
+      "pointers": [
+        "[p.3, quote: 'The input mapping is more expressive than just simple correspondences; it is a first-class model...']",
+        "[p.4, quote: 'Prior algorithms, whose mappings are not first-class models, cannot express these relationships.']",
+        "[p.6, quote: 'Merge resolves representation conflicts using the input mapping.']"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "A principled, multi-level framework for conflict resolution is introduced, separating generic merge logic from model-specific and application-specific concerns.",
+      "baseline_assumption": "Conflict resolution is handled in an ad-hoc, data-model-specific manner, or is limited to a narrow set of predefined conflicts (e.g., the one-type restriction in BDK).",
+      "why_baseline_did_not_include_it": "The goal of previous work was often tied to a specific data model (e.g., ER, XML), so a generic, layered approach to conflict resolution was not the primary focus.",
+      "mechanism_level_implementation": "Conflicts are categorized into three levels: Representation, Meta-model, and Fundamental. Representation conflicts are resolved via the rich mapping (Δ1). Meta-model conflicts (e.g., SQL DDL violations) are deferred to a separate, model-specific `EnforceConstraints` operator. Fundamental conflicts (violations of the generic meta-meta-model) are resolved automatically by Merge using default, overridable strategies.",
+      "primary_metric_improved": "generality",
+      "tradeoffs_or_costs": "The framework requires a well-defined meta-meta-model and may require additional operators (like `EnforceConstraints`) to produce a final, usable model for a specific application. Default resolutions may not always be appropriate, requiring user overrides.",
+      "pointers": [
+        "[p.6, quote: 'We categorize conflicts based on the meta-level at which they occur...']",
+        "[p.6, quote: 'we break out coercion as a separate step, so that Merge remains generic...']",
+        "[p.9, quote: 'For each fundamental conflict, if a special resolution strategy has been defined, then apply it. If not, apply the default resolution strategy...']"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Gr",
+          "name": "Generalized Design",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The design of a single `Merge` operator intended to work across diverse model types like database schemas, UML models, and ontologies.",
+          "why_it_applies": "The paper's central goal is to create a generic framework for merging, abstracting common problems away from specific data models. The first-class mapping is a key mechanism for achieving this generality.",
+          "justification_if_invented": "",
+          "pointer": "[p.1, quote: 'Our goal is to provide a generic framework that can be used to merge models in all these contexts.']"
+        },
+        {
+          "symbol": "Se",
+          "name": "Semantically Explicit",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "Using a first-class model for the mapping, which can contain its own elements and relationships to define complex transformations.",
+          "why_it_applies": "The mapping is transformed from an implicit list of correspondences into an explicit, machine-readable specification of how the models should be combined. This allows the system to automatically handle complex 'representation conflicts' that previously required manual intervention.",
+          "justification_if_invented": "",
+          "pointer": "[p.3, quote: 'Given this rich mapping structure, complex relationships can be defined between elements in A and B, not just simple correspondences.']"
+        },
+        {
+          "symbol": "Al",
+          "name": "Abstraction Lifting",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "Treating the mapping itself as a model, the same kind of artifact as the inputs.",
+          "why_it_applies": "The paper lifts the abstraction of a 'mapping' from a simple data structure (a set of pairs) to a more powerful, structured 'model', which allows it to be manipulated by the same class of operators as the schemas being merged.",
+          "justification_if_invented": "",
+          "pointer": "[p.3, quote: 'The input mapping is more expressive than just simple correspondences; it is a first-class model consisting of elements and relationships.']"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Lu",
+          "name": "Language Homogeneity",
+          "reason_rejected_or_borderline": "While the mapping becomes the same 'language' as the models, this is a consequence of the design choice. The core intent is better captured by Se (making the merge semantics explicit) and Al (lifting the abstraction of a mapping).",
+          "pointer": "[p.3]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Pm",
+          "name": "Policy/Mechanism Separation",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The explicit separation of conflict resolution into three categories with different handlers.",
+          "why_it_applies": "The `Merge` operator provides the core mechanism for combining models. The policies for resolving conflicts are separated: representation conflicts are handled by the input mapping (user policy), meta-model conflicts are deferred to another operator (domain-specific policy), and fundamental conflicts are handled by overridable defaults within Merge (system policy).",
+          "justification_if_invented": "",
+          "pointer": "[p.6, quote: 'representation conflicts...we isolate it from Merge by requiring it to be captured in the input mapping.']"
+        },
+        {
+          "symbol": "Mo",
+          "name": "Modularity",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The decision to handle meta-model-specific constraint enforcement in a separate `EnforceConstraints` operator.",
+          "why_it_applies": "This design choice modularizes the system, keeping the `Merge` operator generic and independent of any specific meta-model (like SQL DDL). The coercion step is a separate module.",
+          "justification_if_invented": "",
+          "pointer": "[p.6, quote: 'we break out coercion as a separate step, so that Merge remains generic and the coercion step can be used independently of Merge.']"
+        },
+        {
+          "symbol": "Gr",
+          "name": "Generalized Design",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The framework for defining and resolving fundamental conflicts based on a generic meta-meta-model.",
+          "why_it_applies": "The conflict resolution strategy is itself designed to be general, allowing it to be adapted to different meta-meta-models by specifying their unique constraints and resolution rules.",
+          "justification_if_invented": "",
+          "pointer": "[p.7, quote: 'we describe other typical meta-meta-model conflicts and provide conflict resolution strategies for them.']"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Ig",
+          "name": "Invariant-Guided",
+          "reason_rejected_or_borderline": "While resolving fundamental conflicts is guided by the invariants of the meta-meta-model (e.g., acyclicity), the primary design contribution is the architectural separation described by Pm and Mo, not just the fact that it follows rules.",
+          "pointer": "[p.7]"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Model-Specific Merge Logic + Gr + Pm + Se -> Generic Merge Operator",
+    "baseline_name": "Model-Specific Merge Logic",
+    "top_3_principle_tags": [
+      "Gr",
+      "Pm",
+      "Se"
+    ],
+    "core_principle_tags": [
+      "Gr",
+      "Se",
+      "Pm",
+      "Mo"
+    ],
+    "supporting_principle_tags": [
+      "Al",
+      "Gr"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Gr",
+      "Se",
+      "Al",
+      "Pm",
+      "Mo"
+    ],
+    "new_system_name": "Merge operator",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "The system achieves a Generalized Design (Gr) for model merging by separating the merge mechanism from the conflict resolution policy (Pm). This separation is made powerful and practical by using a Semantically Explicit (Se) first-class model as the mapping, which allows complex merge policies (like resolving representation conflicts) to be specified declaratively.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Gr",
+          "contribution_to_equation": "Provides the overarching goal of abstracting the merge problem away from any single data model, making the solution broadly applicable."
+        },
+        {
+          "symbol": "Pm",
+          "contribution_to_equation": "Structures the system by separating the 'how' of merging (the mechanism) from the 'what' of conflict resolution (the policy), enabling modularity and extensibility."
+        },
+        {
+          "symbol": "Se",
+          "contribution_to_equation": "Provides the expressive power needed for the policy, by making the input mapping a rich, explicit specification of the desired merge transformation."
+        }
+      ],
+      "transfer_question": "In what other complex data transformation or integration tasks could a declarative, structured specification be used to separate user-defined policy from a generic transformation mechanism?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "latency",
+      "direction": "not specified",
+      "concrete_number": "~20 hours",
+      "pointer": "[p.11]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "none",
+      "symbol": "None",
+      "name": "None",
+      "definition": "No plausible new principle candidate.",
+      "mechanism_pattern": "Not applicable",
+      "why_existing_principles_are_insufficient": "Existing principles, particularly the combination of Generalized Design (Gr), Policy/Mechanism Separation (Pm), and Semantically Explicit (Se), sufficiently cover the paper's core mechanisms of creating a generic merge operator driven by a rich, model-based mapping.",
+      "closest_existing_principles": [],
+      "reusability_beyond_this_paper": "Not applicable",
+      "confidence": "low",
+      "pointer": "Not specified in provided text"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "Generalizes model merging by using a first-class model as a semantically explicit mapping to separate the policy for resolving representation conflicts from the core merge mechanism.",
+    "top_3_principles": [
+      "Gr",
+      "Pm",
+      "Se"
+    ],
+    "mechanism_family": "other",
+    "specific_tools_or_algorithms": [
+      "Merge algorithm",
+      "BDK algorithm customization"
+    ],
+    "primary_design_archetype": "declarative interface to optimizer",
+    "principle_mapping_confidence": "high"
+  }
+}

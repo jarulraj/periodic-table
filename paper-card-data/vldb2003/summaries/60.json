@@ -1,0 +1,270 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "60",
+    "paper_title": "A Dependability Benchmark for OLTP Application Environments",
+    "authors": [
+      "Marco Vieira",
+      "Henrique Madeira"
+    ],
+    "venue_or_source": "Referenced as Technical Report DEI-006-2002, with a VLDB copyright notice.",
+    "year": "2003",
+    "system_or_method_name": "DBench-OLTP",
+    "problem_domain": "Database Benchmarking"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To propose a standard dependability benchmark for OLTP systems that measures both performance and dependability features, with a focus on availability, by extending the TPC-C performance benchmark.",
+    "primary_optimized_metric": "availability",
+    "secondary_metrics": [
+      "throughput",
+      "cost",
+      "data integrity"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "-37.1%",
+        "meaning": "Decrease in baseline throughput (tpmC) for DBMS DB-1 when switching from a high-availability configuration (Config A) to a low-availability one (Config B).",
+        "pointer": "[Table 4]"
+      },
+      {
+        "number_or_delta": "-41.2%",
+        "meaning": "Decrease in throughput under faults (Tf) for DBMS DB-1 when switching from Config A to Config B.",
+        "pointer": "[Table 4]"
+      },
+      {
+        "number_or_delta": "0",
+        "meaning": "Number of data integrity errors (Ne) detected across all experiments, showing the effectiveness of the DBMS's transactional engine.",
+        "pointer": "[Sec. 4.1]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Performance-only benchmarks (e.g., TPC-C)",
+    "why_this_is_the_right_comparison": "The proposed DBench-OLTP benchmark is explicitly designed as an extension to TPC-C, using its workload and setup, but adding dependability aspects that TPC-C lacks.",
+    "limiting_design_assumption": "The primary measure of an OLTP system's quality is its peak performance (e.g., transactions per minute) under ideal, fault-free conditions. Dependability aspects like availability and recoverability are not explicitly measured or reported.",
+    "pointers": [
+      "[quote: '...it is necessary to shift the focus from measuring pure performance to the measurement of both performance and recoverability.']",
+      "[quote: 'The DBench-OLTP dependability benchmark uses the basic setup, the workload, and the performance measures specified in the TPC-C...']"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Benchmark Specification",
+    "specific_tools_or_algorithms": [
+      "Fault Injection"
+    ],
+    "what_is_being_optimized": "The benchmark aims to provide a standardized way to measure and compare the dependability (especially availability) and performance-under-faults of different OLTP system configurations.",
+    "state_or_ir": "A formal specification defining a workload (from TPC-C), a faultload, a multi-phase execution procedure, and a set of performance and dependability metrics.",
+    "output": "A set of metrics including baseline performance (tpmC), performance under faults (Tf), data integrity errors (Ne), and availability from both the system (AvtS) and client (AvtC) perspectives.",
+    "pointers": [
+      "[Sec. 3.3]",
+      "[Sec. 3.5]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Introduces a standardized, portable `faultload` and a formal procedure for injecting faults to measure system reaction, moving beyond the baseline's fault-free evaluation.",
+      "baseline_assumption": "Benchmarks should measure system performance under normal, ideal operating conditions.",
+      "why_baseline_did_not_include_it": "Performance benchmarks like TPC-C were designed to measure peak throughput, and incorporating faults would add significant complexity and was outside their primary goal of standardizing performance measurement.",
+      "mechanism_level_implementation": "DBench-OLTP defines a two-phase benchmark. Phase 1 measures baseline performance. Phase 2 consists of multiple 'injection slots', each running the TPC-C workload while injecting a single, predefined operator fault (e.g., 'Delete file from disk', 'Abrupt OS shutdown'). The procedure specifies how to manage system state, injection timing, and recovery measurement to ensure reproducibility.",
+      "primary_metric_improved": "The ability to reproducibly measure and compare system behavior under adverse conditions.",
+      "tradeoffs_or_costs": "Increased complexity and execution time of the benchmark. A full run for 10 systems took 50 person-days.",
+      "pointers": [
+        "[Sec. 3.1, Figure 2]",
+        "[Sec. 3.4, Table 1]",
+        "[Table 6]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Defines new, user-centric dependability metrics to provide a holistic view of system quality, contrasting with the baseline's focus on a single throughput number.",
+      "baseline_assumption": "A single system-level throughput metric (like tpmC) is sufficient to characterize and compare OLTP systems.",
+      "why_baseline_did_not_include_it": "The baseline's goal was performance, so its metrics were tailored to that. Defining and measuring dependability metrics like availability requires a different experimental setup (fault injection) and a focus on user-perceived outcomes, which was not part of the original scope.",
+      "mechanism_level_implementation": "The benchmark specifies new metrics: `Tf` (throughput in the presence of faults), `Ne` (number of data errors), `AvtS` (availability from the System Under Test's point-of-view), and `AvtC` (availability from the end-users' point-of-view). These are calculated from data collected by an extended driver system during the fault injection phase.",
+      "primary_metric_improved": "availability",
+      "tradeoffs_or_costs": "Requires a more complex driver system to collect the necessary raw data and perform post-run analysis and consistency checks.",
+      "pointers": [
+        "[Sec. 3.3]",
+        "[quote: '...the driver system has been extended to handle the insertion of the faultload. Additionally, the driver system also records the raw data needed to calculate the benchmark measures...']"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Fs",
+          "name": "Formal Specification",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The creation of the DBench-OLTP specification as a formal, structured document defining the faultload, procedures, and rules for conducting the dependability benchmark.",
+          "why_it_applies": "The entire contribution is a formal specification intended to be a standard, ensuring that results are reproducible and comparable across different systems and sites.",
+          "justification_if_invented": "",
+          "pointer": "[quote: 'A dependability benchmark can then be defined as a specification of a standard procedure to assess dependability related measures...']"
+        },
+        {
+          "symbol": "Gr",
+          "name": "Generalized Design",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The design of the faultload to be based on common database administrator mistakes, which are largely equivalent across different DBMS products.",
+          "why_it_applies": "This principle explains the design choice to make the faultload portable and representative of a general class of OLTP systems, rather than being tied to a specific DBMS implementation. This generalization is key to its utility as a standard.",
+          "justification_if_invented": "",
+          "pointer": "[quote: '...it is possible to establish equivalence among many operator faults in different DBMS. In other words, a faultload based on operator faults is fairly portable across typical OLTP systems...']"
+        },
+        {
+          "symbol": "Ex",
+          "name": "Extensibility",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The decision to build DBench-OLTP as an add-on to the existing TPC-C benchmark, reusing its workload, setup, and baseline performance metrics.",
+          "why_it_applies": "The system extends a well-established standard rather than creating a new one from scratch, which simplifies adoption and allows for direct comparison between pure performance and performance-plus-dependability.",
+          "justification_if_invented": "",
+          "pointer": "[quote: 'The DBench-OLTP dependability benchmark uses the basic setup, the workload, and the performance measures specified in the TPC-C and introduces the new components...']"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Ft",
+          "name": "Fault Tolerance",
+          "reason_rejected_or_borderline": "Ft is the property being measured in the target systems, not a design principle of the benchmark itself. The benchmark is a measurement tool, not a fault-tolerant system.",
+          "pointer": "[Sec. 2]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Ho",
+          "name": "Human Observability",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The definition of new metrics like AvtC (client availability) and Tf (throughput with faults).",
+          "why_it_applies": "A stated goal of the new metrics is to be easily understandable by end-users and administrators, making abstract dependability properties concrete, visible, and comparable. The metrics are designed from the user's point of view.",
+          "justification_if_invented": "",
+          "pointer": "[quote: 'Focus on the end-user point of view... Are easy to understandable... by database users and database administrators.']"
+        },
+        {
+          "symbol": "Se",
+          "name": "Semantically Explicit",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The explicit distinction between availability from the SUT's perspective (AvtS) and availability from the end-user's perspective (AvtC).",
+          "why_it_applies": "This mechanism makes the semantics of 'availability' explicit and unambiguous. It recognizes that a system can be partially available (serving some clients but not others) and provides distinct measures for these different semantic interpretations, which is crucial for a clear evaluation.",
+          "justification_if_invented": "",
+          "pointer": "[Sec. 3.3]"
+        }
+      ],
+      "rejected_or_borderline_principles": []
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Performance-only Benchmarking + Fs + Gr + Ho -> Dependability Benchmarking",
+    "baseline_name": "Performance-only Benchmarking (e.g., TPC-C)",
+    "top_3_principle_tags": [
+      "Fs",
+      "Gr",
+      "Ho"
+    ],
+    "core_principle_tags": [
+      "Fs",
+      "Gr",
+      "Ho",
+      "Se"
+    ],
+    "supporting_principle_tags": [
+      "Ex"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Fs",
+      "Gr",
+      "Ex",
+      "Ho",
+      "Se"
+    ],
+    "new_system_name": "DBench-OLTP",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "These principles combine to transform a simple performance measurement tool into a comprehensive evaluation framework. Fs provides the rigorous, reproducible structure of a standard. Gr ensures the challenges (faults) are representative and widely applicable. Ho ensures the results are translated into meaningful, understandable metrics for human decision-makers. Together, they create a trustworthy and useful standard for assessing system dependability.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Fs",
+          "contribution_to_equation": "Provides the formal, repeatable procedure that turns an ad-hoc test into a standard benchmark."
+        },
+        {
+          "symbol": "Gr",
+          "contribution_to_equation": "Generalizes the fault model to be portable across different systems, making the benchmark broadly applicable."
+        },
+        {
+          "symbol": "Ho",
+          "contribution_to_equation": "Makes the abstract concept of dependability observable and quantifiable through user-centric metrics."
+        }
+      ],
+      "transfer_question": "In what other domains could a standardized, generalized set of adversarial inputs and observable metrics be used to create a more holistic evaluation benchmark beyond simple performance?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "Throughput (tpmC)",
+      "direction": "down",
+      "concrete_number": "37.1%",
+      "pointer": "[Table 4]"
+    },
+    {
+      "property": "Cost-per-transaction ($/tpmC)",
+      "direction": "up",
+      "concrete_number": "59.2%",
+      "pointer": "[Table 4]"
+    },
+    {
+      "property": "Availability (AvtS)",
+      "direction": "down",
+      "concrete_number": "13.8%",
+      "pointer": "[Table 4]"
+    },
+    {
+      "property": "Benchmark implementation effort",
+      "direction": "not specified",
+      "concrete_number": "50 person-days for 10 systems",
+      "pointer": "[Table 6]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Ab",
+      "name": "Adversarial Benchmarking",
+      "definition": "The design of an evaluation framework that systematically and reproducibly measures system properties (e.g., dependability, robustness, security) by subjecting the system to a standardized set of faults, attacks, or other stressful conditions.",
+      "mechanism_pattern": "Defining a `faultload` or `attackload` to be executed alongside a traditional `workload`, and specifying metrics that capture the system's response to these adverse events.",
+      "why_existing_principles_are_insufficient": "Fs (Formal Specification) captures the 'standard procedure' aspect but not the specific 'adversarial' or 'fault-based' nature of the evaluation; a performance benchmark is also an Fs. Ft (Fault Tolerance) is a property of the system being tested, not a design principle of the test harness itself. Ab specifically captures the principle of evaluating systems by how they behave under standardized, adverse conditions.",
+      "closest_existing_principles": [
+        "Fs",
+        "Ft"
+      ],
+      "reusability_beyond_this_paper": "This pattern is highly reusable for security benchmarks (e.g., standardizing attack vectors), robustness testing for operating systems (e.g., standardizing invalid inputs), or evaluating the safety of autonomous systems (e.g., standardizing edge-case scenarios).",
+      "confidence": "medium",
+      "pointer": "[Sec. 2, Sec. 3.4]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "The paper proposes a standardized dependability benchmark by extending TPC-C with a portable `faultload` of operator errors and new, user-centric metrics to measure availability and performance under faults.",
+    "top_3_principles": [
+      "Fs",
+      "Gr",
+      "Ho"
+    ],
+    "mechanism_family": "other",
+    "specific_tools_or_algorithms": [
+      "Fault Injection"
+    ],
+    "primary_design_archetype": "other",
+    "principle_mapping_confidence": "high"
+  }
+}

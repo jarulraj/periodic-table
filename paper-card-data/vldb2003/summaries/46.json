@@ -1,0 +1,264 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "46",
+    "paper_title": "Composing Mappings Among Data Sources",
+    "authors": [
+      "Jayant Madhavan",
+      "Alon Y. Halevy"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference, Berlin, Germany, 2003",
+    "year": "2003",
+    "system_or_method_name": "Mapping Composition Algorithm",
+    "problem_domain": "Data integration and peer data management systems"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To develop a method for composing semantic mappings between data sources (A->B and B->C) into an equivalent direct mapping (A->C) for a given class of queries, enabling static analysis and optimization.",
+    "primary_optimized_metric": "query time",
+    "secondary_metrics": [
+      "completeness of answers",
+      "decidability of composition"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "Πp2",
+        "meaning": "The complexity class for determining whether a given finite set of formulas is a composition of two mappings.",
+        "pointer": "[p.10]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Query-time mapping reformulation",
+    "why_this_is_the_right_comparison": "This is the standard approach in peer-data management systems, where mappings are chained dynamically for each query. The paper explicitly aims to improve upon this by pre-composing mappings.",
+    "limiting_design_assumption": "The composition of mappings must be performed dynamically at query time by chaining them together. This is because a static, pre-computed composition might be an infinite set of formulas and was not known to be finitely representable.",
+    "pointers": [
+      "[p.2, quote: 'Chaining mappings at run-time may be expensive...']",
+      "[p.2, quote: '...we chain together mappings at query time.']"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Symbolic methods",
+    "primary_tool_specific_type": "Constructive algorithm for generating mapping formulas",
+    "specific_tools_or_algorithms": [
+      "Query Rewrite Graph (QRG) construction",
+      "Minimal mapping formulas",
+      "Residue-based isomorphism checking"
+    ],
+    "what_is_being_optimized": "The structure of semantic mappings between data sources.",
+    "state_or_ir": "Query Rewrite Graph (QRG)",
+    "output": "A finite representation (the QRG) of a potentially infinite set of GLAV mapping formulas that form the composition.",
+    "pointers": [
+      "[p.8]",
+      "[p.9]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Introduces an algorithm to construct a finite representation (a Query Rewrite Graph) for the composition of two GLAV mappings, which can result in an infinite set of formulas.",
+      "baseline_assumption": "Composing mappings is done dynamically at query time. There is no mechanism to pre-compute a static, direct mapping, in part because the result could be infinite.",
+      "why_baseline_did_not_include_it": "The key difficulty is that the composed mapping may be an infinite set of formulas, which the baseline avoids by only reformulating one specific query at a time rather than composing the mappings for all possible queries.",
+      "mechanism_level_implementation": "The algorithm iteratively builds \"minimal composition formulas\" of increasing size. It uses \"residues\" to capture the potential for future extensions. When two formulas have isomorphic residues, the algorithm detects a cycle, allowing it to represent an infinite family of formulas in a finite graph (the QRG).",
+      "primary_metric_improved": "query time",
+      "tradeoffs_or_costs": "The pre-computation algorithm has a high theoretical complexity (Πp2-hard in some cases) and represents an upfront cost before any queries are run.",
+      "pointers": [
+        "[p.4, Example 3]",
+        "[p.8, Section 3.3]",
+        "[p.9, Section 3.4]",
+        "[p.10, Theorem 3]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Shows that for the practical class of CQk queries, the composition algorithm is guaranteed to terminate and produce a finite representation of the complete composition.",
+      "baseline_assumption": "The problem of composing mappings for all possible conjunctive queries is not known to be decidable and may result in an infinite, non-finitely-representable set of rules.",
+      "why_baseline_did_not_include_it": "The baseline does not distinguish between query classes for pre-composition. The insight that the structural properties of CQk queries enable a finite composition is a key contribution of the paper.",
+      "mechanism_level_implementation": "The QRG construction algorithm is modified to only consider residues with at most k^2 internally existential variables. This bound is sufficient due to the \"locality property\" of CQk queries, which limits variable interactions and thus ensures a finite number of non-isomorphic residues can be generated.",
+      "primary_metric_improved": "decidability of composition",
+      "tradeoffs_or_costs": "The resulting composition is only guaranteed to be complete for queries within the CQk class. For other queries, it may be an incomplete \"approximate composition\".",
+      "pointers": [
+        "[p.10, Section 4]",
+        "[p.10, Theorem 4]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Fs",
+          "name": "Formal Specification",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The entire problem is framed and solved using formalisms: GLAV mappings, conjunctive queries, certain answers, and containment mappings.",
+          "why_it_applies": "The paper's contribution is an algorithm that operates on and produces formal specifications (GLAV formulas) to solve the formally defined problem of mapping composition.",
+          "justification_if_invented": "",
+          "pointer": "[p.3, Section 2]"
+        },
+        {
+          "symbol": "Ep",
+          "name": "Equivalence-based",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The algorithm's termination condition for infinite compositions relies on detecting when two minimal formulas have isomorphic residues, meaning they can be extended in equivalent ways.",
+          "why_it_applies": "The core goal is to find an equivalent direct mapping. The mechanism for handling infinity is to find equivalence classes of partial compositions (via isomorphic residues) and represent them as cycles in a graph.",
+          "justification_if_invented": "",
+          "pointer": "[p.9, quote: 'if two minimal formulas have isomorphic residues, they will also have isomorphic extensions.']"
+        },
+        {
+          "symbol": "Rc",
+          "name": "Reuse of Computation",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The act of pre-composing mappings creates a reusable artifact (the direct A->C mapping).",
+          "why_it_applies": "This principle explains the primary motivation for the entire work: to perform the expensive composition work once, ahead of time, so it can be reused for many queries, saving runtime costs.",
+          "justification_if_invented": "",
+          "pointer": "[p.2, quote: 'By pre-computing the composition, we can also remove redundancies from it, leading to significant run-time savings.']"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "reason_rejected_or_borderline": "The work of composition is not avoided, but rather moved from query time to a pre-computation phase. This is better described by Rc (Reuse of Computation).",
+          "pointer": "[p.2]"
+        },
+        {
+          "symbol": "Si",
+          "name": "Simplicity",
+          "reason_rejected_or_borderline": "While the resulting direct mapping is conceptually simpler than a two-hop path, the mechanism to derive it (QRG, residues) is highly complex.",
+          "pointer": "[p.8]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Cp",
+          "name": "Constraint-based",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The algorithm is modified to guarantee termination by exploiting the structural constraint of CQk queries: that each nested expression has at most k variables.",
+          "why_it_applies": "This principle explains how the paper makes an undecidable/infinite problem tractable. By constraining the input query language, the algorithm can leverage the properties of that language (locality of variable interactions) to bound its state space and terminate.",
+          "justification_if_invented": "",
+          "pointer": "[p.10, Section 4]"
+        },
+        {
+          "symbol": "Fs",
+          "name": "Formal Specification",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The definition of the CQk query class is a formal one.",
+          "why_it_applies": "The constraint that makes the problem decidable is itself a formal property of the query language, building upon the formal framework established for the general problem.",
+          "justification_if_invented": "",
+          "pointer": "[p.3, Section 2.1]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Cc",
+          "name": "Common-Case Specialization",
+          "reason_rejected_or_borderline": "Borderline. The paper argues CQk queries are common in practice. However, the mechanism relies on a formal structural property (the constraint) rather than statistical commonality. Cp is a more precise description of the mechanism's logic.",
+          "pointer": "[p.2, quote: 'CQk queries cover many queries encountered in practice...']"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Query-time Reformulation + Fs + Ep + Cp -> Pre-computed Mapping Composition",
+    "baseline_name": "Query-time Reformulation",
+    "top_3_principle_tags": [
+      "Fs",
+      "Ep",
+      "Cp"
+    ],
+    "core_principle_tags": [
+      "Fs",
+      "Ep",
+      "Cp"
+    ],
+    "supporting_principle_tags": [
+      "Rc",
+      "Fs"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Fs",
+      "Ep",
+      "Rc",
+      "Cp"
+    ],
+    "new_system_name": "Pre-computed Mapping Composition",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "The system uses a formal specification (Fs) of mappings and queries to define an equivalence-based (Ep) transformation that composes them. To make this transformation tractable for a practical set of inputs, it introduces a structural constraint (Cp) on the allowed query language (CQk), which guarantees that the algorithm can find a finite representation.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Fs",
+          "contribution_to_equation": "Provides the formal language (GLAV, CQ) and semantics (certain answers) needed to define the problem of composition and reason about correctness."
+        },
+        {
+          "symbol": "Ep",
+          "contribution_to_equation": "Provides the core mechanism for managing the potentially infinite search space by identifying and collapsing equivalent partial compositions (via isomorphic residues)."
+        },
+        {
+          "symbol": "Cp",
+          "contribution_to_equation": "Makes the problem decidable and practical by restricting the query language, allowing the algorithm to exploit the language's structural properties to guarantee termination."
+        }
+      ],
+      "transfer_question": "In what other domains can a sequence of transformations be pre-compiled by finding a finite, generative representation for a constrained but practical subset of inputs?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "query time",
+      "direction": "down",
+      "concrete_number": "Not specified in provided text",
+      "pointer": "[p.2, quote: '...leading to significant run-time savings.']"
+    },
+    {
+      "property": "Pre-computation complexity",
+      "direction": "up",
+      "concrete_number": "Πp2",
+      "pointer": "[p.10]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Fa",
+      "name": "Finite Abstraction",
+      "definition": "Representing a potentially infinite set of states, behaviors, or artifacts with a finite structure by identifying and collapsing equivalent substructures.",
+      "mechanism_pattern": "The QRG construction algorithm explores a state space of minimal formulas. It terminates exploration along a path when it reaches a state (a rewrite node with a residue) that is isomorphic to a previously seen state. This creates a finite graph with cycles that can generate the infinite set of composition formulas.",
+      "why_existing_principles_are_insufficient": "Ep (Equivalence-based) captures the test for collapsing states (isomorphism), but not the broader pattern of building a finite generative model for an infinite space via state-space exploration and cycle detection. This pattern is a fundamental technique in automata theory, model checking, and program analysis, and deserves its own principle.",
+      "closest_existing_principles": [
+        "Ep",
+        "Fs"
+      ],
+      "reusability_beyond_this_paper": "This pattern is highly reusable. It applies to any system that needs to analyze or compile a process with an infinite state space, such as checking properties of a protocol, compiling a regular expression to a finite automaton, or analyzing recursive programs.",
+      "confidence": "medium",
+      "pointer": "[p.9, Section 3.4]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "The paper develops a formal algorithm that constructs a finite graph-based representation (QRG) of the potentially infinite composition of GLAV semantic mappings by iteratively extending minimal formulas and detecting cycles using isomorphic \"residues\".",
+    "top_3_principles": [
+      "Fs",
+      "Ep",
+      "Cp"
+    ],
+    "mechanism_family": "query optimization",
+    "specific_tools_or_algorithms": [
+      "Query Rewrite Graph (QRG) construction",
+      "Minimal mapping formulas",
+      "Residue-based isomorphism checking"
+    ],
+    "primary_design_archetype": "avoid materialization / recomputation",
+    "principle_mapping_confidence": "high"
+  }
+}

@@ -1,0 +1,268 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "74",
+    "paper_title": "OASIS: An Online and Accurate Technique for Local-alignment Searches on Biological Sequences",
+    "authors": [
+      "Colin Meek",
+      "Jignesh M. Patel",
+      "Shruti Kasetty"
+    ],
+    "venue_or_source": "VLDB",
+    "year": "2003",
+    "system_or_method_name": "OASIS",
+    "problem_domain": "Biological sequence alignment"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To design an accurate and efficient algorithm for evaluating local-alignment searches on biological sequences, which is faster than the accurate Smith-Waterman (S-W) algorithm and as accurate, unlike the heuristic-based BLAST tool.",
+    "primary_optimized_metric": "query time",
+    "secondary_metrics": [
+      "accuracy",
+      "online result delivery"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": ">10x",
+        "meaning": "For short query sequences, OASIS is more than an order of magnitude faster than the Smith-Waterman (S-W) algorithm.",
+        "pointer": "[p.1]"
+      },
+      {
+        "number_or_delta": "3.9%",
+        "meaning": "On average, OASIS expands only 3.9% of the dynamic programming matrix columns that S-W expands.",
+        "pointer": "[p.9]"
+      },
+      {
+        "number_or_delta": "60%",
+        "meaning": "On average, OASIS retrieved about 60% more matches than the heuristic BLAST tool, highlighting the inaccuracy of the baseline heuristic.",
+        "pointer": "[p.9]"
+      },
+      {
+        "number_or_delta": "500MB",
+        "meaning": "The suffix tree index size for a 40M symbol database.",
+        "pointer": "[p.8]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Smith-Waterman (S-W) algorithm",
+    "why_this_is_the_right_comparison": "S-W is the most popular accurate local-alignment search algorithm. OASIS aims to provide the same accuracy guarantees as S-W but with much higher performance, making it the direct functional baseline.",
+    "limiting_design_assumption": "The S-W algorithm assumes that a full dynamic programming matrix must be computed for each query against each target sequence independently. It lacks a mechanism to share computation or prune the search across a large database of sequences.",
+    "pointers": [
+      "[p.1]",
+      "[p.3]"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "A*-search algorithm",
+    "specific_tools_or_algorithms": [
+      "A*-search",
+      "Suffix Tree",
+      "Dynamic Programming"
+    ],
+    "what_is_being_optimized": "The search for high-scoring local alignments in a large sequence database.",
+    "state_or_ir": "Search nodes in a priority queue. Each node corresponds to a suffix tree node and stores a vector of alignment scores (Z-vector), a max score found, and a heuristic f-value representing the maximum possible score achievable through that node.",
+    "output": "A list of local alignments with scores greater than or equal to a minimum score threshold, returned in decreasing order of score.",
+    "pointers": [
+      "[p.4]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Replaces exhaustive pairwise sequence comparison with a goal-directed A*-search over a suffix tree that indexes the entire sequence database, enabling computation sharing for common prefixes.",
+      "baseline_assumption": "Each target sequence in the database must be processed independently against the query sequence, requiring a full O(mn) dynamic programming computation for each pair.",
+      "why_baseline_did_not_include_it": "The Smith-Waterman algorithm is fundamentally a pairwise alignment algorithm and was not designed for database-scale search. Integrating it with a global index like a suffix tree to guide a best-first search is a completely different algorithmic approach.",
+      "mechanism_level_implementation": "A suffix tree is built over the entire database of sequences. The search for alignments is performed as a best-first (A*) traversal of this tree. A priority queue orders the expansion of search nodes (which correspond to suffix tree nodes) based on their potential to yield a high-scoring alignment.",
+      "primary_metric_improved": "query time",
+      "tradeoffs_or_costs": "Requires a large, pre-computed suffix tree index that must be stored on disk (e.g., 500MB for a 40MB database). This introduces a one-time, offline construction cost.",
+      "pointers": [
+        "[p.1]",
+        "[p.4]",
+        "[p.8]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Introduces an exact pruning mechanism within the A*-search that discards partial alignments that are provably unable to produce a final alignment score above the required threshold.",
+      "baseline_assumption": "All intermediate states (cells) in the dynamic programming matrix must be computed, as there is no mechanism to determine if a partial alignment path is globally suboptimal until the full matrix is complete.",
+      "why_baseline_did_not_include_it": "S-W is a bottom-up dynamic programming algorithm, not a best-first search. It lacks the concepts of a search frontier and a heuristic upper-bound score needed to prune unpromising search paths early.",
+      "mechanism_level_implementation": "A heuristic vector H is precomputed, where H_i is the maximum possible alignment score for the suffix of the query starting at position i+1. During the search, if a partial alignment's current score plus the heuristic upper bound for the remaining query is less than the minimum required score (g_i,j + h_i < minScore), that search path is pruned.",
+      "primary_metric_improved": "query time",
+      "tradeoffs_or_costs": "The effectiveness of pruning depends on the query selectivity. For less selective queries (higher E-values), a larger portion of the search space must still be explored.",
+      "pointers": [
+        "[p.5]",
+        "[p.10]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Rc",
+          "name": "Reuse of Computation",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The use of a suffix tree to index all substrings in the database.",
+          "why_it_applies": "The suffix tree allows the dynamic programming computation for a shared prefix to be performed only once for all sequences in the database that contain that prefix. This reuses the work of aligning common substrings, in contrast to S-W which recomputes it for every target sequence.",
+          "justification_if_invented": "",
+          "pointer": "[p.1]"
+        },
+        {
+          "symbol": "Gd",
+          "name": "Goal-Directed",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The use of a best-first A*-search strategy guided by a priority queue ordered by the f-value (an estimate of the best possible score).",
+          "why_it_applies": "Instead of exhaustively filling a DP matrix, OASIS frames the problem as a search for a goal (the highest-scoring alignment). It synthesizes the solution by expanding paths in the suffix tree that are most likely to lead to the goal, as estimated by the heuristic f-value.",
+          "justification_if_invented": "",
+          "pointer": "[p.1]"
+        },
+        {
+          "symbol": "Ha",
+          "name": "Hardware-Aware",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The specific on-disk layout of the suffix tree, where sibling nodes are stored contiguously.",
+          "why_it_applies": "The paper explicitly designs the disk layout to minimize random disk accesses, which is a major performance bottleneck for large, disk-resident tree structures. This layout is beneficial because OASIS explores all children of a node upon expansion.",
+          "justification_if_invented": "",
+          "pointer": "[p.7]"
+        }
+      ],
+      "rejected_or_borderline_principles": []
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "Pruning search paths when the current alignment score plus a precomputed maximum possible score for the remainder of the query is less than the required minimum score.",
+          "why_it_applies": "The pruning is based on a strict upper bound of the achievable score. Any pruned search path is guaranteed not to produce an alignment that meets the minimum score threshold. Therefore, the work of expanding these paths is avoided without altering the final, accurate result set. This is a perfect example of result-preserving work avoidance.",
+          "justification_if_invented": "",
+          "pointer": "[p.5]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Cm",
+          "name": "Cost-based",
+          "reason_rejected_or_borderline": "While A* uses a cost/score function, the core idea here is not choosing between alternative plans based on a cost model, but rather guiding a search towards a goal (Gd) and provably eliminating parts of the search space (Wv). Gd and Wv are more specific.",
+          "pointer": "[p.4]"
+        },
+        {
+          "symbol": "Op",
+          "name": "Optimistic Design",
+          "reason_rejected_or_borderline": "The heuristic is 'optimistic' as it assumes the best possible completion. However, Wv is more specific because it describes the consequence of this optimism: the ability to provably skip work without affecting the result.",
+          "pointer": "[p.5]"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Pairwise Dynamic Programming (S-W) + Gd + Rc + Wv -> OASIS",
+    "baseline_name": "Pairwise Dynamic Programming (S-W)",
+    "top_3_principle_tags": [
+      "Gd",
+      "Rc",
+      "Wv"
+    ],
+    "core_principle_tags": [
+      "Rc",
+      "Gd",
+      "Wv"
+    ],
+    "supporting_principle_tags": [
+      "Ha"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Rc",
+      "Gd",
+      "Ha",
+      "Wv"
+    ],
+    "new_system_name": "OASIS",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "These principles transform an exhaustive, pairwise computation into an efficient, global search. The suffix tree index (Rc) provides a shared structure over the entire database. The goal-directed (Gd) A* search provides the algorithm to traverse this structure efficiently. The result-preserving pruning (Wv) makes the search tractable by eliminating huge portions of the search space without sacrificing the required accuracy.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Gd",
+          "contribution_to_equation": "Reframes the exhaustive DP computation as a best-first search for the highest-scoring alignment, prioritizing promising paths."
+        },
+        {
+          "symbol": "Rc",
+          "contribution_to_equation": "Introduces a suffix tree index to structure the search, allowing alignment work on common prefixes to be shared across the entire database instead of being repeated for each sequence."
+        },
+        {
+          "symbol": "Wv",
+          "contribution_to_equation": "Enables aggressive, yet correct, pruning of the search space by using a score upper-bound to identify and discard paths that cannot possibly yield a valid result."
+        }
+      ],
+      "transfer_question": "In what other domains could an exhaustive dynamic programming algorithm be replaced by a goal-directed search over a shared index structure to enable result-preserving pruning?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "query time",
+      "direction": "down",
+      "concrete_number": ">10x faster than S-W",
+      "pointer": "[p.1]"
+    },
+    {
+      "property": "accuracy",
+      "direction": "up",
+      "concrete_number": "100% (vs. BLAST)",
+      "pointer": "[p.1]"
+    },
+    {
+      "property": "storage",
+      "direction": "up",
+      "concrete_number": "500MB index for 40MB data",
+      "pointer": "[p.8]"
+    },
+    {
+      "property": "online result delivery",
+      "direction": "up",
+      "concrete_number": "Returns results in decreasing score order",
+      "pointer": "[p.1]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "none",
+      "symbol": "None",
+      "name": "None",
+      "definition": "No plausible new principle candidate.",
+      "mechanism_pattern": "Not applicable",
+      "why_existing_principles_are_insufficient": "Existing principles sufficiently cover the paper's mechanisms. The core contribution is a novel composition of Goal-Directed search (Gd), Reuse of Computation (Rc) via indexing, and Result-Preserving Work Avoidance (Wv) via bounding. This composition effectively transforms a dynamic programming problem into a guided search, but the constituent design moves are well-described by existing principles.",
+      "closest_existing_principles": [],
+      "reusability_beyond_this_paper": "Not applicable",
+      "confidence": "low",
+      "pointer": "Not specified in provided text"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "Replaces exhaustive Smith-Waterman dynamic programming with a goal-directed A*-search over a suffix tree index of the database, using a score upper-bound heuristic to provably prune the search space without sacrificing accuracy.",
+    "top_3_principles": [
+      "Gd",
+      "Rc",
+      "Wv"
+    ],
+    "mechanism_family": "indexing / search structure",
+    "specific_tools_or_algorithms": [
+      "A*-search",
+      "Suffix Tree",
+      "Dynamic Programming"
+    ],
+    "primary_design_archetype": "avoid materialization / recomputation",
+    "principle_mapping_confidence": "high"
+  }
+}

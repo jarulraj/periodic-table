@@ -1,0 +1,269 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "17",
+    "paper_title": "Mixed Mode XML Query Processing",
+    "authors": [
+      "Alan Halverson",
+      "Josef Burger",
+      "Leonidas Galanis",
+      "Ameet Kini",
+      "Rajasekar Krishnamurthy",
+      "Ajith Nagaraja Rao",
+      "Feng Tian",
+      "Stratis D. Viglas",
+      "Yuan Wang",
+      "Jeffrey F. Naughton",
+      "David J. DeWitt"
+    ],
+    "venue_or_source": "VLDB",
+    "year": "2003",
+    "system_or_method_name": "Niagara",
+    "problem_domain": "XML query processing"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To demonstrate that a native XML query processing system should support query plans that mix tree-based navigation and structural joins (based on inverted lists) to achieve better performance.",
+    "primary_optimized_metric": "latency",
+    "secondary_metrics": [
+      "scalability"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "1072x speedup",
+        "meaning": "For Query 2 on the 100K document, the hybrid plan (ZZ -> UN) took 17.2ms, while the pure navigational plan (UN) took 18471.1ms.",
+        "pointer": "[p.9, Table 7]"
+      },
+      {
+        "number_or_delta": "24.7x speedup",
+        "meaning": "For Query 2 on the 100K document, the hybrid plan (ZZ -> UN) took 17.2ms, while the pure structural join plan (ZZ) took 425.3ms.",
+        "pointer": "[p.9, Table 7]"
+      },
+      {
+        "number_or_delta": "161x speedup",
+        "meaning": "For Query 3 on the 100K document, the hybrid plan (UN -> ZZ) took 57.7ms, while the pure navigational plan (UN) took 9308.3ms.",
+        "pointer": "[p.9, Table 8]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Homogeneous XML query processing systems",
+    "why_this_is_the_right_comparison": "The paper's central argument is that systems using either only tree navigation or only inverted list filtering are suboptimal, which was the common approach in the literature at the time.",
+    "limiting_design_assumption": "A single query processing paradigm, either purely tree-based navigation or purely index-based structural joins, is sufficient and optimal for all XML path queries.",
+    "pointers": [
+      "[quote: '...there has been a sharp line demarcating the use of inverted list filtering and tree navigation.']",
+      "[quote: '...building systems that keep the two kinds of processing separate is suboptimal...']"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Rule-based optimizer",
+    "primary_tool_specific_type": "Cost-based query optimizer",
+    "specific_tools_or_algorithms": [
+      "Dynamic programming for plan selection",
+      "Cost models for navigational (Unnest) and index-based (ZigZag Join) operators"
+    ],
+    "what_is_being_optimized": "The sequence of navigational and index-based operators in a query plan for an XML path expression.",
+    "state_or_ir": "A path expression query, which is broken into prefixes and suffixes during optimization.",
+    "output": "A query plan that may mix navigational and index-based operators.",
+    "pointers": [
+      "[p.7, Section 3.5]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Introduced a unified query execution engine that can compose operators from two different processing paradigms: tree-based navigation (Unnest) and index-based structural joins (ZigZag Join).",
+      "baseline_assumption": "Query plans are homogeneous, consisting of operators from only one processing paradigm (either navigational or index-based).",
+      "why_baseline_did_not_include_it": "The two processing paradigms were developed and used separately in the literature, and integrating them requires a common data addressing scheme and mechanisms to convert between operator data formats.",
+      "mechanism_level_implementation": "The system provides two operator types: Unnest (navigational) and ZigZag Join (index-based). It also provides mechanisms for converting data between the formats required by each operator (XKeys for Unnest, postings for ZigZag Join), allowing them to be chained together in a single plan.",
+      "primary_metric_improved": "latency",
+      "tradeoffs_or_costs": "Increased system complexity and a runtime cost for converting between data formats (e.g., XKey to posting lookups).",
+      "pointers": [
+        "[p.1, Section 1]",
+        "[p.7, Section 3.4]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Developed a cost-based optimizer using dynamic programming to select the most efficient hybrid plan from the space of possible operator combinations.",
+      "baseline_assumption": "Query optimization is confined to a single processing paradigm. There is no mechanism to choose between paradigms for different parts of a query.",
+      "why_baseline_did_not_include_it": "The need for such an optimizer only arises once hybrid plans are possible. Without the ability to mix operators, there is no choice to be made between them.",
+      "mechanism_level_implementation": "The system uses recursive cost formulas for the Unnest and ZigZag Join operators, which depend on data statistics. A dynamic programming algorithm populates cost matrices to find the minimum cost plan for evaluating a given path expression by considering all valid ways to split the path between the two operator types.",
+      "primary_metric_improved": "latency",
+      "tradeoffs_or_costs": "Requires collecting and maintaining detailed statistics about the XML data, some of which are novel (Skip Factor, Skip Count) and potentially expensive to compute. The optimization process itself adds overhead.",
+      "pointers": [
+        "[p.5, Section 3.2.2]",
+        "[p.6, Section 3.3.2]",
+        "[p.7, Section 3.5]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Co",
+          "name": "Composability",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The ability to pipe results between the Unnest (navigational) and ZigZag Join (index-based) operators within a single query plan.",
+          "why_it_applies": "The central idea is to compose operators from two distinct processing paradigms. The system explicitly provides mechanisms to convert between formats to enable this composition.",
+          "justification_if_invented": "",
+          "pointer": "[quote: '...a native XML repository needs to support query plans that utilize these query processing approaches, and needs to be able to pipe intermediate results between the two.']"
+        },
+        {
+          "symbol": "Mo",
+          "name": "Modularity",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The system architecture is split into a Data Manager for navigational access and an Index Manager for inverted lists.",
+          "why_it_applies": "The system is built from two distinct modules, each responsible for one of the processing paradigms. The mixed-mode execution composes these modules.",
+          "justification_if_invented": "",
+          "pointer": "[p.2, Section 2.1]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Gr",
+          "name": "Generalized Design",
+          "reason_rejected_or_borderline": "The system does not create a single, more general operator. Instead, it composes two specialized, distinct operators. Composability is more specific.",
+          "pointer": "[p.1]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Cm",
+          "name": "Cost-based",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The dynamic programming algorithm that uses cost formulas based on data statistics to select the best plan among the hybrid alternatives.",
+          "why_it_applies": "The paper explicitly develops and validates a cost model to guide the choice of query plan, which is the definition of cost-based optimization.",
+          "justification_if_invented": "",
+          "pointer": "[p.5, Section 3]"
+        },
+        {
+          "symbol": "Ep",
+          "name": "Equivalence-based",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The optimizer's search strategy, which considers different ways to partition a path expression across Unnest and ZigZag Join operators. All generated plans are semantically equivalent.",
+          "why_it_applies": "The optimizer explores a search space of different, but semantically equivalent, plans to find the one with the lowest cost. For example, /A/B/D can be evaluated as a single Unnest, or as a ZigZag join for /A/B followed by another operation for /D.",
+          "justification_if_invented": "",
+          "pointer": "[p.7, Section 3.5]"
+        },
+        {
+          "symbol": "Wa",
+          "name": "Workload-Aware",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The cost model's reliance on statistics that capture the specific structure and cardinality of the XML documents being queried.",
+          "why_it_applies": "The choice of the optimal plan is not fixed but depends on the properties of the data (e.g., element cardinalities, path selectivities), which are a proxy for the workload. The experiments show that the best plan changes for different queries and data.",
+          "justification_if_invented": "",
+          "pointer": "[p.5, Table 1]"
+        }
+      ],
+      "rejected_or_borderline_principles": []
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Homogeneous Query Plans + Co + Ep + Cm -> Mixed-Mode Query Plans",
+    "baseline_name": "Homogeneous Query Plans",
+    "top_3_principle_tags": [
+      "Co",
+      "Cm",
+      "Ep"
+    ],
+    "core_principle_tags": [
+      "Co",
+      "Cm",
+      "Ep"
+    ],
+    "supporting_principle_tags": [
+      "Mo",
+      "Wa"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Co",
+      "Mo",
+      "Cm",
+      "Ep",
+      "Wa"
+    ],
+    "new_system_name": "Niagara",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "The system first uses Composability (Co) to create a new, larger space of possible query plans by allowing operators from different paradigms to be combined. This expanded space of semantically equivalent plans is the domain for an Equivalence-based (Ep) optimizer. Finally, a Cost-based (Cm) model is required to effectively search this space and select the plan with the best performance, as the optimal choice is data-dependent.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Co",
+          "contribution_to_equation": "Enables the creation of hybrid query plans by allowing navigational and index-based operators to be chained together."
+        },
+        {
+          "symbol": "Cm",
+          "contribution_to_equation": "Provides the decision-making framework to select the best plan from the available hybrid options based on estimated execution cost."
+        },
+        {
+          "symbol": "Ep",
+          "contribution_to_equation": "Defines the search space for the optimizer, which consists of many semantically equivalent plans constructed from different combinations of operators."
+        }
+      ],
+      "transfer_question": "In what other domains could composing specialized, heterogeneous execution engines and using a cost-based optimizer to select among them outperform a single, general-purpose engine?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "latency",
+      "direction": "down",
+      "concrete_number": "Up to 1072x speedup for some queries",
+      "pointer": "[p.9, Table 7]"
+    },
+    {
+      "property": "optimizer complexity",
+      "direction": "up",
+      "concrete_number": "Not specified",
+      "pointer": "[p.7, Section 3.5]"
+    },
+    {
+      "property": "storage",
+      "direction": "up",
+      "concrete_number": "Not specified",
+      "pointer": "[p.2, Section 2.1]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "none",
+      "symbol": "None",
+      "name": "None",
+      "definition": "No plausible new principle candidate.",
+      "mechanism_pattern": "Not applicable",
+      "why_existing_principles_are_insufficient": "Existing principles sufficiently cover the paper's mechanisms. The combination of Composability (Co), Equivalence-based (Ep), and Cost-based (Cm) planning accurately describes the classic database optimization pattern of expanding the plan space and then using a cost model to choose the best option. This paper applies that pattern to a new combination of execution strategies (navigational and index-based).",
+      "closest_existing_principles": [],
+      "reusability_beyond_this_paper": "Not applicable",
+      "confidence": "low",
+      "pointer": "Not specified in provided text"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "Enables and cost-optimizes hybrid query plans that compose navigational tree-traversal operators with index-based structural join operators to accelerate XML path queries.",
+    "top_3_principles": [
+      "Co",
+      "Cm",
+      "Ep"
+    ],
+    "mechanism_family": "query optimization",
+    "specific_tools_or_algorithms": [
+      "Dynamic programming for plan selection",
+      "Cost models for navigational (Unnest) and index-based (ZigZag Join) operators"
+    ],
+    "primary_design_archetype": "cost-based planning",
+    "principle_mapping_confidence": "high"
+  }
+}

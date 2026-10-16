@@ -1,0 +1,268 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "28",
+    "paper_title": "WISE-Integrator: An Automatic Integrator of Web Search Interfaces for E-Commerce",
+    "authors": [
+      "Hai He",
+      "Weiyi Meng",
+      "Clement Yu",
+      "Zonghuan Wu"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference",
+    "year": "2003",
+    "system_or_method_name": "WISE-Integrator",
+    "problem_domain": "Web search interface integration"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To automate the integration of web search interfaces for e-commerce sites to reduce the manual cost of building and maintaining metasearch engines.",
+    "primary_optimized_metric": "accuracy",
+    "secondary_metrics": [
+      "completeness"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "95.25%",
+        "meaning": "Average Attribute Matching Accuracy (ama) across book and electronics domains.",
+        "pointer": "[p.11, Table 3]"
+      },
+      {
+        "number_or_delta": "97.91%",
+        "meaning": "Average Attribute Matching Completeness (amc) across book and electronics domains.",
+        "pointer": "[p.11, Table 3]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Manual or semi-automatic interface integration",
+    "why_this_is_the_right_comparison": "The paper states that this is the current practice for building E-commerce metasearch engines, which is inefficient and costly to maintain.",
+    "limiting_design_assumption": "Integrating heterogeneous web search interfaces requires human intervention to resolve semantic mismatches between attributes and their value domains.",
+    "pointers": [
+      "[quote: 'Currently, integrating such search interfaces is carried out either manually or semi-automatically, which is inefficient and difficult to maintain.'] [p.1]"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Heuristic schema matching",
+    "specific_tools_or_algorithms": [
+      "Two-step clustering and weight-based matching",
+      "WordNet for semantic relationships",
+      "Approximate string matching",
+      "Vector Space Model for text similarity"
+    ],
+    "what_is_being_optimized": "The mapping of attributes from multiple local search interfaces to a single, unified global interface.",
+    "state_or_ir": "An internal representation of each interface attribute as a tuple: A = (N, P, DT, DF, VT, SU, ES, R), and an incrementally constructed intermediate integrated interface.",
+    "output": "A unified global search interface in HTML format.",
+    "pointers": [
+      "[p.2]",
+      "[p.4]",
+      "[p.6]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Automates attribute matching using a two-step method: first clustering attributes based on high-confidence 'positive matches' (e.g., exact names, semantics), then using a weighted scoring model on 'predictive matches' to resolve remaining ambiguities.",
+      "baseline_assumption": "Identifying semantically matching attributes across different web interfaces requires human judgment, as simple syntactic matching is insufficient.",
+      "why_baseline_did_not_include_it": "The baseline relies on human cognition for this complex semantic task. Automating it requires combining multiple, heterogeneous signals (names, values, types, formats) in a structured way, which was not a standard automated technique.",
+      "mechanism_level_implementation": "A two-step process. First, attributes are grouped into clusters based on exact name matches, semantic relationships (synonymy, hypernymy) from WordNet, and value overlap. Second, a weight-based matching algorithm computes a score between a local attribute and all attributes in the intermediate global interface. The score is a sum of weights from 8 metrics (e.g., approximate string match, vector space similarity, domain type compatibility).",
+      "primary_metric_improved": "accuracy",
+      "tradeoffs_or_costs": "The accuracy of the matching depends on the experimentally determined weights and the quality of the heuristics. The system can still produce incorrect matches or fail to merge semantically identical attributes.",
+      "pointers": [
+        "[p.5]",
+        "[p.6]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Automates the merging of attribute domains by creating a unified representation for both alphabetic and numeric values, explicitly considering query efficiency and user-friendliness.",
+      "baseline_assumption": "Merging the value sets of matching attributes (e.g., different ways of specifying product 'format' or price ranges) requires manual curation to create a coherent and usable global interface.",
+      "why_baseline_did_not_include_it": "This is a complex semantic normalization task, involving resolving heterogeneity in value names, units, and range specifications, which is typically left to human integrators.",
+      "mechanism_level_implementation": "For alphabetic domains, it clusters values based on semantic similarity and organizes them into a concept hierarchy for user presentation. For numeric range domains, it extracts all unique boundary values from all matching local attributes, sorts them, and uses them to generate a fine-grained global set of ranges. This is designed to reduce query cost by avoiding overly broad range conditions.",
+      "primary_metric_improved": "query time",
+      "tradeoffs_or_costs": "The quality of the merged domain depends on pre-built dictionaries for scales, units, and range modifiers. The generated concept hierarchies are limited to three levels for usability, potentially hiding deeper relationships.",
+      "pointers": [
+        "[p.8]",
+        "[p.9]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Ep",
+          "name": "Equivalence-based",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The entire attribute matching process, which uses exact name matches, semantic relationships (synonymy, hypernymy), and value overlap to identify attributes that are semantically equivalent.",
+          "why_it_applies": "The central goal is to find semantic equivalences between attributes from different interfaces to map them to a single global attribute. The 'positive matches' step directly establishes strong equivalences.",
+          "justification_if_invented": "",
+          "pointer": "[p.5]"
+        },
+        {
+          "symbol": "Cm",
+          "name": "Cost-based",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The 'weight-based match' step, which computes a total weight for a potential match by summing the weights of eight different predictive metrics. The match with the highest weight above a threshold is chosen.",
+          "why_it_applies": "The system uses a quantitative cost model (an inverted cost, i.e., a benefit score) to decide which attributes to match. The decision is not based on hard constraints but on maximizing a score.",
+          "justification_if_invented": "",
+          "pointer": "[p.6]"
+        },
+        {
+          "symbol": "Au",
+          "name": "Automation",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The entire WISE-Integrator system, which is designed to replace a manual or semi-automatic process.",
+          "why_it_applies": "The paper's primary motivation is to automate a tedious, expensive, and error-prone manual task. The system is explicitly presented as a tool for 'automatic integration'.",
+          "justification_if_invented": "",
+          "pointer": "[p.1]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "La",
+          "name": "Learned Approximation",
+          "reason_rejected_or_borderline": "Rejected. Although related work (SEMINT) uses neural networks, this paper uses a weighted sum with experimentally tuned, not learned, weights. [p.11]",
+          "pointer": "[p.6]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Gr",
+          "name": "Generalized Design",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The creation of a global attribute domain that is compatible with all matching local attribute domains. For numeric ranges, it creates a global format by combining all range boundaries from local interfaces.",
+          "why_it_applies": "The system synthesizes a single, generalized representation (the global domain) from multiple, specific, and heterogeneous instances (the local domains). This global representation can be mapped back to each local one.",
+          "justification_if_invented": "",
+          "pointer": "[p.9]"
+        },
+        {
+          "symbol": "Cm",
+          "name": "Cost-based",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The design of the global numeric range format, which is explicitly chosen to minimize query cost.",
+          "why_it_applies": "The paper states the goal is to 'reduce the range width of each range condition in the global interface' to avoid 'more invocations to some local sites', which is a cost-based optimization guiding the design of the merged domain.",
+          "justification_if_invented": "",
+          "pointer": "[p.9]"
+        },
+        {
+          "symbol": "Au",
+          "name": "Automation",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The mechanism for automatically merging attribute values and formats.",
+          "why_it_applies": "The paper explicitly notes the lack of prior work on 'automatic attribute value merging' [p.3], highlighting automation as a key contribution of this mechanism.",
+          "justification_if_invented": "",
+          "pointer": "[p.3]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Si",
+          "name": "Simplicity",
+          "reason_rejected_or_borderline": "Borderline. The goal is a 'user-friendly' interface [p.10], and mechanisms like value hierarchies and attribute trimming support this. However, the core mechanisms are better explained by generalization (Gr) and cost-optimization (Cm).",
+          "pointer": "[p.10]"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Manual Integration + Ep (Equivalence-based) + Cm (Cost-based) + Gr (Generalized Design) -> WISE-Integrator",
+    "baseline_name": "Manual or semi-automatic interface integration",
+    "top_3_principle_tags": [
+      "Ep",
+      "Cm",
+      "Gr"
+    ],
+    "core_principle_tags": [
+      "Ep",
+      "Cm",
+      "Gr"
+    ],
+    "supporting_principle_tags": [
+      "Au"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Ep",
+      "Cm",
+      "Au",
+      "Gr"
+    ],
+    "new_system_name": "WISE-Integrator",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "The system first uses Equivalence-based (Ep) principles to establish the semantic foundation for what attributes should be matched. It then uses a Cost-based (Cm) scoring model to make the final matching decisions and to optimize the structure of the merged domains for query efficiency. Finally, Generalized Design (Gr) is used to synthesize a single, unified interface that is compatible with all the specific, heterogeneous source interfaces.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Ep",
+          "contribution_to_equation": "Provides the semantic rules for identifying which attributes across different interfaces represent the same underlying concept."
+        },
+        {
+          "symbol": "Cm",
+          "contribution_to_equation": "Provides the quantitative decision framework for choosing the best attribute match based on weighted evidence and for designing merged domains to minimize downstream query costs."
+        },
+        {
+          "symbol": "Gr",
+          "contribution_to_equation": "Provides the mechanism for constructing a single, unified schema and value domain that can represent and map to all of the specialized source interfaces."
+        }
+      ],
+      "transfer_question": "In what other domains could a combination of semantic equivalence rules, cost-based decision making, and generalized structure synthesis be used to automate the integration of heterogeneous, human-facing systems?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "query cost",
+      "direction": "down",
+      "concrete_number": "Not specified in provided text",
+      "pointer": "[quote: '...reduce the range width of each range condition in the global interface... multiple query invocations to local interfaces are avoided...'] [p.9]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "He",
+      "name": "Hierarchical Evidence Aggregation",
+      "definition": "Structuring a decision process by first applying high-confidence, low-cost signals to establish strong conclusions or partitions, and then applying lower-confidence or higher-cost signals to resolve remaining ambiguity.",
+      "mechanism_pattern": "The paper's two-step attribute matching process: first, it clusters attributes based on 'positive matches' (exact name, synonymy), which are high-confidence signals. Second, it applies a more complex 'predictive match' model using a weighted sum of weaker signals to match the remaining attributes.",
+      "why_existing_principles_are_insufficient": "Cm (Cost-based) captures the idea of weighting evidence but not the staged application of different classes of evidence. Ep (Equivalence-based) describes the goal of matching but not the procedural strategy for achieving it. This principle captures the control flow of how evidence is aggregated, from strong and simple to weak and complex.",
+      "closest_existing_principles": [
+        "Cm",
+        "Ep"
+      ],
+      "reusability_beyond_this_paper": "This pattern is common in entity resolution, data cleaning, and query optimization (e.g., applying cheap, highly selective predicates first). It is a general strategy for managing complexity and uncertainty in matching and classification tasks.",
+      "confidence": "medium",
+      "pointer": "[p.5]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "Automates web search interface integration by using a two-step, evidence-based process that first clusters attributes on strong semantic signals and then uses a cost-based weighted model to match remaining attributes and merge their domains for query efficiency.",
+    "top_3_principles": [
+      "Ep",
+      "Cm",
+      "Gr"
+    ],
+    "mechanism_family": "other",
+    "specific_tools_or_algorithms": [
+      "Two-step clustering and weight-based matching",
+      "WordNet for semantic relationships",
+      "Approximate string matching",
+      "Vector Space Model for text similarity"
+    ],
+    "primary_design_archetype": "other",
+    "principle_mapping_confidence": "high"
+  }
+}

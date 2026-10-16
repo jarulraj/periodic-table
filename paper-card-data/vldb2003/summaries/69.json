@@ -1,0 +1,255 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "69",
+    "paper_title": "Efficient IR-Style Keyword Search over Relational Databases",
+    "authors": [
+      "Vagelis Hristidis",
+      "Luis Gravano",
+      "Yannis Papakonstantinou"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference, Berlin, Germany, 2003",
+    "year": "2003",
+    "system_or_method_name": "Not specified in provided text",
+    "problem_domain": "Keyword search over relational databases"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To develop efficient query processing techniques for IR-style top-k keyword queries over RDBMSs, avoiding the need to compute all possible matches.",
+    "primary_optimized_metric": "query time",
+    "secondary_metrics": [
+      "result quality"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "Orders of magnitude faster",
+        "meaning": "For a 2-keyword, top-10 query with max CN size 6, the proposed GA/Hybrid algorithms take ~1 second, while the Naive baseline approach takes ~1000 seconds.",
+        "pointer": "[p.11, Fig. 12]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "DBXplorer and DISCOVER",
+    "why_this_is_the_right_comparison": "These are contemporary systems for free-form keyword search over RDBMSs that the paper explicitly identifies as inefficient because they compute all possible answers and use simplistic ranking.",
+    "limiting_design_assumption": "Answering a keyword query requires computing all joining trees of tuples that contain all query keywords.",
+    "pointers": [
+      "[p.1]",
+      "[p.2, quote: 'existing query-processing strategies for keyword search over RDBMSs are inherently inefficient, since they attempt to capture all tuple trees with all query keywords.']"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Top-k query processing algorithm",
+    "specific_tools_or_algorithms": [
+      "Global Pipelined algorithm",
+      "Sparse algorithm",
+      "Hybrid algorithm"
+    ],
+    "what_is_being_optimized": "The execution strategy for finding the k highest-scoring joining trees of tuples from a set of candidate join plans (CNs).",
+    "state_or_ir": "Candidate Networks (CNs), which are join expressions over ranked tuple sets.",
+    "output": "A ranked list of the top-k joining trees of tuples.",
+    "pointers": [
+      "[p.5]",
+      "[p.6]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Replaced the baseline's goal of finding all matching tuple trees with finding only the top-k highest-scoring results, using a composable, IR-style relevance score instead of just join-count.",
+      "baseline_assumption": "The query answer is the complete set of all tuple trees containing the keywords, and relevance is primarily based on the number of joins.",
+      "why_baseline_did_not_include_it": "The baseline systems were designed for exhaustive 'AND' semantics and did not exploit the common IR characteristic that users are generally interested in only the few most relevant matches.",
+      "mechanism_level_implementation": "The system redefines the problem as a top-k query. It leverages the RDBMS's single-attribute IR scoring and uses a `Combine` function to aggregate these scores into a global score for a multi-tuple 'joining tree', which guides the search.",
+      "primary_metric_improved": "query time",
+      "tradeoffs_or_costs": "The system no longer returns the complete set of answers. The user must specify 'k', and the result is an approximation of the full result set, ordered by relevance.",
+      "pointers": [
+        "[p.1, quote: '...our techniques focus on the topk matches for the query...']",
+        "[p.2, quote: '...instead of ranking answers solely based on the size of the result as in DBXplorer and DISCOVER.']",
+        "[p.4]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Introduced a pipelined, score-guided execution model that concurrently explores multiple join plans (CNs) and safely outputs results once their score is provably higher than any possible future result, avoiding full materialization.",
+      "baseline_assumption": "Query execution proceeds by exhaustively evaluating each potential join plan (Candidate Network) independently to generate all its results, which are then merged.",
+      "why_baseline_did_not_include_it": "The baseline's goal of finding all results made a pipelined, top-k-focused approach unnecessary; exhaustive evaluation of each plan was a natural fit for their problem definition.",
+      "mechanism_level_implementation": "The Global Pipelined algorithm maintains a Maximum Possible Future Score (MPFS) for each CN and a Global MPFS (GMPFS). It iteratively expands the most 'promising' CN (the one with the highest MPFS), generates candidate results, and outputs any result whose score is greater than or equal to the GMPFS.",
+      "primary_metric_improved": "query time",
+      "tradeoffs_or_costs": "Increased algorithmic complexity, including maintaining state for multiple concurrent plans, multiple open database cursors, and a priority queue of candidate results.",
+      "pointers": [
+        "[p.7, Fig. 7]",
+        "[p.8, Fig. 8]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Gd",
+          "name": "Goal-Directed",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The re-framing of the problem from finding all results to finding only the top-k results.",
+          "why_it_applies": "The entire system design and its algorithms are derived from the new, more constrained goal of producing only the top-k results. This is a shift in the declarative goal, not just an optimization.",
+          "justification_if_invented": "",
+          "pointer": "[p.1, quote: 'our techniques focus on the topk matches for the query, for moderate values of k.']"
+        },
+        {
+          "symbol": "Cm",
+          "name": "Cost-based",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The use of a `Combine` function to aggregate single-attribute IR-style scores into a global score for a joining tree of tuples.",
+          "why_it_applies": "The system uses an explicit scoring model (Equation 2) to define the 'relevance' of a result. This score is not just for final ranking but is used during execution to guide the search and prune candidates.",
+          "justification_if_invented": "",
+          "pointer": "[p.4, Eq. 2]"
+        },
+        {
+          "symbol": "Co",
+          "name": "Composability",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The system architecture treats the underlying RDBMS's single-attribute IR engine as a black box and builds a new capability (multi-relation keyword search) by combining its outputs.",
+          "why_it_applies": "The paper explicitly states that the approach 'cleanly separates the relevance-ranking problem for a specific database attribute...from the problem of combining the individual attribute scores'. This is a clear example of composing existing components to build a new system.",
+          "justification_if_invented": "",
+          "pointer": "[p.3]"
+        }
+      ],
+      "rejected_or_borderline_principles": []
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Op",
+          "name": "Optimistic Design",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The heuristic of picking the next tuple to process from the 'most promising' tuple set of the 'most promising' CN, defined as the one with the highest Maximum Possible Future Score (MPFS).",
+          "why_it_applies": "The algorithm optimistically assumes that exploring the candidates with the highest potential score first will lead to the top results faster. The MPFS bound is the mechanism that ensures correctness despite this optimistic, greedy-like exploration.",
+          "justification_if_invented": "",
+          "pointer": "[p.7, quote: 'the Single Pipelined algorithm picks the 'most promising' tuple set...with the maximum value of MPFS i.']"
+        },
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "Using the Global Maximum Possible Future Score (GMPFS) as a threshold to safely output results and the Sparse algorithm's pruning of entire CNs.",
+          "why_it_applies": "The result is defined as the top-k items. The algorithm avoids processing tuples and entire CNs that are *proven* to be unable to produce a result that would make it into the final top-k set. This avoided work cannot alter the final, correct top-k result.",
+          "justification_if_invented": "",
+          "pointer": "[p.8, line 18, quote: 'Output all new results T in R with Score(T, Q) >= GMPFS']"
+        },
+        {
+          "symbol": "Ad",
+          "name": "Adaptive Processing",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The Hybrid algorithm, which chooses between the Sparse and Global Pipelined algorithms at runtime based on result-size estimates.",
+          "why_it_applies": "The system adapts its execution strategy based on properties of the specific query. This is not part of the core pipelined algorithm but is a key contribution for overall performance.",
+          "justification_if_invented": "",
+          "pointer": "[p.9, Fig. 10]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Bo",
+          "name": "Bottleneck-Oriented",
+          "reason_rejected_or_borderline": "The paper's argument is about the fundamental inefficiency of the 'find-all' model, not about relieving a specific, isolated bottleneck in an existing pipeline.",
+          "pointer": "[p.2]"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Exhaustive Search + Gd + Cm + Op -> Top-k Pipelined Search",
+    "baseline_name": "Exhaustive keyword search (DBXplorer/DISCOVER)",
+    "top_3_principle_tags": [
+      "Gd",
+      "Cm",
+      "Op"
+    ],
+    "core_principle_tags": [
+      "Gd",
+      "Cm",
+      "Op",
+      "Wv"
+    ],
+    "supporting_principle_tags": [
+      "Co",
+      "Ad"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Gd",
+      "Cm",
+      "Co",
+      "Op",
+      "Wv",
+      "Ad"
+    ],
+    "new_system_name": "Top-k Pipelined Search",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "The system first redefines the problem from an exhaustive search to a top-k goal (Gd). This new goal is quantified by a composite IR-style cost model (Cm), which defines what 'best' means. An optimistic execution strategy (Op) then prioritizes exploration of high-potential candidates, using the cost model to derive bounds that provably avoid unnecessary work (Wv).",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Gd",
+          "contribution_to_equation": "Changes the objective from 'find all results' to 'find the k best results', enabling the entire top-k optimization approach."
+        },
+        {
+          "symbol": "Cm",
+          "contribution_to_equation": "Provides the IR-style scoring function that defines 'best' and is used to guide the search and establish pruning bounds."
+        },
+        {
+          "symbol": "Op",
+          "contribution_to_equation": "Implements the 'most promising first' search strategy, assuming top results can be found efficiently without exhaustive exploration."
+        }
+      ],
+      "transfer_question": "Where else could a shift from an exhaustive 'find all' goal to a score-guided 'find top-k' goal, combined with an optimistic, bound-based execution, dramatically reduce search costs?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "query time",
+      "direction": "down",
+      "concrete_number": "1000x",
+      "pointer": "[p.11, Fig. 12]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "none",
+      "symbol": "None",
+      "name": "None",
+      "definition": "No plausible new principle candidate.",
+      "mechanism_pattern": "Not applicable",
+      "why_existing_principles_are_insufficient": "The combination of Goal-Directed (Gd), Cost-based (Cm), Optimistic Design (Op), and Result-Preserving Work Avoidance (Wv) sufficiently captures the core mechanism of threshold-based top-k query processing.",
+      "closest_existing_principles": [],
+      "reusability_beyond_this_paper": "Not applicable",
+      "confidence": "low",
+      "pointer": "Not specified in provided text"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "Replaces exhaustive generation of all keyword query results with a pipelined, top-k algorithm that uses IR-style score bounds to prune the search space and find the best answers efficiently.",
+    "top_3_principles": [
+      "Gd",
+      "Cm",
+      "Op"
+    ],
+    "mechanism_family": "query optimization",
+    "specific_tools_or_algorithms": [
+      "Global Pipelined algorithm",
+      "Sparse algorithm",
+      "Hybrid algorithm"
+    ],
+    "primary_design_archetype": "avoid materialization / recomputation",
+    "principle_mapping_confidence": "high"
+  }
+}

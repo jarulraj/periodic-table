@@ -1,0 +1,290 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "6",
+    "paper_title": "A Regression-Based Temporal Pattern Mining Scheme for Data Streams",
+    "authors": [
+      "Wei-Guang Teng",
+      "Ming-Syan Chen",
+      "Philip S. Yu"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference, Berlin, Germany, 2003",
+    "year": "2003",
+    "system_or_method_name": "FTP-DS (Frequent Temporal Patterns of Data Streams)",
+    "problem_domain": "Frequent temporal pattern mining on data streams"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To devise an efficient and effective method to mine frequent temporal patterns from data streams, addressing the time (one data scan) and space (bounded memory) constraints.",
+    "primary_optimized_metric": "memory",
+    "secondary_metrics": [
+      "throughput",
+      "accuracy"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "steadily bounded",
+        "meaning": "Memory usage for storing frequent patterns does not grow over time.",
+        "pointer": "[p.11, Figure 8(a)]"
+      },
+      {
+        "number_or_delta": "stable",
+        "meaning": "Execution time per time window remains stable as more of the stream is processed.",
+        "pointer": "[p.11, Figure 8(b)]"
+      },
+      {
+        "number_or_delta": "4%",
+        "meaning": "Approximation error for a retrospective query on averaged support using the regression-based summary.",
+        "pointer": "[p.9, Example 3]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Traditional batch-mode frequent pattern mining algorithms (e.g., Apriori)",
+    "why_this_is_the_right_comparison": "The paper argues that methods designed for traditional databases cannot be directly applied to data streams due to the high volume and pass-through nature of the data, necessitating a new approach.",
+    "limiting_design_assumption": "The entire dataset within a time window is available for multiple scans, which is required to iteratively generate candidate patterns and count their frequencies.",
+    "pointers": [
+      "[p.1, quote: 'most methods which were designed for a traditional database cannot be directly applied to a dynamic data stream']",
+      "[p.11, quote: 'a typical Apriori algorithm which works in batch mode and is allowed to scan data multiple times']"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Streaming algorithm with statistical summarization",
+    "specific_tools_or_algorithms": [
+      "Apriori-style candidate generation",
+      "Sliding window processing",
+      "Piecewise linear regression",
+      "Sufficient statistics for regression"
+    ],
+    "what_is_being_optimized": "The storage space required to maintain the frequency history of patterns and the computational cost of mining.",
+    "state_or_ir": "A list of frequent patterns, where each pattern's history is represented by a list of ATF (Accumulated Time and Frequency) forms.",
+    "output": "The set of frequent temporal patterns and their trends, represented by piecewise linear regression segments.",
+    "pointers": [
+      "[p.1, quote: 'one data scan for online statistics collection and regression-based compact pattern representation']",
+      "[p.5, Definition 2]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Processes the data stream in a single pass using an incremental, level-wise candidate generation approach on a sliding window, avoiding multiple scans of historical data.",
+      "baseline_assumption": "Mining requires multiple passes over the data to first find frequent k-itemsets, then generate (k+1)-candidates, then scan again to count them.",
+      "why_baseline_did_not_include_it": "In a data stream environment, the volume of data is too large to be stored or scanned multiple times.",
+      "mechanism_level_implementation": "The system scans online transaction flows in a sliding window, updating counts for existing candidate patterns. It uses the downward closure property to incrementally generate longer candidate patterns from subsets already found to be frequent.",
+      "primary_metric_improved": "throughput",
+      "tradeoffs_or_costs": "Introduces 'delayed pattern recognition', where a pattern is discovered with a time lag after it actually becomes frequent, because its sub-patterns must be identified first.",
+      "pointers": [
+        "[p.1, quote: 'one data scan for online statistics collection']",
+        "[p.2, quote: 'downward closure property']",
+        "[p.4, quote: 'the phenomenon of delayed pattern recognition exists']"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Represents the frequency history of each pattern using a compact, regression-based summary (the ATF form) instead of storing the full time series, enabling bounded memory usage.",
+      "baseline_assumption": "Analyzing trends or retrospectively querying pattern frequencies requires storing the full history of frequency counts, which is infeasible for long-running streams.",
+      "why_baseline_did_not_include_it": "Storing the complete history of frequency variations for all patterns would violate the strict space constraints of a data stream environment.",
+      "mechanism_level_implementation": "For each pattern, the system maintains a compact ATF (Accumulated Time and Frequency) form: `(t_s, P_tf, P_f, P_f^2)`. This stores the minimal sufficient statistics to compute a least-squares linear fit over a time segment. A pattern's history is a sequence of such segments. Old segments can be merged ('segment relaxation') to further bound space.",
+      "primary_metric_improved": "memory",
+      "tradeoffs_or_costs": "The piecewise linear representation is an approximation of the true frequency time series, which introduces some error in retrospective queries and trend analysis.",
+      "pointers": [
+        "[p.1, quote: 'regression-based compact pattern representation']",
+        "[p.5, Definition 2]",
+        "[p.8, quote: 'segment relaxation']",
+        "[p.7, quote: 'approximately reconstructed']"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Ad",
+          "name": "Adaptive Processing",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The arrival of new transactions in the stream and the expiration of old transactions from the sliding window.",
+          "why_it_applies": "The system continuously adapts its internal state—the set of tracked frequent patterns and their counts—in response to the evolving data stream, without halting or reprocessing from scratch.",
+          "justification_if_invented": "",
+          "pointer": "[p.4, Algorithm FTP-DS]"
+        },
+        {
+          "symbol": "Ig",
+          "name": "Invariant-Guided",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The generation of new candidate patterns to be tracked.",
+          "why_it_applies": "The candidate generation process is guided by the downward closure property, an invariant stating that a pattern can only be frequent if all its sub-patterns are frequent. This prunes the search space.",
+          "justification_if_invented": "",
+          "pointer": "[p.2, quote: 'From the downward closure property... only patterns whose subpatterns are all frequent are taken as candidates']"
+        },
+        {
+          "symbol": "Cr",
+          "name": "Consistency Relaxation",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The decision to use a single-pass, level-wise candidate generation scheme.",
+          "why_it_applies": "The system relaxes the requirement of reporting the exact set of frequent patterns at any given time. It accepts a time-delayed, approximate set as a trade-off for the efficiency of a single data scan, a phenomenon termed 'delayed pattern recognition'.",
+          "justification_if_invented": "",
+          "pointer": "[p.4, quote: 'some patterns are recognized with delays due to the candidate forming process in the data stream.']"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "reason_rejected_or_borderline": "The single-pass approach is not result-preserving. It avoids re-scanning work at the cost of introducing delays and potentially missing transient patterns, which changes the observable result compared to a multi-pass batch algorithm.",
+          "pointer": "[p.4]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Si",
+          "name": "Simplicity",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The representation of a pattern's frequency history.",
+          "why_it_applies": "The ATF form is a minimal representation, storing only four aggregate values. This simple structure is purpose-built and sufficient for one task: computing a linear regression fit, which enables extreme memory savings.",
+          "justification_if_invented": "",
+          "pointer": "[p.5, Definition 2]"
+        },
+        {
+          "symbol": "Cr",
+          "name": "Consistency Relaxation",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "Storing the frequency history of a pattern over time.",
+          "why_it_applies": "The system relaxes the need to store the exact, true history of frequency values. It instead stores a piecewise linear approximation, trading historical precision for bounded memory usage.",
+          "justification_if_invented": "",
+          "pointer": "[p.7, quote: 'the actual time series for a temporal pattern can be approximately reconstructed by this ATF list.']"
+        },
+        {
+          "symbol": "Ad",
+          "name": "Adaptive Processing",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The management of historical segments as time advances.",
+          "why_it_applies": "The 'segment relaxation' technique adaptively changes the representation of historical data. As segments become older, they are merged to form coarser-grained approximations, adapting the storage granularity to prioritize fidelity for recent data.",
+          "justification_if_invented": "",
+          "pointer": "[p.8, Figure 6]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "La",
+          "name": "Learned Approximation",
+          "reason_rejected_or_borderline": "While linear regression is a statistical model, in this context it is used as a direct, analytical data fitting technique, not a 'learned' model in the sense of training a complex function like a neural network.",
+          "pointer": "[p.5]"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Batch Mining + Ad + Cr + Si -> FTP-DS",
+    "baseline_name": "Batch-mode, multi-scan frequent pattern mining",
+    "top_3_principle_tags": [
+      "Ad",
+      "Cr",
+      "Si"
+    ],
+    "core_principle_tags": [
+      "Ad",
+      "Si",
+      "Cr"
+    ],
+    "supporting_principle_tags": [
+      "Ig",
+      "Cr",
+      "Ad"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Ad",
+      "Ig",
+      "Cr",
+      "Si"
+    ],
+    "new_system_name": "FTP-DS",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "This composition transforms a static, multi-pass mining algorithm into a single-pass, online streaming algorithm. Ad (Adaptive Processing) provides the core online, incremental structure. Cr (Consistency Relaxation) enables this by accepting approximate results (delayed patterns, summarized history) in exchange for avoiding prohibitive costs. Si (Simplicity) provides the concrete mechanism for efficient, space-bounded approximation through a minimal statistical summary.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Ad",
+          "contribution_to_equation": "Provides the online, incremental framework, allowing the system to continuously update its set of tracked patterns and their historical summaries as the stream evolves."
+        },
+        {
+          "symbol": "Cr",
+          "contribution_to_equation": "Justifies the fundamental trade-off of sacrificing immediate and historical exactness for the ability to operate in a single pass with bounded resources."
+        },
+        {
+          "symbol": "Si",
+          "contribution_to_equation": "Enables a highly efficient form of approximation by designing a minimal, purpose-built data structure (the ATF form) that captures just enough information for regression-based summarization."
+        }
+      ],
+      "transfer_question": "In what other domains could we replace exhaustive historical tracking with adaptive, model-specific sufficient statistics to enable online analysis?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "memory",
+      "direction": "down",
+      "concrete_number": "steadily bounded",
+      "pointer": "[p.11, Figure 8(a)]"
+    },
+    {
+      "property": "throughput",
+      "direction": "up",
+      "concrete_number": "stable execution time per window, much faster than batch",
+      "pointer": "[p.12, Figure 9(b)]"
+    },
+    {
+      "property": "accuracy",
+      "direction": "mixed",
+      "concrete_number": "Introduces 'delayed pattern recognition' and approximation error (e.g., 4%), but quickly discovers most patterns.",
+      "pointer": "[p.4], [p.9], [p.12, Figure 9(a)]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Ss",
+      "name": "Sufficient Statistics for Summarization",
+      "definition": "Represent a large dataset or stream with a compact set of summary statistics that are provably sufficient to compute a specific class of models or queries losslessly with respect to the model, trading general-purpose queryability for extreme compression.",
+      "mechanism_pattern": "The ATF form `(t_s, P_tf, P_f, P_f^2)` is not just a simple summary; it is precisely the set of sufficient statistics needed to calculate the parameters of a least-squares linear regression over the data points in a segment. The raw data points can be discarded without losing any information relevant to the regression model.",
+      "why_existing_principles_are_insufficient": "Si (Simplicity) captures the minimalism, but not the formal property of being 'sufficient' for a downstream model. Cr (Consistency Relaxation) describes the outcome (approximation), but not the mechanism that enables it. Ss describes a specific 'how': by preserving just enough information for a target model class, enabling a principled trade-off between information loss and compression.",
+      "closest_existing_principles": [
+        "Si",
+        "Cr"
+      ],
+      "reusability_beyond_this_paper": "This pattern is common in streaming algorithms (e.g., sketches), online machine learning (e.g., updating Gaussian parameters with counts, sums, and sums of squares), and database synopses. A dedicated principle would capture this recurring design pattern.",
+      "confidence": "high",
+      "pointer": "[p.6, Theorem 1]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "Mines frequent temporal patterns from data streams in a single pass by incrementally generating candidates and compactly representing their frequency history as piecewise linear segments using a minimal set of sufficient statistics for regression.",
+    "top_3_principles": [
+      "Ad",
+      "Cr",
+      "Si"
+    ],
+    "mechanism_family": "stream processing",
+    "specific_tools_or_algorithms": [
+      "Apriori-style candidate generation",
+      "Sliding window processing",
+      "Piecewise linear regression",
+      "Sufficient statistics for regression"
+    ],
+    "primary_design_archetype": "incremental maintenance",
+    "principle_mapping_confidence": "high"
+  }
+}

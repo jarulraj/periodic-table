@@ -1,0 +1,265 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "38",
+    "paper_title": "Star-Cubing: Computing Iceberg Cubes by Top-Down and Bottom-Up Integration",
+    "authors": [
+      "Dong Xin",
+      "Jiawei Han",
+      "Xiaolei Li",
+      "Benjamin W. Wah"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference",
+    "year": "2003",
+    "system_or_method_name": "Star-Cubing",
+    "problem_domain": "Iceberg data cube computation"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To develop a more efficient iceberg cubing algorithm by integrating the strengths of top-down (simultaneous aggregation) and bottom-up (Apriori pruning) approaches.",
+    "primary_optimized_metric": "latency",
+    "secondary_metrics": [
+      "memory"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "5x faster",
+        "meaning": "Star-Cubing runs around 5 times faster than BUC when min_sup is 50 on a 10-dimension, 1M tuple dataset.",
+        "pointer": "[p.10, Figure 14]"
+      },
+      {
+        "number_or_delta": ">50% reduction",
+        "meaning": "Star-Cubing decreases computation time by more than 50% compared to BUC at a min_sup of 1000.",
+        "pointer": "[p.10, Figure 14]"
+      },
+      {
+        "number_or_delta": "<30%",
+        "meaning": "The proportion of time used to construct the star-table is less than 30% of the total run time.",
+        "pointer": "[p.11]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Hybrid of MultiWay (top-down) and BUC/H-Cubing (bottom-up)",
+    "why_this_is_the_right_comparison": "The paper explicitly frames its contribution as integrating the strengths and overcoming the weaknesses of these two distinct approaches, which were the state-of-the-art.",
+    "limiting_design_assumption": "An algorithm must choose between either a top-down approach that allows for simultaneous multi-dimensional aggregation but cannot use Apriori pruning for iceberg cubes, or a bottom-up approach that allows for Apriori pruning but cannot perform efficient simultaneous aggregation.",
+    "pointers": [
+      "[p.1, Abstract]",
+      "[p.3, Section 2.1]",
+      "[p.4, Section 2.2]"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Hybrid tree-based aggregation algorithm",
+    "specific_tools_or_algorithms": [
+      "Star-tree",
+      "Apriori-based pruning"
+    ],
+    "what_is_being_optimized": "The computation path for generating aggregate cells in an iceberg data cube.",
+    "state_or_ir": "Star-tree, a compressed cuboid tree representation.",
+    "output": "The set of cells in a data cube that satisfy an iceberg condition (e.g., count >= min_sup).",
+    "pointers": [
+      "[p.5, Section 3]",
+      "[p.6, Section 3.3]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Integrates top-down simultaneous aggregation with bottom-up Apriori pruning by introducing the concept of 'shared dimensions' in a top-down traversal.",
+      "baseline_assumption": "An algorithm's computation order is either purely top-down (like MultiWay) or purely bottom-up (like BUC), forcing a choice between shared computation and Apriori pruning.",
+      "why_baseline_did_not_include_it": "The baselines represent two different schools of thought on cube computation. Integrating them required a new way to structure the computation, which Star-Cubing provides via shared dimensions.",
+      "mechanism_level_implementation": "The algorithm follows a top-down global computation order. For each sub-tree in the computation plan (e.g., cuboids descending from ABD), it identifies common 'shared dimensions' (e.g., AB). It computes the aggregate for the shared dimension first. If this aggregate does not satisfy the iceberg condition, the entire sub-tree of descendant cuboids is pruned based on the anti-monotonic property.",
+      "primary_metric_improved": "latency",
+      "tradeoffs_or_costs": "Increased algorithmic complexity to manage the hybrid traversal and identify shared dimensions.",
+      "pointers": [
+        "[p.5, Section 3.1, Lemma 1]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Uses a compressed 'star-tree' data structure that losslessly collapses attribute values that cannot satisfy the iceberg condition into a single '*' node.",
+      "baseline_assumption": "The data structure for cube computation represents all distinct attribute values from the base data, even those that are infrequent.",
+      "why_baseline_did_not_include_it": "This form of query-dependent, lossless pre-compression of the data representation is a novel optimization specific to Star-Cubing.",
+      "mechanism_level_implementation": "Before building the main cuboid tree, the algorithm performs a preliminary scan to compute single-dimensional aggregates. Any attribute value whose count is below the minimum support threshold is identified as a 'star node'. In the main data structure, the star-tree, all occurrences of these star nodes are replaced with a single '*' symbol, which compresses the tree by reducing effective cardinality and collapsing paths.",
+      "primary_metric_improved": "latency",
+      "tradeoffs_or_costs": "Requires one or two initial scans of the data to build a 'star-table' that identifies the star nodes. This overhead is shown to be less than 30% of total runtime.",
+      "pointers": [
+        "[p.6, Section 3.3]",
+        "[p.7, Lemma 2]",
+        "[p.11, Section 4.4]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "Checking if the aggregate count on a 'shared dimension' satisfies the iceberg condition (min_sup).",
+          "why_it_applies": "If the aggregate on a shared dimension fails the iceberg condition, the anti-monotonic property guarantees that no descendant cuboid derived from it can satisfy the condition. Therefore, the entire computation for that sub-tree is pruned, avoiding work that cannot change the final result.",
+          "justification_if_invented": "",
+          "pointer": "[p.5, Lemma 1]"
+        },
+        {
+          "symbol": "Rc",
+          "name": "Reuse of Computation",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The top-down traversal order for computing cuboids.",
+          "why_it_applies": "The algorithm inherits the top-down, multi-way aggregation strategy from MultiWay, where intermediate aggregate values are computed once and reused for successive descendant cuboids (e.g., results of ACD are used to compute AD).",
+          "justification_if_invented": "",
+          "pointer": "[p.3, Figure 1]"
+        },
+        {
+          "symbol": "Co",
+          "name": "Composability",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The overall algorithm design that combines a top-down global order with bottom-up pruning logic.",
+          "why_it_applies": "The paper's central thesis is the integration of two distinct algorithmic approaches (top-down and bottom-up) into a single, more effective algorithm. The 'shared dimension' concept is the composition mechanism.",
+          "justification_if_invented": "",
+          "pointer": "[p.1, \"integrates the strengths of the previous three algorithms\"]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Cp",
+          "name": "Constraint-based",
+          "reason_rejected_or_borderline": "While the iceberg condition is a constraint, the algorithm is not a general constraint solver. It uses a specific property (anti-monotonicity) of this one constraint to prune. Wv is more specific to the pruning mechanism.",
+          "pointer": "[p.2]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "Replacing attribute values whose single-dimensional aggregate is below min_sup with a '*' symbol.",
+          "why_it_applies": "The paper proves this compression is lossless (Lemma 2). Because a value that fails the iceberg condition on one dimension cannot satisfy it when more dimensions are added (anti-monotonicity), distinguishing between these values is unnecessary work. Collapsing them into a single '*' avoids this work throughout the entire tree traversal and aggregation process without affecting the final result.",
+          "justification_if_invented": "",
+          "pointer": "[p.7, Lemma 2 Rationale]"
+        },
+        {
+          "symbol": "Cc",
+          "name": "Common-Case Specialization",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The creation of the star-tree, where all infrequent 'star nodes' are mapped to a single '*' representation.",
+          "why_it_applies": "The mechanism collapses many distinct, infrequent attribute values (the 'uncommon case') into a single, shared representation ('*'). This specializes the data structure by creating one common path for all values guaranteed to be irrelevant, thereby compressing the tree.",
+          "justification_if_invented": "",
+          "pointer": "[p.6, \"the node p can be replaced by ∗ so that the cuboid tree can be further compressed\"]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Cr",
+          "name": "Consistency Relaxation",
+          "reason_rejected_or_borderline": "The star-tree compression is explicitly proven to be lossless for iceberg cube computation, not an approximation or relaxation.",
+          "pointer": "[p.7, Lemma 2]"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "(Top-down Aggregation | Bottom-up Pruning) + Wv + Rc -> Star-Cubing",
+    "baseline_name": "A choice between Top-down Aggregation (MultiWay) or Bottom-up Pruning (BUC)",
+    "top_3_principle_tags": [
+      "Wv",
+      "Rc"
+    ],
+    "core_principle_tags": [
+      "Wv",
+      "Rc"
+    ],
+    "supporting_principle_tags": [
+      "Co",
+      "Cc"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Wv",
+      "Rc",
+      "Co",
+      "Cc"
+    ],
+    "new_system_name": "Star-Cubing",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "The design resolves the baseline's conflict between efficient aggregation and early pruning. Rc provides the efficient, multi-way aggregation structure from the top-down approach, while Wv provides the mechanism for aggressive, result-preserving pruning from the bottom-up approach. Wv is applied at two levels: pruning entire computation sub-trees and pre-compressing the data representation itself, both enabled by the same anti-monotonicity property.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Wv",
+          "contribution_to_equation": "Provides the core optimization logic by exploiting the anti-monotonicity of the iceberg condition to avoid work. It justifies both the pruning of descendant cuboids via shared dimensions and the lossless compression of the star-tree."
+        },
+        {
+          "symbol": "Rc",
+          "contribution_to_equation": "Contributes the simultaneous, multi-dimensional aggregation strategy inherited from top-down methods, allowing intermediate results to be efficiently reused in the computation of multiple descendant cuboids in a single pass."
+        }
+      ],
+      "transfer_question": "In what other domains can a global computation plan that reuses work (Rc) be integrated with a local, property-driven pruning rule that avoids result-irrelevant work (Wv)?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "latency",
+      "direction": "down",
+      "concrete_number": "up to 5x faster than BUC",
+      "pointer": "[p.10, Figure 14]"
+    },
+    {
+      "property": "memory",
+      "direction": "down",
+      "concrete_number": "Total memory is slightly larger than original data size, but star-tree compresses data.",
+      "pointer": "[p.11, Figure 21]"
+    },
+    {
+      "property": "scalability",
+      "direction": "up",
+      "concrete_number": "Scales linearly with the number of tuples.",
+      "pointer": "[p.11, Figure 20]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Scp",
+      "name": "Semantic Compression",
+      "definition": "Compressing a data representation losslessly by exploiting semantic properties of the query or task to merge or eliminate distinctions that are irrelevant to the final result.",
+      "mechanism_pattern": "The star-tree mechanism pre-computes single-dimensional aggregates and replaces all attribute values that fail the anti-monotonic iceberg condition with a single wildcard value ('*'). This shrinks the effective cardinality of dimensions and collapses paths in the tree representation before the main algorithm runs.",
+      "why_existing_principles_are_insufficient": "Wv describes avoiding the *computation*, but not the act of structurally altering the *input data representation* based on query semantics. Cc is about specializing for a common case, whereas this collapses many *uncommon* cases into one. Scp captures the specific pattern of query-aware, lossless data re-representation for downstream efficiency.",
+      "closest_existing_principles": [
+        "Wv",
+        "Cc"
+      ],
+      "reusability_beyond_this_paper": "This pattern is applicable in any domain where a filter condition has properties (e.g., anti-monotonicity, monotonicity) that allow pre-processing and compressing the input data without affecting the correctness of the final output, such as in query processing or constraint satisfaction problems.",
+      "confidence": "medium",
+      "pointer": "[p.6, Section 3.3]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "Star-Cubing integrates top-down multi-way aggregation with bottom-up Apriori pruning by using a compressed 'star-tree' representation and a 'shared dimension' traversal strategy that enables result-preserving pruning of entire sub-trees.",
+    "top_3_principles": [
+      "Wv",
+      "Rc"
+    ],
+    "mechanism_family": "query optimization",
+    "specific_tools_or_algorithms": [
+      "Star-tree",
+      "Apriori-based pruning"
+    ],
+    "primary_design_archetype": "avoid materialization / recomputation",
+    "principle_mapping_confidence": "high"
+  }
+}

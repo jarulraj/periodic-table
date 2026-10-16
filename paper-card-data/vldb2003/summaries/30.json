@@ -1,0 +1,298 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "30",
+    "paper_title": "VIPAS: Virtual Link Powered Authority Search in the Web",
+    "authors": [
+      "Chi-Chun Lin",
+      "Ming-Syan Chen"
+    ],
+    "venue_or_source": "Not specified in provided text",
+    "year": "2003",
+    "system_or_method_name": "VIPAS",
+    "problem_domain": "Web search and information retrieval"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To improve upon link-based search algorithms like HITS by incorporating user browsing behavior (page readers' regard) to produce more relevant and adaptive search results.",
+    "primary_optimized_metric": "accuracy",
+    "secondary_metrics": [
+      "discrepancy coefficient",
+      "grouping coefficient",
+      "stability"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "13.67 -> 2",
+        "meaning": "Discrepancy coefficient for the keyword 'Ruey-Beei Wu' improved from 13.67 (HITS) to 2 (VIPAS-VH). Lower is better.",
+        "pointer": "[p.11]"
+      },
+      {
+        "number_or_delta": "17.25 -> 1.41",
+        "meaning": "Grouping coefficient for the keyword 'Ruey-Beei Wu' improved from 17.25 (HITS) to 1.41 (VIPAS-VH). Lower is better.",
+        "pointer": "[p.11]"
+      },
+      {
+        "number_or_delta": "~3 iterations",
+        "meaning": "Number of iterative updates needed for scores to converge after adding virtual links, starting from pre-computed scores.",
+        "pointer": "[p.11]"
+      },
+      {
+        "number_or_delta": "10",
+        "meaning": "The relative importance factor (γA and γH) of virtual links compared to real links.",
+        "pointer": "[p.9]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "HITS (Hyperlink Induced Topic Search)",
+    "why_this_is_the_right_comparison": "VIPAS is explicitly designed to remedy a major defect of HITS, which is its reliance on static, author-created links.",
+    "limiting_design_assumption": "The static hyperlink structure of the web, created by page authors, is a sufficient signal for determining page authority and relevance. This assumption ignores the perspective of page readers.",
+    "pointers": [
+      "[p.2, quote: 'links in Web pages are only able to reflect the view of the page authors on the topic of those pages but not that of the page readers.']"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Graph ranking algorithm",
+    "specific_tools_or_algorithms": [
+      "HITS algorithm",
+      "Iterative score update on a graph"
+    ],
+    "what_is_being_optimized": "The authority scores of web pages, which determine their rank in search results.",
+    "state_or_ir": "A directed graph of web pages and hyperlinks, augmented with virtual links and their associated weights. Each page has an authority and hub score.",
+    "output": "A ranked list of URLs representing the most authoritative pages for a given query.",
+    "pointers": [
+      "[p.3]",
+      "[p.5]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Introduces 'virtual links' derived from user click behavior to augment the static web graph, making authority calculations reflect user interest (reader's regard) in addition to author's regard.",
+      "baseline_assumption": "The web graph is static and consists only of hyperlinks explicitly created by page authors.",
+      "why_baseline_did_not_include_it": "HITS was designed to analyze the existing, static link structure of the web and lacked a mechanism to collect or incorporate dynamic user feedback.",
+      "mechanism_level_implementation": "The system monitors user clicks on search results. Pages frequently clicked by users are grouped into a 'hot set'. Virtual links are then created pointing to pages in this hot set, originating either from a new 'virtual hub' or from existing top hub pages.",
+      "primary_metric_improved": "accuracy",
+      "tradeoffs_or_costs": "Requires a client-side data collection module to observe user behavior and a 'Web warehouse' to store clickstreams and virtual link information, increasing system complexity and storage requirements.",
+      "pointers": [
+        "[p.2]",
+        "[p.5]",
+        "[p.6]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Modifies the authority score calculation to be adaptive and weighted, incorporating virtual links with weights that reflect the recency and sequence of user clicks.",
+      "baseline_assumption": "All links in the HITS algorithm are unweighted and the score calculation is static for a given graph.",
+      "why_baseline_did_not_include_it": "The baseline did not have a concept of dynamic, weighted links based on user behavior, as it did not collect such data.",
+      "mechanism_level_implementation": "Virtual links are assigned weights based on the click order within a user session and the fraction of clicked pages that are in the 'hot set'. Weights from more recent observation periods are given higher significance. The iterative score update formulas are modified to include a weighted term for these virtual links.",
+      "primary_metric_improved": "accuracy",
+      "tradeoffs_or_costs": "Increases the complexity of the score update calculation and introduces several system-dependent parameters (α, β, γ, degeneration factor) that require tuning.",
+      "pointers": [
+        "[p.6]",
+        "[p.7]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Wa",
+          "name": "Workload-Aware",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The system's 'clicking observer module' records user clickstreams on search results.",
+          "why_it_applies": "The system's primary novelty is its direct use of user interaction data (the workload) to modify its internal state (the link graph) by creating virtual links to a 'hot set' of frequently accessed pages.",
+          "justification_if_invented": "",
+          "pointer": "[p.5, quote: 'we may also record whether a certain URL in the list is often clicked or is often ignored by the user.']"
+        },
+        {
+          "symbol": "Ad",
+          "name": "Adaptive Processing",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The three-phase process (Initialization, Virtual Link Collection, Refinement) where the system continuously observes user behavior and updates authority scores.",
+          "why_it_applies": "The system is designed to 'adaptively adjust the authority scores according to the users' behavior', creating a feedback loop where results improve over time as more user data is collected.",
+          "justification_if_invented": "",
+          "pointer": "[p.5]"
+        },
+        {
+          "symbol": "Ah",
+          "name": "Advisory Hinting",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The creation of 'virtual links' that augment, rather than replace, the real link structure.",
+          "why_it_applies": "User clicks are treated as hints about page authority. The system combines these hints (virtual links) with the original signal (real links) in the score calculation, rather than treating the user feedback as an absolute directive.",
+          "justification_if_invented": "",
+          "pointer": "[p.7, Equation for x_p]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "La",
+          "name": "Learned Approximation",
+          "reason_rejected_or_borderline": "The system learns from data, but it uses a direct, rule-based mechanism to create and weight links, not a statistical model like a neural network to approximate a function.",
+          "pointer": "[p.6]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Wa",
+          "name": "Workload-Aware",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The specific formulas for calculating virtual link weights based on click order and recency.",
+          "why_it_applies": "The weights are a direct, quantitative function of the workload characteristics (click order, recency), making the system's adaptation finely tuned to the observed user behavior.",
+          "justification_if_invented": "",
+          "pointer": "[p.6]"
+        },
+        {
+          "symbol": "Ad",
+          "name": "Adaptive Processing",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The weighting formula for subsequent periods gives more significance to recent data using a degeneration factor.",
+          "why_it_applies": "This mechanism explicitly makes the system adaptive over time, ensuring that the model of user interest does not become stale and reflects current trends.",
+          "justification_if_invented": "",
+          "pointer": "[p.7, formula for w_h(T_i)]"
+        },
+        {
+          "symbol": "Cm",
+          "name": "Cost-based",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The formulas for assigning numerical weights to virtual links based on click order and session context.",
+          "why_it_applies": "The weighting scheme is a heuristic model that quantifies the 'value' or 'importance' of a user click. This value is then used in the authority score calculation, analogous to how a cost model guides decisions in an optimizer.",
+          "justification_if_invented": "",
+          "pointer": "[p.6]"
+        },
+        {
+          "symbol": "Rc",
+          "name": "Reuse of Computation",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "Starting the iterative score update process from the previously converged scores after adding virtual links.",
+          "why_it_applies": "The system reuses the result of the previous full HITS computation as a starting point, which significantly reduces the number of iterations needed to converge to a new steady state.",
+          "justification_if_invented": "",
+          "pointer": "[p.11, quote: 'only about three runs of iterative updates are needed...we begin with an initial vector of scores that are already in the equilibrium state']"
+        }
+      ],
+      "rejected_or_borderline_principles": []
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "HITS (Static Link Analysis) + Wa (Workload-Aware) + Ad (Adaptive Processing) + Ah (Advisory Hinting) -> VIPAS",
+    "baseline_name": "HITS (Static Link Analysis)",
+    "top_3_principle_tags": [
+      "Wa",
+      "Ad",
+      "Ah"
+    ],
+    "core_principle_tags": [
+      "Wa",
+      "Ad",
+      "Ah"
+    ],
+    "supporting_principle_tags": [
+      "Cm",
+      "Rc"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Wa",
+      "Ad",
+      "Ah",
+      "Cm",
+      "Rc"
+    ],
+    "new_system_name": "VIPAS",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "These principles transform a static graph algorithm into a dynamic, self-improving system. Wa provides the raw signal (user clicks), Ah provides the mechanism to inject this signal as non-binding 'virtual links', and Ad provides the feedback loop to continuously update the system's state based on this signal, making the rankings progressively better.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Wa",
+          "contribution_to_equation": "It changes the system's input from a static graph to a dynamic one informed by the workload (user clicks), capturing the 'reader's regard'."
+        },
+        {
+          "symbol": "Ad",
+          "contribution_to_equation": "It introduces a feedback loop where the system's output (rankings) are refined over time based on observed user interactions, allowing it to adapt to changing user interests."
+        },
+        {
+          "symbol": "Ah",
+          "contribution_to_equation": "It defines the mechanism for incorporating user feedback as 'virtual links' that augment the original graph structure, treating user behavior as a powerful but advisory signal."
+        }
+      ],
+      "transfer_question": "In what other domains could a static, structure-based ranking be improved by creating advisory 'virtual structures' from observed user interactions?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "discrepancy coefficient",
+      "direction": "down",
+      "concrete_number": "13.67 -> 2.0 (for one keyword)",
+      "pointer": "[p.11]"
+    },
+    {
+      "property": "grouping coefficient",
+      "direction": "down",
+      "concrete_number": "17.25 -> 1.41 (for one keyword)",
+      "pointer": "[p.11]"
+    },
+    {
+      "property": "convergence time (iterations)",
+      "direction": "down",
+      "concrete_number": "from many to ~3-5",
+      "pointer": "[p.11]"
+    },
+    {
+      "property": "storage",
+      "direction": "up",
+      "concrete_number": "Not specified",
+      "pointer": "[p.8]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Sv",
+      "name": "Signal Injection via Virtual Structure",
+      "definition": "Modifying a system's behavior by creating and inserting non-physical ('virtual') components into its internal data structures (e.g., a graph) to represent and propagate external signals or objectives.",
+      "mechanism_pattern": "The creation of a 'virtual hub' and 'virtual links' that do not exist on the web but are added to the link graph to influence the HITS algorithm's outcome based on user clicks.",
+      "why_existing_principles_are_insufficient": "Wa captures the use of workload data and Ah captures that the data is a hint, but neither describes the specific mechanism of creating new, artificial structural elements ('virtual hub', 'virtual links') within a system's data representation to channel the influence of that external signal.",
+      "closest_existing_principles": [
+        "Ah",
+        "Wa"
+      ],
+      "reusability_beyond_this_paper": "This pattern could apply to other graph-based systems. For example, adding virtual nodes in a social network to represent community interests, or virtual edges in a dataflow graph to enforce scheduling priorities based on external metrics.",
+      "confidence": "medium",
+      "pointer": "[p.5, quote: 'We create an imaginary page, called the 'virtual hub', with links going to pages whose scores are what we want to modify.']"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "VIPAS improves upon the HITS search algorithm by observing user clickstreams to create weighted 'virtual links' that adaptively adjust page authority scores to reflect reader interest.",
+    "top_3_principles": [
+      "Wa",
+      "Ad",
+      "Ah"
+    ],
+    "mechanism_family": "query optimization",
+    "specific_tools_or_algorithms": [
+      "HITS algorithm",
+      "Iterative score update on a graph"
+    ],
+    "primary_design_archetype": "learned control loop",
+    "principle_mapping_confidence": "high"
+  }
+}

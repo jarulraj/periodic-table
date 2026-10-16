@@ -1,0 +1,290 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "15",
+    "paper_title": "MARS: A System for Publishing XML from Mixed and Redundant Storage",
+    "authors": [
+      "Alin Deutsch",
+      "Val Tannen"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference",
+    "year": "2003",
+    "system_or_method_name": "MARS",
+    "problem_domain": "XML data publishing and query reformulation"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To find optimal query reformulations for client XQueries against a virtual public XML schema, where the underlying proprietary storage is mixed (relational+XML) and redundant, by unifying GAV and LAV views and incorporating integrity constraints.",
+    "primary_optimized_metric": "query time",
+    "secondary_metrics": [
+      "reformulation time"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "1.331s",
+        "meaning": "Net saving in query execution time for a star query with NC=3, after accounting for 141ms of reformulation time.",
+        "pointer": "[p.9]"
+      },
+      {
+        "number_or_delta": "2 minutes",
+        "meaning": "Net saving in query execution time for a star query with NC=10, after accounting for 2s of reformulation time.",
+        "pointer": "[p.9]"
+      },
+      {
+        "number_or_delta": "30-100x",
+        "meaning": "Speedup of the new C&B chase implementation compared to a previous direct implementation.",
+        "pointer": "[p.4]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "GAV-only, LAV-only, and GLAV data integration approaches",
+    "why_this_is_the_right_comparison": "These represent the three main existing paradigms for query reformulation in data integration and XML publishing. MARS aims to combine the benefits of GAV (data hiding) and LAV (modeling redundancy) while avoiding the non-optimal, redundant reformulations produced by GLAV.",
+    "limiting_design_assumption": "Query reformulation must use separate, direction-specific algorithms for GAV ('composition-with-views') and LAV ('rewriting-with-views'). Combining them naively, as in GLAV, leads to non-optimal plans that perform redundant work because the algorithms are different.",
+    "pointers": [
+      "[p.1]"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Solver family",
+    "primary_tool_specific_type": "Query minimization under logical constraints",
+    "specific_tools_or_algorithms": [
+      "Chase and Backchase (C&B) algorithm",
+      "Compilation of XQuery to Disjunctive Embedded Dependencies (DEDs)"
+    ],
+    "what_is_being_optimized": "The structure of a query, specifically to find an equivalent query with a minimal set of data source accesses (atoms) under a set of logical constraints.",
+    "state_or_ir": "Relational conjunctive queries and Disjunctive Embedded Dependencies (DEDs) over a generic relational schema for XML (GReX).",
+    "output": "A minimal, lowest-cost query reformulation against the proprietary storage schemas.",
+    "pointers": [
+      "[p.2]",
+      "[p.5]",
+      "[p.6]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Unifies GAV, LAV, and integrity constraints into a single reformulation framework by compiling them all into a common relational logic representation (DEDs), enabling a search for globally optimal query plans.",
+      "baseline_assumption": "GAV and LAV views require different, direction-specific reformulation algorithms (composition vs. rewriting), and combining them naively leads to redundant work.",
+      "why_baseline_did_not_include_it": "Existing systems were built around one paradigm (GAV or LAV). Creating a unified framework required a new theoretical approach: reducing the entire problem to relational query minimization under constraints, which was a significant conceptual shift.",
+      "mechanism_level_implementation": "A compilation algorithm translates the client XQuery, GAV/LAV views, and XML/relational integrity constraints into a uniform representation: relational conjunctive queries and Disjunctive Embedded Dependencies (DEDs) over a generic XML schema (GReX). This unified problem is then solved by the C&B algorithm.",
+      "primary_metric_improved": "query time",
+      "tradeoffs_or_costs": "The compilation to a uniform relational representation produces very large queries and a high number of constraints, making the subsequent minimization problem NP-hard and computationally expensive.",
+      "pointers": [
+        "[p.1]",
+        "[p.2]",
+        "[p.5]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Makes the unified reformulation practical by developing a scalable implementation of the core chase algorithm and introducing XML-specific optimizations to prune the search space.",
+      "baseline_assumption": "Existing implementations of the chase algorithm were designed for smaller relational scenarios and do not scale to the size and complexity of problems generated by the XML-to-relational compilation.",
+      "why_baseline_did_not_include_it": "The performance bottleneck was a direct consequence of the novel compilation strategy in Δ1. The previous C&B implementation was not designed to handle inputs of this scale (e.g., queries with hundreds of joins).",
+      "mechanism_level_implementation": "1. A new chase implementation that treats a chase step as a relational query evaluation over a symbolic database, enabling the use of standard query processing techniques like hash joins. 2. XML-specific optimizations that short-cut the chase for transitive closure and prune the backchase search space by removing redundant atoms and enforcing navigation contiguity.",
+      "primary_metric_improved": "reformulation time",
+      "tradeoffs_or_costs": "The optimizations are specific to the structure of queries generated from XML path navigation and may not apply to general relational query minimization.",
+      "pointers": [
+        "[p.4]",
+        "[p.7]",
+        "[p.8]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Lu",
+          "name": "Language Homogeneity",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The compilation of heterogeneous inputs (XQuery, GAV views, LAV views, XML constraints, relational constraints) into a single, uniform representation (relational DEDs over the GReX schema).",
+          "why_it_applies": "This principle explains the core design move of translating a multi-paradigm problem into a single intermediate representation to enable a unified solving technique. The paper states it switched to a 'direction-neutral' representation by compiling views into constraints.",
+          "justification_if_invented": "",
+          "pointer": "[p.2]"
+        },
+        {
+          "symbol": "Cp",
+          "name": "Constraint-based",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The use of the C&B algorithm, which operates on a set of Disjunctive Embedded Dependencies (DEDs) that encode all schema mappings and integrity rules, to find valid query reformulations.",
+          "why_it_applies": "The system's reasoning power comes from expressing all semantic relationships as logical constraints and using a solver (C&B) that finds solutions satisfying these constraints. The paper states: 'we switched to a different, 'direction-neutral', representation of the views, compiling them into constraints'.",
+          "justification_if_invented": "",
+          "pointer": "[p.2]"
+        },
+        {
+          "symbol": "Ep",
+          "name": "Equivalence-based",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The C&B algorithm's two phases: the chase, which generates a universal plan containing all consequences, and the backchase, which inspects subqueries to find those equivalent to the original query.",
+          "why_it_applies": "The entire goal is to find query reformulations that are equivalent to the original query under the given constraints. The C&B algorithm is a systematic method for exploring this space of equivalent plans to find minimal ones.",
+          "justification_if_invented": "",
+          "pointer": "[p.6]"
+        },
+        {
+          "symbol": "Cm",
+          "name": "Cost-based",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The use of a 'plug-in cost estimator' during the backchase phase to compare the multiple minimal reformulations and select the one with the optimal cost.",
+          "why_it_applies": "After logically identifying all minimal equivalent plans, a cost model is used to make the final selection. This is a classic cost-based optimization step.",
+          "justification_if_invented": "",
+          "pointer": "[p.2, p.6]"
+        }
+      ],
+      "rejected_or_borderline_principles": []
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Bo",
+          "name": "Bottleneck-Oriented",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The creation of a new C&B implementation and XML-specific optimizations in direct response to the poor performance of the original implementation on the large problems generated by XML compilation.",
+          "why_it_applies": "The paper explicitly frames the engineering effort around a performance bottleneck identified via a 'stress test' where the original implementation failed to converge in 12 hours. The new design directly targets this bottleneck.",
+          "justification_if_invented": "",
+          "pointer": "[p.7]"
+        },
+        {
+          "symbol": "Cc",
+          "name": "Common-Case Specialization",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The introduction of 'XML-specific optimization techniques' that exploit the fact that the input is not arbitrary relational queries but results from XML compilation, such as pruning the search space based on navigation path contiguity.",
+          "why_it_applies": "These optimizations specialize the general C&B algorithm for the common case of queries derived from structured XML navigation, significantly reducing the search space from exponential to polynomial in some cases.",
+          "justification_if_invented": "",
+          "pointer": "[p.4, p.8]"
+        },
+        {
+          "symbol": "Rc",
+          "name": "Reuse of Computation",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The new C&B implementation recasts the chase step as a relational query evaluation, which allows it to 'apply classical query processing techniques (such as compiling constraints to join trees, pushing selection into them, etc.)'.",
+          "why_it_applies": "The design reuses the well-developed machinery of relational query optimization to solve a symbolic reasoning problem (the chase), avoiding the need to build a specialized solver from scratch.",
+          "justification_if_invented": "",
+          "pointer": "[p.4, p.8]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "reason_rejected_or_borderline": "The backchase pruning avoids exploring parts of the *search space* for reformulations. It does not skip work during the *execution* of a query. The pruning ensures the search for minimal plans is faster, but it doesn't change the final reformulated query's result.",
+          "pointer": "[p.8]"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "GAV/LAV-specific Reformulation + Lu + Cp + Ep -> MARS",
+    "baseline_name": "GAV/LAV-specific Reformulation",
+    "top_3_principle_tags": [
+      "Lu",
+      "Cp",
+      "Ep"
+    ],
+    "core_principle_tags": [
+      "Lu",
+      "Cp",
+      "Ep",
+      "Bo",
+      "Cc"
+    ],
+    "supporting_principle_tags": [
+      "Cm",
+      "Rc"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Lu",
+      "Cp",
+      "Ep",
+      "Cm",
+      "Bo",
+      "Cc",
+      "Rc"
+    ],
+    "new_system_name": "MARS",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "This composition transforms query reformulation from a set of disparate, paradigm-specific algorithms into a unified, logic-based optimization problem. Language Homogeneity (Lu) provides the crucial first step of creating a common ground. This enables Constraint-based (Cp) and Equivalence-based (Ep) reasoning to systematically explore the entire solution space, finding globally optimal plans that were inaccessible to the baseline approaches which were confined to their specific paradigms.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Lu",
+          "contribution_to_equation": "Translates the heterogeneous problem of mixed GAV/LAV views and XML/relational constraints into a single, uniform relational logic (DEDs), creating a 'direction-neutral' representation."
+        },
+        {
+          "symbol": "Cp",
+          "contribution_to_equation": "Uses the unified DED representation to formally encode all semantic relationships, turning the reformulation problem into one of finding a query that satisfies these constraints."
+        },
+        {
+          "symbol": "Ep",
+          "contribution_to_equation": "Provides the formal machinery (chase and backchase) to systematically search the space of queries that are logically equivalent to the original query under the given constraints, guaranteeing that all minimal reformulations can be found."
+        }
+      ],
+      "transfer_question": "In what other domains could a heterogeneous rewriting or integration problem be solved optimally by first compiling all artifacts into a single, unified constraint logic?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "reformulation time",
+      "direction": "down",
+      "concrete_number": "30-100x faster",
+      "pointer": "[quote: '...the new implementation is between 30 and 100 times faster.'] [p.4]"
+    },
+    {
+      "property": "reformulation search space",
+      "direction": "down",
+      "concrete_number": "O(2^n^2) to O(n)",
+      "pointer": "[quote: '...reducing the number of subqueries from O(2^n^2) to O(2^n)... This pruning criterion reduces the search space size from O(2^n+1) to O(n^2)... This reduces the number of eligible subqueries further... to O(n).'] [p.8]"
+    },
+    {
+      "property": "query execution time",
+      "direction": "down",
+      "concrete_number": "1.3s to 2min savings",
+      "pointer": "[p.9]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Sd",
+      "name": "Symbolic/Data Duality",
+      "definition": "Recast a symbolic manipulation or logical inference problem as a data processing or query evaluation problem over a database representing the symbolic state.",
+      "mechanism_pattern": "The chase algorithm, a logical inference procedure, is implemented by treating the query's atoms as a symbolic database instance and the constraint's premise as a relational query. This allows leveraging standard, highly optimized database query processing techniques (like hash joins) for symbolic reasoning.",
+      "why_existing_principles_are_insufficient": "Rc (Reuse of Computation) captures the reuse of database techniques, but not the specific, powerful pattern of reframing a symbolic problem as a data processing one. Lu (Language Homogeneity) is about unifying representations, not changing the computational paradigm from logic/symbol manipulation to bulk data processing. This duality is a distinct implementation strategy.",
+      "closest_existing_principles": [
+        "Rc"
+      ],
+      "reusability_beyond_this_paper": "This pattern is highly reusable. It appears in areas like Datalog evaluation, program analysis (e.g., using BDDs or relational solvers for pointer analysis), and model checking, where a logical or state-space search problem is translated into a database query problem.",
+      "confidence": "high",
+      "pointer": "[p.7-8]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "MARS unifies XML query reformulation for mixed and redundant storage by compiling all queries, views (GAV/LAV), and constraints into a single relational logic (DEDs), and then uses a scalable, optimized chase-and-backchase algorithm to find the minimal cost equivalent query.",
+    "top_3_principles": [
+      "Lu",
+      "Cp",
+      "Ep"
+    ],
+    "mechanism_family": "query optimization",
+    "specific_tools_or_algorithms": [
+      "Chase and Backchase (C&B) algorithm",
+      "Compilation of XQuery to Disjunctive Embedded Dependencies (DEDs)"
+    ],
+    "primary_design_archetype": "declarative interface to optimizer",
+    "principle_mapping_confidence": "high"
+  }
+}

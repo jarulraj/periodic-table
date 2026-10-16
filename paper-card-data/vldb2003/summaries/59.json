@@ -1,0 +1,286 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "59",
+    "paper_title": "Primitives for Workload Summarization and Implications for SQL",
+    "authors": [
+      "Surajit Chaudhuri",
+      "Prasanna Ganesan",
+      "Vivek Narasayya"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference, Berlin, Germany, 2003",
+    "year": "2003",
+    "system_or_method_name": "WAL (Workload Analysis Language)",
+    "problem_domain": "Database workload summarization"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To identify and support declarative primitives for summarizing large SQL workloads, making subsequent database administration tasks like index tuning more efficient and scalable.",
+    "primary_optimized_metric": "query time",
+    "secondary_metrics": [
+      "workload size",
+      "summarization time"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "3 orders of magnitude faster",
+        "meaning": "The proposed WAL query execution for summarization is about three orders of magnitude faster than the baseline workload compression technique.",
+        "pointer": "[p.9]"
+      },
+      {
+        "number_or_delta": "Comparable quality",
+        "meaning": "The quality of the database design (measured by optimizer-estimated cost of the original workload) produced by tuning on the summarized workload is comparable to that from the more expensive workload compression method.",
+        "pointer": "[p.9, Figure 3]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Standard SQL and simple sampling",
+    "why_this_is_the_right_comparison": "The paper argues that standard SQL is the natural tool for this task but is inadequate for expressing complex summarization requirements, and that simple alternatives like random sampling are also insufficient.",
+    "limiting_design_assumption": "Workload summarization can be adequately expressed using standard SQL's per-tuple filtering and aggregation, or simple statistical techniques like uniform random sampling.",
+    "pointers": [
+      "[p.1]"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Solver family",
+    "primary_tool_specific_type": "Combinatorial optimization",
+    "specific_tools_or_algorithms": [
+      "Skyline operator algorithms",
+      "0-1 Integer Programming",
+      "Greedy heuristics for knapsack-like problems"
+    ],
+    "what_is_being_optimized": "A subset of queries from a larger workload.",
+    "state_or_ir": "A relational table representing the SQL workload, conforming to a defined schema.",
+    "output": "A smaller, representative subset of the input workload.",
+    "pointers": [
+      "[p.2, Table 1]",
+      "[p.3]",
+      "[p.7]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Introduces a declarative `DOMINATE` clause to filter a workload based on a user-defined partial order, removing queries that are 'dominated' by others.",
+      "baseline_assumption": "Filtering is based on predicates applied to individual queries independently, as in a standard SQL `WHERE` clause.",
+      "why_baseline_did_not_include_it": "Standard SQL lacks operators for expressing and filtering based on partial-order relationships between tuples in a set.",
+      "mechanism_level_implementation": "A new `DOMINATE` clause specifies partitioning attributes and a set of partial order conditions. The engine filters out any statement S1 for which another statement S2 exists in the same partition where S2 dominates S1 (e.g., S1.GroupByCols ⊂ S2.GroupByCols). This generalizes the Skyline operator.",
+      "primary_metric_improved": "Expressiveness, leading to higher-quality summarization for tasks where inter-query relationships are important.",
+      "tradeoffs_or_costs": "Adds complexity to the language and query engine. The operator has a worst-case O(n^2) complexity within each partition.",
+      "pointers": [
+        "[p.1]",
+        "[p.3]",
+        "[p.5]",
+        "[p.7]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Introduces a declarative `REPRESENT` clause to specify and solve a constrained optimization problem for selecting an optimal subset of the workload.",
+      "baseline_assumption": "Selecting a representative subset is done via simple heuristics (e.g., top-k by cost) or random sampling, which cannot enforce complex coverage or budget constraints.",
+      "why_baseline_did_not_include_it": "Standard SQL has no constructs for expressing or solving combinatorial optimization problems like integer programming or knapsack.",
+      "mechanism_level_implementation": "A `REPRESENT` clause specifies an objective function (e.g., `MAXIMIZING SUM(Weight)`), partitioning attributes, and a set of global, local, and filter constraints. This specification is mapped to a 0-1 Integer Programming problem, for which the paper suggests using external solvers, or built-in greedy heuristics and efficient exact solvers for special cases.",
+      "primary_metric_improved": "Expressiveness, allowing users to find optimal or near-optimal workload summaries under complex, task-specific constraints.",
+      "tradeoffs_or_costs": "The general problem is NP-Hard, making it potentially very expensive to solve. Heuristic solutions may not be optimal.",
+      "pointers": [
+        "[p.1]",
+        "[p.4]",
+        "[p.6]",
+        "[p.7]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Se",
+          "name": "Semantically Explicit",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The `DOMINATE` clause, which allows a user to declaratively specify a partial order relationship between queries.",
+          "why_it_applies": "The mechanism makes the semantic relationship of 'dominance' (e.g., one query's requirements being a subset of another's) an explicit, first-class concept in the query language, rather than being encoded implicitly in procedural logic.",
+          "justification_if_invented": "",
+          "pointer": "[p.3, 5]"
+        },
+        {
+          "symbol": "Ep",
+          "name": "Equivalence-based",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The filtering semantic of the `DOMINATE` operator, which outputs a minimal subset where every excluded item is dominated by an included item.",
+          "why_it_applies": "The operator transforms the input set into a smaller, representative set based on a defined dominance relationship. The goal is to find a minimal set that 'covers' the entire original set, which is a form of equivalence-based reduction for the purpose of the downstream task.",
+          "justification_if_invented": "",
+          "pointer": "[quote: '...it outputs a smallest subset such that every statement not included in the output is dominated by some statement in the output.'] [p.3]"
+        },
+        {
+          "symbol": "Gr",
+          "name": "Generalized Design",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The design of the `DOMINATE` operator.",
+          "why_it_applies": "The paper explicitly states that the dominance primitive is a generalization of the Skyline operator, extending it with partitioning and dominance-based aggregates.",
+          "justification_if_invented": "",
+          "pointer": "[quote: 'The dominance primitive is a generalization of the Skyline operator...'] [p.1]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "reason_rejected_or_borderline": "Rejected because removing dominated queries is a heuristic. The paper states that indexes for a dominating query are only 'likely to be adequate' for a dominated one, not guaranteed. This does not meet the strict result-preservation requirement of Wv.",
+          "pointer": "[p.2]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Cp",
+          "name": "Constraint-based",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The `REPRESENT` clause, which allows specifying an objective function subject to `GLOBAL CONSTRAINT`, `LOCAL CONSTRAINT`, and `FILTER CONSTRAINT` clauses.",
+          "why_it_applies": "This mechanism directly maps a declarative specification of constraints and an objective into a formal combinatorial optimization problem (0-1 Integer Programming) to be solved.",
+          "justification_if_invented": "",
+          "pointer": "[p.4, 6]"
+        },
+        {
+          "symbol": "Cm",
+          "name": "Cost-based",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The `MAXIMIZING` or `MINIMIZING` part of the `REPRESENT` clause, which specifies an aggregate expression to be optimized.",
+          "why_it_applies": "The core of the representation primitive is to make a selection based on optimizing a cost or utility function (e.g., maximizing total weight, minimizing total count) subject to budget-like constraints.",
+          "justification_if_invented": "",
+          "pointer": "[p.4, 6]"
+        },
+        {
+          "symbol": "Se",
+          "name": "Semantically Explicit",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The entire `REPRESENT` clause syntax.",
+          "why_it_applies": "The mechanism allows the user to declaratively state the high-level goal of the summarization (the optimization problem) rather than writing procedural code to implement a specific selection heuristic.",
+          "justification_if_invented": "",
+          "pointer": "[p.4]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Gd",
+          "name": "Goal-Directed",
+          "reason_rejected_or_borderline": "Rejected because the user specifies the optimization problem (objective and constraints) quite explicitly, which is a better fit for Cp/Cm. Gd implies synthesizing a plan from a more abstract goal.",
+          "pointer": "[p.4]"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Standard SQL + Semantically Explicit (Se) + Constraint-based (Cp) + Equivalence-based (Ep) -> WAL",
+    "baseline_name": "Standard SQL",
+    "top_3_principle_tags": [
+      "Se",
+      "Cp",
+      "Ep"
+    ],
+    "core_principle_tags": [
+      "Se",
+      "Ep",
+      "Cp",
+      "Cm"
+    ],
+    "supporting_principle_tags": [
+      "Gr",
+      "Se"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Se",
+      "Ep",
+      "Gr",
+      "Cp",
+      "Cm"
+    ],
+    "new_system_name": "WAL",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "Se provides the declarative foundation to express complex summarization goals that go beyond simple filtering. Ep and Cp provide the two core computational models for these goals: Ep prunes the workload by finding a minimal representative set based on a partial order, while Cp selects an optimal subset by solving a constrained optimization problem. Together, they form a powerful, expressive language for workload analysis.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Se",
+          "contribution_to_equation": "Provides the declarative interface, lifting the semantics of dominance and constrained optimization into a first-class language construct."
+        },
+        {
+          "symbol": "Cp",
+          "contribution_to_equation": "Enables the specification and solving of subset selection as a formal constrained optimization problem, allowing trade-offs between workload coverage and size."
+        },
+        {
+          "symbol": "Ep",
+          "contribution_to_equation": "Enables filtering based on semantic redundancy, where queries covered by more general queries are removed to create a smaller, logically equivalent workload for a given task."
+        }
+      ],
+      "transfer_question": "Could other system configuration tasks, like test case selection or feature engineering, be improved by declarative primitives for dominance-based filtering and constrained subset optimization?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "summarization time",
+      "direction": "down",
+      "concrete_number": "3 orders of magnitude",
+      "pointer": "[p.9]"
+    },
+    {
+      "property": "workload size",
+      "direction": "down",
+      "concrete_number": "Not specified in provided text",
+      "pointer": "[p.9, Figure 4]"
+    },
+    {
+      "property": "quality of resulting configuration",
+      "direction": "not specified",
+      "concrete_number": "comparable to workload compression",
+      "pointer": "[p.9, Figure 3]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Ds",
+      "name": "Declarative Subset Optimization",
+      "definition": "The principle of providing a declarative interface to specify and solve a constrained combinatorial optimization problem whose output is a subset of the input relation, chosen to optimize a given objective function.",
+      "mechanism_pattern": "The `REPRESENT` clause, which specifies an objective (MAXIMIZE/MINIMIZE aggregate), partitioning, and multiple types of constraints (GLOBAL, LOCAL, FILTER) to select a subset of tuples from an input relation.",
+      "why_existing_principles_are_insufficient": "Cp (Constraint-based) is about solving constraints in general, not specifically about the common pattern of selecting an optimal subset of input items. Cm (Cost-based) is about using a cost model, but doesn't capture the full structure of a constrained optimization problem. Se (Semantically Explicit) describes the declarative nature but not the specific optimization structure. Ds captures the recurring and powerful pattern of 'pick the best N things under a budget' declaratively.",
+      "closest_existing_principles": [
+        "Cp",
+        "Cm",
+        "Se"
+      ],
+      "reusability_beyond_this_paper": "This pattern is highly reusable for tasks like selecting materialized views, choosing items for a cache, feature selection for machine learning, or test case prioritization.",
+      "confidence": "medium",
+      "pointer": "[p.4, 6]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "Extends SQL with declarative `DOMINATE` (partial-order filtering) and `REPRESENT` (constrained optimization) clauses to allow users to specify and solve complex workload summarization tasks directly in the database engine.",
+    "top_3_principles": [
+      "Se",
+      "Cp",
+      "Ep"
+    ],
+    "mechanism_family": "query optimization",
+    "specific_tools_or_algorithms": [
+      "Skyline operator algorithms",
+      "0-1 Integer Programming",
+      "Greedy heuristics for knapsack-like problems"
+    ],
+    "primary_design_archetype": "declarative interface to optimizer",
+    "principle_mapping_confidence": "high"
+  }
+}

@@ -1,0 +1,293 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "9",
+    "paper_title": "Optimized Query Execution in Large Search Engines with Global Page Ordering",
+    "authors": [
+      "Xiaohui Long",
+      "Torsten Suel"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference",
+    "year": "2003",
+    "system_or_method_name": "pingo",
+    "problem_domain": "Web search query processing"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To optimize query performance, as measured by query throughput and latency, in a large web search engine with term- and link-based ranking, through the use of pruning techniques that scale well with collection size.",
+    "primary_optimized_metric": "throughput",
+    "secondary_metrics": [
+      "latency",
+      "I/O",
+      "accuracy"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": ">20 queries/sec",
+        "meaning": "Throughput of the most aggressive pruning heuristic (fancy first-30) on a 16-node cluster.",
+        "pointer": "[p.9, Fig 6.10]"
+      },
+      {
+        "number_or_delta": "<3 queries/sec",
+        "meaning": "Throughput of the baseline (no pruning) method on a 16-node cluster.",
+        "pointer": "[p.9, Fig 6.10]"
+      },
+      {
+        "number_or_delta": "80% reduction",
+        "meaning": "The reliable pruning technique reduces I/O cost to about 20% of the baseline for top-4 queries.",
+        "pointer": "[p.9, Fig 6.8]"
+      },
+      {
+        "number_or_delta": "99%",
+        "meaning": "The fancy first-100 heuristic obtains the correct top-4 results for more than 99% of queries, with a fancy list length of 10%.",
+        "pointer": "[p.8, Fig 6.7]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Exhaustive list scanning",
+    "why_this_is_the_right_comparison": "This represents the standard approach in large search engines at the time, where computing ranked results requires scanning the entire inverted lists for query terms. The paper notes that 'several of the major engines still scan the entire inverted lists for most queries'.",
+    "limiting_design_assumption": "To compute the top-k results for a ranked query, the system must process the entire inverted lists for the query terms to score all documents in the intersection. This causes query cost to scale linearly with collection size.",
+    "pointers": [
+      "[p.2, quote: '...a doubling of the collection size results in a doubling of the amount of data that is scanned for each query.']",
+      "[p.5, quote: '...to our knowledge several of the major engines still scan the entire inverted lists for most queries.']",
+      "[p.8, quote: 'Baseline (no pruning): We compute top 10 results by scanning the complete inverted lists...']"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Pruning heuristic for top-k query processing",
+    "specific_tools_or_algorithms": [
+      "first-m pruning",
+      "fancy first-m pruning",
+      "reliable pruning"
+    ],
+    "what_is_being_optimized": "The number of disk blocks read from inverted lists during query execution.",
+    "state_or_ir": "A partitioned inverted index where sub-lists are sorted by a global quality score (Pagerank).",
+    "output": "An exact or approximate ranked list of top-k documents for a query.",
+    "pointers": [
+      "[p.5]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Reorders inverted lists by a global, query-independent quality score (Pagerank) instead of document ID, enabling an aggressive but approximate pruning heuristic that terminates after finding the first 'm' matching documents.",
+      "baseline_assumption": "Inverted lists are sorted by document ID for efficient compression and intersection. Existing pruning techniques for term-based ranking sorted lists by term-specific scores.",
+      "why_baseline_did_not_include_it": "There was little published work on how to efficiently integrate global, link-based ranking scores like Pagerank into the physical index layout and query processing pipeline for pruning.",
+      "mechanism_level_implementation": "Each inverted list's postings are sorted in descending order by their document's global Pagerank score. The 'first-m' query processing heuristic scans the lists, intersecting them, and stops after finding the first m documents that contain all query terms, returning the top-k from that set.",
+      "primary_metric_improved": "throughput",
+      "tradeoffs_or_costs": "This is an approximate heuristic that introduces significant errors in the ranking, as it may miss documents with lower Pagerank but very high term-based scores.",
+      "pointers": [
+        "[p.6, Section 5.1]",
+        "[p.8, quote: 'While we get great performance benefits, they come at a significant error rate.']"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Partitions each inverted list into a short 'fancy list' (high term-score postings) and a long list (the rest), with both sorted by Pagerank. This structure enables more accurate heuristics and a reliable, zero-error pruning technique.",
+      "baseline_assumption": "An inverted list is a single, monolithic data structure for each term.",
+      "why_baseline_did_not_include_it": "While list partitioning and 'fancy hits' were known concepts, this paper's contribution is to systematize the partitioning based on term-score thresholds specifically to integrate a global page ordering (Pagerank) for efficient and reliable pruning.",
+      "mechanism_level_implementation": "Each inverted list is split into two: a 'fancy list' with the 'h' postings having the highest term values, and a 'longer list' with all other postings. Both lists are sorted by Pagerank. Query processing first intersects fancy lists, then scans the longer lists. The 'reliable pruning' variant uses the maximum possible term scores from the longer lists to compute an upper bound on the score of any unseen document, stopping provably when no remaining document can enter the top-k.",
+      "primary_metric_improved": "accuracy",
+      "tradeoffs_or_costs": "Increases index management complexity by creating two lists per term. Query processing logic is more complex than a simple intersection.",
+      "pointers": [
+        "[p.6, Section 5.2]",
+        "[p.7, Section 5.4]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Bo",
+          "name": "Bottleneck-Oriented",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The entire set of pruning techniques is designed to reduce disk I/O.",
+          "why_it_applies": "The paper explicitly identifies the bottleneck as the large amount of data scanned from disk, which scales linearly with collection size, and designs the pruning mechanisms to directly address this I/O cost.",
+          "justification_if_invented": "",
+          "pointer": "[p.2, quote: 'the amount of data that has to be scanned on disk is huge and scales linearly with the size of the collection.']"
+        },
+        {
+          "symbol": "Cm",
+          "name": "Cost-based",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "Sorting inverted lists by Pagerank and stopping after 'm' results.",
+          "why_it_applies": "The system uses Pagerank as a query-independent proxy for a document's final score. The 'first-m' heuristic is a cost-based decision to prune the search space, assuming that the highest Pagerank documents are the most likely candidates for the top-k, trading accuracy for reduced cost.",
+          "justification_if_invented": "",
+          "pointer": "[p.6, quote: 'Since our indexes are sorted by Pagerank, these are the m pages with the highest Pagerank that contain all query terms.']"
+        },
+        {
+          "symbol": "Cr",
+          "name": "Consistency Relaxation",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The 'first-m' heuristic, which is explicitly approximate.",
+          "why_it_applies": "This heuristic knowingly sacrifices correctness (finding the exact top-k) for performance. The paper extensively evaluates this trade-off by measuring the error rate of the approximation.",
+          "justification_if_invented": "",
+          "pointer": "[p.8, Figures 6.3 and 6.4]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "reason_rejected_or_borderline": "Rejected because the 'first-m' heuristic is an approximation. The avoided work (scanning the rest of the lists) can and does change the final result, so it is not result-preserving.",
+          "pointer": "[p.8]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Cc",
+          "name": "Common-Case Specialization",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "Partitioning each inverted list into a short 'fancy list' for high term-score postings and a longer list for the rest.",
+          "why_it_applies": "This mechanism creates a specialized, fast-path data structure (the fancy list) for the common case of high-scoring documents, which are expected to have either high term scores or high Pagerank. The system processes these special cases first.",
+          "justification_if_invented": "",
+          "pointer": "[p.6, quote: 'The intuition is that a document scoring high overall should be either in one of the fancy lists or close to the beginning of the longer lists.']"
+        },
+        {
+          "symbol": "Ig",
+          "name": "Invariant-Guided",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The 'reliable pruning' technique's stopping condition.",
+          "why_it_applies": "The reliable technique maintains an invariant: the maximum possible score of any unseen document. It uses this bound (derived from the current position in the Pagerank-sorted lists and max term scores) to prove when it is safe to terminate because no remaining document can possibly make it into the current top-k set.",
+          "justification_if_invented": "",
+          "pointer": "[p.7, quote: 'Using top(k), priast, to, and t1, we can also decide if any documents not yet encountered at all can still make it into the top k. We stop when this test fails...']"
+        },
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The termination of the 'reliable pruning' scan before reaching the end of the lists.",
+          "why_it_applies": "This applies specifically to the reliable pruning variant. Once the invariant (from Ig) is met, the system avoids scanning the remainder of the inverted lists. This avoided work is guaranteed not to alter the final top-k result, making it a perfect example of result-preserving work avoidance.",
+          "justification_if_invented": "",
+          "pointer": "[p.7, Section 5.4]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Mo",
+          "name": "Modularity",
+          "reason_rejected_or_borderline": "Rejected because the list partitioning is not for clean separation of concerns, but for performance optimization. The two parts of the list are tightly coupled in the query algorithm. Cc is more specific to the design intent.",
+          "pointer": "[p.6]"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Exhaustive List Scanning + Cm + Cc + Ig -> Pruning via Global Rank + Fancy Lists",
+    "baseline_name": "Exhaustive List Scanning",
+    "top_3_principle_tags": [
+      "Cm",
+      "Cc",
+      "Ig"
+    ],
+    "core_principle_tags": [
+      "Bo",
+      "Cm",
+      "Cc",
+      "Ig"
+    ],
+    "supporting_principle_tags": [
+      "Cr",
+      "Wv"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Bo",
+      "Cm",
+      "Cr",
+      "Cc",
+      "Ig",
+      "Wv"
+    ],
+    "new_system_name": "pingo",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "The principles compose to transform an exhaustive search into a bounded, guided search. Cm provides the initial heuristic (Pagerank predicts final score) to structure the search space. Cc refines this by creating a specialized fast-path ('fancy lists') for candidates that are strong on a different dimension (term score), which the primary heuristic might miss. Finally, Ig provides a formal stopping condition by calculating score bounds, turning the combined heuristic into a provably correct and efficient algorithm.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Cm",
+          "contribution_to_equation": "Provides the cost model (Pagerank as a proxy for quality) that justifies reordering the index to place promising documents first, enabling pruning."
+        },
+        {
+          "symbol": "Cc",
+          "contribution_to_equation": "Creates a specialized data structure (fancy lists) to handle the common case of documents with high term-specific scores, complementing the global Pagerank ordering."
+        },
+        {
+          "symbol": "Ig",
+          "contribution_to_equation": "Introduces a formal bound (max possible score of unseen documents) that allows the system to prove when the search is complete, enabling correct early termination."
+        }
+      ],
+      "transfer_question": "In what other domains can a system accelerate top-k queries over composite scores by physically structuring its index according to a primary global score while creating specialized partitions for items that are exceptional on secondary local scores?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "I/O",
+      "direction": "down",
+      "concrete_number": "to ~20% of baseline",
+      "pointer": "[p.9, Fig 6.8]"
+    },
+    {
+      "property": "latency",
+      "direction": "down",
+      "concrete_number": "Not specified in provided text",
+      "pointer": "[p.9, Fig 6.11]"
+    },
+    {
+      "property": "throughput",
+      "direction": "up",
+      "concrete_number": "3x-7x over baseline",
+      "pointer": "[p.9, Fig 6.10]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Ml",
+      "name": "Multi-criteria Index Layout",
+      "definition": "Physically structuring an index based on a composition of multiple, potentially conflicting, ranking criteria to accelerate queries that combine these criteria.",
+      "mechanism_pattern": "The system sorts inverted lists by a primary, global criterion (Pagerank) but partitions them based on a secondary, local criterion (term score). This creates fast paths for items that rank high on either criterion, enabling efficient processing of queries that use a combined score.",
+      "why_existing_principles_are_insufficient": "Cc (Common-Case Specialization) captures the 'fast path' idea but not the specific mechanism of using multiple criteria to structure the index layout. Cm (Cost-based) describes using a model for decisions but not how to embed that model into the physical data layout. Lo (Locality of Reference) is too general; this is a specific strategy for creating locality for items that are good under a disjunction of scoring criteria.",
+      "closest_existing_principles": [
+        "Cc",
+        "Cm",
+        "Lo"
+      ],
+      "reusability_beyond_this_paper": "This pattern is highly reusable. For example, a product recommendation system could index items by global popularity but create a special partition for items with very high recent review scores. A database could sort a customer table by lifetime value but partition it to give fast access to customers with large, recent transactions.",
+      "confidence": "medium",
+      "pointer": "[p.6, Section 5.2]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "Accelerates top-k web search queries by sorting inverted lists by a global quality score (Pagerank) and partitioning them to create a 'fancy list' fast-path for documents with high term-specific scores, enabling aggressive and even provably correct pruning.",
+    "top_3_principles": [
+      "Cm",
+      "Cc",
+      "Ig"
+    ],
+    "mechanism_family": "indexing / search structure",
+    "specific_tools_or_algorithms": [
+      "first-m pruning",
+      "fancy first-m pruning",
+      "reliable pruning"
+    ],
+    "primary_design_archetype": "cost-based planning",
+    "principle_mapping_confidence": "high"
+  }
+}

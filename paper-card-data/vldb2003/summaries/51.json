@@ -1,0 +1,274 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "51",
+    "paper_title": "Temporal Slicing in the Evaluation of XML Queries",
+    "authors": [
+      "Dengfeng Gao",
+      "Richard T. Snodgrass"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference",
+    "year": "2003",
+    "system_or_method_name": "TXQuery",
+    "problem_domain": "Temporal XML query processing"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To add temporal support to the XQuery language with minimal extensions, moving the complexity of handling time from the user into the query processor by mapping temporal queries to conventional XQuery.",
+    "primary_optimized_metric": "query time",
+    "secondary_metrics": [
+      "expressiveness",
+      "number of constant periods"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "Not specified in provided text",
+        "meaning": "The paper proposes conceptual optimizations and argues for their benefits qualitatively without providing quantitative performance measurements.",
+        "pointer": "[p.9]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Standard XQuery",
+    "why_this_is_the_right_comparison": "The system, TXQuery, is designed as a minimal temporal extension to XQuery. The alternative is for users to manually write complex queries in standard XQuery to manage time, which the paper argues is difficult and error-prone.",
+    "limiting_design_assumption": "Standard XQuery assumes a static, non-temporal data model. It lacks built-in semantics for time, forcing users to explicitly manage timestamps and time-slicing logic within the query itself.",
+    "pointers": [
+      "[p.1, quote: 'Expressing queries on timevarying (relational or XML) data is more difficult than writing queries on nontemporal data.']",
+      "[p.2, quote: '...the query becomes much more complex... (The reader is invited to try to express this in XQuery, an exercise which will clearly show why a temporal extension is needed.)']"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Source-to-source query rewriting",
+    "specific_tools_or_algorithms": [
+      "Maximally-fragmented time-slicing",
+      "Selected node time-slicing",
+      "Copy-based per-expression time-slicing",
+      "In-place per-expression time-slicing",
+      "Idiomatic time-slicing"
+    ],
+    "what_is_being_optimized": "The number of constant time periods over which a query is evaluated and the amount of data processed per period.",
+    "state_or_ir": "A TXQuery query string.",
+    "output": "A semantically equivalent standard XQuery query string.",
+    "pointers": [
+      "[p.1, quote: 'we adopt a stratum approach which maps a 7XQuery query to a conventional XQuery.']",
+      "[p.5, quote: 'The semantics of (TQ) is expressed with the semantic function TXQuery | ], taking one parameter, a 7XQuery query... the range is the set of syntactically correct XQuery queries.']"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Introduces a stratum architecture to map declarative temporal queries (TXQuery) into standard, non-temporal XQuery, avoiding the need for a new query engine.",
+      "baseline_assumption": "Supporting a new query language feature like time requires building a new, specialized query engine or significantly modifying an existing one.",
+      "why_baseline_did_not_include_it": "Standard XQuery was not designed with temporal semantics. Adding them natively would be a major change to the language specification and engine implementations.",
+      "mechanism_level_implementation": "A stratum layer intercepts a TXQuery. For 'sequenced' queries, it generates an XQuery program that first computes all 'constant periods' (intervals where data does not change) from timestamps in the source documents. It then iterates through these periods, evaluating the original query logic on a snapshot of the data valid for each period.",
+      "primary_metric_improved": "expressiveness",
+      "tradeoffs_or_costs": "The generated XQuery can be significantly more complex and verbose than the original TXQuery. Performance is dependent on how well the underlying, non-temporal XQuery engine optimizes the generated code.",
+      "pointers": [
+        "[p.1, quote: 'we adopt the stratum approach, in which a stratum accepts 7X Query expressions and maps each to a semantically equivalent XQuery expression.']",
+        "[p.5, quote: 'the result changes only at those time points that begin or end a valid-time period... Hence, we can compute the constant periods...']"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Develops several optimized time-slicing strategies to reduce the amount of work performed by the generated XQuery, moving beyond a naive 'maximally-fragmented' approach.",
+      "baseline_assumption": "To correctly evaluate a temporal query via slicing, one must consider every timestamp in the input documents to define the constant periods.",
+      "why_baseline_did_not_include_it": "The baseline (maximally-fragmented slicing) is the most straightforward implementation of the stratum approach, but it is not efficient as it doesn't consider the query's specific data access patterns.",
+      "mechanism_level_implementation": "Introduces query-aware slicing: 1) Selected Node Slicing only uses timestamps from elements/attributes referenced in the query. 2) Per-Expression Slicing recursively slices only the subtrees relevant to the current sub-expression. 3) Idiomatic Slicing provides specialized translations for common query patterns (e.g., path expressions) to avoid redundant slicing.",
+      "primary_metric_improved": "query time",
+      "tradeoffs_or_costs": "The optimizations increase the complexity of the stratum's query mapper. The generated XQuery code can become longer and more intricate. Some optimized methods have limitations, e.g., copy-based slicing cannot handle reverse axes in path expressions.",
+      "pointers": [
+        "[p.7, quote: 'Slicing the whole document at all the time points found in the timestamp periods often involves too much work over too many constant periods.']",
+        "[p.7, quote: 'Selected Node Slicing... Collecting the valid time points of only these nodes... is sufficient.']",
+        "[p.7, quote: 'Per-expression slicing time-slices the subtree that is referenced by the relevant portion of the recursively evaluated query expression...']"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Al",
+          "name": "Abstraction Lifting",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The introduction of TXQuery syntax (e.g., 'current', 'validtime') that allows users to express temporal queries without referencing the underlying timestamp representation.",
+          "why_it_applies": "The system lifts the abstraction from manual, representation-aware timestamp management in XQuery to a declarative, temporal data model. The stated goal is to hide this complexity from the user.",
+          "justification_if_invented": "",
+          "pointer": "[p.1, quote: 'Our goal is to move the complexity of handling time from the user/application code into the 7XQuery processor.']"
+        },
+        {
+          "symbol": "Ep",
+          "name": "Equivalence-based",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The stratum's function of mapping a TXQuery expression to a semantically equivalent standard XQuery expression.",
+          "why_it_applies": "The entire implementation is a source-to-source transformation based on a formal denotational semantics that defines the equivalence between a TXQuery and its XQuery translation. This ensures snapshot reducibility.",
+          "justification_if_invented": "",
+          "pointer": "[p.5, quote: 'We now define the formal syntax and semantics of T XQuery statements, the latter as a source-to-source mapping from 7XQuery to XQuery.']"
+        },
+        {
+          "symbol": "Mo",
+          "name": "Modularity",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The adoption of a stratum architecture that separates temporal query processing logic from the underlying non-temporal XQuery engine.",
+          "why_it_applies": "The stratum is a distinct module that can be placed on top of any standard XQuery engine, promoting reuse of existing, complex query processing infrastructure.",
+          "justification_if_invented": "",
+          "pointer": "[p.1, quote: 'The advantage of this approach is that we can exploit the existing techniques in an XQuery engine... The stratum approach does not depend on a particular XQuery engine.']"
+        }
+      ],
+      "rejected_or_borderline_principles": []
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The optimized slicing strategies (Selected Node, Per-Expression) that prune timestamps and subtrees from consideration during the computation of constant periods.",
+          "why_it_applies": "These optimizations avoid work (evaluating the query over unnecessary time slices or on irrelevant parts of the document) that is guaranteed not to change the final result. The paper explicitly calls slicing untouched parts 'wasted work'.",
+          "justification_if_invented": "",
+          "pointer": "[p.7, quote: 'Timeslicing this untouched part is wasted work.']"
+        },
+        {
+          "symbol": "Bo",
+          "name": "Bottleneck-Oriented",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The focus on reducing the number of constant periods as the primary means of optimization.",
+          "why_it_applies": "The paper identifies that the initial 'maximally-fragmented' approach creates too many constant periods, and the subsequent optimizations are all designed to reduce this number, targeting it as the main performance bottleneck.",
+          "justification_if_invented": "",
+          "pointer": "[p.7, quote: 'Slicing the whole document at all the time points found in the timestamp periods often involves too much work over too many constant periods.']"
+        },
+        {
+          "symbol": "Cc",
+          "name": "Common-Case Specialization",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The 'idiomatic slicing' mechanism, which provides a specialized translation for common path expressions.",
+          "why_it_applies": "Instead of using the general (and verbose) normalization-based translation for all expressions, idiomatic slicing recognizes a common case (path expressions) and applies a more direct and efficient translation, avoiding extra work.",
+          "justification_if_invented": "",
+          "pointer": "[p.9, quote: 'To avoid the extra slicing, a path expression can be translated without normalization. This is an instance of idiomatic slicing...']"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Cm",
+          "name": "Cost-based",
+          "reason_rejected_or_borderline": "The paper proposes several static, rule-based optimization strategies but does not describe a cost model or planner to choose between them at runtime.",
+          "pointer": "[p.9]"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Manual Time Management in XQuery + Al + Ep + Wv -> TXQuery",
+    "baseline_name": "Manual Time Management in XQuery",
+    "top_3_principle_tags": [
+      "Al",
+      "Ep",
+      "Wv"
+    ],
+    "core_principle_tags": [
+      "Al",
+      "Ep",
+      "Wv"
+    ],
+    "supporting_principle_tags": [
+      "Mo",
+      "Bo",
+      "Cc"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Al",
+      "Ep",
+      "Mo",
+      "Wv",
+      "Bo",
+      "Cc"
+    ],
+    "new_system_name": "TXQuery",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "The system provides a simplified temporal query interface (Al) by translating it into an equivalent, non-temporal program (Ep). This translation is made efficient by systematically avoiding computation on data or time intervals that cannot affect the query's result (Wv).",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Al",
+          "contribution_to_equation": "Provides the user-facing value by hiding the complexity of manual timestamp management behind a declarative temporal language."
+        },
+        {
+          "symbol": "Ep",
+          "contribution_to_equation": "Defines the core implementation strategy: a source-to-source rewrite that leverages an existing query engine instead of building a new one."
+        },
+        {
+          "symbol": "Wv",
+          "contribution_to_equation": "Makes the rewrite strategy practical by introducing query-aware optimizations that prune the amount of slicing and data processing required."
+        }
+      ],
+      "transfer_question": "In what other domains could a declarative interface be mapped to an existing engine by rewriting queries to iterate over a set of discrete, 'constant' worlds?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "query time",
+      "direction": "down",
+      "concrete_number": "Not specified in provided text",
+      "pointer": "[p.7, quote: 'the translated query is expected to be more efficient.']"
+    },
+    {
+      "property": "number of constant periods",
+      "direction": "down",
+      "concrete_number": "Not specified in provided text",
+      "pointer": "[p.1, quote: 'each of which reduces the number of constant periods over which the query is evaluated.']"
+    },
+    {
+      "property": "generated query complexity",
+      "direction": "up",
+      "concrete_number": "Not specified in provided text",
+      "pointer": "[p.9, quote: 'the result of the normalization will be much longer than the path expression.']"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Ed",
+      "name": "Event-Driven Discretization",
+      "definition": "Decompose a continuous domain (e.g., time) into a discrete set of intervals based on events that can change a query's result, and evaluate the query once per interval on the static state within it.",
+      "mechanism_pattern": "The core mechanism of identifying all timestamp boundaries ('modification points'), using them to define a set of 'constant periods', and then evaluating a snapshot-based query for each period.",
+      "why_existing_principles_are_insufficient": "Ep describes the rewrite but not the specific strategy of partitioning the temporal domain. Wv describes the optimization of this partitioning (pruning events/periods), but not the partitioning itself. This principle captures the fundamental transformation from a query over a continuous domain to a loop over discrete, static worlds, a common pattern in temporal and streaming systems.",
+      "closest_existing_principles": [
+        "Ep",
+        "Wv"
+      ],
+      "reusability_beyond_this_paper": "This pattern is fundamental to temporal databases (snapshot reducibility), stream processing (windowing/epochs), and incremental view maintenance (evaluating deltas).",
+      "confidence": "medium",
+      "pointer": "[p.5, quote: 'the result changes only at those time points that begin or end a valid-time period... Hence, we can compute the constant periods... the XQuery expression only needs to be evaluated on each snapshot...']"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "Provides a declarative temporal query language for XML by rewriting queries into standard XQuery that iterates over time slices, using query-aware optimizations to avoid slicing on irrelevant data or time points.",
+    "top_3_principles": [
+      "Al",
+      "Ep",
+      "Wv"
+    ],
+    "mechanism_family": "query optimization",
+    "specific_tools_or_algorithms": [
+      "Maximally-fragmented time-slicing",
+      "Selected node time-slicing",
+      "Copy-based per-expression time-slicing",
+      "In-place per-expression time-slicing",
+      "Idiomatic time-slicing"
+    ],
+    "primary_design_archetype": "declarative interface to optimizer",
+    "principle_mapping_confidence": "high"
+  }
+}

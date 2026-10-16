@@ -1,0 +1,294 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "73",
+    "paper_title": "Controlling Access to Published Data Using Cryptography",
+    "authors": [
+      "Gerome Miklau",
+      "Dan Suciu"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference",
+    "year": "2003",
+    "system_or_method_name": "Protected Data Publishing Framework",
+    "problem_domain": "Access control for published XML data"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To provide a framework for enforcing rich, fine-grained access control policies on published data by generating a single, partially-encrypted version of the data that enforces all policies.",
+    "primary_optimized_metric": "storage",
+    "secondary_metrics": [
+      "latency"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "5-7x",
+        "meaning": "Increase in document size for a protection with many keys and super-encryption, without optimizations or compression.",
+        "pointer": "[p.9, '5 times the size of original for Mondial, 7 times for SwissProt for this protection.']"
+      },
+      {
+        "number_or_delta": "< 1x",
+        "meaning": "With gzip compression, the protected document size can be smaller than the original data.",
+        "pointer": "[p.9, 'With gzip, under P123, t' is in fact smaller than the original data.']"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Publishing multiple views",
+    "why_this_is_the_right_comparison": "It is the current approach for controlled data publishing, which is the paper's target scenario.",
+    "limiting_design_assumption": "Access control for published data requires creating and managing a separate, pre-filtered data view for each user or class of users, which is infeasible for fine-grained policies.",
+    "pointers": [
+      "[p.3, 'The other is to publish multiple views of the data, one for each user or class of users. This is the current approach to controlled data publishing...']",
+      "[p.3, 'One is that the number of views may become very large: for example, to implement Policy Query 2.2 one needs a different view for each subject in the database.']"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Cryptographic enforcement of declarative access policies",
+    "specific_tools_or_algorithms": [
+      "XQuery extension for policies",
+      "Tree Protection Logical Model",
+      "AES encryption",
+      "Secret sharing"
+    ],
+    "what_is_being_optimized": "The logical representation of access control policies (the 'tree protection model') to minimize the size of the final encrypted document.",
+    "state_or_ir": "Tree Protection Logical Model",
+    "output": "A single, partially-encrypted XML document that enforces all specified access control policies.",
+    "pointers": [
+      "[p.1, 'a language for specifying such policies as queries']",
+      "[p.4, 'We describe here a logical model for protecting an XML tree...']",
+      "[p.9, 'Advanced Encryption Standard (AES)']",
+      "[p.4, 'secret sharing']"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Replaces the baseline of publishing multiple, pre-filtered views with a single, partially-encrypted data instance that enforces all access control policies simultaneously.",
+      "baseline_assumption": "Each distinct set of access rights requires a separate, physically distinct published view of the data.",
+      "why_baseline_did_not_include_it": "The baseline lacks a mechanism to embed multiple, overlapping access control policies into a single data artifact. It relies on pre-filtering at the server, which leads to a combinatorial explosion of views for fine-grained control.",
+      "mechanism_level_implementation": "A policy query evaluator translates declarative policies into a logical 'tree protection model'. This model annotates XML nodes with boolean guard formulas over cryptographic keys. The system then generates a single XML document where nodes are selectively encrypted according to these guards.",
+      "primary_metric_improved": "storage",
+      "tradeoffs_or_costs": "Introduces computational overhead for encryption/decryption and increases the size of the single published instance compared to a single cleartext view.",
+      "pointers": [
+        "[p.1, abstract]",
+        "[p.3, 'Our Solution']",
+        "[p.5, 'Tree Protection']"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Introduces a logical intermediate representation for access policies (the 'tree protection model') with equivalence-preserving rewrite rules to optimize the physical encryption, primarily to reduce document size.",
+      "baseline_assumption": "A direct translation from access policies to encryption would be used, leading to inefficient structures like nested encryption.",
+      "why_baseline_did_not_include_it": "A naive approach lacks an intermediate logical layer for optimization. The baseline (multiple views) doesn't need this as filtering happens on the server.",
+      "mechanism_level_implementation": "The system defines a set of sound rewrite rules (e.g., formula pull-up, push-down, simplification) that operate on the tree protection model. These rules transform a protection into an equivalent but more efficient one, for example by eliminating nested guards which would otherwise lead to nested encryption.",
+      "primary_metric_improved": "storage",
+      "tradeoffs_or_costs": "Adds complexity to the policy evaluation and encryption generation process.",
+      "pointers": [
+        "[p.6, Sec 3.2]",
+        "[p.9, 'Protected document size']"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Pm",
+          "name": "Policy/Mechanism",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The framework's architecture separates high-level policy queries (XQuery extension) from the low-level encryption mechanism, using the tree protection model as the intermediary.",
+          "why_it_applies": "This separation is a central design choice, allowing policies to be expressed declaratively without specifying cryptographic details.",
+          "justification_if_invented": "",
+          "pointer": "[p.1, 'The data owner starts by defining high-level access control policies... A modified query engine evaluates these policy queries to produce... a single 'protection' over the XML document.']"
+        },
+        {
+          "symbol": "Ac",
+          "name": "Access Control",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The entire system is designed to enforce access control policies on data. The mechanism uses cryptographic keys to grant or deny access to specific XML nodes.",
+          "why_it_applies": "This is the fundamental purpose of the system. The mechanism directly implements access control.",
+          "justification_if_invented": "",
+          "pointer": "[p.1, 'We propose a framework for enforcing access control policies on published XML documents using cryptography.']"
+        },
+        {
+          "symbol": "Sy",
+          "name": "Security via Isolation",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The use of encryption to make parts of the XML document inaccessible to users without the correct keys.",
+          "why_it_applies": "Encryption creates isolated compartments within the single document, ensuring that unauthorized users cannot access protected data, thus providing security.",
+          "justification_if_invented": "",
+          "pointer": "[p.7, 'we now describe how to generate an encrypted XML document t' that implements P such that a user... knowing a set of keys K will have efficient access only to those nodes of t in accP(K).']"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Gr",
+          "name": "Generalized Design",
+          "reason_rejected_or_borderline": "The single instance enforces all policies, which is a form of generalization over specialized views. Rejected because Pm and Ac are more specific to the mechanism's intent.",
+          "pointer": "[p.1, 'publishes a single data instance, which is partially encrypted, and which enforces all access control policies.']"
+        },
+        {
+          "symbol": "Fp",
+          "name": "Function Placement",
+          "reason_rejected_or_borderline": "The access control enforcement logic is moved from a central server to the data artifact itself. Borderline because while true, the core novelty is more about the policy-to-crypto translation (Pm) and the security model (Ac, Sy).",
+          "pointer": "[p.1, 'once the data owner has published the data, she loses control over it... we depend entirely on encryption to enforce our control policies.']"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Ep",
+          "name": "Equivalence-based",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The use of rewrite rules that transform a tree protection into a different but semantically equivalent one.",
+          "why_it_applies": "The paper explicitly states the rules are sound and preserve the access semantics, while improving physical properties like size. This is the definition of equivalence-based optimization.",
+          "justification_if_invented": "",
+          "pointer": "[p.6, 'It is easy to check that all rewrite rules are sound, i.e. each replaces one protection with an equivalent one.']"
+        },
+        {
+          "symbol": "Al",
+          "name": "Abstraction Lifting",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The introduction of the 'tree protection logical model' as an intermediate representation between high-level policies and low-level encrypted XML.",
+          "why_it_applies": "This logical model abstracts away cryptographic details, enabling high-level reasoning and optimization (the rewrites) that would be difficult at the encrypted-byte level.",
+          "justification_if_invented": "",
+          "pointer": "[p.4, 'We describe here a logical model for protecting an XML tree, which plays a central role in our secure publishing framework: it is the output of policy queries, the input to the physical encryption procedure...']"
+        },
+        {
+          "symbol": "Bo",
+          "name": "Bottleneck-Oriented",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The rewrite rules are explicitly motivated by the need to avoid nested encryption, which is identified as a major cause of size blow-up.",
+          "why_it_applies": "The optimization effort is directed at a specific, identified performance bottleneck (space overhead from super-encryption).",
+          "justification_if_invented": "",
+          "pointer": "[p.6, 'nested protections lead to nested encryptions, which increase the size of the output XML document significantly. Hence (c) can be viewed as a space-reducing optimization.']"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Cm",
+          "name": "Cost-based",
+          "reason_rejected_or_borderline": "The rewrites are not guided by a quantitative cost model, but by structural heuristics (e.g., 'avoid nesting'). Rejected as not cost-based.",
+          "pointer": "[p.6, Figure 5]"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Publishing Multiple Views + Pm + Ac + Ep -> Single Encrypted Instance",
+    "baseline_name": "Publishing Multiple Views",
+    "top_3_principle_tags": [
+      "Pm",
+      "Ac",
+      "Ep"
+    ],
+    "core_principle_tags": [
+      "Pm",
+      "Ac",
+      "Ep"
+    ],
+    "supporting_principle_tags": [
+      "Sy",
+      "Al",
+      "Bo"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Pm",
+      "Ac",
+      "Sy",
+      "Ep",
+      "Al",
+      "Bo"
+    ],
+    "new_system_name": "Protected Data Publishing Framework",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "The composition enables a shift from server-side filtering to client-side, cryptographically-enforced access control. Pm provides the crucial separation between declarative policies and their implementation, Ac defines the security mechanism using keys, and Ep makes the approach practical by optimizing the logical representation of these policies to control the significant space overhead of encryption.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Pm",
+          "contribution_to_equation": "Separates the high-level 'what' of access control (declarative policy queries) from the low-level 'how' (cryptographic enforcement), enabling a clean architecture."
+        },
+        {
+          "symbol": "Ac",
+          "contribution_to_equation": "Provides the core mechanism of using cryptographic keys as the basis for granting or denying access to portions of the data."
+        },
+        {
+          "symbol": "Ep",
+          "contribution_to_equation": "Introduces equivalence-preserving rewrites on the logical policy representation to optimize the physical layout, mitigating the performance and storage costs of naive encryption."
+        }
+      ],
+      "transfer_question": "In what other domains could a declarative specification be compiled into a self-enforcing, optimizable artifact, moving enforcement from a trusted server to the artifact itself?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "storage",
+      "direction": "up",
+      "concrete_number": "up to 5-7x without compression/optimization",
+      "pointer": "[p.9, '5 times the size of original for Mondial, 7 times for SwissProt']"
+    },
+    {
+      "property": "storage",
+      "direction": "down",
+      "concrete_number": "< 1x with compression",
+      "pointer": "[p.9, 'With gzip, under P123, t' is in fact smaller than the original data.']"
+    },
+    {
+      "property": "latency",
+      "direction": "not specified",
+      "concrete_number": "Not specified in provided text",
+      "pointer": "[p.9, Figure 8]"
+    },
+    {
+      "property": "latency",
+      "direction": "not specified",
+      "concrete_number": "Not specified in provided text",
+      "pointer": "[p.9, Figure 8]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "none",
+      "symbol": "None",
+      "name": "None",
+      "definition": "No plausible new principle candidate.",
+      "mechanism_pattern": "Not applicable",
+      "why_existing_principles_are_insufficient": "Existing principles sufficiently cover the paper's mechanisms. The combination of Policy/Mechanism (Pm), Access Control (Ac), Security via Isolation (Sy), and Equivalence-based (Ep) optimization captures the core design of translating declarative policies into an optimized, self-enforcing cryptographic artifact.",
+      "closest_existing_principles": [],
+      "reusability_beyond_this_paper": "Not applicable",
+      "confidence": "low",
+      "pointer": "Not specified in provided text"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "Translates declarative access control policies into an optimizable logical 'tree protection model' that is then enforced on a single, published XML document using cryptographic techniques like selective encryption and secret sharing.",
+    "top_3_principles": [
+      "Pm",
+      "Ac",
+      "Ep"
+    ],
+    "mechanism_family": "privacy / security mechanism",
+    "specific_tools_or_algorithms": [
+      "XQuery extension for policies",
+      "Tree Protection Logical Model",
+      "AES encryption",
+      "Secret sharing"
+    ],
+    "primary_design_archetype": "declarative interface to optimizer",
+    "principle_mapping_confidence": "high"
+  }
+}

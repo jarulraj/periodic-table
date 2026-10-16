@@ -1,0 +1,248 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "14",
+    "paper_title": "RRXS: Redundancy reducing XML storage in relations",
+    "authors": [
+      "Yi Chen",
+      "Susan Davidson",
+      "Carmem Hara",
+      "Yifeng Zheng"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference, Berlin, Germany, 2003",
+    "year": "2003",
+    "system_or_method_name": "RRXS",
+    "problem_domain": "XML to relational database mapping"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To provide a mapping from XML to a relational database that preserves structural and semantic constraints, reduces redundancy, and allows constraints to be enforced efficiently using relational primary key technology.",
+    "primary_optimized_metric": "memory",
+    "secondary_metrics": [
+      "constraint checking time"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "67% reduction",
+        "meaning": "Storage size reduction for a ~1250 KB XML instance compared to hybrid inlining (1157 KB vs 377.1 KB).",
+        "pointer": "[p.9, Figure 6]"
+      },
+      {
+        "number_or_delta": ">99% reduction",
+        "meaning": "Constraint checking time reduction for the largest dataset compared to hybrid inlining (19.1s vs 0.06s).",
+        "pointer": "[p.9, Figure 7]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Structure-only XML-to-relational mapping (e.g., hybrid inlining)",
+    "why_this_is_the_right_comparison": "The paper contrasts its approach with prior work that uses structural constraints (like DTDs) to produce a relational mapping but ignores semantic constraints like keys or functional dependencies.",
+    "limiting_design_assumption": "The relational schema for storing XML should be derived solely from the document's structure, ignoring semantic constraints. This leads to data redundancy and requires inefficient, procedural enforcement of semantic constraints.",
+    "pointers": [
+      "[p.1]"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Symbolic methods",
+    "primary_tool_specific_type": "Constraint-based schema normalization",
+    "specific_tools_or_algorithms": [
+      "XML Functional Dependencies (XFDs)",
+      "Rewrite rules for XFDs",
+      "3NF decomposition algorithm"
+    ],
+    "what_is_being_optimized": "The relational schema to reduce storage redundancy and improve constraint checking performance.",
+    "state_or_ir": "A set of XML Functional Dependencies (XFDs).",
+    "output": "A normalized (3NF) relational schema and an instance transformation program.",
+    "pointers": [
+      "[p.1]",
+      "[p.4]",
+      "[p.7]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Introduces a unified formalism, XML Functional Dependencies (XFDs), to explicitly capture both structural and semantic constraints from XML data, along with a formal system of rewrite rules to reason about them.",
+      "baseline_assumption": "Semantic constraints like keys and functional dependencies are not formally captured or used during the XML-to-relational schema design process.",
+      "why_baseline_did_not_include_it": "Prior work lacked a unified framework for expressing and reasoning about both structural and a broad class of semantic constraints for XML in a way that could guide automated relational schema design.",
+      "mechanism_level_implementation": "Defines a path-based language for XFDs. Provides a sound set of rewrite rules (reflexivity, augmentation, transitivity, containment, etc.) and a polynomial-time inference algorithm to determine logical implication among XFDs.",
+      "primary_metric_improved": "Enables subsequent redundancy reduction and efficient constraint checking.",
+      "tradeoffs_or_costs": "Requires semantic constraints to be specified by a user or discovered through data mining. The rewrite rules are noted as sound but not known to be complete.",
+      "pointers": [
+        "[p.1]",
+        "[p.2]",
+        "[p.4]",
+        "[p.10]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Uses the formal XFD framework to derive a normalized (3NF) relational schema, which eliminates data redundancy and replaces system-generated node IDs with value-based keys where possible.",
+      "baseline_assumption": "XML-to-relational mappings preserve the redundancy inherent in the XML structure and rely on system-generated node IDs for identity and relationships, even when natural keys exist.",
+      "why_baseline_did_not_include_it": "Without a formal representation of semantic dependencies (Δ1), the baseline has no principled way to perform normalization or identify equivalences between node identity and value-based keys.",
+      "mechanism_level_implementation": "The RRXS algorithm first finds equivalences between P-attributes to identify value-based keys (Equivalence), computes a minimal cover of XFDs (Reduce), simplifies equivalence classes (Shrink), maps the resulting XFDs to relational FDs, and generates a 3NF schema.",
+      "primary_metric_improved": "memory",
+      "tradeoffs_or_costs": "The resulting schema may be more fragmented (more tables) than a denormalized baseline, potentially requiring more joins for certain queries.",
+      "pointers": [
+        "[p.1]",
+        "[p.7]",
+        "[p.8]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Se",
+          "name": "Semantically Explicit",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The definition of XML Functional Dependencies (XFDs) as a uniform framework to capture structural constraints, keys, and user-defined functional dependencies.",
+          "why_it_applies": "The central idea is to make implicit semantic knowledge about the data explicit in a machine-readable form (XFDs) so that the system can reason about it to optimize the storage schema.",
+          "justification_if_invented": "",
+          "pointer": "[p.1, quote: 'A novel constraint definition, XFDs, that can capture structural constraints, key constraints ... as well as the functional dependencies...']"
+        },
+        {
+          "symbol": "Fs",
+          "name": "Formal Specification",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The development of a sound set of rewrite rules for XFDs and a polynomial-time inference algorithm to check for logical implication.",
+          "why_it_applies": "The paper establishes a formal system for reasoning about XFDs, analogous to Armstrong's Axioms for relational FDs. This formal underpinning is necessary to correctly reduce the set of constraints and prove equivalences.",
+          "justification_if_invented": "",
+          "pointer": "[p.4, Section 3.1]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Gr",
+          "name": "Generalized Design",
+          "reason_rejected_or_borderline": "While XFDs do generalize and unify different types of constraints, Se and Fs are more specific principles that describe the core mechanisms of making semantics explicit and creating a formal system to reason about them.",
+          "pointer": "[p.1]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Ep",
+          "name": "Equivalence-based",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The `Equivalence`, `Reduce`, and `Shrink` steps of the RRXS algorithm, which transform the initial set of XFDs into a minimal, non-redundant set while preserving their logical meaning.",
+          "why_it_applies": "The system explicitly finds and uses equivalences (e.g., between a node ID and a value-based key) to rewrite and simplify the schema representation. The entire normalization process is a series of equivalence-preserving transformations.",
+          "justification_if_invented": "",
+          "pointer": "[p.7, Section 4.1.1]"
+        },
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The generation of a 3rd Normal Form (3NF) relational schema based on the derived functional dependencies.",
+          "why_it_applies": "The goal of normalization is to eliminate storage redundancy. By not storing data that can be derived from other data via a functional dependency (e.g., storing a book's title only once with its ISBN key), the system avoids storage work (materialization) without losing any information. The full data can be reconstructed via joins, preserving the queryable result.",
+          "justification_if_invented": "",
+          "pointer": "[p.1, quote: 'removes redundancy as indicated by the XFDs']"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Si",
+          "name": "Simplicity",
+          "reason_rejected_or_borderline": "While the resulting schema is simpler in terms of avoiding redundancy, it can be more complex in terms of the number of tables and required joins. The mechanism itself is also complex, so Si does not capture the design intent.",
+          "pointer": "[p.8]"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Structure-only Mapping + Se + Ep -> RRXS",
+    "baseline_name": "Structure-only XML-to-Relational Mapping",
+    "top_3_principle_tags": [
+      "Se",
+      "Ep"
+    ],
+    "core_principle_tags": [
+      "Se",
+      "Fs",
+      "Ep",
+      "Wv"
+    ],
+    "supporting_principle_tags": [],
+    "all_principle_tags_for_deltas": [
+      "Se",
+      "Fs",
+      "Ep",
+      "Wv"
+    ],
+    "new_system_name": "RRXS",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "The system first makes semantic constraints machine-readable (Se) to enable automated reasoning. It then uses this explicit representation to perform a series of equivalence-based (Ep) transformations that rewrite the schema into a normalized form, eliminating redundancy.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Se",
+          "contribution_to_equation": "Contributes the core idea of formalizing implicit semantic constraints (like keys and FDs) into an explicit representation (XFDs) that the system can manipulate."
+        },
+        {
+          "symbol": "Ep",
+          "contribution_to_equation": "Contributes the mechanism for transforming the explicit constraints into a minimal, non-redundant form, which directly translates to a normalized relational schema."
+        }
+      ],
+      "transfer_question": "In what other domains could formalizing implicit application semantics (Se) and then applying equivalence-based rewriting (Ep) be used to generate a more efficient underlying data representation?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "storage size",
+      "direction": "down",
+      "concrete_number": "67% reduction on one dataset",
+      "pointer": "[p.9, Figure 6]"
+    },
+    {
+      "property": "constraint checking time",
+      "direction": "down",
+      "concrete_number": ">99% reduction on one dataset",
+      "pointer": "[p.9, Figure 7]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Cg",
+      "name": "Constraint-Guided Design",
+      "definition": "Using a formal specification of data constraints (e.g., dependencies, keys, invariants) to automatically derive a system's structural design (e.g., data schema, object model).",
+      "mechanism_pattern": "The system takes a set of formally-defined XFDs, reasons about them to produce a minimal cover, and then systematically maps this cover to a normalized (3NF) relational schema.",
+      "why_existing_principles_are_insufficient": "Se captures the act of making constraints explicit, and Ep captures the rewriting process. However, no existing principle captures the end-to-end pattern of *generating a schema* from a set of constraints. Gd (Goal-Directed) is for synthesizing action plans, not static data schemas.",
+      "closest_existing_principles": [
+        "Se",
+        "Ep",
+        "Gd",
+        "Fs"
+      ],
+      "reusability_beyond_this_paper": "This pattern is fundamental to relational database normalization, and could apply to generating efficient object models, API contracts, or other structural artifacts from formal specifications.",
+      "confidence": "medium",
+      "pointer": "[p.7, Algorithm 2]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "RRXS introduces a formal language for XML functional dependencies (XFDs) and uses a rule-based inference engine to derive a normalized, redundancy-free relational schema.",
+    "top_3_principles": [
+      "Se",
+      "Ep"
+    ],
+    "mechanism_family": "other",
+    "specific_tools_or_algorithms": [
+      "XML Functional Dependencies (XFDs)",
+      "Rewrite rules for XFDs",
+      "3NF decomposition algorithm"
+    ],
+    "primary_design_archetype": "declarative interface to optimizer",
+    "principle_mapping_confidence": "high"
+  }
+}

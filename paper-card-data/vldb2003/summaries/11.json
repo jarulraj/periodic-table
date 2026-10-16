@@ -1,0 +1,277 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "11",
+    "paper_title": "On the minimization of Xpath queries",
+    "authors": [
+      "S. Flesca",
+      "F. Furfaro",
+      "E. Masciari"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference, Berlin, Germany, 2003",
+    "year": "2003",
+    "system_or_method_name": "XPath Minimization Algorithm",
+    "problem_domain": "XML query optimization"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To minimize XPath queries for the general fragment XP{/,//,[],*} by finding an equivalent query with the minimum number of nodes in its tree pattern representation.",
+    "primary_optimized_metric": "query time",
+    "secondary_metrics": [
+      "query size",
+      "minimization algorithm complexity"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "coNP-complete",
+        "meaning": "The complexity of the decisional problem for minimizing a query in the XP{/,//,[],*} fragment.",
+        "pointer": "[p.8, Theorem 2]"
+      },
+      {
+        "number_or_delta": "Polynomial time",
+        "meaning": "The complexity of minimizing queries for the identified tractable subclass of 'limited branched tree patterns'.",
+        "pointer": "[p.9, Theorem 3]"
+      },
+      {
+        "number_or_delta": "O(b * r * |p|^2 * (w+1)^(d+1))",
+        "meaning": "An upper bound on the complexity of the general minimization algorithm (Algorithm 1).",
+        "pointer": "[p.7, Proposition 1]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Minimization algorithms for restricted XPath fragments",
+    "why_this_is_the_right_comparison": "The paper explicitly extends prior work on simpler fragments (XP{/,[],*} and XP{/,//,[]}) to the more general and complex fragment XP{/,//,[],*} which includes both the descendant operator '//' and the wildcard '*'.",
+    "limiting_design_assumption": "Prior algorithms for simpler fragments could rely on efficient, polynomial-time containment checks based on homomorphism. This property does not hold for the more general XP{/,//,[],*} fragment, where containment is coNP-complete.",
+    "pointers": [
+      "[p.2, quote: 'The minimization of XPath queries was first studied in [16]... In [1], a different fragment of XPath (called XP{/,//,[]}) has been studied...']",
+      "[p.5, quote: 'Unfortunately, property 2 [homomorphism] does not hold for more general XPath fragments.']"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Symbolic methods",
+    "primary_tool_specific_type": "Query rewriting and minimization",
+    "specific_tools_or_algorithms": [
+      "Recursive top-down pruning algorithm (Algorithm 1)",
+      "Bottom-up polynomial-time algorithm for a 'limited branched' subclass (Algorithm 2)",
+      "Query containment checking for XP{/,//,[],*}"
+    ],
+    "what_is_being_optimized": "The structure of an XPath query, represented as a tree pattern.",
+    "state_or_ir": "Tree pattern representation of an XPath query.",
+    "output": "A semantically equivalent tree pattern with the minimum possible number of nodes.",
+    "pointers": [
+      "[p.7, Algorithm 1]",
+      "[p.9, Algorithm 2]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Extends query minimization to the general but computationally hard XP{/,//,[],*} fragment by proving that a minimal query can still be found by pruning subpatterns, and then using a general (but exponential) containment-based algorithm to perform the pruning.",
+      "baseline_assumption": "XPath minimization algorithms relied on efficient (polynomial-time) containment checks based on homomorphism, which is only a sound but not complete test for the more general fragment.",
+      "why_baseline_did_not_include_it": "The interaction of the descendant ('//') and wildcard ('*') operators introduces a form of disjunction that breaks the homomorphism property. Proving that the minimal query is still a subpattern of the original (the 'global minimality property') was a novel theoretical result required to justify a pruning-based approach.",
+      "mechanism_level_implementation": "A recursive algorithm (Algorithm 1) iterates through a query's subpatterns. For each subpattern `p_i`, it checks if it is contained within the rest of the query (`p_i ⊇ p - sp_i`). If so, the subpattern is pruned. This relies on a general, but coNP-complete, containment test.",
+      "primary_metric_improved": "generality",
+      "tradeoffs_or_costs": "The minimization algorithm has worst-case exponential time complexity, and the underlying decision problem is coNP-complete, whereas minimization for baseline fragments was polynomial.",
+      "pointers": [
+        "[p.6, Theorem 1]",
+        "[p.7, Algorithm 1]",
+        "[p.8, Theorem 2]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Identifies a tractable subclass of queries, 'limited branched tree patterns', within the generally hard XP{/,//,[],*} fragment, and provides a specialized polynomial-time minimization algorithm for it.",
+      "baseline_assumption": "The entire XP{/,//,[],*} fragment is computationally hard to minimize.",
+      "why_baseline_did_not_include_it": "This is a new theoretical result identifying a novel structural property of queries that makes minimization efficient even in the presence of both '//' and '*' operators.",
+      "mechanism_level_implementation": "A bottom-up algorithm (Algorithm 2) processes branching nodes from the deepest ones upwards. For 'limited branched' patterns, at any node, at most one subpattern is complex, while the others are 'linear'. Containment checks involving at least one linear pattern are known to be polynomial-time. The algorithm leverages this to achieve overall polynomial complexity.",
+      "primary_metric_improved": "query time",
+      "tradeoffs_or_costs": "The efficient algorithm is only applicable to queries that conform to the specific 'limited branched' structural definition.",
+      "pointers": [
+        "[p.8, Definition 2]",
+        "[p.9, Theorem 3]",
+        "[p.9, Algorithm 2]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Ep",
+          "name": "Equivalence-based",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The core problem is to find a pattern `p_min` that is equivalent to the original pattern `p` (`p_min ≡ p`) but has minimal size.",
+          "why_it_applies": "The entire framework is built on the formal definition of query equivalence. The algorithm works by transforming a query into a smaller but semantically identical one. The pruning step `p_min = p_min - sp_i` is only valid if the resulting pattern is equivalent to the one before pruning.",
+          "justification_if_invented": "",
+          "pointer": "[p.4, quote: 'We say that p1 and p2 are equivalent (p1 ≡ p2) iff ... p1(t) = p2(t)']"
+        },
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The pruning of a 'redundant' subpattern `sp_j` because it is contained in another subpattern `sp_i` (`p_i ⊆ p_j`).",
+          "why_it_applies": "If one subpattern's condition is subsumed by another's, any data that matches the stricter condition will also match the looser one. Pruning the stricter (redundant) condition avoids the work of matching it against the data, without changing the final set of result nodes. The paper explicitly calls this out: 'the first condition makes the second one redundant' [p.2].",
+          "justification_if_invented": "",
+          "pointer": "[p.7, Lemma 5, quote: 'A pattern p ... is not of minimum size iff ... there exists a pair of subpatterns pi, pj s.t. pi ⊆ pj']"
+        },
+        {
+          "symbol": "Fs",
+          "name": "Formal Specification",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The use of tree patterns, models, canonical models, and formal proofs (e.g., Theorem 1) to establish the correctness of the minimization approach.",
+          "why_it_applies": "The paper's main contribution, proving that a minimal query can be found among subpatterns of the original, is a formal proof (Theorem 1) that relies on a detailed formal semantics for XPath queries. This formal grounding is what enables the equivalence-based pruning mechanism.",
+          "justification_if_invented": "",
+          "pointer": "[p.6, Theorem 1]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Bo",
+          "name": "Bottleneck-Oriented",
+          "reason_rejected_or_borderline": "While motivated by the fact that large query patterns are a performance bottleneck, the mechanism is a general logical transformation, not a targeted optimization for a specific resource (like CPU or I/O).",
+          "pointer": "[p.2, quote: 'The efficiency of the matching operation greatly depends on the size of the pattern']"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Cc",
+          "name": "Common-Case Specialization",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "Defining the 'limited branched tree pattern' subclass and providing a specialized, polynomial-time algorithm (Algorithm 2) for it, while the general problem is coNP-complete.",
+          "why_it_applies": "This is a classic example of specialization. The paper identifies a structural property of queries that makes a generally hard problem tractable and provides a dedicated, efficient algorithm for that case.",
+          "justification_if_invented": "",
+          "pointer": "[p.8, Definition 2]"
+        },
+        {
+          "symbol": "Ep",
+          "name": "Equivalence-based",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The goal of Algorithm 2 is still to find a minimal but equivalent query.",
+          "why_it_applies": "As with Δ1, the correctness of the specialized algorithm depends on preserving query equivalence throughout the minimization process.",
+          "justification_if_invented": "",
+          "pointer": "[p.9, quote: 'A minimum pattern p_min equivalent to p can be found in polynomial time']"
+        },
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The pruning of redundant subpatterns within Algorithm 2.",
+          "why_it_applies": "The mechanism for reducing query size is still pruning redundant branches, which is a form of avoiding result-preserving work. The specialization (Cc) just makes the check for redundancy efficient.",
+          "justification_if_invented": "",
+          "pointer": "[p.9, Algorithm 2, quote: 'if ... (qi ⊇ qj) Red_q = Red_q U {qi}']"
+        }
+      ],
+      "rejected_or_borderline_principles": []
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Homomorphism-based Minimization + Ep + Wv + Cc -> General XPath Minimizer",
+    "baseline_name": "Homomorphism-based Minimization for simple XPath fragments",
+    "top_3_principle_tags": [
+      "Ep",
+      "Wv",
+      "Cc"
+    ],
+    "core_principle_tags": [
+      "Ep",
+      "Wv",
+      "Cc"
+    ],
+    "supporting_principle_tags": [
+      "Fs",
+      "Ep",
+      "Wv"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Ep",
+      "Wv",
+      "Fs",
+      "Cc"
+    ],
+    "new_system_name": "General XPath Minimizer",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "The system's goal is to find a smaller but semantically equivalent (Ep) query. It achieves this by identifying and pruning logically redundant query parts, which constitutes avoiding result-preserving work (Wv). Because this general check is computationally expensive, the design also provides a specialized, efficient path for a structurally-defined common case (Cc), making the optimization practical for a subset of queries.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Ep",
+          "contribution_to_equation": "Provides the formal guarantee that query rewriting is correct, ensuring the minimized query returns the exact same results as the original."
+        },
+        {
+          "symbol": "Wv",
+          "contribution_to_equation": "Defines the primary optimization strategy: identify and eliminate parts of the query (subpatterns) that are logically redundant and thus represent computation that cannot alter the final result."
+        },
+        {
+          "symbol": "Cc",
+          "contribution_to_equation": "Addresses the high computational cost of the general Wv strategy by identifying a structural subclass of queries where redundancy checks are cheap, enabling efficient optimization for that case."
+        }
+      ],
+      "transfer_question": "In what other domains can we prove that complex optimizations reduce to pruning redundant sub-problems, and are there special structural cases that make this expensive check tractable?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "Minimization Complexity (General Case)",
+      "direction": "up",
+      "concrete_number": "coNP-complete",
+      "pointer": "[p.8, Theorem 2]"
+    },
+    {
+      "property": "Minimization Complexity (Tractable Subclass)",
+      "direction": "down",
+      "concrete_number": "Polynomial time",
+      "pointer": "[p.9, Theorem 3]"
+    },
+    {
+      "property": "Query Size",
+      "direction": "down",
+      "concrete_number": "Not specified in provided text",
+      "pointer": "[p.4, quote: 'minsize(p) = min_{p' in Eq(p)} (size(p'))']"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "none",
+      "symbol": "None",
+      "name": "None",
+      "definition": "No plausible new principle candidate.",
+      "mechanism_pattern": "Not applicable",
+      "why_existing_principles_are_insufficient": "Existing principles sufficiently cover the paper's mechanisms. The core idea of proving that an optimal solution is a substructure of the original problem, enabling a pruning-based search, is well-captured by the combination of Formal Specification (Fs), Equivalence-based (Ep) rewriting, and Result-Preserving Work Avoidance (Wv). Identifying a tractable subclass is well-captured by Common-Case Specialization (Cc).",
+      "closest_existing_principles": [],
+      "reusability_beyond_this_paper": "Not applicable",
+      "confidence": "low",
+      "pointer": "Not specified in provided text"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "Proves that minimal XPath queries in a general, hard-to-optimize fragment can be found by pruning redundant branches, and provides an efficient algorithm for a tractable 'limited branched' subclass where most branches are simple linear paths.",
+    "top_3_principles": [
+      "Ep",
+      "Wv",
+      "Cc"
+    ],
+    "mechanism_family": "query optimization",
+    "specific_tools_or_algorithms": [
+      "Recursive top-down pruning algorithm (Algorithm 1)",
+      "Bottom-up polynomial-time algorithm for a 'limited branched' subclass (Algorithm 2)",
+      "Query containment checking for XP{/,//,[],*}"
+    ],
+    "primary_design_archetype": "avoid materialization / recomputation",
+    "principle_mapping_confidence": "high"
+  }
+}

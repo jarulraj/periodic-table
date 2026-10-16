@@ -31,7 +31,7 @@ function similarityFields(summary) {
 }
 
 function readSessions(sourceId) {
-    const files = {vldb2023: 'vldb2023-sessions.json', osdi23: 'osdi23-sessions.json'};
+    const files = {vldb2023: 'vldb2023-sessions.json', osdi23: 'osdi23-sessions.json', vldb2003: 'vldb2003-sessions.json'};
     if (sourceId) {
         if (!Object.hasOwn(files, sourceId)) throw new Error('Unknown session source: ' + sourceId);
         return JSON.parse(fs.readFileSync(path.join(__dirname, files[sourceId]), 'utf8'));

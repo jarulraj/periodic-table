@@ -1,0 +1,243 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "52",
+    "paper_title": "The Generalized Pre-Grouping Transformation: AggregateQuery Optimization in the Presence of Dependencies",
+    "authors": [
+      "Aris Tsois",
+      "Timos Sellis"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference, Berlin, Germany",
+    "year": "2003",
+    "system_or_method_name": "Generalized Pre-Grouping Transformation",
+    "problem_domain": "OLAP query optimization"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To generalize the Hierarchical Pre-Grouping optimization technique by providing a formal algebraic definition and identifying sufficient conditions for its application based on standard integrity constraints (functional and inclusion dependencies), making it applicable to databases without special hierarchical surrogate keys.",
+    "primary_optimized_metric": "query time",
+    "secondary_metrics": [
+      "I/O"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "< 50%",
+        "meaning": "Reduction in time needed to answer large aggregate queries, based on experimental measurements from prior work.",
+        "pointer": "[p.3]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Standard star-join query execution plan",
+    "why_this_is_the_right_comparison": "It is the 'straightforward execution plan' where the fact table is joined with all necessary dimension tables before the final grouping and aggregation operations are performed.",
+    "limiting_design_assumption": "All joins in a star schema must be performed on the full fact table at the granularity specified in the query before aggregation can occur. The optimizer does not use semantic integrity constraints to perform aggregation earlier or eliminate joins.",
+    "pointers": [
+      "[p.3]",
+      "[quote: 'The straightforward execution plan for this query is sketched in Figure 3.']"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Symbolic methods",
+    "primary_tool_specific_type": "Relational algebra transformations",
+    "specific_tools_or_algorithms": [
+      "Generalized Projection Operator (Л)",
+      "Surrogate-Join transformation",
+      "SplitЛ transformation",
+      "Remove-Join transformation"
+    ],
+    "what_is_being_optimized": "A relational algebra expression representing a query execution plan.",
+    "state_or_ir": "Relational algebra expressions with bag semantics.",
+    "output": "An algebraically equivalent, but more efficient, query execution plan.",
+    "pointers": [
+      "[p.4]",
+      "[p.7-9]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Eliminates joins with dimension tables by proving that grouping can be performed on surrogate attributes already present in the fact table, making the join redundant.",
+      "baseline_assumption": "To group by an attribute from a dimension table, a join with that dimension table is required.",
+      "why_baseline_did_not_include_it": "A standard optimizer lacks the rules to prove that grouping on a surrogate attribute in the fact table is semantically equivalent to joining with the dimension table and then grouping on the target attribute. This requires reasoning about functional and inclusion dependencies.",
+      "mechanism_level_implementation": "The system applies a sequence of algebraic transformations, including `Surrogate-Join` and `Remove-Join`. These transformations use integrity constraints to substitute the dimension table's grouping attribute with an equivalent attribute from the fact table, and then prove the join is unnecessary.",
+      "primary_metric_improved": "query time",
+      "tradeoffs_or_costs": "The optimizer must be aware of and able to reason about integrity constraints. The fact table must contain attributes that can act as surrogates for the dimension attributes.",
+      "pointers": [
+        "[p.3, case 1]",
+        "[p.8, Remove-Join]",
+        "[p.11, Stage 1]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Rewrites join conditions to use coarser-grained surrogate keys, which enables pushing aggregation to occur on the large fact table *before* the join, thus reducing the join's input cardinality.",
+      "baseline_assumption": "A join must be performed using the specific keys and at the fine granularity specified in the original query predicate (e.g., on `store_id`).",
+      "why_baseline_did_not_include_it": "The baseline optimizer cannot prove that rewriting the join predicate to use a different, coarser-grained key (e.g., `area`) and pre-aggregating is equivalent to the original plan. This requires semantic knowledge from integrity constraints.",
+      "mechanism_level_implementation": "The `Surrogate-Join` transformation uses functional and inclusion dependencies to replace the original join condition with a new one on surrogate attributes. This enables the `SplitЛ` or `Surrogate-Join-Early-GroupBy` transformations to push aggregation before the modified join.",
+      "primary_metric_improved": "query time",
+      "tradeoffs_or_costs": "The correctness of the transformation depends on having the right set of functional and inclusion dependencies declared in the schema. The logic for proving the equivalence is complex and must be encoded in the optimizer.",
+      "pointers": [
+        "[p.3, case 2]",
+        "[p.9, Surrogate-Join]",
+        "[p.11, Stage 2]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Ep",
+          "name": "Equivalence-based",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The definition of the `Remove-Join` transformation as an algebraic equivalence: `LHS ≡ RHS`.",
+          "why_it_applies": "The entire method is based on transforming a query plan into a semantically equivalent but more performant one. The paper formally defines transformations and the conditions under which they are valid equivalences.",
+          "justification_if_invented": "",
+          "pointer": "[p.8]"
+        },
+        {
+          "symbol": "Ig",
+          "name": "Invariant-Guided",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The conditions for applying the `Remove-Join` transformation are expressed as integrity constraints (strict inclusion dependency and key properties).",
+          "why_it_applies": "The transformations are guided by and their correctness is proven using integrity constraints (functional and inclusion dependencies) as invariants that must hold.",
+          "justification_if_invented": "",
+          "pointer": "[p.8, Conditions C1, C2]"
+        },
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The `Remove-Join` transformation completely eliminates a join operation from the query plan.",
+          "why_it_applies": "The paper provides a formal proof (via conditions C1 and C2) that under specific integrity constraints, the join with the dimension table is redundant and does not alter the final result. The work is provably unnecessary.",
+          "justification_if_invented": "",
+          "pointer": "[p.8]"
+        }
+      ],
+      "rejected_or_borderline_principles": []
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Ep",
+          "name": "Equivalence-based",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The `Surrogate-Join` transformation is defined as an equivalence between two different join expressions, valid under a set of formal conditions.",
+          "why_it_applies": "The mechanism rewrites a join expression into a different but provably equivalent form to enable further optimizations like early aggregation. This is a core application of equivalence-based planning.",
+          "justification_if_invented": "",
+          "pointer": "[p.9, Theorem 5.2]"
+        },
+        {
+          "symbol": "Ig",
+          "name": "Invariant-Guided",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The conditions (C1, C2) required to apply the `Surrogate-Join` transformation are defined in terms of inclusion and functional dependencies.",
+          "why_it_applies": "The rewriting of the join predicate is guided by integrity constraints, which act as invariants to ensure the transformation preserves the query's semantics.",
+          "justification_if_invented": "",
+          "pointer": "[p.9, Conditions C1, C2]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Cc",
+          "name": "Common-Case Specialization",
+          "reason_rejected_or_borderline": "While star-join queries are a common case in OLAP, the mechanism itself is a general algebraic rule based on formal properties (integrity constraints), not on specializing for a particular data distribution or workload pattern.",
+          "pointer": "[p.6]"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Standard Join-then-Aggregate Plan + Ig + Ep -> Generalized Pre-Grouping Plan",
+    "baseline_name": "Standard Join-then-Aggregate Plan",
+    "top_3_principle_tags": [
+      "Ig",
+      "Ep"
+    ],
+    "core_principle_tags": [
+      "Ep",
+      "Ig"
+    ],
+    "supporting_principle_tags": [
+      "Wv"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Ep",
+      "Ig",
+      "Wv"
+    ],
+    "new_system_name": "Generalized Pre-Grouping Transformation",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "Integrity constraints (Ig) serve as formal invariants that enable an optimizer to discover and apply a set of provably correct algebraic rewrites (Ep). The constraints provide the semantic knowledge needed to find equivalent plans that perform work differently (e.g., aggregating early) or avoid work entirely.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Ig",
+          "contribution_to_equation": "Provides the semantic rules (functional and inclusion dependencies) that guarantee a transformation is semantics-preserving."
+        },
+        {
+          "symbol": "Ep",
+          "contribution_to_equation": "Provides the formal framework of algebraic transformations for rewriting a query plan into an equivalent but more efficient form."
+        }
+      ],
+      "transfer_question": "In what other domains could explicitly declared invariants be used to find equivalent, more efficient execution plans by rewriting operator predicates?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "query time",
+      "direction": "down",
+      "concrete_number": "to less than 50%",
+      "pointer": "[p.3]"
+    },
+    {
+      "property": "I/O",
+      "direction": "down",
+      "concrete_number": "Not specified",
+      "pointer": "[p.2]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Sr",
+      "name": "Surrogate Rewriting",
+      "definition": "Rewrite a computation to use a set of surrogate attributes that are semantically equivalent to the original attributes under known integrity constraints, in order to expose new optimization opportunities.",
+      "mechanism_pattern": "The `Surrogate-Join` transformation replaces a join predicate on one set of keys (e.g., `Hu=Kd`) with a predicate on a different, 'surrogate' set of keys (e.g., `SHu=SKd`) that are proven equivalent by functional and inclusion dependencies. This rewriting enables subsequent optimizations like early aggregation or join elimination.",
+      "why_existing_principles_are_insufficient": "Ig and Ep describe the general approach (using invariants for equivalence), but not the specific pattern of *substituting* one set of identifiers for another to change the granularity or location of a computation. Sr captures this recurring pattern of using a proxy/surrogate representation to unlock optimizations.",
+      "closest_existing_principles": [
+        "Ig",
+        "Ep"
+      ],
+      "reusability_beyond_this_paper": "This pattern could apply in other areas, such as rewriting distributed computations to use local object IDs instead of global ones, or replacing expensive string comparisons with integer surrogate key comparisons when an equivalence is known.",
+      "confidence": "medium",
+      "pointer": "[p.9, Surrogate-Join]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "Generalizes pre-grouping optimizations for OLAP aggregate queries by formalizing them as a series of equivalence-based algebraic transformations guided by integrity constraints like functional and inclusion dependencies.",
+    "top_3_principles": [
+      "Ig",
+      "Ep"
+    ],
+    "mechanism_family": "query optimization",
+    "specific_tools_or_algorithms": [
+      "Generalized Projection Operator (Л)",
+      "Surrogate-Join transformation",
+      "SplitЛ transformation",
+      "Remove-Join transformation"
+    ],
+    "primary_design_archetype": "invariant-preserving shortcut",
+    "principle_mapping_confidence": "high"
+  }
+}

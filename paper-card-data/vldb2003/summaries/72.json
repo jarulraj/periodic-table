@@ -1,0 +1,253 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "72",
+    "paper_title": "Robust Estimation With Sampling and Approximate Pre-Aggregation",
+    "authors": [
+      "Christopher Jermaine"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference, Berlin, Germany, 2003",
+    "year": "2003",
+    "system_or_method_name": "Approximate Pre-Aggregation (APA)",
+    "problem_domain": "Approximate query processing over categorical data"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To alleviate the effect of data variance on the accuracy of random sampling for aggregate query estimation, particularly for categorical or mixed data, without requiring prior knowledge of the query workload.",
+    "primary_optimized_metric": "accuracy",
+    "secondary_metrics": [
+      "storage overhead"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "713%",
+        "meaning": "The median relative error for SUM queries using random sampling is 713% greater than for APA0 (APA with 0-dimensional facts) on a 40,000 tuple sample.",
+        "pointer": "[p.9]"
+      },
+      {
+        "number_or_delta": "678%",
+        "meaning": "The median relative error for AVG queries using random sampling is 678% greater than for APA0 on a 40,000 tuple sample.",
+        "pointer": "[p.9]"
+      },
+      {
+        "number_or_delta": "28% to 175%",
+        "meaning": "The relative error for stratified sampling is between 28% and 175% greater than for APA.",
+        "pointer": "[p.1]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Random sampling ('plain vanilla' sampling)",
+    "why_this_is_the_right_comparison": "Random sampling is one of the few estimation techniques suitable for high-dimensional categorical data, where methods like wavelets and histograms fail. However, its accuracy suffers from data skew, which this paper aims to fix.",
+    "limiting_design_assumption": "The estimate of an aggregate can be accurately derived by scaling the aggregate computed over a random sample. This assumption fails when the data has high variance (skew), a common case in real-world data.",
+    "pointers": [
+      "[p.2]"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Solver family",
+    "primary_tool_specific_type": "Constrained Maximum Likelihood Estimation",
+    "specific_tools_or_algorithms": [
+      "Maximum Likelihood Estimation (MLE)",
+      "Quadratic Programming (QP)"
+    ],
+    "what_is_being_optimized": "The 'real' values of the aggregate function for each cell in the data cube defined by the query predicates. These are the hidden model parameters (θ) in the MLE formulation.",
+    "state_or_ir": "A random sample of the data combined with a set of pre-computed, exact aggregate values called 'facts' (e.g., global SUM, per-category SUMs).",
+    "output": "An improved, more accurate estimate for an aggregate query.",
+    "pointers": [
+      "[p.4]",
+      "[p.6]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Augments a random sample with a small set of pre-computed, exact aggregate values (called 'facts') to provide ground-truth information that corrects for sampling error caused by data skew.",
+      "baseline_assumption": "A random sample is the sole source of information for producing an approximate query answer.",
+      "why_baseline_did_not_include_it": "The baseline prioritizes simplicity and minimal storage, using only the sample itself. Incorporating external facts requires additional storage and a more complex estimation process.",
+      "mechanism_level_implementation": "During a single pass over the data, the system collects a random sample and also computes and stores low-dimensional aggregate facts, such as the global SUM of a measure attribute ('0-dimensional fact') or the SUM for each value of a single categorical attribute ('1-dimensional fact').",
+      "primary_metric_improved": "accuracy",
+      "tradeoffs_or_costs": "Requires additional storage for the facts, though the paper argues this is small ('a few dozen to a few hundred bytes' for APA0, 'kilobytes' for APA1).",
+      "pointers": [
+        "[p.3]",
+        "[p.8]",
+        "[p.9]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Reframes aggregate estimation as a constrained optimization problem, finding the most likely true data distribution that is consistent with both the observed sample and the known aggregate facts.",
+      "baseline_assumption": "The estimate is computed by a simple scaling of the aggregate over the sample (e.g., SUM(sample) * (total_rows / sample_rows)).",
+      "why_baseline_did_not_include_it": "The baseline uses a simple arithmetic calculation, avoiding the computational complexity of solving an optimization problem at query time.",
+      "mechanism_level_implementation": "The problem is formulated as a Maximum Likelihood Estimation (MLE) task where the goal is to find the model parameters (true cell aggregates) that maximize the likelihood of observing the sample data. The pre-computed 'facts' are incorporated as hard linear constraints. This constrained MLE problem is then solved using a quadratic programming (QP) formulation.",
+      "primary_metric_improved": "accuracy",
+      "tradeoffs_or_costs": "Increased query-time computation to solve the quadratic program. The paper notes that while QP is NP-hard in general, practical algorithms often make it tractable.",
+      "pointers": [
+        "[p.4]",
+        "[p.6]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Ig",
+          "name": "Invariant-Guided",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The use of pre-computed aggregate 'facts', such as the total SUM over the entire dataset.",
+          "why_it_applies": "These 'facts' are true invariants of the full dataset. The estimation process is explicitly guided by these invariants, as they are used as constraints that any valid solution must satisfy, thereby correcting for errors in the sample.",
+          "justification_if_invented": "",
+          "pointer": "[quote: '...reconcile the error of the sample with a set of known facts.' p.6]"
+        },
+        {
+          "symbol": "Rc",
+          "name": "Reuse of Computation",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The pre-aggregation of summary statistics ('facts').",
+          "why_it_applies": "The aggregate facts are computed once in a single pass over the data and are then reused to improve the accuracy of many subsequent queries.",
+          "justification_if_invented": "",
+          "pointer": "[quote: 'The statistics can be gathered in one pass, at the same time that the sampling is performed.' p.2]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Ah",
+          "name": "Advisory Hinting",
+          "reason_rejected_or_borderline": "The 'facts' are used as hard constraints in the optimization problem, not as non-binding hints. Ig (Invariant-Guided) is a stronger and more accurate description of their role.",
+          "pointer": "[p.6]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Cp",
+          "name": "Constraint-based",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The formulation of the estimation problem as a quadratic program with an objective function to maximize subject to linear equality constraints.",
+          "why_it_applies": "The core mechanism is to solve for the most likely estimates (θ) that satisfy a set of explicit constraints derived from the known facts. The paper states the problem as 'maximize ... subject to Aθ = b', which is the canonical form of a constraint-based problem.",
+          "justification_if_invented": "",
+          "pointer": "[p.6]"
+        },
+        {
+          "symbol": "Pd",
+          "name": "Probabilistic Design",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The use of a random sample and the formulation of the objective function based on a probability density function (pdf) derived from the Central Limit Theorem.",
+          "why_it_applies": "The system is fundamentally probabilistic. It uses a random sample and finds the 'most likely' solution by maximizing a log-likelihood function, which models the probability of observing the sample given a set of true underlying data parameters.",
+          "justification_if_invented": "",
+          "pointer": "[p.3]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "La",
+          "name": "Learned Approximation",
+          "reason_rejected_or_borderline": "The model is a classical statistical model (MLE) solved via optimization, not a machine learning model trained on data.",
+          "pointer": "[p.4]"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Random Sampling (Pd) + Invariant-Guided (Ig) + Constraint-based (Cp) -> Approximate Pre-Aggregation",
+    "baseline_name": "Random Sampling",
+    "top_3_principle_tags": [
+      "Pd",
+      "Ig",
+      "Cp"
+    ],
+    "core_principle_tags": [
+      "Ig",
+      "Cp",
+      "Pd"
+    ],
+    "supporting_principle_tags": [
+      "Rc"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Ig",
+      "Rc",
+      "Cp",
+      "Pd"
+    ],
+    "new_system_name": "Approximate Pre-Aggregation (APA)",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "This composition transforms a simple probabilistic estimate into a robust one by forcing it to conform to known ground truths. The probabilistic sample (Pd) provides a cheap but high-variance starting point. The invariants (Ig) provide low-cost, exact checks. The constraint-based solver (Cp) provides the mathematical machinery to find the most likely estimate that reconciles the noisy sample with the exact invariants.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Pd",
+          "contribution_to_equation": "Provides the initial, low-cost approximate summary (the random sample) and the probabilistic objective function (likelihood) for the optimization."
+        },
+        {
+          "symbol": "Ig",
+          "contribution_to_equation": "Introduces external, exact information about the full dataset as invariants that the final estimate must respect, correcting for sampling error."
+        },
+        {
+          "symbol": "Cp",
+          "contribution_to_equation": "Provides the mechanism to enforce the invariants, formally framing the reconciliation of the sample and the facts as a constrained optimization problem."
+        }
+      ],
+      "transfer_question": "In what other domains could a cheap, probabilistic estimate be corrected by solving for the most likely model that also satisfies a small set of pre-computed, exact invariants?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "accuracy (relative error)",
+      "direction": "down",
+      "concrete_number": "Error for sampling is 713% greater than APA0 for SUM queries.",
+      "pointer": "[p.9]"
+    },
+    {
+      "property": "storage overhead",
+      "direction": "up",
+      "concrete_number": "A few dozen to a few hundred bytes for APA0; kilobytes for APA1.",
+      "pointer": "[p.9]"
+    },
+    {
+      "property": "query time computation",
+      "direction": "up",
+      "concrete_number": "Requires solving a quadratic program, but the paper claims this is 'typically dominated by the time required to scan the sample in memory'.",
+      "pointer": "[p.10]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "none",
+      "symbol": "None",
+      "name": "None",
+      "definition": "No plausible new principle candidate.",
+      "mechanism_pattern": "Not applicable",
+      "why_existing_principles_are_insufficient": "Existing principles sufficiently cover the paper's mechanisms. The composition of Probabilistic Design (Pd), Invariant-Guided (Ig), and Constraint-based (Cp) effectively describes the core design pattern of correcting a sample-based estimate using known aggregate facts framed as constraints in an optimization problem.",
+      "closest_existing_principles": [],
+      "reusability_beyond_this_paper": "Not applicable",
+      "confidence": "low",
+      "pointer": "Not specified in provided text"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "Improves sample-based query estimates by using Maximum Likelihood Estimation to find the most probable data distribution that is consistent with both the sample and a small set of pre-computed aggregate 'facts' which are enforced as constraints in a quadratic program.",
+    "top_3_principles": [
+      "Pd",
+      "Ig",
+      "Cp"
+    ],
+    "mechanism_family": "query optimization",
+    "specific_tools_or_algorithms": [
+      "Maximum Likelihood Estimation (MLE)",
+      "Quadratic Programming (QP)"
+    ],
+    "primary_design_archetype": "invariant-preserving shortcut",
+    "principle_mapping_confidence": "high"
+  }
+}

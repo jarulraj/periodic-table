@@ -1,0 +1,313 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "19",
+    "paper_title": "Efficient Processing of Expressive Node-Selecting Queries on XML Data in Secondary Storage: A Tree Automata-based Approach",
+    "authors": [
+      "Christoph Koch"
+    ],
+    "venue_or_source": "VLDB",
+    "year": "2003",
+    "system_or_method_name": "Arb",
+    "problem_domain": "XML query processing"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To develop a truly scalable query evaluation technique for expressive node-selecting queries on very large XML data held in secondary storage, requiring only a constant number of linear scans and a fixed-size memory buffer.",
+    "primary_optimized_metric": "query time",
+    "secondary_metrics": [
+      "memory",
+      "I/O"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "O(m+n)",
+        "meaning": "Overall running time, where n is the size of the data and m depends only on the query.",
+        "pointer": "[p.1]"
+      },
+      {
+        "number_or_delta": "2",
+        "meaning": "Number of linear passes over the XML data on disk required for query processing.",
+        "pointer": "[p.1]"
+      },
+      {
+        "number_or_delta": "Bounded by tree depth",
+        "meaning": "Main memory requirement is a stack bounded by the depth of the XML tree, independent of the total data size.",
+        "pointer": "[p.2]"
+      },
+      {
+        "number_or_delta": "~22 seconds",
+        "meaning": "Average total query time for path queries on the Treebank dataset (32M nodes).",
+        "pointer": "[p.11]"
+      },
+      {
+        "number_or_delta": "~1.6 MB",
+        "meaning": "Average maximum main memory used for queries on the Treebank dataset.",
+        "pointer": "[p.11]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Conventional XPath query processors",
+    "why_this_is_the_right_comparison": "These systems can evaluate expressive queries but are not scalable for large, disk-resident data because they may visit each node many times, leading to excessive and non-sequential I/O.",
+    "limiting_design_assumption": "Evaluating expressive node-selecting queries (e.g., with upward and sideways axes) requires multiple, potentially non-sequential traversals of the data tree, making it inefficient for data in secondary storage.",
+    "pointers": [
+      "[quote: '...current systems for evaluating XPath 1 queries require each node to be visited an exponential number of times at worst...']",
+      "[p.2]"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Tree automata",
+    "specific_tools_or_algorithms": [
+      "Selecting Tree Automata (STA)",
+      "Deterministic bottom-up tree automata",
+      "Deterministic top-down tree automata",
+      "Residual propositional logic programs",
+      "TMNF (Tree-Marking Normal Form)"
+    ],
+    "what_is_being_optimized": "The query evaluation strategy, by transforming a non-deterministic automaton into a deterministic two-pass algorithm.",
+    "state_or_ir": "The query is represented in TMNF. The intermediate state between the two passes is a sequence of residual logic programs representing reachable automaton states for each node, stored on disk.",
+    "output": "The set of XML tree nodes that satisfy the query.",
+    "pointers": [
+      "[p.2]",
+      "[p.4]",
+      "[p.6]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Replaces multi-pass, random-access query evaluation with a fixed two-pass, linear-scan algorithm using deterministic tree automata, enabling scalable processing of highly expressive (MSO-complete) queries on disk-resident data.",
+      "baseline_assumption": "Expressive queries with features like upward or sideways navigation require complex, multi-visit evaluation strategies that perform poorly on secondary storage.",
+      "why_baseline_did_not_include_it": "The baseline approaches were not designed with the primary constraint of a small, constant number of linear scans. The specific automata-theoretic machinery (STAs and their determinization) was a recent theoretical advance not yet applied in this context.",
+      "mechanism_level_implementation": "A non-deterministic Selecting Tree Automaton (STA) representing the query is determinized into a two-phase process. Phase 1 is a bottom-up pass with a deterministic automaton that computes 'reachable states' for each node and writes them to disk. Phase 2 is a top-down pass with another deterministic automaton that reads the intermediate results and prunes states to find the final selected nodes.",
+      "primary_metric_improved": "query time",
+      "tradeoffs_or_costs": "Requires temporary disk space on the order of the data size to store the intermediate results from the first pass.",
+      "pointers": [
+        "[p.2]",
+        "[p.6]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Manages the potentially large state space of the deterministic automata by representing sets of reachable states as compact residual propositional logic programs, making the lazy computation of transitions practical.",
+      "baseline_assumption": "A standard powerset construction to determinize a non-deterministic automaton would lead to an exponential blowup in the number of states, making it impractical for complex queries.",
+      "why_baseline_did_not_include_it": "This is a novel technical contribution of the paper, based on the insight that sets of reachable states can be represented and manipulated efficiently as Horn formulae.",
+      "mechanism_level_implementation": "The state of the deterministic bottom-up automaton for a node is a residual logic program representing all constraints on possible STA states inferable from the node's subtree. The automaton's transition function is implemented by the `ComputeReachableStates` procedure, which manipulates these logic programs using linear-time unit resolution.",
+      "primary_metric_improved": "memory",
+      "tradeoffs_or_costs": "Introduces the complexity of manipulating logic programs (e.g., unfolding, contraction, unit resolution) as part of the query evaluation engine.",
+      "pointers": [
+        "[p.3]",
+        "[p.6]",
+        "[p.8]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Fs",
+          "name": "Formal Specification",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The entire query evaluation framework is based on the formal equivalence between MSO logic, TMNF, and Selecting Tree Automata (STAs).",
+          "why_it_applies": "The paper leverages the formal properties of tree automata to prove that a non-deterministic, single-pass model (STA) can be transformed into an equivalent deterministic two-pass model. This formal grounding is what enables the novel algorithm.",
+          "justification_if_invented": "",
+          "pointer": "[p.3]"
+        },
+        {
+          "symbol": "Mo",
+          "name": "Modularity",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The query evaluation is explicitly decomposed into a two-phase technique: a bottom-up pass followed by a top-down pass.",
+          "why_it_applies": "This modular decomposition separates the concern of gathering all possible states (bottom-up) from the concern of pruning invalid paths and identifying the final result (top-down). The first phase produces a well-defined intermediate result that the second phase consumes.",
+          "justification_if_invented": "",
+          "pointer": "[p.2]"
+        },
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The two-pass algorithm replaces evaluation strategies that may visit nodes an 'unbounded' or 'exponential' number of times with one that visits each node exactly twice.",
+          "why_it_applies": "The two-pass structure avoids the redundant up-and-down traversals that less structured algorithms would perform. The bottom-up pass computes all necessary information from subtrees once, and the top-down pass uses this to resolve states once. This avoids re-deriving information, and the final result is identical to the formal specification (STA evaluation), so the avoided work does not change the result.",
+          "justification_if_invented": "",
+          "pointer": "[p.2]"
+        },
+        {
+          "symbol": "Ha",
+          "name": "Hardware-Aware",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The algorithm is designed to use a constant number of linear scans and avoid random disk access. A custom storage model is proposed to facilitate this.",
+          "why_it_applies": "The design explicitly targets the performance characteristics of secondary storage (disks), where sequential I/O is much faster than random I/O. This awareness motivates the entire two-pass, linear-scan architecture.",
+          "justification_if_invented": "",
+          "pointer": "[p.2]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Sc",
+          "name": "Scalability",
+          "reason_rejected_or_borderline": "This is a primary goal and benefit of the system, but not the mechanism itself. The other principles explain *how* scalability is achieved.",
+          "pointer": "[p.1]"
+        },
+        {
+          "symbol": "Ep",
+          "name": "Equivalence-based",
+          "reason_rejected_or_borderline": "The transformation from STA to the two-pass algorithm is an equivalence-based rewrite. However, Fs is more fundamental, as it describes the formal system within which such equivalences are defined and proven. Fs is the foundation that enables Ep.",
+          "pointer": "[p.3]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Al",
+          "name": "Abstraction Lifting",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "Representing a set of reachable automaton states not as an explicit set, but as a 'residual propositional logic program'.",
+          "why_it_applies": "This change in representation lifts the abstraction from a simple collection of states to a logical formula. This new abstraction is more concise and supports efficient manipulation (e.g., via linear-time unit resolution), which is critical for making the automata-based approach practical.",
+          "justification_if_invented": "",
+          "pointer": "[p.6]"
+        },
+        {
+          "symbol": "Rc",
+          "name": "Reuse of Computation",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The lazy computation of automaton transitions, which are then stored in hash tables for later lookup.",
+          "why_it_applies": "When a transition for a given input state (a residual program) is computed, the result is stored. If the same input state is encountered again, the stored result is reused, avoiding re-computation. The residual program itself is a reusable summary of computation over a subtree.",
+          "justification_if_invented": "",
+          "pointer": "[p.11, footnote 15]"
+        }
+      ],
+      "rejected_or_borderline_principles": []
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Multi-pass Query Evaluation + Fs + Mo + Al -> Arb",
+    "baseline_name": "Multi-pass, random-access XML query evaluation",
+    "top_3_principle_tags": [
+      "Fs",
+      "Mo",
+      "Al"
+    ],
+    "core_principle_tags": [
+      "Fs",
+      "Mo",
+      "Al"
+    ],
+    "supporting_principle_tags": [
+      "Wv",
+      "Ha",
+      "Rc"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Fs",
+      "Mo",
+      "Wv",
+      "Ha",
+      "Al",
+      "Rc"
+    ],
+    "new_system_name": "Arb",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "The composition is a cascade from theory to practice. Formal Specification (Fs) provides the theoretical guarantee that a complex, non-deterministic query model can be transformed into a deterministic one. Modularity (Mo) provides the concrete architectural pattern for this transformation: a two-pass algorithm separating information gathering from result pruning. Abstraction Lifting (Al) provides the key data structure—residual logic programs—that makes the state management within this modular architecture efficient and practical.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Fs",
+          "contribution_to_equation": "Provides the formal grounding in automata theory that guarantees the correctness of transforming a non-deterministic query model into a deterministic, multi-pass algorithm."
+        },
+        {
+          "symbol": "Mo",
+          "contribution_to_equation": "Decomposes the complex evaluation into a clean, two-phase structure (bottom-up, then top-down), which is amenable to linear scans over secondary storage."
+        },
+        {
+          "symbol": "Al",
+          "contribution_to_equation": "Introduces a concise logical representation for the potentially huge sets of automaton states, making the computation tractable in terms of memory and processing time."
+        }
+      ],
+      "transfer_question": "In what other domains could a non-deterministic, multi-visit process be transformed into a fixed-pass, deterministic algorithm by formally modeling the problem and finding a compact intermediate representation to pass between stages?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "query time",
+      "direction": "down",
+      "concrete_number": "O(m+n)",
+      "pointer": "[p.1]"
+    },
+    {
+      "property": "memory",
+      "direction": "down",
+      "concrete_number": "bounded by tree depth",
+      "pointer": "[p.2]"
+    },
+    {
+      "property": "I/O operations",
+      "direction": "down",
+      "concrete_number": "2 linear scans",
+      "pointer": "[p.1]"
+    },
+    {
+      "property": "I/O pattern",
+      "direction": "not specified",
+      "concrete_number": "sequential reads/writes",
+      "pointer": "[p.2]"
+    },
+    {
+      "property": "temporary disk space",
+      "direction": "up",
+      "concrete_number": "O(data size)",
+      "pointer": "[p.2]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Sr",
+      "name": "Staged Resolution",
+      "definition": "Decompose a non-deterministic computation into a sequence of deterministic passes, where early passes compute and materialize a summary of possibilities, and later passes use this summary to resolve ambiguity and compute the final result.",
+      "mechanism_pattern": "The paper's two-phase algorithm is a prime example. The first, bottom-up pass computes the set of all 'reachable states' (the possibilities) for each node as a residual program. The second, top-down pass uses constraints from the parent to prune these possibilities and determine the final 'true predicates' (the resolved result).",
+      "why_existing_principles_are_insufficient": "Mo (Modularity) captures the decomposition into passes but not the specific semantic pattern of 'gather possibilities, then resolve'. Fs (Formal Specification) is a prerequisite for this transformation but doesn't describe the transformation's structure. Staged Resolution captures the common pattern of resolving uncertainty via multiple, structured passes, which also appears in areas like multi-pass compilation and type inference.",
+      "closest_existing_principles": [
+        "Mo",
+        "Fs",
+        "Ep"
+      ],
+      "reusability_beyond_this_paper": "This pattern is highly reusable. It applies to constraint solving, program analysis (e.g., attribute grammars), and any problem where local ambiguity can be resolved using global context gathered in a separate pass.",
+      "confidence": "medium",
+      "pointer": "[p.6]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "Achieves scalable, expressive XML query processing by transforming a non-deterministic tree automaton evaluation into a two-pass, linear-scan algorithm over disk, using compact residual logic programs to represent automaton states.",
+    "top_3_principles": [
+      "Fs",
+      "Mo",
+      "Al"
+    ],
+    "mechanism_family": "query optimization",
+    "specific_tools_or_algorithms": [
+      "Selecting Tree Automata (STA)",
+      "Deterministic bottom-up tree automata",
+      "Deterministic top-down tree automata",
+      "Residual propositional logic programs",
+      "TMNF (Tree-Marking Normal Form)"
+    ],
+    "primary_design_archetype": "other",
+    "principle_mapping_confidence": "high"
+  }
+}

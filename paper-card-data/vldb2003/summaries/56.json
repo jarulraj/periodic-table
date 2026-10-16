@@ -1,0 +1,298 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "56",
+    "paper_title": "Memory Requirements for Query Execution in Highly Constrained Devices",
+    "authors": [
+      "Nicolas Anciaux",
+      "Luc Bouganim",
+      "Philippe Pucheral"
+    ],
+    "venue_or_source": "Proceedings of the 29th VLDB Conference",
+    "year": "2003",
+    "system_or_method_name": "RLB query evaluator with iteration filters",
+    "problem_domain": "Query processing on resource-constrained devices"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To devise a query execution model for hardware-constrained devices that minimizes RAM consumption by avoiding swapping and indexing, while using optimizations to make the performance acceptable.",
+    "primary_optimized_metric": "memory",
+    "secondary_metrics": [
+      "query time"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "< 1KB",
+        "meaning": "Typical RAM available to applications in smartcards at the time.",
+        "pointer": "[p.1]"
+      },
+      {
+        "number_or_delta": "~1 second",
+        "meaning": "Achievable response time for 'Regular' queries (Q1-Q5) using only 1KB of RAM with the proposed techniques.",
+        "pointer": "[p.9]"
+      },
+      {
+        "number_or_delta": "78%",
+        "meaning": "RAM saved by using iteration filters to execute query Q2 in under 1 second (940 bytes without vs. 200 bytes with).",
+        "pointer": "[p.9]"
+      },
+      {
+        "number_or_delta": "16KB -> 2KB",
+        "meaning": "RAM required to execute query Q5 in 1 second, reduced from over 16KB to 2KB by using iteration filters.",
+        "pointer": "[p.9]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Traditional DBMS query evaluation",
+    "why_this_is_the_right_comparison": "The paper's techniques are designed for environments where standard DBMS approaches like swapping to stable storage or relying on indexes are infeasible due to hardware constraints (expensive writes, limited space).",
+    "limiting_design_assumption": "The baseline assumes that RAM is either sufficient to hold intermediate results and data structures, or that swapping to stable storage is a cheap and viable fallback mechanism to handle memory pressure.",
+    "pointers": [
+      "[p.2, quote: 'In traditional DBMSs, query evaluation techniques resort to swapping to overcome the RAM limitation.']",
+      "[p.2, quote: 'swapping is proscribed in highly constrained devices because it incurs prohibitive write costs...']"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Custom query execution model",
+    "specific_tools_or_algorithms": [
+      "RAM Lower Bound (RLB) query execution model",
+      "Multi-pass re-computation algorithms (e.g., CompMin for GroupBy)",
+      "Iteration filters"
+    ],
+    "what_is_being_optimized": "The data flow and operator algorithms within a query execution plan to minimize RAM usage.",
+    "state_or_ir": "A query execution plan (QEP) tree of iterators.",
+    "output": "A stream of result tuples.",
+    "pointers": [
+      "[p.3, Section 3]",
+      "[p.7, Section 4.2]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Introduces a RAM Lower Bound (RLB) query execution model that avoids materializing intermediate results by re-computing them on-demand, trading CPU cycles for minimal memory usage.",
+      "baseline_assumption": "Intermediate results from sub-queries are materialized in RAM (or swapped to disk) to be consumed by parent operators.",
+      "why_baseline_did_not_include_it": "The performance penalty of constant re-computation is unacceptable in systems where RAM is not the absolute, most critical bottleneck.",
+      "mechanism_level_implementation": "A strict pipelined iterator model guided by the rule 'Never store information that could be recomputed'. A Join operator re-evaluates its entire right input for each tuple of its left input. Blocking operators like GroupBy and Sort use multiple passes over their input, storing only constant-size state (e.g., the current group key being processed).",
+      "primary_metric_improved": "memory",
+      "tradeoffs_or_costs": "Exhibits 'poor performance' due to a 'dramatic' increase in the number of iterations over the source data.",
+      "pointers": [
+        "[p.3, Section 3.1, R2]",
+        "[p.3, quote: 'intermediate results are never stored since they can be recomputed from the data sources at any time.']",
+        "[p.5, quote: 'a RAM lower bound query execution model exhibits poor performance...']"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Introduces 'iteration filters', a new optimization that pushes dynamic predicates down the query plan to prune tuples that are irrelevant to the current pass of a multi-pass operator, mitigating the high performance cost of the RLB model.",
+      "baseline_assumption": "The RLB model (from Δ1) processes all tuples from its input sub-queries on every pass, even if most are provably irrelevant to the current group or sort key being computed.",
+      "why_baseline_did_not_include_it": "This optimization is specifically tailored to the multi-pass, re-computation-heavy execution model of Δ1. Traditional optimizers push down static predicates, not dynamic, per-iteration predicates generated from an operator's internal state.",
+      "mechanism_level_implementation": "An operator like GroupBy (using the CompMin algorithm) generates a dynamic filter predicate (e.g., `t.GrpLst >= Current and t.GrpLst < Split`). This predicate is pushed down the QEP to be checked by lower-level operators like Scan or Join, which then avoid producing and sending 'Irrelevant tuples' upstream.",
+      "primary_metric_improved": "query time",
+      "tradeoffs_or_costs": "Adds complexity to operators, which must now generate, communicate, and check these dynamic filters. The filter predicates can be more costly to check than simple static predicates.",
+      "pointers": [
+        "[p.6, Section 4.2]",
+        "[p.7, quote: 'Each operator willing to eliminate the Irrelevant tuples from its input expresses a predicate, called iteration filter...']",
+        "[p.7, Figure 5]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Bo",
+          "name": "Bottleneck-Oriented",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The design of the entire RLB execution model, which re-computes all intermediate results.",
+          "why_it_applies": "The paper explicitly identifies RAM as the 'critical resource' and 'most limiting factor'. The entire design is a radical tradeoff, sacrificing CPU performance (by re-computing) to minimize the usage of the bottleneck resource, RAM.",
+          "justification_if_invented": "",
+          "pointer": "[p.1, quote: 'RAM will remain the critical resource in these environments...']"
+        },
+        {
+          "symbol": "Ha",
+          "name": "Hardware-Aware",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The proscription of swapping and the general avoidance of writes to stable storage.",
+          "why_it_applies": "The design is fundamentally shaped by the specific hardware properties of the target devices: extremely limited RAM and expensive, lifetime-limited writes to electronic stable storage (EE-PROM, Flash), which makes swapping infeasible.",
+          "justification_if_invented": "",
+          "pointer": "[p.2, H4]"
+        },
+        {
+          "symbol": "Si",
+          "name": "Simplicity",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The design rules R1 ('Proscribe variable size data structures') and R2 ('Never store information that could be recomputed').",
+          "why_it_applies": "These rules enforce a simple, uniform policy for memory management across all operators, avoiding complex buffering or spilling logic. The resulting operator algorithms (like nested-loop join) are conceptually simple, even if their repeated execution is costly.",
+          "justification_if_invented": "",
+          "pointer": "[p.3, Section 3.1]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "reason_rejected_or_borderline": "Rejected because this delta does the opposite of Wv. It intentionally *adds* a massive amount of re-computation work to avoid the 'work' of storing intermediate results in RAM. The goal is to save space, not avoid computation.",
+          "pointer": "[p.3, R2]"
+        },
+        {
+          "symbol": "Rc",
+          "name": "Reuse of Computation",
+          "reason_rejected_or_borderline": "Rejected because the core principle is to explicitly *avoid* reuse of computed intermediate results by re-computing them from scratch.",
+          "pointer": "[p.3, R2]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The creation and pushdown of 'iteration filters' to prune 'Irrelevant tuples'.",
+          "why_it_applies": "The paper defines 'Irrelevant tuples' as those that are neither 'Relevant' (participating in the result) nor 'Required' (updating operator state) for the current iteration. Pruning these tuples early in the QEP avoids the work of processing them further, and this avoidance is guaranteed not to change the final result of the query.",
+          "justification_if_invented": "",
+          "pointer": "[p.6, quote: 'Irrelevant tuples are all the tuples present in the input that are not Relevant nor Required. Eager pruning should take place to avoid producing Irrelevant tuples...']"
+        },
+        {
+          "symbol": "Se",
+          "name": "Semantically Explicit",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The GroupBy/Sort operators express their internal state (Current, Split variables) as a formal predicate that is passed to other operators.",
+          "why_it_applies": "The iteration filter makes the internal, iterative state of one operator explicit and communicable to other operators in the plan. This exposed semantic information is what enables the downstream operators to perform the early pruning.",
+          "justification_if_invented": "",
+          "pointer": "[p.7, Section 4.3]"
+        },
+        {
+          "symbol": "Fp",
+          "name": "Function Placement",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "Pushing the evaluation of iteration filters as far down the QEP as possible, ideally to the Scan operator.",
+          "why_it_applies": "The 'function' of checking the filter predicate is placed at the earliest possible point in the data flow (e.g., at the leaf Scan node for a single-relation filter) to maximize its pruning effectiveness and minimize data movement.",
+          "justification_if_invented": "",
+          "pointer": "[p.7, quote: 'The objective is to push the evaluation of iteration filters down to the QEP in order to prune Irrelevant tuples as early as possible.']"
+        }
+      ],
+      "rejected_or_borderline_principles": []
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Traditional DBMS (Materialization) + Ha + Bo + Wv -> RLB Evaluator with Iteration Filters",
+    "baseline_name": "Traditional DBMS (Materialization)",
+    "top_3_principle_tags": [
+      "Ha",
+      "Bo",
+      "Wv"
+    ],
+    "core_principle_tags": [
+      "Bo",
+      "Ha",
+      "Wv"
+    ],
+    "supporting_principle_tags": [
+      "Si",
+      "Se",
+      "Fp"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Bo",
+      "Ha",
+      "Si",
+      "Wv",
+      "Se",
+      "Fp"
+    ],
+    "new_system_name": "RLB Evaluator with Iteration Filters",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "The design is a two-step process. First, being Hardware-Aware (Ha) of extreme RAM limits forces a Bottleneck-Oriented (Bo) design that trades all other resources (CPU, I/O) to minimize RAM usage, leading to a slow re-computation model. Second, this new performance bottleneck is then mitigated by applying Result-Preserving Work Avoidance (Wv) to prune the massive amount of useless work generated by the re-computation strategy, making the approach practical.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Ha",
+          "contribution_to_equation": "Constrains the design space by making standard techniques like swapping infeasible, forcing a radical rethinking of query execution."
+        },
+        {
+          "symbol": "Bo",
+          "contribution_to_equation": "Provides the core strategic tradeoff: sacrifice performance (CPU/IO) to aggressively minimize the primary bottleneck, RAM, by re-computing instead of storing."
+        },
+        {
+          "symbol": "Wv",
+          "contribution_to_equation": "Recovers performance by identifying and eliminating computation that is provably useless within the new re-computation model, making the Bo strategy viable."
+        }
+      ],
+      "transfer_question": "In what other resource-starved domains could a 're-compute everything' strategy, made viable by aggressive, semantically-aware work avoidance, replace a 'store everything' baseline?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "memory",
+      "direction": "down",
+      "concrete_number": "reaches a theoretical lower bound",
+      "pointer": "[p.3]"
+    },
+    {
+      "property": "query time",
+      "direction": "mixed",
+      "concrete_number": "RLB model is very slow; iteration filters make it acceptable (~1s for many queries)",
+      "pointer": "[p.5, p.9]"
+    },
+    {
+      "property": "I/O (stable storage reads)",
+      "direction": "up",
+      "concrete_number": "dramatic increase in iterations implies many more reads from stable storage",
+      "pointer": "[p.5, Figure 4]"
+    },
+    {
+      "property": "I/O (stable storage writes)",
+      "direction": "down",
+      "concrete_number": "avoids swapping, which incurs prohibitive write costs",
+      "pointer": "[p.2, H4]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Ir",
+      "name": "Iterative Refinement",
+      "definition": "An operator refines its processing scope over multiple passes on its input, communicating its current scope to downstream operators to enable early filtering.",
+      "mechanism_pattern": "A blocking operator (like GroupBy) makes multiple passes over its input. In each pass, it computes a result for a small partition of the data (e.g., one group key). It generates a dynamic filter representing this partition and pushes it down the query plan, so that only data relevant to the current partition is processed in that pass.",
+      "why_existing_principles_are_insufficient": "Wv describes the *outcome* (avoiding work) but not the specific mechanism of using an operator's iterative state to dynamically generate the pruning condition. Se describes the *enabler* (exposing state) but not the full pattern of multi-pass processing with shrinking focus. Ir captures the complete, dynamic, multi-pass filtering pattern.",
+      "closest_existing_principles": [
+        "Wv",
+        "Se"
+      ],
+      "reusability_beyond_this_paper": "This pattern could apply to other iterative algorithms, such as multi-pass graph algorithms, iterative machine learning model training on databases, or any system that repeatedly scans data with a progressively refined focus.",
+      "confidence": "medium",
+      "pointer": "[p.7, Section 4.3]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "Achieves a RAM lower bound for query execution by re-computing all intermediate results and uses dynamic, per-iteration filters pushed down the query plan to prune irrelevant data and make the high re-computation cost practical.",
+    "top_3_principles": [
+      "Ha",
+      "Bo",
+      "Wv"
+    ],
+    "mechanism_family": "query optimization",
+    "specific_tools_or_algorithms": [
+      "RLB query execution model",
+      "Multi-pass re-computation algorithms (e.g., CompMin for GroupBy)",
+      "Iteration filters"
+    ],
+    "primary_design_archetype": "avoid materialization / recomputation",
+    "principle_mapping_confidence": "high"
+  }
+}

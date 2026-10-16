@@ -1,0 +1,1434 @@
+{
+  "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html",
+  "retrieved_on": "2026-10-16",
+  "source_html_sha256": "1ea94c91288fb66fe8e08bb5340cc20c9bccb671e9d6231d70a2973389dae9a0",
+  "paper_count": 75,
+  "category_caveat": "Official 2003 research-session labels are preserved verbatim. Labels from different years are not a harmonized topic taxonomy.",
+  "papers": {
+    "vldb2003-1": {
+      "paper_title": "Complex Queries over Web Repositories",
+      "paper_url": "https://vldb.org/conf/2003/papers/S03P01.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Internet/WWW"
+      ],
+      "sessions": [
+        {
+          "session_id": "A1",
+          "raw_label": "Internet/WWW",
+          "category": "Internet/WWW",
+          "paper_title": "Complex Queries over Web Repositories",
+          "paper_url": "https://vldb.org/conf/2003/papers/S03P01.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#A1"
+        }
+      ]
+    },
+    "vldb2003-2": {
+      "paper_title": "XSEarch: A Semantic Search Engine for XML",
+      "paper_url": "https://vldb.org/conf/2003/papers/S03P02.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Internet/WWW"
+      ],
+      "sessions": [
+        {
+          "session_id": "A1",
+          "raw_label": "Internet/WWW",
+          "category": "Internet/WWW",
+          "paper_title": "XSEarch: A Semantic Search Engine for XML",
+          "paper_url": "https://vldb.org/conf/2003/papers/S03P02.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#A1"
+        }
+      ]
+    },
+    "vldb2003-3": {
+      "paper_title": "An Efficient and Resilient Approach to Filtering and Disseminating Streaming Data",
+      "paper_url": "https://vldb.org/conf/2003/papers/S03P03.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Internet/WWW"
+      ],
+      "sessions": [
+        {
+          "session_id": "A1",
+          "raw_label": "Internet/WWW",
+          "category": "Internet/WWW",
+          "paper_title": "An Efficient and Resilient Approach to Filtering and Disseminating Streaming Data",
+          "paper_url": "https://vldb.org/conf/2003/papers/S03P03.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#A1"
+        }
+      ]
+    },
+    "vldb2003-4": {
+      "paper_title": "Efficient Mining of XML Query Patterns for Caching",
+      "paper_url": "https://vldb.org/conf/2003/papers/S04P01.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Data Mining/Streams"
+      ],
+      "sessions": [
+        {
+          "session_id": "A2",
+          "raw_label": "Data Mining/Streams",
+          "category": "Data Mining/Streams",
+          "paper_title": "Efficient Mining of XML Query Patterns for Caching",
+          "paper_url": "https://vldb.org/conf/2003/papers/S04P01.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#A2"
+        }
+      ]
+    },
+    "vldb2003-5": {
+      "paper_title": "A Framework for Clustering Evolving Data Streams",
+      "paper_url": "https://vldb.org/conf/2003/papers/S04P02.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Data Mining/Streams"
+      ],
+      "sessions": [
+        {
+          "session_id": "A2",
+          "raw_label": "Data Mining/Streams",
+          "category": "Data Mining/Streams",
+          "paper_title": "A Framework for Clustering Evolving Data Streams",
+          "paper_url": "https://vldb.org/conf/2003/papers/S04P02.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#A2"
+        }
+      ]
+    },
+    "vldb2003-6": {
+      "paper_title": "A Regression-Based Temporal Pattern Mining Scheme for Data Streams",
+      "paper_url": "https://vldb.org/conf/2003/papers/S04P03.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Data Mining/Streams"
+      ],
+      "sessions": [
+        {
+          "session_id": "A2",
+          "raw_label": "Data Mining/Streams",
+          "category": "Data Mining/Streams",
+          "paper_title": "A Regression-Based Temporal Pattern Mining Scheme for Data Streams",
+          "paper_url": "https://vldb.org/conf/2003/papers/S04P03.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#A2"
+        }
+      ]
+    },
+    "vldb2003-7": {
+      "paper_title": "On the Costs of Multilingualism in Database Systems",
+      "paper_url": "https://vldb.org/conf/2003/papers/S05P01.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Query Processing in the Web"
+      ],
+      "sessions": [
+        {
+          "session_id": "A3",
+          "raw_label": "Query Processing in the Web",
+          "category": "Query Processing in the Web",
+          "paper_title": "On the Costs of Multilingualism in Database Systems",
+          "paper_url": "https://vldb.org/conf/2003/papers/S05P01.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#A3"
+        }
+      ]
+    },
+    "vldb2003-8": {
+      "paper_title": "Distributed Top-N Query Processing with Possibly Uncooperative Local Systems",
+      "paper_url": "https://vldb.org/conf/2003/papers/S05P02.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Query Processing in the Web"
+      ],
+      "sessions": [
+        {
+          "session_id": "A3",
+          "raw_label": "Query Processing in the Web",
+          "category": "Query Processing in the Web",
+          "paper_title": "Distributed Top-N Query Processing with Possibly Uncooperative Local Systems",
+          "paper_url": "https://vldb.org/conf/2003/papers/S05P02.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#A3"
+        }
+      ]
+    },
+    "vldb2003-9": {
+      "paper_title": "Optimized Query Execution in Large Search Engines with Global Page Ordering",
+      "paper_url": "https://vldb.org/conf/2003/papers/S05P03.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Query Processing in the Web"
+      ],
+      "sessions": [
+        {
+          "session_id": "A3",
+          "raw_label": "Query Processing in the Web",
+          "category": "Query Processing in the Web",
+          "paper_title": "Optimized Query Execution in Large Search Engines with Global Page Ordering",
+          "paper_url": "https://vldb.org/conf/2003/papers/S05P03.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#A3"
+        }
+      ]
+    },
+    "vldb2003-10": {
+      "paper_title": "Path Queries on Compressed XML",
+      "paper_url": "https://vldb.org/conf/2003/papers/S06P01.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "XML Queries Processing I"
+      ],
+      "sessions": [
+        {
+          "session_id": "A4",
+          "raw_label": "XML Queries Processing I",
+          "category": "XML Queries Processing I",
+          "paper_title": "Path Queries on Compressed XML",
+          "paper_url": "https://vldb.org/conf/2003/papers/S06P01.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#A4"
+        }
+      ]
+    },
+    "vldb2003-11": {
+      "paper_title": "On the minimization of Xpath queries",
+      "paper_url": "https://vldb.org/conf/2003/papers/S06P02.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "XML Queries Processing I"
+      ],
+      "sessions": [
+        {
+          "session_id": "A4",
+          "raw_label": "XML Queries Processing I",
+          "category": "XML Queries Processing I",
+          "paper_title": "On the minimization of Xpath queries",
+          "paper_url": "https://vldb.org/conf/2003/papers/S06P02.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#A4"
+        }
+      ]
+    },
+    "vldb2003-12": {
+      "paper_title": "Covering Indexes for XML Queries: Bisimulation - Simulation = Negation",
+      "paper_url": "https://vldb.org/conf/2003/papers/S06P03.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "XML Queries Processing I"
+      ],
+      "sessions": [
+        {
+          "session_id": "A4",
+          "raw_label": "XML Queries Processing I",
+          "category": "XML Queries Processing I",
+          "paper_title": "Covering Indexes for XML Queries: Bisimulation - Simulation = Negation",
+          "paper_url": "https://vldb.org/conf/2003/papers/S06P03.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#A4"
+        }
+      ]
+    },
+    "vldb2003-13": {
+      "paper_title": "Phrase Matching in XML",
+      "paper_url": "https://vldb.org/conf/2003/papers/S07P01.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "XML Matching & Storage"
+      ],
+      "sessions": [
+        {
+          "session_id": "A5",
+          "raw_label": "XML Matching & Storage",
+          "category": "XML Matching & Storage",
+          "paper_title": "Phrase Matching in XML",
+          "paper_url": "https://vldb.org/conf/2003/papers/S07P01.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#A5"
+        }
+      ]
+    },
+    "vldb2003-14": {
+      "paper_title": "RRXS: Redundancy reducing XML storage in relations",
+      "paper_url": "https://vldb.org/conf/2003/papers/S07P02.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "XML Matching & Storage"
+      ],
+      "sessions": [
+        {
+          "session_id": "A5",
+          "raw_label": "XML Matching & Storage",
+          "category": "XML Matching & Storage",
+          "paper_title": "RRXS: Redundancy reducing XML storage in relations",
+          "paper_url": "https://vldb.org/conf/2003/papers/S07P02.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#A5"
+        }
+      ]
+    },
+    "vldb2003-15": {
+      "paper_title": "MARS: A System for Publishing XML from Mixed and Redundant Storage",
+      "paper_url": "https://vldb.org/conf/2003/papers/S07P03.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "XML Matching & Storage"
+      ],
+      "sessions": [
+        {
+          "session_id": "A5",
+          "raw_label": "XML Matching & Storage",
+          "category": "XML Matching & Storage",
+          "paper_title": "MARS: A System for Publishing XML from Mixed and Redundant Storage",
+          "paper_url": "https://vldb.org/conf/2003/papers/S07P03.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#A5"
+        }
+      ]
+    },
+    "vldb2003-16": {
+      "paper_title": "Projecting XML Documents",
+      "paper_url": "https://vldb.org/conf/2003/papers/S08P01.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "XML Query Processing II"
+      ],
+      "sessions": [
+        {
+          "session_id": "A6",
+          "raw_label": "XML Query Processing II",
+          "category": "XML Query Processing II",
+          "paper_title": "Projecting XML Documents",
+          "paper_url": "https://vldb.org/conf/2003/papers/S08P01.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#A6"
+        }
+      ]
+    },
+    "vldb2003-17": {
+      "paper_title": "Mixed Mode XML Query Processing",
+      "paper_url": "https://vldb.org/conf/2003/papers/S08P02.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "XML Query Processing II"
+      ],
+      "sessions": [
+        {
+          "session_id": "A6",
+          "raw_label": "XML Query Processing II",
+          "category": "XML Query Processing II",
+          "paper_title": "Mixed Mode XML Query Processing",
+          "paper_url": "https://vldb.org/conf/2003/papers/S08P02.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#A6"
+        }
+      ]
+    },
+    "vldb2003-18": {
+      "paper_title": "From Tree Patterns to Generalized Tree Patterns: On Efficient Evaluation of XQuery",
+      "paper_url": "https://vldb.org/conf/2003/papers/S08P03.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "XML Query Processing II"
+      ],
+      "sessions": [
+        {
+          "session_id": "A6",
+          "raw_label": "XML Query Processing II",
+          "category": "XML Query Processing II",
+          "paper_title": "From Tree Patterns to Generalized Tree Patterns: On Efficient Evaluation of XQuery",
+          "paper_url": "https://vldb.org/conf/2003/papers/S08P03.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#A6"
+        }
+      ]
+    },
+    "vldb2003-19": {
+      "paper_title": "Efficient Processing of Expressive Node-Selecting Queries on XML Data in Secondary Storage: A Tree Automata-based Approach",
+      "paper_url": "https://vldb.org/conf/2003/papers/S09P01.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "XML Query Processing III"
+      ],
+      "sessions": [
+        {
+          "session_id": "A7",
+          "raw_label": "XML Query Processing III",
+          "category": "XML Query Processing III",
+          "paper_title": "Efficient Processing of Expressive Node-Selecting Queries on XML Data in Secondary Storage: A Tree Automata-based Approach",
+          "paper_url": "https://vldb.org/conf/2003/papers/S09P01.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#A7"
+        }
+      ]
+    },
+    "vldb2003-20": {
+      "paper_title": "Query Processing for High-Volume XML Message Brokering",
+      "paper_url": "https://vldb.org/conf/2003/papers/S09P02.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "XML Query Processing III"
+      ],
+      "sessions": [
+        {
+          "session_id": "A7",
+          "raw_label": "XML Query Processing III",
+          "category": "XML Query Processing III",
+          "paper_title": "Query Processing for High-Volume XML Message Brokering",
+          "paper_url": "https://vldb.org/conf/2003/papers/S09P02.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#A7"
+        }
+      ]
+    },
+    "vldb2003-21": {
+      "paper_title": "Holistic Twig Joins on Indexed XML Documents",
+      "paper_url": "https://vldb.org/conf/2003/papers/S09P03.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "XML Query Processing III"
+      ],
+      "sessions": [
+        {
+          "session_id": "A7",
+          "raw_label": "XML Query Processing III",
+          "category": "XML Query Processing III",
+          "paper_title": "Holistic Twig Joins on Indexed XML Documents",
+          "paper_url": "https://vldb.org/conf/2003/papers/S09P03.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#A7"
+        }
+      ]
+    },
+    "vldb2003-22": {
+      "paper_title": "Maximizing the Output Rate of Multi-Way Join Queries over Streaming Information Sources",
+      "paper_url": "https://vldb.org/conf/2003/papers/S10P01.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Streaming"
+      ],
+      "sessions": [
+        {
+          "session_id": "A8",
+          "raw_label": "Streaming",
+          "category": "Streaming",
+          "paper_title": "Maximizing the Output Rate of Multi-Way Join Queries over Streaming Information Sources",
+          "paper_url": "https://vldb.org/conf/2003/papers/S10P01.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#A8"
+        }
+      ]
+    },
+    "vldb2003-23": {
+      "paper_title": "Scheduling for shared window joins over data streams",
+      "paper_url": "https://vldb.org/conf/2003/papers/S10P02.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Streaming"
+      ],
+      "sessions": [
+        {
+          "session_id": "A8",
+          "raw_label": "Streaming",
+          "category": "Streaming",
+          "paper_title": "Scheduling for shared window joins over data streams",
+          "paper_url": "https://vldb.org/conf/2003/papers/S10P02.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#A8"
+        }
+      ]
+    },
+    "vldb2003-24": {
+      "paper_title": "Load Shedding in a Data Stream Manager",
+      "paper_url": "https://vldb.org/conf/2003/papers/S10P03.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Streaming"
+      ],
+      "sessions": [
+        {
+          "session_id": "A8",
+          "raw_label": "Streaming",
+          "category": "Streaming",
+          "paper_title": "Load Shedding in a Data Stream Manager",
+          "paper_url": "https://vldb.org/conf/2003/papers/S10P03.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#A8"
+        }
+      ]
+    },
+    "vldb2003-25": {
+      "paper_title": "Querying the Internet with PIER",
+      "paper_url": "https://vldb.org/conf/2003/papers/S11P01.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Distributed Data & Streams"
+      ],
+      "sessions": [
+        {
+          "session_id": "A9",
+          "raw_label": "Distributed Data & Streams",
+          "category": "Distributed Data & Streams",
+          "paper_title": "Querying the Internet with PIER",
+          "paper_url": "https://vldb.org/conf/2003/papers/S11P01.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#A9"
+        }
+      ]
+    },
+    "vldb2003-26": {
+      "paper_title": "Tuple Routing Strategies for Distributed Eddies",
+      "paper_url": "https://vldb.org/conf/2003/papers/S11P02.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Distributed Data & Streams"
+      ],
+      "sessions": [
+        {
+          "session_id": "A9",
+          "raw_label": "Distributed Data & Streams",
+          "category": "Distributed Data & Streams",
+          "paper_title": "Tuple Routing Strategies for Distributed Eddies",
+          "paper_url": "https://vldb.org/conf/2003/papers/S11P02.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#A9"
+        }
+      ]
+    },
+    "vldb2003-27": {
+      "paper_title": "AQuery: Query Language for Ordered Data, Optimization Techniques, and Experiments",
+      "paper_url": "https://vldb.org/conf/2003/papers/S11P03.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Distributed Data & Streams"
+      ],
+      "sessions": [
+        {
+          "session_id": "A9",
+          "raw_label": "Distributed Data & Streams",
+          "category": "Distributed Data & Streams",
+          "paper_title": "AQuery: Query Language for Ordered Data, Optimization Techniques, and Experiments",
+          "paper_url": "https://vldb.org/conf/2003/papers/S11P03.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#A9"
+        }
+      ]
+    },
+    "vldb2003-28": {
+      "paper_title": "WISE-Integrator: An Automatic Integrator of Web Search Interfaces for E-Commerce",
+      "paper_url": "https://vldb.org/conf/2003/papers/S12P01.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Web & Statistics"
+      ],
+      "sessions": [
+        {
+          "session_id": "A10",
+          "raw_label": "Web & Statistics",
+          "category": "Web & Statistics",
+          "paper_title": "WISE-Integrator: An Automatic Integrator of Web Search Interfaces for E-Commerce",
+          "paper_url": "https://vldb.org/conf/2003/papers/S12P01.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#A10"
+        }
+      ]
+    },
+    "vldb2003-29": {
+      "paper_title": "SASH: A Self-Adaptive Histogram Set for Dynamically Changing Workloads",
+      "paper_url": "https://vldb.org/conf/2003/papers/S12P02.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Web & Statistics"
+      ],
+      "sessions": [
+        {
+          "session_id": "A10",
+          "raw_label": "Web & Statistics",
+          "category": "Web & Statistics",
+          "paper_title": "SASH: A Self-Adaptive Histogram Set for Dynamically Changing Workloads",
+          "paper_url": "https://vldb.org/conf/2003/papers/S12P02.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#A10"
+        }
+      ]
+    },
+    "vldb2003-30": {
+      "paper_title": "VIPAS: Virtual Link Powered Authority Search in the Web",
+      "paper_url": "https://vldb.org/conf/2003/papers/S12P03.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Web & Statistics"
+      ],
+      "sessions": [
+        {
+          "session_id": "A10",
+          "raw_label": "Web & Statistics",
+          "category": "Web & Statistics",
+          "paper_title": "VIPAS: Virtual Link Powered Authority Search in the Web",
+          "paper_url": "https://vldb.org/conf/2003/papers/S12P03.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#A10"
+        }
+      ]
+    },
+    "vldb2003-31": {
+      "paper_title": "Balancing Performance and Data Freshness in Web Database Servers",
+      "paper_url": "https://vldb.org/conf/2003/papers/S13P01.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Caching"
+      ],
+      "sessions": [
+        {
+          "session_id": "B1",
+          "raw_label": "Caching",
+          "category": "Caching",
+          "paper_title": "Balancing Performance and Data Freshness in Web Database Servers",
+          "paper_url": "https://vldb.org/conf/2003/papers/S13P01.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#B1"
+        }
+      ]
+    },
+    "vldb2003-32": {
+      "paper_title": "Buffering Accesses to Memory-Resident Index Structures",
+      "paper_url": "https://vldb.org/conf/2003/papers/S13P02.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Caching"
+      ],
+      "sessions": [
+        {
+          "session_id": "B1",
+          "raw_label": "Caching",
+          "category": "Caching",
+          "paper_title": "Buffering Accesses to Memory-Resident Index Structures",
+          "paper_url": "https://vldb.org/conf/2003/papers/S13P02.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#B1"
+        }
+      ]
+    },
+    "vldb2003-33": {
+      "paper_title": "Data Morphing: An Adaptive, Cache-Conscious Storage Technique",
+      "paper_url": "https://vldb.org/conf/2003/papers/S13P03.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Caching"
+      ],
+      "sessions": [
+        {
+          "session_id": "B1",
+          "raw_label": "Caching",
+          "category": "Caching",
+          "paper_title": "Data Morphing: An Adaptive, Cache-Conscious Storage Technique",
+          "paper_url": "https://vldb.org/conf/2003/papers/S13P03.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#B1"
+        }
+      ]
+    },
+    "vldb2003-34": {
+      "paper_title": "COMBI-Operator: Database Support for Data Mining Applications",
+      "paper_url": "https://vldb.org/conf/2003/papers/S14P01.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Data Mining"
+      ],
+      "sessions": [
+        {
+          "session_id": "B2",
+          "raw_label": "Data Mining",
+          "category": "Data Mining",
+          "paper_title": "COMBI-Operator: Database Support for Data Mining Applications",
+          "paper_url": "https://vldb.org/conf/2003/papers/S14P01.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#B2"
+        }
+      ]
+    },
+    "vldb2003-35": {
+      "paper_title": "A Shrinking-Based Approach for Multi-Dimensional Data Analysis",
+      "paper_url": "https://vldb.org/conf/2003/papers/S14P02.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Data Mining"
+      ],
+      "sessions": [
+        {
+          "session_id": "B2",
+          "raw_label": "Data Mining",
+          "category": "Data Mining",
+          "paper_title": "A Shrinking-Based Approach for Multi-Dimensional Data Analysis",
+          "paper_url": "https://vldb.org/conf/2003/papers/S14P02.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#B2"
+        }
+      ]
+    },
+    "vldb2003-36": {
+      "paper_title": "Data Bubbles for Non-Vector Data: Speeding-up Hierarchical Clustering in Arbitrary Metric Spaces",
+      "paper_url": "https://vldb.org/conf/2003/papers/S14P03.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Data Mining"
+      ],
+      "sessions": [
+        {
+          "session_id": "B2",
+          "raw_label": "Data Mining",
+          "category": "Data Mining",
+          "paper_title": "Data Bubbles for Non-Vector Data: Speeding-up Hierarchical Clustering in Arbitrary Metric Spaces",
+          "paper_url": "https://vldb.org/conf/2003/papers/S14P03.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#B2"
+        }
+      ]
+    },
+    "vldb2003-37": {
+      "paper_title": "Finding Hierarchical Heavy Hitters in Data Streams",
+      "paper_url": "https://vldb.org/conf/2003/papers/S15P01.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "OLAP & Data Mining"
+      ],
+      "sessions": [
+        {
+          "session_id": "B3",
+          "raw_label": "OLAP & Data Mining",
+          "category": "OLAP & Data Mining",
+          "paper_title": "Finding Hierarchical Heavy Hitters in Data Streams",
+          "paper_url": "https://vldb.org/conf/2003/papers/S15P01.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#B3"
+        }
+      ]
+    },
+    "vldb2003-38": {
+      "paper_title": "Star-Cubing: Computing Iceberg Cubes by Top-Down and Bottom-Up Integration",
+      "paper_url": "https://vldb.org/conf/2003/papers/S15P02.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "OLAP & Data Mining"
+      ],
+      "sessions": [
+        {
+          "session_id": "B3",
+          "raw_label": "OLAP & Data Mining",
+          "category": "OLAP & Data Mining",
+          "paper_title": "Star-Cubing: Computing Iceberg Cubes by Top-Down and Bottom-Up Integration",
+          "paper_url": "https://vldb.org/conf/2003/papers/S15P02.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#B3"
+        }
+      ]
+    },
+    "vldb2003-39": {
+      "paper_title": "Coarse-Grained Optimization: Techniques for Rewriting SQL Statement Sequences",
+      "paper_url": "https://vldb.org/conf/2003/papers/S15P03.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "OLAP & Data Mining"
+      ],
+      "sessions": [
+        {
+          "session_id": "B3",
+          "raw_label": "OLAP & Data Mining",
+          "category": "OLAP & Data Mining",
+          "paper_title": "Coarse-Grained Optimization: Techniques for Rewriting SQL Statement Sequences",
+          "paper_url": "https://vldb.org/conf/2003/papers/S15P03.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#B3"
+        }
+      ]
+    },
+    "vldb2003-40": {
+      "paper_title": "Processing Sliding Window Multi-Joins in Continuous Queries over Data Streams",
+      "paper_url": "https://vldb.org/conf/2003/papers/S16P01.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Advanced Query Processing"
+      ],
+      "sessions": [
+        {
+          "session_id": "B4",
+          "raw_label": "Advanced Query Processing",
+          "category": "Advanced Query Processing",
+          "paper_title": "Processing Sliding Window Multi-Joins in Continuous Queries over Data Streams",
+          "paper_url": "https://vldb.org/conf/2003/papers/S16P01.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#B4"
+        }
+      ]
+    },
+    "vldb2003-41": {
+      "paper_title": "Continuous K-Nearest Neighbor Queries for Continuously Moving Points with Updates",
+      "paper_url": "https://vldb.org/conf/2003/papers/S16P02.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Advanced Query Processing"
+      ],
+      "sessions": [
+        {
+          "session_id": "B4",
+          "raw_label": "Advanced Query Processing",
+          "category": "Advanced Query Processing",
+          "paper_title": "Continuous K-Nearest Neighbor Queries for Continuously Moving Points with Updates",
+          "paper_url": "https://vldb.org/conf/2003/papers/S16P02.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#B4"
+        }
+      ]
+    },
+    "vldb2003-42": {
+      "paper_title": "Staircase Join: Teach a Relational DBMS to Watch its (Axis) Steps",
+      "paper_url": "https://vldb.org/conf/2003/papers/S16P03.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Advanced Query Processing"
+      ],
+      "sessions": [
+        {
+          "session_id": "B4",
+          "raw_label": "Advanced Query Processing",
+          "category": "Advanced Query Processing",
+          "paper_title": "Staircase Join: Teach a Relational DBMS to Watch its (Axis) Steps",
+          "paper_url": "https://vldb.org/conf/2003/papers/S16P03.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#B4"
+        }
+      ]
+    },
+    "vldb2003-43": {
+      "paper_title": "Checks and Balances: Monitoring Data Quality Problems in Network Traffic Databases",
+      "paper_url": "https://vldb.org/conf/2003/papers/S17P01.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Data Quality, Data Mining"
+      ],
+      "sessions": [
+        {
+          "session_id": "B5",
+          "raw_label": "Data Quality, Data Mining",
+          "category": "Data Quality, Data Mining",
+          "paper_title": "Checks and Balances: Monitoring Data Quality Problems in Network Traffic Databases",
+          "paper_url": "https://vldb.org/conf/2003/papers/S17P01.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#B5"
+        }
+      ]
+    },
+    "vldb2003-44": {
+      "paper_title": "Systematic Development of Data Mining-Based Data Quality Tools",
+      "paper_url": "https://vldb.org/conf/2003/papers/S17P02.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Data Quality, Data Mining"
+      ],
+      "sessions": [
+        {
+          "session_id": "B5",
+          "raw_label": "Data Quality, Data Mining",
+          "category": "Data Quality, Data Mining",
+          "paper_title": "Systematic Development of Data Mining-Based Data Quality Tools",
+          "paper_url": "https://vldb.org/conf/2003/papers/S17P02.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#B5"
+        }
+      ]
+    },
+    "vldb2003-45": {
+      "paper_title": "Adaptive, Hands-Off Stream Mining",
+      "paper_url": "https://vldb.org/conf/2003/papers/S17P03.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Data Quality, Data Mining"
+      ],
+      "sessions": [
+        {
+          "session_id": "B5",
+          "raw_label": "Data Quality, Data Mining",
+          "category": "Data Quality, Data Mining",
+          "paper_title": "Adaptive, Hands-Off Stream Mining",
+          "paper_url": "https://vldb.org/conf/2003/papers/S17P03.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#B5"
+        }
+      ]
+    },
+    "vldb2003-46": {
+      "paper_title": "Composing Mappings Among Data Sources",
+      "paper_url": "https://vldb.org/conf/2003/papers/S18P01.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Managing derived Data"
+      ],
+      "sessions": [
+        {
+          "session_id": "B6",
+          "raw_label": "Managing derived Data",
+          "category": "Managing derived Data",
+          "paper_title": "Composing Mappings Among Data Sources",
+          "paper_url": "https://vldb.org/conf/2003/papers/S18P01.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#B6"
+        }
+      ]
+    },
+    "vldb2003-47": {
+      "paper_title": "Mapping Adaptation under Evolving Schemas",
+      "paper_url": "https://vldb.org/conf/2003/papers/S18P02.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Managing derived Data"
+      ],
+      "sessions": [
+        {
+          "session_id": "B6",
+          "raw_label": "Managing derived Data",
+          "category": "Managing derived Data",
+          "paper_title": "Mapping Adaptation under Evolving Schemas",
+          "paper_url": "https://vldb.org/conf/2003/papers/S18P02.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#B6"
+        }
+      ]
+    },
+    "vldb2003-48": {
+      "paper_title": "Locking Protocols for Materialized Aggregate Join Views",
+      "paper_url": "https://vldb.org/conf/2003/papers/S18P03.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Managing derived Data"
+      ],
+      "sessions": [
+        {
+          "session_id": "B6",
+          "raw_label": "Managing derived Data",
+          "category": "Managing derived Data",
+          "paper_title": "Locking Protocols for Materialized Aggregate Join Views",
+          "paper_url": "https://vldb.org/conf/2003/papers/S18P03.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#B6"
+        }
+      ]
+    },
+    "vldb2003-49": {
+      "paper_title": "Supporting Frequent Updates in R-Trees: A Bottom-Up Approach",
+      "paper_url": "https://vldb.org/conf/2003/papers/S19P01.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Access Methods & Temporal Data"
+      ],
+      "sessions": [
+        {
+          "session_id": "B7",
+          "raw_label": "Access Methods & Temporal Data",
+          "category": "Access Methods & Temporal Data",
+          "paper_title": "Supporting Frequent Updates in R-Trees: A Bottom-Up Approach",
+          "paper_url": "https://vldb.org/conf/2003/papers/S19P01.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#B7"
+        }
+      ]
+    },
+    "vldb2003-50": {
+      "paper_title": "The ND-Tree: A Dynamic Indexing Technique for Multidimensional Non-ordered Discrete Data Spaces",
+      "paper_url": "https://vldb.org/conf/2003/papers/S19P02.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Access Methods & Temporal Data"
+      ],
+      "sessions": [
+        {
+          "session_id": "B7",
+          "raw_label": "Access Methods & Temporal Data",
+          "category": "Access Methods & Temporal Data",
+          "paper_title": "The ND-Tree: A Dynamic Indexing Technique for Multidimensional Non-ordered Discrete Data Spaces",
+          "paper_url": "https://vldb.org/conf/2003/papers/S19P02.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#B7"
+        }
+      ]
+    },
+    "vldb2003-51": {
+      "paper_title": "Temporal Slicing in the Evaluation of XML Queries",
+      "paper_url": "https://vldb.org/conf/2003/papers/S19P03.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Access Methods & Temporal Data"
+      ],
+      "sessions": [
+        {
+          "session_id": "B7",
+          "raw_label": "Access Methods & Temporal Data",
+          "category": "Access Methods & Temporal Data",
+          "paper_title": "Temporal Slicing in the Evaluation of XML Queries",
+          "paper_url": "https://vldb.org/conf/2003/papers/S19P03.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#B7"
+        }
+      ]
+    },
+    "vldb2003-52": {
+      "paper_title": "The Generalized Pre-Grouping Transformation: Aggregate-Query Optimization in the Presence of Dependencies",
+      "paper_url": "https://vldb.org/conf/2003/papers/S20P01.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Aggregation, Prediction & Constraints"
+      ],
+      "sessions": [
+        {
+          "session_id": "B8",
+          "raw_label": "Aggregation, Prediction & Constraints",
+          "category": "Aggregation, Prediction & Constraints",
+          "paper_title": "The Generalized Pre-Grouping Transformation: Aggregate-Query Optimization in the Presence of Dependencies",
+          "paper_url": "https://vldb.org/conf/2003/papers/S20P01.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#B8"
+        }
+      ]
+    },
+    "vldb2003-53": {
+      "paper_title": "Estimating the Output Cardinality of Partial Preaggregation with a Measure of Clusteredness",
+      "paper_url": "https://vldb.org/conf/2003/papers/S20P02.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Aggregation, Prediction & Constraints"
+      ],
+      "sessions": [
+        {
+          "session_id": "B8",
+          "raw_label": "Aggregation, Prediction & Constraints",
+          "category": "Aggregation, Prediction & Constraints",
+          "paper_title": "Estimating the Output Cardinality of Partial Preaggregation with a Measure of Clusteredness",
+          "paper_url": "https://vldb.org/conf/2003/papers/S20P02.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#B8"
+        }
+      ]
+    },
+    "vldb2003-54": {
+      "paper_title": "BHUNT: Automatic Discovery of Fuzzy Algebraic Constraints in Relational Data",
+      "paper_url": "https://vldb.org/conf/2003/papers/S20P03.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Aggregation, Prediction & Constraints"
+      ],
+      "sessions": [
+        {
+          "session_id": "B8",
+          "raw_label": "Aggregation, Prediction & Constraints",
+          "category": "Aggregation, Prediction & Constraints",
+          "paper_title": "BHUNT: Automatic Discovery of Fuzzy Algebraic Constraints in Relational Data",
+          "paper_url": "https://vldb.org/conf/2003/papers/S20P03.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#B8"
+        }
+      ]
+    },
+    "vldb2003-55": {
+      "paper_title": "Tabular Placement of Relational Data on MEMS-based Storage Devices",
+      "paper_url": "https://vldb.org/conf/2003/papers/S21P01.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Storage Management"
+      ],
+      "sessions": [
+        {
+          "session_id": "B9",
+          "raw_label": "Storage Management",
+          "category": "Storage Management",
+          "paper_title": "Tabular Placement of Relational Data on MEMS-based Storage Devices",
+          "paper_url": "https://vldb.org/conf/2003/papers/S21P01.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#B9"
+        }
+      ]
+    },
+    "vldb2003-56": {
+      "paper_title": "Memory Requirements for Query Execution in Highly Constrained Devices",
+      "paper_url": "https://vldb.org/conf/2003/papers/S21P02.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Storage Management"
+      ],
+      "sessions": [
+        {
+          "session_id": "B9",
+          "raw_label": "Storage Management",
+          "category": "Storage Management",
+          "paper_title": "Memory Requirements for Query Execution in Highly Constrained Devices",
+          "paper_url": "https://vldb.org/conf/2003/papers/S21P02.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#B9"
+        }
+      ]
+    },
+    "vldb2003-57": {
+      "paper_title": "Lachesis: Robust Database Storage Management Based on Device-specific Performance Characteristics",
+      "paper_url": "https://vldb.org/conf/2003/papers/S21P03.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Storage Management"
+      ],
+      "sessions": [
+        {
+          "session_id": "B9",
+          "raw_label": "Storage Management",
+          "category": "Storage Management",
+          "paper_title": "Lachesis: Robust Database Storage Management Based on Device-specific Performance Characteristics",
+          "paper_url": "https://vldb.org/conf/2003/papers/S21P03.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#B9"
+        }
+      ]
+    },
+    "vldb2003-58": {
+      "paper_title": "Cache Tables: Paving the Way for an Adaptive Database Cache",
+      "paper_url": "https://vldb.org/conf/2003/papers/S22P01.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Performance & Benchmarking"
+      ],
+      "sessions": [
+        {
+          "session_id": "B10",
+          "raw_label": "Performance & Benchmarking",
+          "category": "Performance & Benchmarking",
+          "paper_title": "Cache Tables: Paving the Way for an Adaptive Database Cache",
+          "paper_url": "https://vldb.org/conf/2003/papers/S22P01.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#B10"
+        }
+      ]
+    },
+    "vldb2003-59": {
+      "paper_title": "Primitives for Workload Summarization and Implications for SQL",
+      "paper_url": "https://vldb.org/conf/2003/papers/S22P02.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Performance & Benchmarking"
+      ],
+      "sessions": [
+        {
+          "session_id": "B10",
+          "raw_label": "Performance & Benchmarking",
+          "category": "Performance & Benchmarking",
+          "paper_title": "Primitives for Workload Summarization and Implications for SQL",
+          "paper_url": "https://vldb.org/conf/2003/papers/S22P02.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#B10"
+        }
+      ]
+    },
+    "vldb2003-60": {
+      "paper_title": "A Dependability Benchmark for OLTP Application Environments",
+      "paper_url": "https://vldb.org/conf/2003/papers/S22P03.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Performance & Benchmarking"
+      ],
+      "sessions": [
+        {
+          "session_id": "B10",
+          "raw_label": "Performance & Benchmarking",
+          "category": "Performance & Benchmarking",
+          "paper_title": "A Dependability Benchmark for OLTP Application Environments",
+          "paper_url": "https://vldb.org/conf/2003/papers/S22P03.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#B10"
+        }
+      ]
+    },
+    "vldb2003-61": {
+      "paper_title": "Supporting Top-k Join Queries in Relational Databases",
+      "paper_url": "https://vldb.org/conf/2003/papers/S23P01.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Query Optimization"
+      ],
+      "sessions": [
+        {
+          "session_id": "C2",
+          "raw_label": "Query Optimization",
+          "category": "Query Optimization",
+          "paper_title": "Supporting Top-k Join Queries in Relational Databases",
+          "paper_url": "https://vldb.org/conf/2003/papers/S23P01.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#C2"
+        }
+      ]
+    },
+    "vldb2003-62": {
+      "paper_title": "AniPQO: Almost Non-intrusive Parametric Query Optimization for Nonlinear Cost Functions",
+      "paper_url": "https://vldb.org/conf/2003/papers/S23P02.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Query Optimization"
+      ],
+      "sessions": [
+        {
+          "session_id": "C2",
+          "raw_label": "Query Optimization",
+          "category": "Query Optimization",
+          "paper_title": "AniPQO: Almost Non-intrusive Parametric Query Optimization for Nonlinear Cost Functions",
+          "paper_url": "https://vldb.org/conf/2003/papers/S23P02.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#C2"
+        }
+      ]
+    },
+    "vldb2003-63": {
+      "paper_title": "Efficient Approximation of Optimization Queries Under Parametric Aggregation Constraints",
+      "paper_url": "https://vldb.org/conf/2003/papers/S23P03.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Query Optimization"
+      ],
+      "sessions": [
+        {
+          "session_id": "C2",
+          "raw_label": "Query Optimization",
+          "category": "Query Optimization",
+          "paper_title": "Efficient Approximation of Optimization Queries Under Parametric Aggregation Constraints",
+          "paper_url": "https://vldb.org/conf/2003/papers/S23P03.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#C2"
+        }
+      ]
+    },
+    "vldb2003-64": {
+      "paper_title": "The TPR*-Tree: An Optimized Spatio-Temporal Access Method for Predictive Queries",
+      "paper_url": "https://vldb.org/conf/2003/papers/S24P01.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Spatial Support"
+      ],
+      "sessions": [
+        {
+          "session_id": "C3",
+          "raw_label": "Spatial Support",
+          "category": "Spatial Support",
+          "paper_title": "The TPR*-Tree: An Optimized Spatio-Temporal Access Method for Predictive Queries",
+          "paper_url": "https://vldb.org/conf/2003/papers/S24P01.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#C3"
+        }
+      ]
+    },
+    "vldb2003-65": {
+      "paper_title": "Query Processing in Spatial Network Databases",
+      "paper_url": "https://vldb.org/conf/2003/papers/S24P02.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Spatial Support"
+      ],
+      "sessions": [
+        {
+          "session_id": "C3",
+          "raw_label": "Spatial Support",
+          "category": "Spatial Support",
+          "paper_title": "Query Processing in Spatial Network Databases",
+          "paper_url": "https://vldb.org/conf/2003/papers/S24P02.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#C3"
+        }
+      ]
+    },
+    "vldb2003-66": {
+      "paper_title": "Multiscale Histograms: Summarizing Topological Relations in Large Spatial Datasets",
+      "paper_url": "https://vldb.org/conf/2003/papers/S24P03.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Spatial Support"
+      ],
+      "sessions": [
+        {
+          "session_id": "C3",
+          "raw_label": "Spatial Support",
+          "category": "Spatial Support",
+          "paper_title": "Multiscale Histograms: Summarizing Topological Relations in Large Spatial Datasets",
+          "paper_url": "https://vldb.org/conf/2003/papers/S24P03.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#C3"
+        }
+      ]
+    },
+    "vldb2003-67": {
+      "paper_title": "Avoiding Sorting and Grouping In Processing Queries",
+      "paper_url": "https://vldb.org/conf/2003/papers/S25P01.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Advanced Query Processing"
+      ],
+      "sessions": [
+        {
+          "session_id": "C5",
+          "raw_label": "Advanced Query Processing",
+          "category": "Advanced Query Processing",
+          "paper_title": "Avoiding Sorting and Grouping In Processing Queries",
+          "paper_url": "https://vldb.org/conf/2003/papers/S25P01.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#C5"
+        }
+      ]
+    },
+    "vldb2003-68": {
+      "paper_title": "Operator Scheduling in a Data Stream Manager",
+      "paper_url": "https://vldb.org/conf/2003/papers/S25P02.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Advanced Query Processing"
+      ],
+      "sessions": [
+        {
+          "session_id": "C5",
+          "raw_label": "Advanced Query Processing",
+          "category": "Advanced Query Processing",
+          "paper_title": "Operator Scheduling in a Data Stream Manager",
+          "paper_url": "https://vldb.org/conf/2003/papers/S25P02.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#C5"
+        }
+      ]
+    },
+    "vldb2003-69": {
+      "paper_title": "Efficient IR-Style Keyword Search over Relational Databases",
+      "paper_url": "https://vldb.org/conf/2003/papers/S25P03.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Advanced Query Processing"
+      ],
+      "sessions": [
+        {
+          "session_id": "C5",
+          "raw_label": "Advanced Query Processing",
+          "category": "Advanced Query Processing",
+          "paper_title": "Efficient IR-Style Keyword Search over Relational Databases",
+          "paper_url": "https://vldb.org/conf/2003/papers/S25P03.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#C5"
+        }
+      ]
+    },
+    "vldb2003-70": {
+      "paper_title": "Merging Models Based on Given Correspondences",
+      "paper_url": "https://vldb.org/conf/2003/papers/S26P01.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Metadata & Sampling"
+      ],
+      "sessions": [
+        {
+          "session_id": "C6",
+          "raw_label": "Metadata & Sampling",
+          "category": "Metadata & Sampling",
+          "paper_title": "Merging Models Based on Given Correspondences",
+          "paper_url": "https://vldb.org/conf/2003/papers/S26P01.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#C6"
+        }
+      ]
+    },
+    "vldb2003-71": {
+      "paper_title": "Locating Data Sources in Large Distributed Systems",
+      "paper_url": "https://vldb.org/conf/2003/papers/S26P02.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Metadata & Sampling"
+      ],
+      "sessions": [
+        {
+          "session_id": "C6",
+          "raw_label": "Metadata & Sampling",
+          "category": "Metadata & Sampling",
+          "paper_title": "Locating Data Sources in Large Distributed Systems",
+          "paper_url": "https://vldb.org/conf/2003/papers/S26P02.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#C6"
+        }
+      ]
+    },
+    "vldb2003-72": {
+      "paper_title": "Robust Estimation With Sampling and Approximate Pre-Aggregation",
+      "paper_url": "https://vldb.org/conf/2003/papers/S26P03.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Metadata & Sampling"
+      ],
+      "sessions": [
+        {
+          "session_id": "C6",
+          "raw_label": "Metadata & Sampling",
+          "category": "Metadata & Sampling",
+          "paper_title": "Robust Estimation With Sampling and Approximate Pre-Aggregation",
+          "paper_url": "https://vldb.org/conf/2003/papers/S26P03.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#C6"
+        }
+      ]
+    },
+    "vldb2003-73": {
+      "paper_title": "Controlling Access to Published Data Using Cryptography",
+      "paper_url": "https://vldb.org/conf/2003/papers/S27P01.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Potpourri - Access Control, Bioinformatics & Security"
+      ],
+      "sessions": [
+        {
+          "session_id": "C10",
+          "raw_label": "Potpourri - Access Control, Bioinformatics & Security",
+          "category": "Potpourri - Access Control, Bioinformatics & Security",
+          "paper_title": "Controlling Access to Published Data Using Cryptography",
+          "paper_url": "https://vldb.org/conf/2003/papers/S27P01.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#C10"
+        }
+      ]
+    },
+    "vldb2003-74": {
+      "paper_title": "OASIS: An Online and Accurate Technique for Local-alignment Searches on Biological Sequences",
+      "paper_url": "https://vldb.org/conf/2003/papers/S27P02.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Potpourri - Access Control, Bioinformatics & Security"
+      ],
+      "sessions": [
+        {
+          "session_id": "C10",
+          "raw_label": "Potpourri - Access Control, Bioinformatics & Security",
+          "category": "Potpourri - Access Control, Bioinformatics & Security",
+          "paper_title": "OASIS: An Online and Accurate Technique for Local-alignment Searches on Biological Sequences",
+          "paper_url": "https://vldb.org/conf/2003/papers/S27P02.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#C10"
+        }
+      ]
+    },
+    "vldb2003-75": {
+      "paper_title": "Privacy-Preserving Indexing of Documents on the Network",
+      "paper_url": "https://vldb.org/conf/2003/papers/S27P03.pdf",
+      "status": "matched",
+      "match_method": "pdf_url",
+      "categories": [
+        "Potpourri - Access Control, Bioinformatics & Security"
+      ],
+      "sessions": [
+        {
+          "session_id": "C10",
+          "raw_label": "Potpourri - Access Control, Bioinformatics & Security",
+          "category": "Potpourri - Access Control, Bioinformatics & Security",
+          "paper_title": "Privacy-Preserving Indexing of Documents on the Network",
+          "paper_url": "https://vldb.org/conf/2003/papers/S27P03.pdf",
+          "source_url": "https://vldb.org/conf/2003/homepage/uni_hro/proceedings.html#C10"
+        }
+      ]
+    }
+  }
+}

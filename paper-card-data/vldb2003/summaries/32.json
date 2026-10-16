@@ -1,0 +1,293 @@
+{
+  "section_0_paper_identification": {
+    "paper_number": "32",
+    "paper_title": "Buffering Accesses to Memory-Resident Index Structures",
+    "authors": [
+      "Jingren Zhou",
+      "Kenneth A. Ross"
+    ],
+    "venue_or_source": "VLDB",
+    "year": "2003",
+    "system_or_method_name": "Buffered Tree Indexes",
+    "problem_domain": "In-memory index structures for bulk/stream lookups"
+  },
+  "section_1_goal_and_primary_metric": {
+    "goal": "To make a bulk lookup on a memory-resident index substantially faster than a sequence of single lookups by avoiding cache thrashing.",
+    "primary_optimized_metric": "throughput",
+    "secondary_metrics": [
+      "latency",
+      "cache misses",
+      "TLB misses"
+    ],
+    "concrete_numbers": [
+      {
+        "number_or_delta": "2x to 3x",
+        "meaning": "Increase in probe throughput compared to traditional methods.",
+        "pointer": "[p.1]"
+      },
+      {
+        "number_or_delta": "3x",
+        "meaning": "Speedup over conventional B+-tree index lookups.",
+        "pointer": "[p.2]"
+      },
+      {
+        "number_or_delta": "2x",
+        "meaning": "Speedup over CSB+-tree and R-tree index lookups.",
+        "pointer": "[p.2]"
+      },
+      {
+        "number_or_delta": ">30%",
+        "meaning": "Portion of execution time attributed to index node cache misses for a CSB+-tree during bulk access.",
+        "pointer": "[p.3]"
+      }
+    ]
+  },
+  "section_2_comparison_baseline": {
+    "baseline_name": "Conventional and cache-conscious main-memory indexes (B+-Tree, CSB+-Tree)",
+    "why_this_is_the_right_comparison": "These are the standard approaches for in-memory indexing. The paper shows that even designs optimized for single-lookup cache performance (like CSB+-Tree) are suboptimal for bulk lookups.",
+    "limiting_design_assumption": "Index lookups are processed one at a time, independently. Optimizations focus on the performance of a single lookup, ignoring the potential for exploiting locality between consecutive lookups, which leads to cache thrashing during bulk access.",
+    "pointers": [
+      "[p.1]",
+      "[quote: 'All these techniques focus on better utilization of each cache line and optimize the search performance of a single lookup. None has exploited cache spatial and temporal locality between consecutive lookups.']"
+    ]
+  },
+  "section_3_primary_mechanism_tooling_classification": {
+    "primary_tool_category": "Systems mechanism",
+    "primary_tool_specific_type": "Buffering and batching",
+    "specific_tools_or_algorithms": [
+      "Fixed-size buffering",
+      "Variable-size buffering",
+      "Order-preserving buffering",
+      "Hardware-aware calibration"
+    ],
+    "what_is_being_optimized": "The access pattern to index tree nodes to improve cache and TLB locality during bulk lookups.",
+    "state_or_ir": "Buffers associated with index tree (virtual) nodes, containing records of pending lookups (probes).",
+    "output": "The results of the batched lookups, e.g., matching record identifiers (RIDs).",
+    "pointers": [
+      "[p.4]",
+      "[p.8]"
+    ]
+  },
+  "section_4_key_deltas_vs_baseline": [
+    {
+      "delta_id": "Δ1",
+      "summary": "Introduces level-wise buffering to batch lookups, amortizing the cost of loading an index node into cache over many probes instead of just one.",
+      "baseline_assumption": "Each lookup traverses the index tree from root to leaf independently, causing repeated cache misses for nodes that are not resident.",
+      "why_baseline_did_not_include_it": "Baselines were optimized for single-lookup latency, where batching would add overhead. They did not target bulk-lookup throughput, where cache thrashing becomes the dominant bottleneck.",
+      "mechanism_level_implementation": "Each non-root (virtual) node in the index tree is associated with a buffer. As lookups traverse the tree, they are not immediately passed to child nodes but are instead copied into the appropriate child's buffer. These buffers are flushed periodically (e.g., when full), at which point all lookups in the buffer are processed against the node and distributed to the next level of buffers.",
+      "primary_metric_improved": "throughput",
+      "tradeoffs_or_costs": "Increased latency for individual lookups and increased memory consumption for the buffers.",
+      "pointers": [
+        "[p.4]"
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "summary": "Configures the granularity of buffering by grouping physical tree nodes into 'virtual nodes' whose size is optimized for the hardware's memory hierarchy.",
+      "baseline_assumption": "The unit of access and optimization is a single physical tree node.",
+      "why_baseline_did_not_include_it": "The baseline processes lookups individually, so there is no concept of a multi-node buffering granularity to optimize.",
+      "mechanism_level_implementation": "A two-stage process determines the optimal virtual node structure. First, an analytical model based on L2 cache size suggests a partitioning of tree levels into virtual nodes to avoid capacity misses. Second, a fast calibration experiment measures the performance of different fine-grained partitions to account for architecture-specific effects like TLB misses and hardware prefetching.",
+      "primary_metric_improved": "throughput",
+      "tradeoffs_or_costs": "Requires a calibration step and adds complexity to system configuration.",
+      "pointers": [
+        "[p.8, Section 5]",
+        "[p.9, Section 5.3]"
+      ]
+    }
+  ],
+  "section_5_principle_mapping_minimum_set": [
+    {
+      "delta_id": "Δ1",
+      "principles": [
+        {
+          "symbol": "Lo",
+          "name": "Locality of Reference",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "Batching lookups in buffers at each level of the index tree.",
+          "why_it_applies": "The explicit goal of buffering is to group accesses to the same index node together in time, improving temporal and spatial locality to reduce cache misses.",
+          "justification_if_invented": "",
+          "pointer": "[quote: 'The point of buffering is that it increases temporal and spatial locality.']"
+        },
+        {
+          "symbol": "Rc",
+          "name": "Reuse of Computation",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "Processing an entire buffer of lookups against an index node after it has been loaded into cache.",
+          "why_it_applies": "The 'computation' being reused is the memory access to bring an index node into the cache. By processing many lookups, the cost of this access is amortized, fitting the spirit of reuse.",
+          "justification_if_invented": "",
+          "pointer": "[quote: 'When an index node is used for traversal, instead of being used for just one probe, it is used for many. As a result, the memory overhead for bringing index nodes into the cache is smaller, amortized over many accesses.']"
+        },
+        {
+          "symbol": "Bo",
+          "name": "Bottleneck-Oriented",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The entire buffering mechanism is designed to mitigate cache thrashing.",
+          "why_it_applies": "The paper identifies memory access as the key performance bottleneck for bulk lookups and designs the buffering system specifically to alleviate it.",
+          "justification_if_invented": "",
+          "pointer": "[quote: 'Main memory access is therefore increasingly a performance bottleneck for many computer applications, including database systems...']"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Wv",
+          "name": "Result-Preserving Work Avoidance",
+          "reason_rejected_or_borderline": "No work is avoided; the same lookups are performed. The order of operations is changed to be more efficient, but the total work is the same or slightly more due to copying.",
+          "pointer": "[p.4]"
+        }
+      ]
+    },
+    {
+      "delta_id": "Δ2",
+      "principles": [
+        {
+          "symbol": "Ha",
+          "name": "Hardware-Aware",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The creation of 'virtual nodes' and the algorithm to determine their size.",
+          "why_it_applies": "The virtual node size is explicitly chosen based on hardware parameters like L2 cache size, TLB entries, and the presence of hardware prefetching.",
+          "justification_if_invented": "",
+          "pointer": "[p.8, Section 5.1, 5.2]"
+        },
+        {
+          "symbol": "Cm",
+          "name": "Cost-based",
+          "invented": false,
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The two-stage algorithm for choosing buffer placement.",
+          "why_it_applies": "The system first uses an analytical cost model based on cache size to propose a configuration, then uses empirical cost measurements from a calibration run to refine the choice, explicitly trading off different costs (cache misses, TLB misses, copying overhead).",
+          "justification_if_invented": "",
+          "pointer": "[p.9, Section 5.3]"
+        },
+        {
+          "symbol": "Gr",
+          "name": "Generalized Design",
+          "invented": false,
+          "core_or_supporting": "supporting",
+          "evidence_strength": "medium",
+          "mechanism_trigger": "The concept of a 'virtual node' as the unit of buffering.",
+          "why_it_applies": "This mechanism abstracts the unit of buffering away from a physical tree node, allowing the same buffering logic to apply to single nodes or multi-level subtrees. This generalizes the buffering placement problem.",
+          "justification_if_invented": "",
+          "pointer": "[p.8, Section 5]"
+        }
+      ],
+      "rejected_or_borderline_principles": [
+        {
+          "symbol": "Bb",
+          "name": "Black-Box Tuning",
+          "reason_rejected_or_borderline": "The calibration is not black-box; it is guided by an analytical model and explores a structured, limited set of choices. Cm is more specific and accurate.",
+          "pointer": "[p.9]"
+        }
+      ]
+    }
+  ],
+  "section_7_compound_equation": {
+    "equation": "Single-Lookup Index + Lo + Ha -> Buffered Tree Index",
+    "baseline_name": "Single-Lookup Optimized Index",
+    "top_3_principle_tags": [
+      "Lo",
+      "Ha"
+    ],
+    "core_principle_tags": [
+      "Lo",
+      "Ha",
+      "Cm"
+    ],
+    "supporting_principle_tags": [
+      "Rc",
+      "Bo",
+      "Gr"
+    ],
+    "all_principle_tags_for_deltas": [
+      "Lo",
+      "Rc",
+      "Bo",
+      "Ha",
+      "Cm",
+      "Gr"
+    ],
+    "new_system_name": "Buffered Tree Index",
+    "principle_composition_rationale": {
+      "why_these_principles_work_together": "The design changes the data access pattern to improve performance. Locality of Reference (Lo) provides the core strategy of batching requests to amortize memory access costs. Hardware-Aware (Ha) design makes this strategy effective by tailoring the batching granularity (via 'virtual nodes') to the specific machine's cache and TLB characteristics, preventing the batching mechanism itself from becoming a new bottleneck.",
+      "what_each_principle_contributes": [
+        {
+          "symbol": "Lo",
+          "contribution_to_equation": "Transforms the one-probe-at-a-time processing model into a batched model, grouping accesses to the same index nodes to improve cache reuse."
+        },
+        {
+          "symbol": "Ha",
+          "contribution_to_equation": "Determines the optimal granularity for batching by creating 'virtual nodes' whose size is matched to the L2 cache and TLB, ensuring the locality benefits are realized on real hardware."
+        }
+      ],
+      "transfer_question": "In what other domains could grouping fine-grained operations into hardware-sized batches improve throughput at the cost of latency?"
+    }
+  },
+  "section_8_physical_properties_summary": [
+    {
+      "property": "throughput",
+      "direction": "up",
+      "concrete_number": "2x-3x",
+      "pointer": "[p.1]"
+    },
+    {
+      "property": "latency",
+      "direction": "up",
+      "concrete_number": "Can be bounded, e.g., to <1s",
+      "pointer": "[p.7, Section 4.5]"
+    },
+    {
+      "property": "L2 cache misses",
+      "direction": "down",
+      "concrete_number": "Not specified in provided text",
+      "pointer": "[p.10, Figure 10]"
+    },
+    {
+      "property": "memory",
+      "direction": "up",
+      "concrete_number": "Roughly equal to index size for fixed-size; B/(B-1) * input size for variable-size",
+      "pointer": "[p.5, p.6]"
+    }
+  ],
+  "section_9_discovery_candidates": {
+    "best_candidate_new_principle": {
+      "candidate_status": "candidate",
+      "symbol": "Ga",
+      "name": "Granularity Adaptation",
+      "definition": "Adjusting the operational granularity of a mechanism (e.g., for batching, locking, communication, or consistency) to align with physical resource characteristics or performance tradeoffs.",
+      "mechanism_pattern": "The paper groups fine-grained logical units (physical tree nodes) into coarser-grained operational units ('virtual nodes'). The size of these virtual nodes is chosen to match a hardware resource limit (L2 cache size) and behavior (TLB misses).",
+      "why_existing_principles_are_insufficient": "Ha (Hardware-Aware) is the motivation, but doesn't describe the specific action of regrouping or changing granularity. Gr (Generalized Design) captures the abstraction of a 'node' but not the act of adapting its size. Ga captures the specific, reusable pattern of changing the 'chunk size' of an operation to fit the underlying system.",
+      "closest_existing_principles": [
+        "Ha",
+        "Gr",
+        "Cm"
+      ],
+      "reusability_beyond_this_paper": "This pattern is common: choosing lock granularity in concurrent data structures, message batching in networking, block/page sizes in storage systems, and chunking data for parallel processing.",
+      "confidence": "medium",
+      "pointer": "[p.8, Section 5]"
+    },
+    "candidate_new_principles": []
+  },
+  "section_11_normalized_summary": {
+    "one_sentence_mechanism": "Amortizes the cost of loading index nodes into cache by batching lookups in hardware-aware buffers at each level of the tree.",
+    "top_3_principles": [
+      "Lo",
+      "Ha"
+    ],
+    "mechanism_family": "indexing / search structure",
+    "specific_tools_or_algorithms": [
+      "Fixed-size buffering",
+      "Variable-size buffering",
+      "Cost-based calibration"
+    ],
+    "primary_design_archetype": "hardware-conscious layout",
+    "principle_mapping_confidence": "high"
+  }
+}
