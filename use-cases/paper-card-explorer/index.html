@@ -335,6 +335,8 @@
             gap: 10px;
         }
         .paper-card {
+            position: relative;
+            isolation: isolate;
             width: 100%;
             padding: 13px 14px;
             border: 1px solid var(--line);
@@ -343,7 +345,7 @@
             overflow-wrap: anywhere;
         }
         .paper-card:hover,
-        .paper-card:focus {
+        .paper-card:focus-within {
             border-color: var(--line-strong);
             box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
         }
@@ -401,10 +403,26 @@
             font-weight: 700;
             line-height: inherit;
         }
+        /* Extend the native button over the card without nesting the tag controls. */
+        .paper-open::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 6px;
+        }
+        .paper-open:focus-visible { outline: none; }
+        .paper-open:focus-visible::after {
+            outline: 2px solid var(--ink);
+            outline-offset: 2px;
+        }
         .paper-open:hover { text-decoration: underline; text-underline-offset: 3px; }
         .paper-system { font-weight: 650; }
         .paper-mechanism { margin: 10px 0 12px; color: #444; font-size: 0.95rem; }
-        .paper-card .principle-button { font-weight: 500; }
+        .paper-card .principle-button {
+            position: relative;
+            z-index: 1;
+            font-weight: 500;
+        }
         .paper-tags {
             display: flex;
             flex-wrap: wrap;
@@ -616,7 +634,7 @@
     <main class="page">
         <header class="page-header">
             <h1>Systems Paper Card Explorer</h1>
-            <p class="intro">This page indexes system cards based on their underlying design principles (as opposed to research areas). You can search papers based on their title, author, or mechanism, or select principle tags to inspect the corresponding card, compact design equation, and principle mappings for a paper.</p>
+            <p class="intro">This page indexes system cards based on their design principles (as opposed to research areas). You can search papers by paper title or select principle tags to read the corresponding paper cards.</p>
         </header>
 
         <section class="explorer-grid">
