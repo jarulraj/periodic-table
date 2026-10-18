@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const {normalizeTag} = require('../../assets/principle-tags');
 
 function sessionFields(paperId, metadata) {
     const entry = metadata.papers[paperId];
@@ -25,7 +26,7 @@ function similarityFields(summary) {
     const explicit = Array.isArray(equation.core_principle_tags);
     const tags = explicit ? equation.core_principle_tags : normalized.top_3_principles || [];
     return {
-        similarity_principle_tags: [...new Set(tags)].sort(),
+        similarity_principle_tags: [...new Set(tags.map(normalizeTag))].sort(),
         similarity_principle_source: explicit ? 'equation_core' : 'top_three_fallback'
     };
 }

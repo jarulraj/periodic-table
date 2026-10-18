@@ -3,12 +3,13 @@
 const fs = require('fs');
 const path = require('path');
 const {sessionFields, similarityFields, readSessions} = require('./paper-metadata');
+const {normalizeData} = require('../../assets/principle-tags');
 const sessionMetadata = readSessions();
 
 const KNOWN_TAGS = new Set([
-    'Si', 'Mo', 'Co', 'Ex', 'Pm', 'Gr', 'Pd',
-    'Sc', 'Rc', 'Wv', 'Cc', 'Bo', 'Ha', 'Op', 'La',
-    'Al', 'Lu', 'Se', 'Fs', 'Ig',
+    'Si', 'Mo', 'Co', 'Ex', 'Pm', 'Gr', 'Pd', 'Rv',
+    'Sc', 'Rw', 'Wv', 'Cc', 'Bo', 'Ha', 'Op', 'La',
+    'Al', 'Lu', 'Se', 'Fs', 'Ig', 'Qr',
     'Lt', 'Dc', 'Fp', 'Lo', 'Cz',
     'Ep', 'Cm', 'Cp', 'Gd', 'Bb', 'Ah',
     'Ad', 'Ec', 'Wa', 'Au', 'Ho', 'Ev',
@@ -43,7 +44,8 @@ const PUBLISHED_SOURCES = {
     }
 };
 
-const outputPath = path.resolve(__dirname, 'paper-cards.json');
+const outputPath = process.env.PAPER_CARD_OUTPUT_PATH ?
+    path.resolve(process.env.PAPER_CARD_OUTPUT_PATH) : path.resolve(__dirname, 'paper-cards.json');
 
 function asArray(value) {
     return Array.isArray(value) ? value : [];
@@ -411,12 +413,12 @@ const args = process.argv.slice(2);
 if (args.some(arg => arg !== '--merge')) throw new Error('Usage: build-paper-cards.js [--merge]');
 const selected = new Set(sources.map(source => source.id));
 if (selected.size !== sources.length) throw new Error('Duplicate summary sources.');
-const previous = fs.existsSync(outputPath) ? JSON.parse(fs.readFileSync(outputPath, 'utf8')) : {};
+const previous = fs.existsSync(outputPath) ? normalizeData(JSON.parse(fs.readFileSync(outputPath, 'utf8'))) : {};
 const retainedSources = (previous.sources || []).filter(source => !selected.has(source.id));
 if (retainedSources.length && !args.includes('--merge')) {
     throw new Error('This build would remove published collections: ' + retainedSources.map(source => source.collection).join(', ') + '. Use --merge to retain them.');
 }
-// Only rebuild selected sources; retain curated cards from all other collections verbatim.
+// Retain other curated collections, updating only legacy principle labels.
 const cardsById = Object.fromEntries(Object.entries(previous.cards_by_id || {}).filter(([, card]) => !selected.has(card.source_id)));
 const cardIdsByTitle = Object.fromEntries(Object.entries(previous.card_ids_by_title || {}).filter(([, id]) => Object.hasOwn(cardsById, id)));
 const collectionCounts = {};
@@ -435,7 +437,7 @@ for (const source of sources) {
 
     for (const file of files) {
         const fileNumber = parseInt(file, 10);
-        const summary = JSON.parse(fs.readFileSync(path.join(source.summaryDir, file), 'utf8'));
+        const summary = normalizeData(JSON.parse(fs.readFileSync(path.join(source.summaryDir, file), 'utf8')));
         const identification = summary.section_0_paper_identification || {};
         const title = identification.paper_title || '';
         const entries = principleEntries(summary);

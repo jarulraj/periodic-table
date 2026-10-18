@@ -41,9 +41,16 @@ node --test examples/vldb23-osdi23-crossref/session-metadata.test.js
 PYTHONDONTWRITEBYTECODE=1 python3 examples/vldb23-osdi23-crossref/test_session_extraction.py
 PYTHONDONTWRITEBYTECODE=1 python3 examples/vldb23-osdi23-crossref/test_osdi_session_extraction.py
 node --test use-cases/paper-card-explorer/filters.test.js
+node --test assets/principle-tags.test.js
 ```
 
 The analysis never writes to the manuscript or membership input. It records the input checksum and produces `vldb2023-session-analysis.md` and `.json` here. Omit the membership argument to generate only the corpus and nearest-match analysis.
+
+## Principle Labels
+
+`Rw` (Reuse of Prior Work) replaces `Rc` (Reuse of Computation). The card builder accepts legacy source cards and normalizes their symbols, names, equations, and usage keys. Similarity enrichment also normalizes `Rc` to `Rw`. The explorer accepts old `?tags=Rc` links and reads either version of the card labels. The README retains the `principle-rc` anchor and the legacy tile URL remains available.
+
+`Qr` (Quality Relaxation, Semantics) and `Rv` (Resource Virtualization, Structure) are available for future mappings. Adding them does not assign them to existing cards. The reuse rename preserves principle memberships and similarity scores; source summaries in other repositories are unchanged. Set `PAPER_CARD_OUTPUT_PATH` to build cards into a separate file for inspection without replacing the published data.
 
 ## Retrieval
 
@@ -51,7 +58,7 @@ For conference cards, the explorer searches both VLDB 2023 and OSDI 2023 by defa
 
 Ranking uses direct Jaccard similarity: shared core principles divided by distinct core principles across both cards. At least two principles must be shared. Ties break by shared count and then numeric paper ID. The top five are shown; there is no conference bonus, forced cross-conference match, graph threshold, transitive neighbor expansion, or clustering step. The low-level `rank` API enables cross-conference matching only with `acrossConferences: true`, preserving the existing within-VLDB analysis reports.
 
-`similarity_principle_tags` uses the source equation's explicit core tags. An absent core field falls back to the source top-three tags with an explicit `similarity_principle_source` marker. An explicitly empty core set stays empty. Existing display fields are unchanged, including their historical core/top-three union. All 321 currently published cards have explicit equation-core tags.
+`similarity_principle_tags` uses the source equation's explicit core tags. An absent core field falls back to the source top-three tags with an explicit `similarity_principle_source` marker. An explicitly empty core set stays empty. Explicit core assignments remain separate from supporting tags.
 
 The cross-category filter requires known, disjoint category names. Missing metadata does not count as a different area, and papers sharing any normalized category name are excluded even if they belong to different conferences. Different names across conferences are not proof of different research areas; the original program labels are retained without inferring equivalences between them.
 

@@ -7,18 +7,18 @@ const papers = [
     {id: 2, collection: 'VLDB', tags: ['Ha'], conference_session_categories: ['Storage', 'Systems'], text: 'nvme'},
     {id: 3, collection: 'VLDB', tags: ['Bo'], conference_session_categories: ['Systems'], text: 'cpu'},
     {id: 4, collection: 'OSDI', tags: ['Bo', 'Ha'], conference_session_categories: ['Storage'], text: 'nvme'},
-    {id: 5, collection: 'VLDB', tags: ['Rc'], conference_session_categories: ['Systems'], text: 'cache'},
+    {id: 5, collection: 'VLDB', tags: ['Rw'], conference_session_categories: ['Systems'], text: 'cache'},
     {id: 6, collection: 'VLDB', tags: [], text: 'nvme'}
 ];
 const base = {collections: new Set(['VLDB']), tags: ['Ha'], mode: 'all'};
 
 test('all-mode prospective counts narrow within the complete search context', () => {
     const state = {...base, category: 'Storage', matchesSearch: p => p.text === 'nvme'};
-    assert.deepEqual(tagCounts(papers, state, ['Bo','Rc']), {Bo: 1, Rc: 0});
+    assert.deepEqual(tagCounts(papers, state, ['Bo','Rw']), {Bo: 1, Rw: 0});
     assert.deepEqual(filter(papers, {...state, tags:['Ha','Bo']}).map(p=>p.id), [1]);
 });
 test('any-mode prospective counts include new matches outside the current results, without duplicates', () => {
-    assert.deepEqual(tagCounts(papers, {...base, mode:'any'}, ['Bo','Rc']), {Bo:3, Rc:3});
+    assert.deepEqual(tagCounts(papers, {...base, mode:'any'}, ['Bo','Rw']), {Bo:3, Rw:3});
     assert.deepEqual(tagCounts(papers, {...base, mode:'any', category:'Storage'}, ['Bo']), {Bo:2});
 });
 test('the first tag filters an unfiltered scope in either mode', () => {
@@ -31,7 +31,7 @@ test('session counts replace the selected category and count multi-session paper
     assert.deepEqual(sessionCounts(papers, {...base, matchesSearch:p=>p.text==='cpu'}), {counts:{}, total:0});
 });
 test('zero-result states and empty collections retain their filters and allow recovery', () => {
-    const state = {...base, tags:['Ha','Rc'], category:'Storage'};
+    const state = {...base, tags:['Ha','Rw'], category:'Storage'};
     const before = JSON.stringify(state);
     assert.equal(filter(papers, state).length, 0);
     assert.equal(filter(papers, {...state, tags:['Ha']}).length, 2);
@@ -49,7 +49,7 @@ test('predicted counts equal actual selections across the published corpus', () 
         for (const category of ['', 'Modern Memory and Storage']) {
             const state = {collections:new Set(['VLDB 2023']), tags:['Ha'], mode, category,
                 matchesSearch: paper => /storage|index|query/i.test(paper.title)};
-            const candidates = ['Bo','Rc','Wv','Un'];
+            const candidates = ['Bo','Rw','Wv','Un'];
             const counts = tagCounts(rows, state, candidates);
             for (const tag of candidates) {
                 const expected = rows.filter(p => p.collection === 'VLDB 2023' &&

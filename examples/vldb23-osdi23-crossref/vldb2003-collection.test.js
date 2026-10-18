@@ -6,6 +6,7 @@ const os = require('os');
 const crypto = require('crypto');
 const {spawnSync} = require('child_process');
 const {readSessions} = require('./paper-metadata');
+const {normalizeData} = require('../../assets/principle-tags');
 const {filter} = require('../../use-cases/paper-card-explorer/filters');
 const {compare, rank} = require('../../use-cases/paper-card-explorer/similarity');
 const root = path.resolve(__dirname, '../../paper-card-data/vldb2003');
@@ -25,7 +26,7 @@ test('all 75 audited summaries are published with official PDF and session links
         const card = data.cards_by_id[id];
         const receipt = provenance.papers[id];
         const bytes = fs.readFileSync(path.join(root, 'summaries', n + '.json'));
-        const summary = JSON.parse(bytes);
+        const summary = normalizeData(JSON.parse(bytes));
         assert.equal(hash(bytes), receipt.summary_sha256, id);
         assert.equal(card.paper_title, summary.section_0_paper_identification.paper_title);
         assert.equal(card.publication_year, '2003');
@@ -60,15 +61,12 @@ test('2003 and 2023 can be filtered together and compared with the existing rank
 test('incremental import preserves curated collections, is repeatable, and guards against deletion', () => {
     const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'vldb2003-import-test-'));
     try {
-        for (const name of ['build-paper-cards.js', 'paper-metadata.js', 'vldb2003-sessions.json', 'vldb2023-sessions.json', 'osdi23-sessions.json']) {
-            fs.copyFileSync(path.join(__dirname, name), path.join(temp, name));
-        }
         const output = path.join(temp, 'paper-cards.json');
         const original = structuredClone(data);
         original.cards_by_id['vldb2023-1'].goal = 'Curated sentinel: preserve exactly';
         fs.writeFileSync(output, JSON.stringify(original));
-        const run = args => spawnSync(process.execPath, [path.join(temp, 'build-paper-cards.js'), ...args], {
-            env: {...process.env, PAPER_CARD_SUMMARY_DIRS: path.join(root, 'summaries')}, encoding: 'utf8'
+        const run = args => spawnSync(process.execPath, [path.join(__dirname, 'build-paper-cards.js'), ...args], {
+            env: {...process.env, PAPER_CARD_SUMMARY_DIRS: path.join(root, 'summaries'), PAPER_CARD_OUTPUT_PATH: output}, encoding: 'utf8'
         });
         const rejected = run([]);
         assert.notEqual(rejected.status, 0);
@@ -86,6 +84,15 @@ test('incremental import preserves curated collections, is repeatable, and guard
         assert.equal(result.card_count, original.card_count);
         assert.equal(run(['--merge']).status, 0);
         assert.equal(fs.readFileSync(output, 'utf8'), first);
+
+        const legacy = structuredClone(result);
+        const card = legacy.cards_by_id['vldb2023-1'];
+        card.core_principle_tags = ['Rc'];
+        card.equation = 'Baseline + Rc (Reuse of Computation) -> System';
+        fs.writeFileSync(output, JSON.stringify(legacy));
+        assert.equal(run(['--merge']).status, 0);
+        const migrated = JSON.parse(fs.readFileSync(output));
+        assert.deepEqual(migrated.cards_by_id['vldb2023-1'], normalizeData(card));
     } finally {
         fs.rmSync(temp, {recursive: true, force: true});
     }

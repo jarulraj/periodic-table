@@ -37,7 +37,7 @@ Each principle is tagged with a short symbol (e.g., [`Co`](#user-content-princip
 
 - [<img src="assets/swatches/structure.svg" width="14" height="14" alt=""> Group 1: Structure](#user-content-group-1-structure): *Control complexity by choosing boundaries that make parts understandable, replaceable, and extensible.*
 - [<img src="assets/swatches/efficiency.svg" width="14" height="14" alt=""> Group 2: Efficiency](#user-content-group-2-efficiency): *Improve performance by reducing unnecessary work and matching effort to dominant costs.*
-- [<img src="assets/swatches/semantics.svg" width="14" height="14" alt=""> Group 3: Semantics](#user-content-group-3-semantics): *Make behavior explicit enough to reason about, transform, and preserve.*
+- [<img src="assets/swatches/semantics.svg" width="14" height="14" alt=""> Group 3: Semantics](#user-content-group-3-semantics): *Make behavior explicit enough to reason about, transform, preserve, or deliberately relax.*
 - [<img src="assets/swatches/distribution.svg" width="14" height="14" alt=""> Group 4: Distribution](#user-content-group-4-distribution): *Manage state, computation, and coordination when a system spans machines.*
 - [<img src="assets/swatches/planning.svg" width="14" height="14" alt=""> Group 5: Planning](#user-content-group-5-planning): *Turn goals and constraints into concrete choices among alternative designs or executions.*
 - [<img src="assets/swatches/operability.svg" width="14" height="14" alt=""> Group 6: Operability](#user-content-group-6-operability): *Keep systems understandable and adjustable as workloads, resources, and requirements change.*
@@ -72,7 +72,7 @@ Each principle is tagged with a short symbol (e.g., [`Co`](#user-content-princip
     </tr>
     <tr>
       <td align="center"><a href="#user-content-principle-mo"><img src="assets/tiles/mo.svg" width="48" alt="Mo - Modularity"></a></td>
-      <td align="center"><a href="#user-content-principle-rc"><img src="assets/tiles/rc.svg" width="48" alt="Rc - Reuse of Computation"></a></td>
+      <td align="center"><a href="#user-content-principle-rw"><img src="assets/tiles/rw.svg" width="48" alt="Rw - Reuse of Prior Work"></a></td>
       <td align="center"><a href="#user-content-principle-lu"><img src="assets/tiles/lu.svg" width="48" alt="Lu - Language Homogeneity"></a></td>
       <td align="center"><a href="#user-content-principle-dc"><img src="assets/tiles/dc.svg" width="48" alt="Dc - Decentralised Control"></a></td>
       <td align="center"><a href="#user-content-principle-cm"><img src="assets/tiles/cm.svg" width="48" alt="Cm - Cost-based Planning"></a></td>
@@ -113,7 +113,7 @@ Each principle is tagged with a short symbol (e.g., [`Co`](#user-content-princip
     <tr>
       <td align="center"><a href="#user-content-principle-gr"><img src="assets/tiles/gr.svg" width="48" alt="Gr - Generalized Design"></a></td>
       <td align="center"><a href="#user-content-principle-ha"><img src="assets/tiles/ha.svg" width="48" alt="Ha - Hardware-Aware Design"></a></td>
-      <td align="center">&nbsp;</td>
+      <td align="center"><a href="#user-content-principle-qr"><img src="assets/tiles/qr.svg" width="48" alt="Qr - Quality Relaxation"></a></td>
       <td align="center">&nbsp;</td>
       <td align="center"><a href="#user-content-principle-ah"><img src="assets/tiles/ah.svg" width="48" alt="Ah - Advisory Hinting"></a></td>
       <td align="center"><a href="#user-content-principle-ev"><img src="assets/tiles/ev.svg" width="48" alt="Ev - Evolvability"></a></td>
@@ -131,7 +131,7 @@ Each principle is tagged with a short symbol (e.g., [`Co`](#user-content-princip
       <td align="center"><a href="#user-content-principle-un"><img src="assets/tiles/un.svg" width="48" alt="Un - Adversarial Unpredictability"></a></td>
     </tr>
     <tr>
-      <td align="center">&nbsp;</td>
+      <td align="center"><a href="#user-content-principle-rv"><img src="assets/tiles/rv.svg" width="48" alt="Rv - Resource Virtualization"></a></td>
       <td align="center"><a href="#user-content-principle-la"><img src="assets/tiles/la.svg" width="48" alt="La - Learned Approximation"></a></td>
       <td align="center">&nbsp;</td>
       <td align="center">&nbsp;</td>
@@ -211,6 +211,15 @@ Introduce controlled randomness to gain efficiency, scalability, or simplicity w
 
 <sub><a href="#user-content-principle-table">back to table</a></sub>
 
+<a id="principle-rv"></a>
+<img src="assets/swatches/structure.svg" width="14" height="14" alt=""> **Rv – Resource Virtualization**
+
+Separate the logical resources presented to clients from their physical backing, allowing that backing to be shared or reassigned while preserving the required client-visible behaviour. The resource may be a processor, an address space, a storage volume, or a network. This principle concerns independent resource allocation; a higher-level interface or a hidden location alone does not establish virtualization.
+
+**Example:** A virtual machine presents a machine interface to a guest while its monitor controls the physical resources. Popek and Goldberg formalize conditions for equivalent program behaviour, resource control, and efficient execution <a href="#user-content-ref-42">[42]</a>.
+
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
 <a id="group-2-efficiency"></a>
 
 ## <img src="assets/swatches/efficiency.svg" width="14" height="14" alt=""> Group 2: Efficiency
@@ -225,11 +234,12 @@ Design the system to handle growth in data, traffic, or nodes with near-linear c
 <sub><a href="#user-content-principle-table">back to table</a></sub>
 
 <a id="principle-rc"></a>
-<img src="assets/swatches/efficiency.svg" width="14" height="14" alt=""> **Rc – Reuse of Computation**
+<a id="principle-rw"></a>
+<img src="assets/swatches/efficiency.svg" width="14" height="14" alt=""> **Rw – Reuse of Prior Work**
 
-Avoid redundant work by caching, materializing intermediate results (e.g., indexes), or incrementally updating outputs across repeated or slightly modified inputs, saving computation.
+Reuse computed results, fetched data, or derived state to avoid repeating computation or data access. Cache or materialize these artifacts, share them across operations, and maintain them incrementally when inputs change. This principle was previously named Reuse of Computation (Rc).
 
-**Example:** A B+tree reuses its sorted key order: lookups follow the existing search path instead of rescanning the entire data set each time, thereby reusing computation <a href="#user-content-ref-2">[2]</a>.
+**Example:** Sprite retains file data in client and server caches, avoiding repeated disk reads and network transfers <a href="#user-content-ref-51">[51]</a>. An index similarly reuses maintained search structure across lookups <a href="#user-content-ref-2">[2]</a>.
 
 <sub><a href="#user-content-principle-table">back to table</a></sub>
 
@@ -333,6 +343,15 @@ Describe system behaviour using mathematical models or logic to support rigorous
 Use formally stated invariants to drive safe refactoring, optimisation, or reconfiguration.
 
 **Example:** In compilers, SSA treats "one definition per name" as an IR invariant; passes rewrite code while preserving semantics and then re-establish SSA <a href="#user-content-ref-9">[9]</a>. In query optimisers, relational-algebra equivalences (e.g., selection/projection pushdown) preserve result semantics <a href="#user-content-ref-46">[46]</a>.
+
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-qr"></a>
+<img src="assets/swatches/semantics.svg" width="14" height="14" alt=""> **Qr – Quality Relaxation**
+
+Permit an explicitly specified reduction in output accuracy, fidelity, or completeness to reduce resource requirements, while preserving guarantees outside that relaxation. The approximation may be deterministic, randomized, or learned. Unlike Work Avoidance, the output may change; unlike Consistency Relaxation, the relaxation concerns answer quality rather than ordering or visibility guarantees.
+
+**Example:** Funkhouser and Séquin select geometric detail and rendering methods for visible objects to fit a target frame time, accepting lower visual fidelity when full-detail rendering would be too expensive <a href="#user-content-ref-52">[52]</a>.
 
 <sub><a href="#user-content-principle-table">back to table</a></sub>
 
@@ -626,7 +645,7 @@ To illustrate how multiple design principles intersect in practice, consider the
 - <a href="#user-content-principle-ep"><img src="assets/tiles/ep.svg" width="36" alt="Ep - Equivalence-based Planning"></a> The optimizer first rewrites the query using algebraic equivalences (**[Equivalence-based Planning](#user-content-principle-ep)**).
 - <a href="#user-content-principle-cm"><img src="assets/tiles/cm.svg" width="36" alt="Cm - Cost-based Planning"></a> It then chooses concrete physical operators using a cost model (**[Cost-based Planning](#user-content-principle-cm)**).
 - <a href="#user-content-principle-ha"><img src="assets/tiles/ha.svg" width="36" alt="Ha - Hardware-Aware Design"></a> Physical operators are often optimized for underlying hardware features (**[Hardware-Aware Design](#user-content-principle-ha)**).
-- <a href="#user-content-principle-wv"><img src="assets/tiles/wv.svg" width="36" alt="Wv - Work Avoidance"></a> <a href="#user-content-principle-rc"><img src="assets/tiles/rc.svg" width="36" alt="Rc - Reuse of Computation"></a> Predicate-pushdown illustrates **[Work Avoidance](#user-content-principle-wv)**, while indexes enable **[Reuse of Computation](#user-content-principle-rc)**.
+- <a href="#user-content-principle-wv"><img src="assets/tiles/wv.svg" width="36" alt="Wv - Work Avoidance"></a> <a href="#user-content-principle-rw"><img src="assets/tiles/rw.svg" width="36" alt="Rw - Reuse of Prior Work"></a> Predicate-pushdown illustrates **[Work Avoidance](#user-content-principle-wv)**, while indexes enable **[Reuse of Prior Work](#user-content-principle-rw)**.
 - <a href="#user-content-principle-ah"><img src="assets/tiles/ah.svg" width="36" alt="Ah - Advisory Hinting"></a> <a href="#user-content-principle-ad"><img src="assets/tiles/ad.svg" width="36" alt="Ad - Adaptive Processing"></a> <a href="#user-content-principle-la"><img src="assets/tiles/la.svg" width="36" alt="La - Learned Approximation"></a> <a href="#user-content-principle-pd"><img src="assets/tiles/pd.svg" width="36" alt="Pd - Probabilistic Design"></a> **[Advisory Hinting](#user-content-principle-ah)** can guide the optimizer, and newer database systems add runtime re-optimization (**[Adaptive Processing](#user-content-principle-ad)**), learned models (**[Learned Approximation](#user-content-principle-la)**), and sampling (**[Probabilistic Design](#user-content-principle-pd)**).
 
 Thus, logical-to-physical operator mapping in database systems exemplifies how several design principles come together to efficiently process declarative SQL queries.
@@ -657,7 +676,7 @@ System design spans diverse domains and vocabularies, which can make shared disc
 
 [2] Rudolf Bayer and Edward McCreight. *Organization and Maintenance of Large Ordered Indexes*. Acta Informatica, 1972.
 
-<sub>back to: <a href="#user-content-principle-rc">Rc</a></sub>
+<sub>back to: <a href="#user-content-principle-rw">Rw</a></sub>
 
 <a id="ref-3"></a>
 
@@ -895,9 +914,9 @@ System design spans diverse domains and vocabularies, which can make shared disc
 
 <a id="ref-42"></a>
 
-[42] Gerald J. Popek and Robert P. Goldberg. *Formal Requirements for Virtualizable Third Generation Architectures*. Communications of the ACM, 1974.
+[42] Gerald J. Popek and Robert P. Goldberg. *[Formal Requirements for Virtualizable Third Generation Architectures](https://doi.org/10.1145/361011.361073)*. Communications of the ACM, 17(7): 412–421, 1974.
 
-<sub>back to: <a href="#user-content-principle-sy">Sy</a></sub>
+<sub>back to: <a href="#user-content-principle-sy">Sy</a> · <a href="#user-content-principle-rv">Rv</a></sub>
 
 <a id="ref-43"></a>
 
@@ -946,6 +965,18 @@ System design spans diverse domains and vocabularies, which can make shared disc
 [50] Hubert Zimmermann. *OSI Reference Model – The ISO Model of Architecture for Open Systems Interconnection*. IEEE Transactions on Communications, 1980.
 
 <sub>back to: <a href="#user-content-principle-mo">Mo</a></sub>
+
+<a id="ref-51"></a>
+
+[51] Michael N. Nelson, Brent B. Welch, and John K. Ousterhout. *[Caching in the Sprite Network File System](https://doi.org/10.1145/35037.42183)*. ACM TOCS, 6(1): 134–154, 1988.
+
+<sub>back to: <a href="#user-content-principle-rw">Rw</a></sub>
+
+<a id="ref-52"></a>
+
+[52] Thomas A. Funkhouser and Carlo H. Séquin. *[Adaptive Display Algorithm for Interactive Frame Rates During Visualization of Complex Virtual Environments](https://www.cs.princeton.edu/~funk/sig93.pdf)*. In SIGGRAPH, pp. 247–254, 1993.
+
+<sub>back to: <a href="#user-content-principle-qr">Qr</a></sub>
 
 ## HOW TO CITE
 
