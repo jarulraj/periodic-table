@@ -1,6 +1,6 @@
 {
   "inputs": {
-    "paper_cards_sha256": "fe592b8c612a3dc4fce634818376ae1c94a1f4cb9b62b334973adfa19da77c0b",
+    "paper_cards_sha256": "5b24d967818d4d85c73ad785ced6397ae7b8d328f45296636b1bc5552d0c3652",
     "sessions_sha256": "8e57c142ae0d04ab3ea31375930c5cecc76352bf79166d6769f3ca71144bc66b",
     "cluster_memberships_sha256": "62f6289db7d601bbc6accda61d34e4169bb96638553dd2c9b4129222d3609c63"
   },
