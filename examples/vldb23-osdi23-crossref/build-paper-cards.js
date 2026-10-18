@@ -8,7 +8,7 @@ const sessionMetadata = readSessions();
 
 const KNOWN_TAGS = new Set([
     'Si', 'Mo', 'Co', 'Ex', 'Pm', 'Gr', 'Pd', 'Rv',
-    'Sc', 'Rw', 'Wv', 'Cc', 'Bo', 'Ha', 'Op', 'La',
+    'Sc', 'Rw', 'Wv', 'Cc', 'Bo', 'Rs', 'Ha', 'Op', 'La',
     'Al', 'Lu', 'Se', 'Fs', 'Ig', 'Qr',
     'Lt', 'Dc', 'Fp', 'Lo', 'Cz',
     'Ep', 'Cm', 'Cp', 'Gd', 'Bb', 'Ah',

@@ -140,6 +140,16 @@ Each principle is tagged with a short symbol (e.g., [`Co`](#user-content-princip
       <td align="center">&nbsp;</td>
       <td align="center"><a href="#user-content-principle-ls"><img src="assets/tiles/ls.svg" width="48" alt="Ls - Leakage Shaping"></a></td>
     </tr>
+    <tr>
+      <td align="center">&nbsp;</td>
+      <td align="center"><a href="#user-content-principle-rs"><img src="assets/tiles/rs.svg" width="48" alt="Rs - Resource Substitution"></a></td>
+      <td align="center">&nbsp;</td>
+      <td align="center">&nbsp;</td>
+      <td align="center">&nbsp;</td>
+      <td align="center">&nbsp;</td>
+      <td align="center">&nbsp;</td>
+      <td align="center">&nbsp;</td>
+    </tr>
   </tbody>
 </table>
 
@@ -214,7 +224,7 @@ Introduce controlled randomness to gain efficiency, scalability, or simplicity w
 <a id="principle-rv"></a>
 <img src="assets/swatches/structure.svg" width="14" height="14" alt=""> **Rv – Resource Virtualization**
 
-Separate the logical resources presented to clients from their physical backing, allowing that backing to be shared or reassigned while preserving the required client-visible behaviour. The resource may be a processor, an address space, a storage volume, or a network. This principle concerns independent resource allocation; a higher-level interface or a hidden location alone does not establish virtualization.
+Separate logical resources from their physical backing so that the backing can be shared or reassigned while preserving client-visible behaviour.
 
 **Example:** A virtual machine presents a machine interface to a guest while its monitor controls the physical resources. Popek and Goldberg formalize conditions for equivalent program behaviour, resource control, and efficient execution <a href="#user-content-ref-42">[42]</a>.
 
@@ -237,7 +247,7 @@ Design the system to handle growth in data, traffic, or nodes with near-linear c
 <a id="principle-rw"></a>
 <img src="assets/swatches/efficiency.svg" width="14" height="14" alt=""> **Rw – Reuse of Prior Work**
 
-Reuse computed results, fetched data, or derived state to avoid repeating computation or data access. Cache or materialize these artifacts, share them across operations, and maintain them incrementally when inputs change. This principle was previously named Reuse of Computation (Rc).
+Reuse computed results, fetched data, or derived state to avoid repeating computation or data access.
 
 **Example:** Sprite retains file data in client and server caches, avoiding repeated disk reads and network transfers <a href="#user-content-ref-51">[51]</a>. An index similarly reuses maintained search structure across lookups <a href="#user-content-ref-2">[2]</a>.
 
@@ -267,6 +277,15 @@ Detect the execution paths or data items that dominate run-time ("hot spots") an
 Profile end-to-end performance, locate the tightest resource constraint, and focus improvement effort there until another stage becomes the limiter.
 
 **Example:** Rare 99th-percentile stragglers bottleneck latency, and replicated requests help cut tail response times <a href="#user-content-ref-11">[11]</a>.
+
+<sub><a href="#user-content-principle-table">back to table</a></sub>
+
+<a id="principle-rs"></a>
+<img src="assets/swatches/efficiency.svg" width="14" height="14" alt=""> **Rs – Resource Substitution**
+
+Change the representation or execution strategy to spend more of an available resource and relieve a tighter resource constraint, while preserving required behaviour.
+
+**Example:** Gray and Putzolu use access frequency and resource costs to determine when extra memory is worth the disk accesses or CPU work it saves <a href="#user-content-ref-53">[53]</a>.
 
 <sub><a href="#user-content-principle-table">back to table</a></sub>
 
@@ -349,7 +368,7 @@ Use formally stated invariants to drive safe refactoring, optimisation, or recon
 <a id="principle-qr"></a>
 <img src="assets/swatches/semantics.svg" width="14" height="14" alt=""> **Qr – Quality Relaxation**
 
-Permit an explicitly specified reduction in output accuracy, fidelity, or completeness to reduce resource requirements, while preserving guarantees outside that relaxation. The approximation may be deterministic, randomized, or learned. Unlike Work Avoidance, the output may change; unlike Consistency Relaxation, the relaxation concerns answer quality rather than ordering or visibility guarantees.
+Allow a specified reduction in output accuracy, fidelity, or completeness to reduce resource use, while preserving other required guarantees.
 
 **Example:** Funkhouser and Séquin select geometric detail and rendering methods for visible objects to fit a target frame time, accepting lower visual fidelity when full-detail rendering would be too expensive <a href="#user-content-ref-52">[52]</a>.
 
@@ -514,7 +533,7 @@ Expose internal state of the system, like metrics, traces, plans, to make the sy
 <a id="principle-ev"></a>
 <img src="assets/swatches/operability.svg" width="14" height="14" alt=""> **Ev – Evolvability**
 
-Design so the system can change with minimal downtime or rewrites and do so without breaking external contracts or observable behaviour for existing clients. Unlike extensibility that lets outsiders add new behavior via defined hook points without touching the core, evolvability lets the system’s internals change over time without breaking existing external contracts.
+Allow internal changes with minimal downtime or rewriting while preserving external contracts and observable behaviour for existing clients.
 
 **Example:** Parnas presents how a modular design makes system easier to extend without disruptive rewrites <a href="#user-content-ref-38">[38]</a>.
 
@@ -977,6 +996,12 @@ System design spans diverse domains and vocabularies, which can make shared disc
 [52] Thomas A. Funkhouser and Carlo H. Séquin. *[Adaptive Display Algorithm for Interactive Frame Rates During Visualization of Complex Virtual Environments](https://www.cs.princeton.edu/~funk/sig93.pdf)*. In SIGGRAPH, pp. 247–254, 1993.
 
 <sub>back to: <a href="#user-content-principle-qr">Qr</a></sub>
+
+<a id="ref-53"></a>
+
+[53] Jim Gray and Franco Putzolu. *[The 5 Minute Rule for Trading Memory for Disc Accesses and the 10 Byte Rule for Trading Memory for CPU Time](https://pages.cs.wisc.edu/~yxy/cs764-f20/papers/5-minute-rule.pdf)*. In SIGMOD, pp. 395–398, 1987.
+
+<sub>back to: <a href="#user-content-principle-rs">Rs</a></sub>
 
 ## HOW TO CITE
 

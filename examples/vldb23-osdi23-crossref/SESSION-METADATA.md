@@ -52,6 +52,8 @@ The analysis never writes to the manuscript or membership input. It records the 
 
 `Qr` (Quality Relaxation, Semantics) and `Rv` (Resource Virtualization, Structure) are available for future mappings. Adding them does not assign them to existing cards. The reuse rename preserves principle memberships and similarity scores; source summaries in other repositories are unchanged. Set `PAPER_CARD_OUTPUT_PATH` to build cards into a separate file for inspection without replacing the published data.
 
+`Rs` (Resource Substitution, Efficiency) is also registered for future mappings. A mapping must identify the resources exchanged and the mechanism that makes the exchange possible. Registering the principle does not change existing cards or similarity results.
+
 ## Retrieval
 
 For conference cards, the explorer searches both VLDB 2023 and OSDI 2023 by default, independently of the collection filters on the main search list. Unchecking "Search across conferences" restricts matches to the source conference. Each match shows its conference and session category. Reading-list cards keep within-collection matching and are excluded from cross-conference results.

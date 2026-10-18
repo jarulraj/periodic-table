@@ -16,7 +16,7 @@ const principles = vm.runInNewContext(registrySource + '\nPRINCIPLES;');
 
 test('legacy symbols normalize without changing other identifiers', () => {
     assert.equal(normalizeTag(' Rc '), 'Rw');
-    for (const tag of ['Rw', 'Qr', 'Rv', 'Cr', 'RcOther']) assert.equal(normalizeTag(tag), tag);
+    for (const tag of ['Rw', 'Qr', 'Rv', 'Rs', 'Cr', 'RcOther']) assert.equal(normalizeTag(tag), tag);
     assert.equal(normalizeText('Rc + \\RcP + Reuse of Computation'), 'Rw + \\RwP + Reuse of Prior Work');
     assert.equal(normalizeText('CRC RcOther RcP'), 'CRC RcOther RcP');
 });
@@ -57,7 +57,8 @@ test('README tiles, definitions, and explorer registry agree', () => {
     for (const [symbol, name, group] of [
         ['Rw', 'Reuse of Prior Work', 'Efficiency'],
         ['Qr', 'Quality Relaxation', 'Semantics'],
-        ['Rv', 'Resource Virtualization', 'Structure']
+        ['Rv', 'Resource Virtualization', 'Structure'],
+        ['Rs', 'Resource Substitution', 'Efficiency']
     ]) {
         assert.equal(principles[symbol].name, name);
         assert.equal(principles[symbol].group, group);
@@ -77,7 +78,7 @@ test('README tiles, definitions, and explorer registry agree', () => {
 test('browser URL handling accepts Rc and Rw without duplicate selection', () => {
     const context = {
         URLSearchParams,
-        window: {location: {search: '?tags=Rc,Rw,Qr,Rv&conf=VLDB+2023'}},
+        window: {location: {search: '?tags=Rc,Rw,Qr,Rv,Rs&conf=VLDB+2023'}},
         document: {getElementById: () => null},
         selectedTags: new Set()
     };
@@ -86,7 +87,7 @@ test('browser URL handling accepts Rc and Rw without duplicate selection', () =>
     const start = html.indexOf('function loadUrlState()');
     const end = html.indexOf('function toggleTag(', start);
     vm.runInContext(registrySource + '\n' + html.slice(start, end) + '\nloadUrlState();', context);
-    assert.deepEqual([...context.selectedTags], ['Rw', 'Qr', 'Rv']);
+    assert.deepEqual([...context.selectedTags], ['Rw', 'Qr', 'Rv', 'Rs']);
 });
 
 test('published cards use canonical labels and registered symbols', () => {
@@ -113,10 +114,11 @@ test('builder accepts legacy cards and new principles without editing the source
             section_5_principle_mapping_minimum_set: [{principles: [
                 {symbol: 'Rc', name: 'Reuse of Computation'},
                 {symbol: 'Qr', name: 'Quality Relaxation'},
-                {symbol: 'Rv', name: 'Resource Virtualization'}
+                {symbol: 'Rv', name: 'Resource Virtualization'},
+                {symbol: 'Rs', name: 'Resource Substitution'}
             ]}],
             section_7_compound_equation: {
-                core_principle_tags: ['Rc', 'Qr', 'Rv'], equation: 'Baseline + Rc + Qr + Rv -> Fixture'
+                core_principle_tags: ['Rc', 'Qr', 'Rv', 'Rs'], equation: 'Baseline + Rc + Qr + Rv + Rs -> Fixture'
             }
         };
         const sourceText = JSON.stringify(summary);
@@ -128,10 +130,10 @@ test('builder accepts legacy cards and new principles without editing the source
         });
         const data = JSON.parse(fs.readFileSync(output, 'utf8'));
         assert.equal(data.paper_count, 1);
-        assert.deepEqual(data.papers[0].tags, ['Rw', 'Qr', 'Rv']);
+        assert.deepEqual(data.papers[0].tags, ['Rw', 'Qr', 'Rv', 'Rs']);
         const card = data.cards_by_id['fixture-1'];
-        assert.equal(card.equation, 'Baseline + Rw + Qr + Rv -> Fixture');
-        assert.deepEqual(card.similarity_principle_tags, ['Qr', 'Rv', 'Rw']);
+        assert.equal(card.equation, 'Baseline + Rw + Qr + Rv + Rs -> Fixture');
+        assert.deepEqual(card.similarity_principle_tags, ['Qr', 'Rs', 'Rv', 'Rw']);
         assert.equal(card.usagesByTag.Rw[0].name, 'Reuse of Prior Work');
         assert.equal(fs.readFileSync(input, 'utf8'), sourceText);
     } finally {
