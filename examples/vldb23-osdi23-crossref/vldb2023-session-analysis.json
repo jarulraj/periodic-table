@@ -1,6 +1,6 @@
 {
   "inputs": {
-    "paper_cards_sha256": "3bf8c85a1b3411ce94c72addcd8772c3f3fb6399d9d83c8f25dfda845b8c1f9d",
+    "paper_cards_sha256": "fe592b8c612a3dc4fce634818376ae1c94a1f4cb9b62b334973adfa19da77c0b",
     "sessions_sha256": "8e57c142ae0d04ab3ea31375930c5cecc76352bf79166d6769f3ca71144bc66b",
     "cluster_memberships_sha256": "62f6289db7d601bbc6accda61d34e4169bb96638553dd2c9b4129222d3609c63"
   },
@@ -1209,7 +1209,7 @@
         "categories": [
           "Similarity Search"
         ],
-        "score": 0.75,
+        "score": 0.6,
         "shared": [
           "Cm",
           "Rc",
@@ -1217,7 +1217,8 @@
         ],
         "only_source": [],
         "only_target": [
-          "Cz"
+          "Cz",
+          "Sc"
         ]
       },
       {
@@ -1441,22 +1442,22 @@
         ]
       },
       {
-        "paper_id": "vldb2023-89",
-        "title": "Odyssey: A Journey in the Land of Distributed Data Series Similarity Search",
+        "paper_id": "vldb2023-126",
+        "title": "MiniGraph: Querying Big Graphs with a Single Machine",
         "categories": [
-          "Similarity Search"
+          "Graph Analytics"
         ],
         "score": 0.4,
         "shared": [
-          "Cz",
+          "Bo",
           "Rc"
         ],
         "only_source": [
-          "Bo"
+          "Cz"
         ],
         "only_target": [
-          "Cm",
-          "Wa"
+          "Gr",
+          "Ha"
         ]
       }
     ],
@@ -7601,14 +7602,15 @@
         "categories": [
           "View and Change Management"
         ],
-        "score": 0.75,
+        "score": 0.6,
         "shared": [
           "Cm",
           "Rc",
           "Wa"
         ],
         "only_source": [
-          "Cz"
+          "Cz",
+          "Sc"
         ],
         "only_target": []
       },
@@ -7618,13 +7620,14 @@
         "categories": [
           "Scalable ML"
         ],
-        "score": 0.5,
+        "score": 0.4,
         "shared": [
           "Cm",
           "Cz"
         ],
         "only_source": [
           "Rc",
+          "Sc",
           "Wa"
         ],
         "only_target": []
@@ -7635,13 +7638,14 @@
         "categories": [
           "Information Integration and Mining"
         ],
-        "score": 0.4,
+        "score": 0.3333333333333333,
         "shared": [
           "Cz",
           "Rc"
         ],
         "only_source": [
           "Cm",
+          "Sc",
           "Wa"
         ],
         "only_target": [
@@ -7654,14 +7658,15 @@
         "categories": [
           "Modern Memory and Storage"
         ],
-        "score": 0.4,
+        "score": 0.3333333333333333,
         "shared": [
           "Cm",
           "Wa"
         ],
         "only_source": [
           "Cz",
-          "Rc"
+          "Rc",
+          "Sc"
         ],
         "only_target": [
           "Ha"
@@ -7673,14 +7678,15 @@
         "categories": [
           "Modern Memory and Storage"
         ],
-        "score": 0.4,
+        "score": 0.3333333333333333,
         "shared": [
           "Cz",
           "Wa"
         ],
         "only_source": [
           "Cm",
-          "Rc"
+          "Rc",
+          "Sc"
         ],
         "only_target": [
           "Ha"
@@ -8231,7 +8237,7 @@
         "categories": [
           "Similarity Search"
         ],
-        "score": 0.5,
+        "score": 0.4,
         "shared": [
           "Cm",
           "Cz"
@@ -8239,6 +8245,7 @@
         "only_source": [],
         "only_target": [
           "Rc",
+          "Sc",
           "Wa"
         ]
       }
