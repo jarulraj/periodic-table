@@ -1,6 +1,6 @@
 {
   "inputs": {
-    "paper_cards_sha256": "5b24d967818d4d85c73ad785ced6397ae7b8d328f45296636b1bc5552d0c3652",
+    "paper_cards_sha256": "9ea4853b08b3e9f87eac0143fee0a00c9d5fe5d5b2ead6dd7a12e565fb146ca8",
     "sessions_sha256": "8e57c142ae0d04ab3ea31375930c5cecc76352bf79166d6769f3ca71144bc66b",
     "cluster_memberships_sha256": "62f6289db7d601bbc6accda61d34e4169bb96638553dd2c9b4129222d3609c63"
   },
@@ -1204,24 +1204,6 @@
     ],
     "vldb2023-11": [
       {
-        "paper_id": "vldb2023-89",
-        "title": "Odyssey: A Journey in the Land of Distributed Data Series Similarity Search",
-        "categories": [
-          "Similarity Search"
-        ],
-        "score": 0.6,
-        "shared": [
-          "Cm",
-          "Rc",
-          "Wa"
-        ],
-        "only_source": [],
-        "only_target": [
-          "Cz",
-          "Sc"
-        ]
-      },
-      {
         "paper_id": "vldb2023-51",
         "title": "Write-Aware Timestamp Tracking: Effective and Efficient Page Replacement for Modern Hardware",
         "categories": [
@@ -1291,6 +1273,24 @@
         ],
         "only_target": [
           "Ep"
+        ]
+      },
+      {
+        "paper_id": "vldb2023-221",
+        "title": "Nemo: Guiding and Contextualizing Weak Supervision for Interactive Data Programming",
+        "categories": [
+          "Scalable ML"
+        ],
+        "score": 0.5,
+        "shared": [
+          "Cm",
+          "Wa"
+        ],
+        "only_source": [
+          "Rc"
+        ],
+        "only_target": [
+          "Lo"
         ]
       }
     ],
@@ -6678,6 +6678,23 @@
         ]
       },
       {
+        "paper_id": "vldb2023-89",
+        "title": "Odyssey: A Journey in the Land of Distributed Data Series Similarity Search",
+        "categories": [
+          "Similarity Search"
+        ],
+        "score": 0.5,
+        "shared": [
+          "Ad",
+          "Rc"
+        ],
+        "only_source": [],
+        "only_target": [
+          "Cm",
+          "Sc"
+        ]
+      },
+      {
         "paper_id": "vldb2023-129",
         "title": "Sage: A System for Uncertain Network Analysis",
         "categories": [
@@ -6699,23 +6716,6 @@
         "title": "Zebra: When Temporal Graph Neural Networks Meet Temporal Personalized PageRank",
         "categories": [
           "Graph Structures and Queries"
-        ],
-        "score": 0.5,
-        "shared": [
-          "Ad",
-          "Rc"
-        ],
-        "only_source": [],
-        "only_target": [
-          "Al",
-          "La"
-        ]
-      },
-      {
-        "paper_id": "vldb2023-187",
-        "title": "FILM: a Fully Learned Index for Larger-than-Memory Databases",
-        "categories": [
-          "Indexing and Learned Indexing"
         ],
         "score": 0.5,
         "shared": [
@@ -6981,10 +6981,10 @@
         ]
       },
       {
-        "paper_id": "vldb2023-129",
-        "title": "Sage: A System for Uncertain Network Analysis",
+        "paper_id": "vldb2023-89",
+        "title": "Odyssey: A Journey in the Land of Distributed Data Series Similarity Search",
         "categories": [
-          "Graph Analytics"
+          "Similarity Search"
         ],
         "score": 0.4,
         "shared": [
@@ -6995,8 +6995,8 @@
           "Ig"
         ],
         "only_target": [
-          "Wa",
-          "Wv"
+          "Cm",
+          "Sc"
         ]
       }
     ],
@@ -7597,99 +7597,94 @@
     ],
     "vldb2023-89": [
       {
+        "paper_id": "vldb2023-77",
+        "title": "OneShotSTL: One-Shot Seasonal-Trend Decomposition For Online Time Series Anomaly Detection And Forecasting",
+        "categories": [
+          "Time-Series Analytics"
+        ],
+        "score": 0.5,
+        "shared": [
+          "Ad",
+          "Rc"
+        ],
+        "only_source": [
+          "Cm",
+          "Sc"
+        ],
+        "only_target": []
+      },
+      {
+        "paper_id": "vldb2023-176",
+        "title": "Fairness Matters: A Tit-For-Tat Strategy Against Selfish Mining",
+        "categories": [
+          "Reasoning, Recommendation, Classification"
+        ],
+        "score": 0.5,
+        "shared": [
+          "Ad",
+          "Cm"
+        ],
+        "only_source": [
+          "Rc",
+          "Sc"
+        ],
+        "only_target": []
+      },
+      {
         "paper_id": "vldb2023-11",
         "title": "SageDB: An Instance-Optimized Data Analytics System",
         "categories": [
           "View and Change Management"
         ],
-        "score": 0.6,
-        "shared": [
-          "Cm",
-          "Rc",
-          "Wa"
-        ],
-        "only_source": [
-          "Cz",
-          "Sc"
-        ],
-        "only_target": []
-      },
-      {
-        "paper_id": "vldb2023-97",
-        "title": "Scalable Graph Convolutional Network Training on Distributed-Memory Systems",
-        "categories": [
-          "Scalable ML"
-        ],
         "score": 0.4,
         "shared": [
           "Cm",
-          "Cz"
-        ],
-        "only_source": [
-          "Rc",
-          "Sc",
-          "Wa"
-        ],
-        "only_target": []
-      },
-      {
-        "paper_id": "vldb2023-13",
-        "title": "Fast Algorithms for Denial Constraint Discovery",
-        "categories": [
-          "Information Integration and Mining"
-        ],
-        "score": 0.3333333333333333,
-        "shared": [
-          "Cz",
           "Rc"
         ],
         "only_source": [
-          "Cm",
-          "Sc",
-          "Wa"
+          "Ad",
+          "Sc"
         ],
         "only_target": [
-          "Bo"
+          "Wa"
         ]
       },
       {
-        "paper_id": "vldb2023-51",
-        "title": "Write-Aware Timestamp Tracking: Effective and Efficient Page Replacement for Modern Hardware",
+        "paper_id": "vldb2023-17",
+        "title": "A Two-Level Signature Scheme for Stable Set Similarity Joins",
         "categories": [
-          "Modern Memory and Storage"
+          "Similarity Join and Entity Resolution"
         ],
-        "score": 0.3333333333333333,
+        "score": 0.4,
         "shared": [
-          "Cm",
-          "Wa"
+          "Ad",
+          "Cm"
         ],
         "only_source": [
-          "Cz",
           "Rc",
           "Sc"
         ],
         "only_target": [
-          "Ha"
+          "Wv"
         ]
       },
       {
-        "paper_id": "vldb2023-53",
-        "title": "NV-SQL: Boosting OLTP Performance with Non-Volatile DIMMs",
+        "paper_id": "vldb2023-32",
+        "title": "Analyzing the Impact of Cardinality Estimation on Execution Plans in Microsoft SQL Server",
         "categories": [
-          "Modern Memory and Storage"
+          "Optimizing Queries and Beyond"
         ],
-        "score": 0.3333333333333333,
+        "score": 0.4,
         "shared": [
-          "Cz",
-          "Wa"
+          "Ad",
+          "Cm"
         ],
         "only_source": [
-          "Cm",
           "Rc",
           "Sc"
         ],
         "only_target": [
-          "Ha"
+          "Se"
         ]
       }
     ],
@@ -8229,24 +8224,6 @@
         "only_target": [
           "Ad",
           "Fp"
-        ]
-      },
-      {
-        "paper_id": "vldb2023-89",
-        "title": "Odyssey: A Journey in the Land of Distributed Data Series Similarity Search",
-        "categories": [
-          "Similarity Search"
-        ],
-        "score": 0.4,
-        "shared": [
-          "Cm",
-          "Cz"
-        ],
-        "only_source": [],
-        "only_target": [
-          "Rc",
-          "Sc",
-          "Wa"
         ]
       }
     ],
