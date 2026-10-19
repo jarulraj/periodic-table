@@ -82,7 +82,7 @@ Each principle is tagged with a short symbol (e.g., [`Co`](#user-content-princip
     </tr>
     <tr>
       <td align="center"><a href="#user-content-principle-co"><img src="assets/tiles/co.svg" width="48" alt="Co - Composability"></a></td>
-      <td align="center"><a href="#user-content-principle-wv"><img src="assets/tiles/wv.svg" width="48" alt="Wv - Work Avoidance"></a></td>
+      <td align="center"><a href="#user-content-principle-wv"><img src="assets/tiles/wv.svg" width="48" alt="Wv - Result-Preserving Work Avoidance"></a></td>
       <td align="center"><a href="#user-content-principle-se"><img src="assets/tiles/se.svg" width="48" alt="Se - Semantically Explicit Interfaces"></a></td>
       <td align="center"><a href="#user-content-principle-fp"><img src="assets/tiles/fp.svg" width="48" alt="Fp - Function Placement"></a></td>
       <td align="center"><a href="#user-content-principle-cp"><img src="assets/tiles/cp.svg" width="48" alt="Cp - Constraint-based Planning"></a></td>
@@ -254,7 +254,7 @@ Reuse computed results, fetched data, or derived state to avoid repeating comput
 <sub><a href="#user-content-principle-table">back to table</a></sub>
 
 <a id="principle-wv"></a>
-<img src="assets/swatches/efficiency.svg" width="14" height="14" alt=""> **Wv – Work Avoidance**
+<img src="assets/swatches/efficiency.svg" width="14" height="14" alt=""> **Wv – Result-Preserving Work Avoidance**
 
 Skip computation that would not alter externally observable results. Examples include lazy evaluation and predicate short-circuiting.
 
@@ -664,7 +664,7 @@ To illustrate how multiple design principles intersect in practice, consider the
 - <a href="#user-content-principle-ep"><img src="assets/tiles/ep.svg" width="36" alt="Ep - Equivalence-based Planning"></a> The optimizer first rewrites the query using algebraic equivalences (**[Equivalence-based Planning](#user-content-principle-ep)**).
 - <a href="#user-content-principle-cm"><img src="assets/tiles/cm.svg" width="36" alt="Cm - Cost-based Planning"></a> It then chooses concrete physical operators using a cost model (**[Cost-based Planning](#user-content-principle-cm)**).
 - <a href="#user-content-principle-ha"><img src="assets/tiles/ha.svg" width="36" alt="Ha - Hardware-Aware Design"></a> Physical operators are often optimized for underlying hardware features (**[Hardware-Aware Design](#user-content-principle-ha)**).
-- <a href="#user-content-principle-wv"><img src="assets/tiles/wv.svg" width="36" alt="Wv - Work Avoidance"></a> <a href="#user-content-principle-rw"><img src="assets/tiles/rw.svg" width="36" alt="Rw - Reuse of Prior Work"></a> Predicate-pushdown illustrates **[Work Avoidance](#user-content-principle-wv)**, while indexes enable **[Reuse of Prior Work](#user-content-principle-rw)**.
+- <a href="#user-content-principle-wv"><img src="assets/tiles/wv.svg" width="36" alt="Wv - Result-Preserving Work Avoidance"></a> <a href="#user-content-principle-rw"><img src="assets/tiles/rw.svg" width="36" alt="Rw - Reuse of Prior Work"></a> Predicate-pushdown illustrates **[Result-Preserving Work Avoidance](#user-content-principle-wv)**, while indexes enable **[Reuse of Prior Work](#user-content-principle-rw)**.
 - <a href="#user-content-principle-ah"><img src="assets/tiles/ah.svg" width="36" alt="Ah - Advisory Hinting"></a> <a href="#user-content-principle-ad"><img src="assets/tiles/ad.svg" width="36" alt="Ad - Adaptive Processing"></a> <a href="#user-content-principle-la"><img src="assets/tiles/la.svg" width="36" alt="La - Learned Approximation"></a> <a href="#user-content-principle-pd"><img src="assets/tiles/pd.svg" width="36" alt="Pd - Probabilistic Design"></a> **[Advisory Hinting](#user-content-principle-ah)** can guide the optimizer, and newer database systems add runtime re-optimization (**[Adaptive Processing](#user-content-principle-ad)**), learned models (**[Learned Approximation](#user-content-principle-la)**), and sampling (**[Probabilistic Design](#user-content-principle-pd)**).
 
 Thus, logical-to-physical operator mapping in database systems exemplifies how several design principles come together to efficiently process declarative SQL queries.

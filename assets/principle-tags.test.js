@@ -56,6 +56,7 @@ test('README tiles, definitions, and explorer registry agree', () => {
     assert.deepEqual(tableSymbols.sort(), Object.keys(principles).sort());
     for (const [symbol, name, group] of [
         ['Rw', 'Reuse of Prior Work', 'Efficiency'],
+        ['Wv', 'Result-Preserving Work Avoidance', 'Efficiency'],
         ['Qr', 'Quality Relaxation', 'Semantics'],
         ['Rv', 'Resource Virtualization', 'Structure'],
         ['Rs', 'Resource Substitution', 'Efficiency']
@@ -73,6 +74,28 @@ test('README tiles, definitions, and explorer registry agree', () => {
     for (const match of readme.matchAll(/href="#user-content-((?:principle|ref)-[a-z0-9-]+)"/g)) {
         assert.ok(readme.includes('<a id="' + match[1] + '"></a>'), match[1]);
     }
+});
+
+test('Wv buttons use the result-preserving name without changing their filter symbol', () => {
+    const context = {
+        principle: tag => principles[tag],
+        selectedTags: new Set(),
+        escapeHtml: value => String(value)
+    };
+    vm.createContext(context);
+    const start = html.indexOf('function principleButton(');
+    const end = html.indexOf('function sessionBadges(', start);
+    vm.runInContext(html.slice(start, end), context);
+    for (const options of [{}, {count: 10, prospective: true, className: 'tag-button'}]) {
+        const button = context.principleButton('Wv', options);
+        assert.ok(button.includes('Wv (Result-Preserving Work Avoidance)'));
+        assert.ok(button.includes('data-tag="Wv"'));
+        assert.ok(button.includes('aria-pressed="false"'));
+    }
+    context.selectedTags.add('Wv');
+    const selected = context.principleLabels(['Wv']);
+    assert.ok(selected.includes('aria-pressed="true"'));
+    assert.ok(selected.includes('Remove filter: Wv (Result-Preserving Work Avoidance)'));
 });
 
 test('browser URL handling accepts Rc and Rw without duplicate selection', () => {
