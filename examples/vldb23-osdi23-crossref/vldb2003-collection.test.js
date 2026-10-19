@@ -7,6 +7,7 @@ const crypto = require('crypto');
 const {spawnSync} = require('child_process');
 const {readSessions} = require('./paper-metadata');
 const {normalizeData} = require('../../assets/principle-tags');
+const {loadReview} = require('./principle-additions');
 const {filter} = require('../../use-cases/paper-card-explorer/filters');
 const {compare, rank} = require('../../use-cases/paper-card-explorer/similarity');
 const root = path.resolve(__dirname, '../../paper-card-data/vldb2003');
@@ -35,7 +36,9 @@ test('all 75 audited summaries are published with official PDF and session links
         assert.match(card.paper_url, /^https:\/\/vldb\.org\/conf\/2003\/papers\/.+\.pdf$/);
         assert.equal(card.analysis_note, provenance.review_status);
         assert.equal(receipt.truncated, false);
-        assert.deepEqual(card.core_principle_tags, summary.section_7_compound_equation.core_principle_tags);
+        const additions = loadReview().entries.find(entry => entry.paper_id === id)?.additions || [];
+        const addedCore = additions.filter(a => a.role === 'core').map(a => a.tag);
+        assert.deepEqual(card.core_principle_tags, [...summary.section_7_compound_equation.core_principle_tags, ...addedCore]);
         assert.deepEqual([...card.core_principle_tags].sort(), card.similarity_principle_tags);
         assert.equal(sessions.papers[id].paper_url, card.paper_url);
         for (const session of card.conference_sessions) {

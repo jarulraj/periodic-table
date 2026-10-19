@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const {sessionFields, similarityFields, readSessions} = require('./paper-metadata');
 const {normalizeData} = require('../../assets/principle-tags');
+const {applyAdditions, writeAtomic} = require('./principle-additions');
 const sessionMetadata = readSessions();
 
 const KNOWN_TAGS = new Set([
@@ -503,7 +504,7 @@ const output = {
     card_ids_by_title: cardIdsByTitle
 };
 
-fs.writeFileSync(outputPath, JSON.stringify(output));
+writeAtomic(outputPath, applyAdditions(output, undefined, selected));
 console.log(JSON.stringify({
     output: outputPath,
     papers: papers.length,

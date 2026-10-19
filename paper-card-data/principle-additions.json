@@ -1,0 +1,2360 @@
+{
+  "schema_version": 1,
+  "review_date": "2026-10-19",
+  "status": "Conservative additive selection from the four-principle Argon audit; not author endorsement.",
+  "policy": "Explicit source-checked allowlist, additions only. No existing mapping or author correction is replaced. Other audit proposals remain pending.",
+  "audit_model": "gemini-4-argon",
+  "selection_sha256": "715857ecb8bda302a2401e1eb8209a740918d75099e80498e503508524a8429c",
+  "protected_cards": {
+    "vldb2023-19": "f1c2a494638dc04899595763ff9a7f0a93b37ab5759406a9f389ab463a2f2802",
+    "vldb2023-28": "758a1af422ab301a219cd8ec6ea1e840fc3f370d9e72fbba98a5bcf755a94e98",
+    "vldb2023-54": "d13a1c3198a3b3139c605879ea892a630bad4023219e5cf27cd2391e3d476e22",
+    "vldb2023-57": "5f569e82307243fe356ef1c832d482bec8450001b64cf01015f037ba6d1c4ac3",
+    "vldb2023-58": "138e8cbdd66037384129f731c4caa8cf927c5b877275e4d014c36fea8ec6f16d",
+    "vldb2023-59": "af8eba0f589fd6591bb9048736df95bd57bbd4878d9c0931a03d499e4189502b",
+    "vldb2023-72": "61f4209c0ec02984e3df1a8834b21b0fa223f9795d323b48d5a27e74ee7a040e",
+    "vldb2023-74": "146f5cb701efca9bdd0954721fd485ed5d17be5776e14392e72908435ca69203",
+    "vldb2023-89": "d2ec97ddbdca292714390805a01b634e33ed66cf711ab418e6350a4c26217de9",
+    "vldb2023-99": "6b5c278b0760323204d9cb7d808ae24544a26d8a94cff088b0b629e0f635bfc1"
+  },
+  "entries": [
+    {
+      "paper_id": "osdi23-3",
+      "source_id": "osdi23",
+      "title": "Userspace Bypass: Accelerating Syscall-intensive Applications",
+      "base_equation": "Standard Syscall Model + Fp + Wv + Sy -> Userspace Bypass",
+      "source_text_sha256": "9b076257f471ca75f651ed671e332c95680e86b3233455acb8946b0ad12ad3fc",
+      "audit_receipt_sha256": "b26196181d006a3727b1f5098748abfd3ce801f591461cbcf5ab2ce70a127827",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "supporting",
+          "explanation": "Retains translated and sanitized instruction blocks so repeated hot paths do not require translation again.",
+          "sections": [
+            "1 Introduction",
+            "5.2.1 Jump Sanitation"
+          ],
+          "paper_url": "https://www.usenix.org/system/files/osdi23-zhou-zhe.pdf",
+          "source_passages": [
+            38,
+            105
+          ]
+        }
+      ],
+      "before_sha256": "08d499dec049c6862efff1f591fff181e3d49f13dec01ca807aa3222410b29d2",
+      "after_sha256": "dffc66afc164d549d98e8b728e1faac5591207503f9539d344ef46feeb1753ee"
+    },
+    {
+      "paper_id": "osdi23-7",
+      "source_id": "osdi23",
+      "title": "K9db: Privacy-Compliant Storage For Web Applications By Construction",
+      "base_equation": "Application-level privacy logic + Se + Sa + Is -> K9db",
+      "source_text_sha256": "9df492b30d69f1f522e5072ae648a6983e0583a367d94358d659a24ac9ab7692",
+      "audit_receipt_sha256": "839f91c0f990ab10b256b2accda628cb37a281a1bb9098a26797831d9ad75eb4",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "supporting",
+          "explanation": "Maintains ownership shortcuts and materialized query results, avoiding repeated ownership joins and query evaluation while updating retained state when data changes.",
+          "sections": [
+            "5.2 µDB Integrity",
+            "6.2 Materialized Views"
+          ],
+          "paper_url": "https://www.usenix.org/system/files/osdi23-albab.pdf",
+          "source_passages": [
+            131,
+            158
+          ]
+        },
+        {
+          "tag": "Rs",
+          "role": "core",
+          "explanation": "Duplicates shared rows across owner-specific stores and maintains ownership metadata, spending storage and update work to reduce the work required for subject-specific access and deletion.",
+          "sections": [
+            "5 Compliant by Construction Storage",
+            "5.2 µDB Integrity"
+          ],
+          "paper_url": "https://www.usenix.org/system/files/osdi23-albab.pdf",
+          "source_passages": [
+            121,
+            131
+          ]
+        }
+      ],
+      "before_sha256": "d8266919a0659e088e74061e3a68eedc52cb01ca55999a45b958dd4526b41f08",
+      "after_sha256": "7a2503178e6fcc7bec613de6bf5e7b1ed76c55d130cfec08e4f326b7e24805bc"
+    },
+    {
+      "paper_id": "osdi23-8",
+      "source_id": "osdi23",
+      "title": "Encrypted Databases Made Secure Yet Maintainable",
+      "base_equation": "Type-II EDB + Sy + Pm + Ep -> HEDB",
+      "source_text_sha256": "e13f7c6797bb1aa611cc877d700147f480ef39a608e64c864e7712fbb726573f",
+      "audit_receipt_sha256": "ac2fe7a18831514324f5417b4c1075ae133d7bdd5b90543c674d339fc39da73a",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "supporting",
+          "explanation": "Caches generated anonymization inputs and reuses initialized symbolic-execution state, avoiding repeated work on matching paths and constraints.",
+          "sections": [
+            "5.2 Optimization",
+            "6.3.4 Replay-based Maintenance Overhead"
+          ],
+          "paper_url": "https://www.usenix.org/system/files/osdi23-li-mingyu.pdf",
+          "source_passages": [
+            159,
+            219
+          ]
+        }
+      ],
+      "before_sha256": "3f590ab8b91ec38fb1f8fb27639910d1bdaeecf219cda5eeae5ffa2a11bfa56f",
+      "after_sha256": "e467f0a76a3f4821f83a8ac9de94eae85f6d2ff2df1a113e68c5425522766bb8"
+    },
+    {
+      "paper_id": "osdi23-9",
+      "source_id": "osdi23",
+      "title": "LVMT: An Efficient Authenticated Storage for Blockchain",
+      "base_equation": "Merkle Patricia Trie + Pm + Wv + Sc -> LVMT",
+      "source_text_sha256": "4e2daacbbe56b4988b0bd30a3c11af2c8d45e89ed9d834cd66640f4da4a1e61e",
+      "audit_receipt_sha256": "ea2ad949c34ae134b3494d202ca1000cbe023a5e76b3ce2ee95954dcdc6d345a",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "supporting",
+          "explanation": "Precomputes and retains elliptic-curve points used in commitment operations, replacing repeated expensive computations with lookups.",
+          "sections": [
+            "5 Implementation"
+          ],
+          "paper_url": "https://www.usenix.org/system/files/osdi23-li-chenxing.pdf",
+          "source_passages": [
+            147,
+            148
+          ]
+        }
+      ],
+      "before_sha256": "9e2ef832cb3ac2e6c828e1e96277a9f9c46a58a67c0a08bad635857b1a931f35",
+      "after_sha256": "29fb341f986f87f675ce240f3b60e2a8637e7a17ae85b89e23df4825a8e169ee"
+    },
+    {
+      "paper_id": "osdi23-10",
+      "source_id": "osdi23",
+      "title": "Honeycomb: Secure and Efficient GPU Executions via Static Validation",
+      "base_equation": "Runtime-enforced GPU TEE + Sy + Fs + Ig -> Honeycomb",
+      "source_text_sha256": "280f3167606e50689a45da78770f9be71f902d089c054bb3f27f8d8993d7ff2c",
+      "audit_receipt_sha256": "3e004a60efa88c482ade10b20b36d4d8a7d8f31b51f61e4384ffcac632a2367b",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "supporting",
+          "explanation": "Retains validated GPU code and its preconditions after load-time analysis; later launches check the actual arguments against those preconditions without repeating the full analysis.",
+          "sections": [
+            "6 Security monitors",
+            "11.4 Overheads"
+          ],
+          "paper_url": "https://www.usenix.org/system/files/osdi23-mai.pdf",
+          "source_passages": [
+            115,
+            176
+          ]
+        }
+      ],
+      "before_sha256": "454c0c02d447109b7c4f9012d099a27ed865c0c643e1dbe1b7a8db83538cb942",
+      "after_sha256": "ef6b3b04dbb5b12153566986d4c15872659a36c36102806260ee043ae0b311ed"
+    },
+    {
+      "paper_id": "osdi23-13",
+      "source_id": "osdi23",
+      "title": "Kerveros : Efficient and Scalable Cloud Admission Control",
+      "base_equation": "Early-Binding Admission Control + Al + La + Ad -> Kerveros",
+      "source_text_sha256": "74c5d7c855ac99b950eafc887abbecafed4636a2e7bebe9cab07685629dd1dd3",
+      "audit_receipt_sha256": "ad7a3a514c8a722cd9883935d4ac4fe10b39a08125cf00ad109a7c783539b941",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "supporting",
+          "explanation": "Caches available-capacity estimates and updates only changed machines, reusing the estimates across admission requests.",
+          "sections": [
+            "4.2 Practical Considerations",
+            "4.1.1 Allocation Worker Instances"
+          ],
+          "paper_url": "https://www.usenix.org/system/files/osdi23-sajal.pdf",
+          "source_passages": [
+            164,
+            151
+          ]
+        },
+        {
+          "tag": "Rv",
+          "role": "core",
+          "explanation": "Represents protected capacity independently of specific machines, binds it when claimed, and allows preemptible workloads to use the unclaimed physical capacity.",
+          "sections": [
+            "1 Introduction",
+            "3.1 Buffers"
+          ],
+          "paper_url": "https://www.usenix.org/system/files/osdi23-sajal.pdf",
+          "source_passages": [
+            33,
+            86
+          ]
+        }
+      ],
+      "before_sha256": "0e7da7b5a1107ebbd5c260df556eb8e13f4bf9b17f2a6e88f712e57f5c53cbd7",
+      "after_sha256": "cbdeff283b5da6144c1e3dfc89958c2e2cb5c95b73425476b71b1076a48a8795"
+    },
+    {
+      "paper_id": "osdi23-16",
+      "source_id": "osdi23",
+      "title": "ExoFlow: A Universal Workflow System for Exactly-Once DAGs",
+      "base_equation": "Tightly-coupled Recovery + Pm + Se + Wv -> ExoFlow",
+      "source_text_sha256": "c478ce1ae56224ec6c951ed983a9cc6517c8ee51794bb725378044420490b86e",
+      "audit_receipt_sha256": "7c0984553058c8c712a9649c2eb3ea19f3463e62d659253965172524888de46e",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "supporting",
+          "explanation": "Shares retained task outputs and stateful workers across downstream tasks, and reuses previously checkpointed references when extending streaming checkpoints.",
+          "sections": [
+            "2.2 Applications",
+            "3.4 References"
+          ],
+          "paper_url": "https://www.usenix.org/system/files/osdi23-zhuang.pdf",
+          "source_passages": [
+            71,
+            139
+          ]
+        }
+      ],
+      "before_sha256": "e1c37755da0908429639632817b10b8ba72ec341e3db01db4d5e7b048c65dc0b",
+      "after_sha256": "be105b0690d210504b302c5630acb90b6d263f2fcd8d291558c46d4f78c526b5"
+    },
+    {
+      "paper_id": "osdi23-20",
+      "source_id": "osdi23",
+      "title": "Chardonnay: Fast and General Datacenter Transactions for On-Disk Databases",
+      "base_equation": "System R* (Contention-unaware) + Bo + Op + Cz -> Chardonnay",
+      "source_text_sha256": "8f94043449db4ba20e8170ecf57e2175c3bffb9c83a25b5c861af19073101e73",
+      "audit_receipt_sha256": "bf81da782084df749c62b7dbfbe16b071d236f0317d63a290343f070a2eeff3e",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "supporting",
+          "explanation": "Retains records fetched during a transaction's dry run in a pinned buffer so the subsequent locked execution can reuse them without another storage access.",
+          "sections": [
+            "7.3 Design"
+          ],
+          "paper_url": "https://www.usenix.org/system/files/osdi23-eldeeb.pdf",
+          "source_passages": [
+            125,
+            126
+          ]
+        }
+      ],
+      "before_sha256": "9c4b208ef53becd053ad9fcc80fb4256228919feb1edbf4c5ba125a38b725dc4",
+      "after_sha256": "77789946a4772d3d4009f26ac6247c69a52dcefd6e130cab02d8a422bcef2bc6"
+    },
+    {
+      "paper_id": "osdi23-28",
+      "source_id": "osdi23",
+      "title": "No Provisioned Concurrency: Fast RDMA-codesigned Remote Fork for Serverless Computing",
+      "base_equation": "Checkpoint/Restore Remote Fork + Ha (Hardware-Aware) + Wv (Result-Preserving Work Avoidance) + Sy (Security via Isolation) -> MITOSIS",
+      "source_text_sha256": "37239e50c7d3b5d04f4ee350d104e0a9f5ecf3b15f05922d36e5a0e7180889a0",
+      "audit_receipt_sha256": "64c4a2213011ad304451823bc12bdd89a1997c67d9a4de6ea524b3dfabf4595a",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "supporting",
+          "explanation": "Caches pages fetched for a completed child so later children of the same parent can reuse local pages instead of fetching them remotely again.",
+          "sections": [
+            "Connection-based memory access control and isolation.",
+            "6.1 Fork-aware serverless platform"
+          ],
+          "paper_url": "https://www.usenix.org/system/files/osdi23-wei-rdma.pdf",
+          "source_passages": [
+            137,
+            150
+          ]
+        },
+        {
+          "tag": "Rv",
+          "role": "core",
+          "explanation": "Backs a child container's virtual address space with its remote parent's memory and fetches pages on demand, separating logical addresses from local physical backing.",
+          "sections": [
+            "1 Introduction",
+            "5.4 RDMA-Aware virtual memory management"
+          ],
+          "paper_url": "https://www.usenix.org/system/files/osdi23-wei-rdma.pdf",
+          "source_passages": [
+            37,
+            122
+          ]
+        }
+      ],
+      "before_sha256": "1ffb6a4d4366db835b0d6b5e224c28ea7d045d108934f9aae150c98cda14046d",
+      "after_sha256": "ae3ab950e1a115bd734a62a3dea66bd354814ed8d44d72cfa15698b166a44f69"
+    },
+    {
+      "paper_id": "osdi23-32",
+      "source_id": "osdi23",
+      "title": "ORC: Increasing Cloud Memory Density via Object Reuse with Capabilities",
+      "base_equation": "Blind Page Scanning + Se + Sy + Mo -> ORC",
+      "source_text_sha256": "b6b905e47b26a42e7b63698f9c86edd0602d4051cb59025d4e93b6d8c16a11e5",
+      "audit_receipt_sha256": "ee89ed04c78ddb3dae19a83c5fea7df14950ab0b90f3c7c8b77b9fa50596290f",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "core",
+          "explanation": "Retains loaded immutable binary objects and distributes capabilities to later compartments, avoiding repeated loading and relocation of the same object.",
+          "sections": [
+            "3 Design of ORC",
+            "3.1 Architecture overview"
+          ],
+          "paper_url": "https://www.usenix.org/system/files/osdi23-sartakov.pdf",
+          "source_passages": [
+            91,
+            99
+          ]
+        }
+      ],
+      "before_sha256": "85ef8eb8ec002c77b9701141d12ab2c611a0d7cfbb737ec2493daf369fcac465",
+      "after_sha256": "2b4ca9eee898479bc6e120ee4e54fad83d6ab242d9dbc3d7c2b5910880e9af62"
+    },
+    {
+      "paper_id": "osdi23-41",
+      "source_id": "osdi23",
+      "title": "EINNET: Optimizing Tensor Programs with Derivation-Based Transformations",
+      "base_equation": "POR Optimization + Al + Ep + Pm -> EINNET",
+      "source_text_sha256": "561948191c1ac6bc03e9e978ad03c722febe7de13aeb0a5052e7d044502c21b3",
+      "audit_receipt_sha256": "087efde369e7007057ba43594a3f61513143c78b8fdb22de09945c7bccd87551",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "supporting",
+          "explanation": "Retains canonical expression fingerprints to avoid revisiting explored states and precomputes weight-only expressions for reuse during execution.",
+          "sections": [
+            "3 Tensor Algebra Expression",
+            "6.2 Redundancy Pruning"
+          ],
+          "paper_url": "https://www.usenix.org/system/files/osdi23-zheng.pdf",
+          "source_passages": [
+            59,
+            153
+          ]
+        }
+      ],
+      "before_sha256": "2f45e1a53965bf42062a8eadb698718461f1c2c264b2e5d6abc7cb37a994cfdf",
+      "after_sha256": "a42f296cf0b7bf2b53a219371df95d66bb8ecda0881c1c4de90408236e1ada38"
+    },
+    {
+      "paper_id": "osdi23-47",
+      "source_id": "osdi23",
+      "title": "Spoq: Scaling Machine-Checkable Systems Verification in Coq",
+      "base_equation": "Manual verification with C subsetting + Au + Al + Ep -> Spoq",
+      "source_text_sha256": "9f4fb6c07f696e37686e964f2a88608066995e2cc1fbea729600753971eb5c8c",
+      "audit_receipt_sha256": "9e523d1ee90510f77fc5b2c61bf3039bef1db8e0de9d64a5d3fc45470d61faf7",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "supporting",
+          "explanation": "Carries discovered equivalences into proof checking as reusable annotations and retains specifications and proofs for unchanged layers.",
+          "sections": [
+            "2 Spoq Usage Model",
+            "6 Synthesizing Lifting Refinements"
+          ],
+          "paper_url": "https://www.usenix.org/system/files/osdi23-li-xupeng.pdf",
+          "source_passages": [
+            46,
+            122
+          ]
+        }
+      ],
+      "before_sha256": "0883f2b455dd454eb4b79e39e22d1e1b22aa52ad972af9330290484a36c33dc6",
+      "after_sha256": "bbb87f2fee9cdccfb725dc9a59cb955576f837d11f28b739bb8ec79522d99a35"
+    },
+    {
+      "paper_id": "osdi23-53",
+      "source_id": "osdi23",
+      "title": "ServiceRouter: Hyperscale and Minimal Cost Service Mesh at Meta",
+      "base_equation": "Sidecar Proxy Mesh + Fp (Function Placement) + Ad (Adaptive Processing) + Pm (Policy/Mechanism) -> ServiceRouter",
+      "source_text_sha256": "272dde41571941e8410b88df0881cb78bb13f413475d0bfcefb606eafbe887d0",
+      "audit_receipt_sha256": "7bbe19507862fd1427a3194c689df22d481547d4484f3e0f1950c87dd3f25a1c",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "supporting",
+          "explanation": "Caches routing metadata and subscribes to updates, avoiding repeated metadata retrieval while retaining usable routing state across requests and restarts.",
+          "sections": [
+            "3.2 Service Discovery",
+            "3.4.2 RPC Connection Reuse"
+          ],
+          "paper_url": "https://www.usenix.org/system/files/osdi23-saokar.pdf",
+          "source_passages": [
+            90,
+            118
+          ]
+        }
+      ],
+      "before_sha256": "f50b602862b78c3b6f6c5421de595088cf1b148ba9718bbc9196ac37c183554b",
+      "after_sha256": "46021cb076b479fecb35325361e7a0456f1919462434925e7b190afbf42165c0"
+    },
+    {
+      "paper_id": "osdi23-54",
+      "source_id": "osdi23",
+      "title": "Characterizing Off-path SmartNIC for Accelerating Distributed Systems",
+      "base_equation": "Single-Path Offloading + Fp (Function Placement) + Bo (Bottleneck-Oriented) -> Multi-Path SmartNIC Acceleration",
+      "source_text_sha256": "09301dc968e6b1b6f520bc7d2050e61132da8c5396af3cc3c47fc4a2d63e5855",
+      "audit_receipt_sha256": "b0e14b9c4a7da5d803b55c36f148a4fdf715190f289318dc0e55004dbe72eb77",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "supporting",
+          "explanation": "Keeps hot values in network-adapter memory so cache hits avoid repeated transfers from host memory.",
+          "sections": [
+            "5.2 Disaggregated key-value store"
+          ],
+          "paper_url": "https://www.usenix.org/system/files/osdi23-wei-smartnic.pdf",
+          "source_passages": [
+            180,
+            186
+          ]
+        }
+      ],
+      "before_sha256": "c4a6aa9a6b5ec651d6031b35105685c5e16074f4df274b8c0ceea81dfca268d4",
+      "after_sha256": "61dfbde10d922f36555d7f329425fb1bf5b42a1e36ee517def94ae7d93aa0c29"
+    },
+    {
+      "paper_id": "vldb2003-21",
+      "source_id": "vldb2003",
+      "title": "Holistic Twig Joins on Indexed XML Documents",
+      "base_equation": "Holistic Twig Join + Wv + Cm -> TSGeneric+",
+      "source_text_sha256": "e7e9ef8d01f290ffe49c64ad9e5e11f69676b0d6b2ee1ae6251f7956490fe338",
+      "audit_receipt_sha256": "24e199042d3bee6f793aca9238739555ec38c0ffe04d0d481de147cfec27e86e",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "supporting",
+          "explanation": "Retains the root-to-leaf cursor path and current entry positions, allowing subsequent twig-join navigation to continue without restarting index lookup.",
+          "sections": [
+            "3.1 Preliminaries",
+            "4.2.2 Implementation of the cursor interface"
+          ],
+          "paper_url": "https://vldb.org/conf/2003/papers/S09P03.pdf",
+          "source_passages": [
+            44,
+            128
+          ]
+        }
+      ],
+      "before_sha256": "fea7f0a4e27d6b6c440dceddb38fbe6ec9880e8db426e07a4879f3930043f8c5",
+      "after_sha256": "bc8cbfc473323a42b33693823438c32fd3696b2a5be76ae3fee6a47e3123d362"
+    },
+    {
+      "paper_id": "vldb2003-23",
+      "source_id": "vldb2003",
+      "title": "Scheduling for shared window joins over data streams",
+      "base_equation": "LWO (Fixed FIFO Scheduling) + Ad (Adaptive Processing) + Cm (Cost-based) -> MQT",
+      "source_text_sha256": "3408ae1b60b8c6426ac26827bc71e276cb5d9ba236b318d9bb229811a6a7ed70",
+      "audit_receipt_sha256": "6d461b1e025cd72c886b485591b40c3cba91b83a5bbc581a4bd2b6436e7b2b5b",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "supporting",
+          "explanation": "Retains partially completed window-join work and its resume position so processing a larger window continues from the completed portion.",
+          "sections": [
+            "3.2. Smallest Window First (SWF)",
+            "3.3 Maximum Query Throughput (MQT)"
+          ],
+          "paper_url": "https://vldb.org/conf/2003/papers/S10P02.pdf",
+          "source_passages": [
+            78,
+            111
+          ]
+        }
+      ],
+      "before_sha256": "cb165b0107e205807c5e0896d319e2ac0dbc36e9055dd331963af2e795fc253c",
+      "after_sha256": "526931e425ab9a177e674e05817c6e49435fc9d2f12b0ee3cfe77ae179a64d60"
+    },
+    {
+      "paper_id": "vldb2003-24",
+      "source_id": "vldb2003",
+      "title": "Load Shedding in a Data Stream Manager",
+      "base_equation": "Admission Control + Ad + Cm + Se -> QoS-Aware Load Shedding",
+      "source_text_sha256": "65577d8cf501c0a346039050939873d12ec7cf76c32957b58b48ccc76ad74972",
+      "audit_receipt_sha256": "8258acc9a9be588c9dd57dc8882fa98546742a8768822e3e88f6ec1c922ce4e8",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "supporting",
+          "explanation": "Precomputes load-shedding plans and their cost and quality effects, then reuses them when selecting a runtime response to overload.",
+          "sections": [
+            "4.1 Algorithm Structure",
+            "4.2 Overload Detection"
+          ],
+          "paper_url": "https://vldb.org/conf/2003/papers/S10P03.pdf",
+          "source_passages": [
+            45,
+            59
+          ]
+        },
+        {
+          "tag": "Qr",
+          "role": "core",
+          "explanation": "Drops selected tuples to meet processing capacity while minimizing loss under application quality functions; the supported query network returns a subset of the complete answer.",
+          "sections": [
+            "2 Aurora Overview",
+            "3 The Problem"
+          ],
+          "paper_url": "https://vldb.org/conf/2003/papers/S10P03.pdf",
+          "source_passages": [
+            28,
+            37
+          ]
+        }
+      ],
+      "before_sha256": "674b68884b38f25b4c3fe3df492dea9d91cc7feb7b1e9b46b3b1428ec99c2908",
+      "after_sha256": "79beb32f32d69a58244169990fe36480963b261d78f0e614ebf1e5118dcc15c4"
+    },
+    {
+      "paper_id": "vldb2003-33",
+      "source_id": "vldb2003",
+      "title": "Data Morphing: An Adaptive, Cache-Conscious Storage Technique",
+      "base_equation": "Static Data Layout + Wa + Cm + Ha -> Data Morphing",
+      "source_text_sha256": "9a930e2772681a20476b58c2052df78cc3c7cc039a983e5a558c6c22858c84fe",
+      "audit_receipt_sha256": "c6ccac7f45bf558b93310e155e01a9d3d2de3b5d021144376283e4338b41a440",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "supporting",
+          "explanation": "Tabulates the modeled cost of each attribute group and reuses those values when evaluating alternative storage partitions.",
+          "sections": [
+            "4.2.3 Naive Algorithm"
+          ],
+          "paper_url": "https://vldb.org/conf/2003/papers/S13P03.pdf",
+          "source_passages": [
+            100,
+            107
+          ]
+        }
+      ],
+      "before_sha256": "5e738bd4cde82eb913efb55644c84544542e3e833fc29dbc9c20873f0b052187",
+      "after_sha256": "2aef4cd10d1a8844dc2e260c0af9011ce7905f3893e789f17dd1cdac183c1cef"
+    },
+    {
+      "paper_id": "vldb2003-36",
+      "source_id": "vldb2003",
+      "title": "Data Bubbles for Non-Vector Data: Speeding-up Hierarchical Clustering in Arbitrary Metric Spaces",
+      "base_equation": "Vector-Space Summaries + Gr + Se -> Non-Vector Data Bubbles",
+      "source_text_sha256": "30756c9235d48e5ec36550cebbd1f96a8edcc0b3f8368fdf6fe076663bec3d75",
+      "audit_receipt_sha256": "da248eb7a8f12fe379273939da21514b39ad96720677d196148252ebc6ec5ea8",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "supporting",
+          "explanation": "Reuses distances already computed during object classification to construct the additional distance summaries needed for clustering.",
+          "sections": [
+            "4. Data Bubbles for Non-Vector Spaces",
+            "4.3   The Distance Between Data Bubbles"
+          ],
+          "paper_url": "https://vldb.org/conf/2003/papers/S14P03.pdf",
+          "source_passages": [
+            62,
+            140
+          ]
+        }
+      ],
+      "before_sha256": "4593b53c06012ba58dbf8d0907e1aff4f7766d8ced6b1086155d3370190b75e7",
+      "after_sha256": "174e4ddef71621c91851dc4f708b28976fcc10ca63eaf69299a7d5f6ff153532"
+    },
+    {
+      "paper_id": "vldb2003-41",
+      "source_id": "vldb2003",
+      "title": "Continuous K-Nearest Neighbor Queries for Continuously Moving Points with Updates",
+      "base_equation": "Indexed k-NN Search + Cc + Wv + Fp -> Continuous Windowing k-NN",
+      "source_text_sha256": "decbfc4cdbabd564bbb0f8b6841f5f8774336ba5bb87e3eadf7aebd44382021d",
+      "audit_receipt_sha256": "05b369ec303ff418ad75459ba8b8877712dc13edd044eb12c942dfc8d901e1cd",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "core",
+          "explanation": "Retains a candidate window and future boundary events so continuous nearest-neighbor maintenance can reuse local state instead of repeatedly scanning the base relation.",
+          "sections": [
+            "2 Background",
+            "5 Continuous Windowing KNN (CW)"
+          ],
+          "paper_url": "https://vldb.org/conf/2003/papers/S16P02.pdf",
+          "source_passages": [
+            44,
+            85
+          ]
+        }
+      ],
+      "before_sha256": "3dece8ffd58ea5de743581f24414decf2db74f10351a4cdd22fea4f2948e33ab",
+      "after_sha256": "1f0e683bbc04ea324067c629909379ef8386221760089bd7b3a93b8b3317b666"
+    },
+    {
+      "paper_id": "vldb2003-45",
+      "source_id": "vldb2003",
+      "title": "Adaptive, Hands-Off Stream Mining",
+      "base_equation": "Human-Tuned Time-Domain Modeling + Al + Au + Ad -> AWSOM",
+      "source_text_sha256": "1d4dd8ed5ada6703bd3fc6ee663745fa7e20216060521347469c636cffc54fe1",
+      "audit_receipt_sha256": "4e083517da772a4db3e354ee78aee36b7114840d3eb0d7bf8ebd67b5810a62dc",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "supporting",
+          "explanation": "Maintains wavelet coefficients and regression statistics incrementally, reusing prior state rather than rescanning the stream for each model update.",
+          "sections": [
+            "3.2 Wavelets",
+            "B Recursive Least Squares (RLS)"
+          ],
+          "paper_url": "https://vldb.org/conf/2003/papers/S17P03.pdf",
+          "source_passages": [
+            65,
+            218
+          ]
+        }
+      ],
+      "before_sha256": "e35a6f10300181a5948deb1aca29806810acc68e36bf1868aa49ad602a38a6a4",
+      "after_sha256": "df372a1525611e0f0a53469697ff8ef44fd9af81516bb529e84d2d49d81950fc"
+    },
+    {
+      "paper_id": "vldb2003-58",
+      "source_id": "vldb2003",
+      "title": "Cache Tables: Paving the Way for an Adaptive Database Cache",
+      "base_equation": "Static Caching (Materialized Views) + Ad + Wa + Se -> Adaptive Caching (Cache Tables)",
+      "source_text_sha256": "26012ac58b3b43412225d28cd41c6f9307f05a1100601f85ccad8cb9f16d0208",
+      "audit_receipt_sha256": "88cfdb66bcccacd9132c96e543d0f9c805975da77aae744e08069a645078a6c0",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "core",
+          "explanation": "Retains complete sets of related rows in cache tables and reuses compiled switching plans to answer later queries without repeating remote retrieval or compilation.",
+          "sections": [
+            "Abstract",
+            "4.2 Generating Query Plans for Dynamic Cache Tables"
+          ],
+          "paper_url": "https://vldb.org/conf/2003/papers/S22P01.pdf",
+          "source_passages": [
+            7,
+            111
+          ]
+        }
+      ],
+      "before_sha256": "89aa8cca493866e1da5713a61e83e4eda4c67c24464314885e68ee1e2640d31b",
+      "after_sha256": "6764193701a088879438fbf03fe81973dc5d9ddb5decf5cc4a559c3942adc856"
+    },
+    {
+      "paper_id": "vldb2003-64",
+      "source_id": "vldb2003",
+      "title": "The TPR*-Tree: An Optimized Spatio-Temporal Access Method for Predictive Queries",
+      "base_equation": "TPR-tree (Time-Integrated R*-tree Heuristics) + Cm + Ad -> TPR*-tree",
+      "source_text_sha256": "c4465a165d9c801d5eb17f896a13f400aa359776749440cba71fee8830dc546c",
+      "audit_receipt_sha256": "805f686b909c23c8ff03849d5335904b9465a269cea4302dec224538fab246d6",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "supporting",
+          "explanation": "Uses node contents already fetched during deletion search to tighten ancestor bounds while those ancestors are being updated.",
+          "sections": [
+            "4.2 Deletion"
+          ],
+          "paper_url": "https://vldb.org/conf/2003/papers/S24P01.pdf",
+          "source_passages": [
+            117,
+            118
+          ]
+        }
+      ],
+      "before_sha256": "685d449c548526d195e33cdba713ae00fa576cf22dbb3a5584b6ee66c118e532",
+      "after_sha256": "b3a4a47af576060888e2fd10cb6112a1914aa9cce19529349b9d0eeb6fc70cce"
+    },
+    {
+      "paper_id": "vldb2003-71",
+      "source_id": "vldb2003",
+      "title": "Locating Data Sources in Large Distributed Systems",
+      "base_equation": "DHT Catalog (Uniform Access Assumption) + Ad + Al -> Workload-Aware Distributed Catalog",
+      "source_text_sha256": "a8e3a146c60469541ca8e0974ba1da961ddd4e12c7532baefc2e164d38d42fb5",
+      "audit_receipt_sha256": "9e788dc603898e050669b84c4410b40f4d2c0290263462fb21012d7fc6f005ca",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "supporting",
+          "explanation": "Caches mappings to split or replicated catalog entries so later lookups can directly reach the appropriate entries.",
+          "sections": [
+            "6.1. Structure Based Splitting",
+            "7.3.2. Data Summary Sizes"
+          ],
+          "paper_url": "https://vldb.org/conf/2003/papers/S26P02.pdf",
+          "source_passages": [
+            80,
+            123
+          ]
+        }
+      ],
+      "before_sha256": "1979df3fe5c586ed7ba162461c40a9c041134e736857b8287d111cf80188464f",
+      "after_sha256": "3d2fe0960a0ad1406e2fe5df86ff9c92b24c816aee81e5b7b1c2a6073e828b27"
+    },
+    {
+      "paper_id": "vldb2023-39",
+      "source_id": "vldb2023",
+      "title": "Declarative Sub-Operators for Universal Data Processing",
+      "base_equation": "Monolithic Operators + Pm + Mo + Au -> LingoDB (with sub-operators)",
+      "source_text_sha256": "7ae094accebff5c3f9576971019631c80fc6e63723a6a4a2df5cc00a779ffbe6",
+      "audit_receipt_sha256": "cbaa704092a0650c54c396df3d572958dd81db69ef92b0f176569fef2ff83ce6",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "supporting",
+          "explanation": "Shares scans and built data structures between pipelines and retains partial aggregates for repeated window evaluation.",
+          "sections": [
+            "4.1 Complex Relational Operators",
+            "6 IMPLEMENTATION IN LINGODB"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p3461-jungmair.pdf",
+          "source_passages": [
+            60,
+            92
+          ]
+        }
+      ],
+      "before_sha256": "1b9f4e5c2bd0d5249cf553ac1e8662340e08fc8086bd6fec1d7fd54ac8e53f29",
+      "after_sha256": "b1b5aebecb0d0c9c12e0c0705c80fe7593eb1d4ae34c67489868104f7fd4b6ba"
+    },
+    {
+      "paper_id": "vldb2023-40",
+      "source_id": "vldb2023",
+      "title": "Fine-Grained Re-Execution for Efficient Batched Commit of Distributed Transactions",
+      "base_equation": "OCC with Batch Aborts + Se + Wv + Fp -> Hackwrench",
+      "source_text_sha256": "051cde51bf8b1bb22dbc3db271993732a0d822191b268a21d3e3945ce995dbbb",
+      "audit_receipt_sha256": "181fedc45ad20d523ddb631a8c7dbb29360ee6d972b40e3594e53fdbeeb7e843",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "core",
+          "explanation": "Retains unaffected transaction reads and computed outputs during repair, recomputing only operations that depend on changed versions.",
+          "sections": [
+            "2.3 Our Approach",
+            "4 IMPLEMENTATION"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p1930-dong.pdf",
+          "source_passages": [
+            58,
+            106
+          ]
+        }
+      ],
+      "before_sha256": "823cfe5ae317c237088ff4420276f2c30980b69c35b3b62f2369112a194ebda5",
+      "after_sha256": "ef1b78bfac028c36d1fa53d177de6759ca8e2ced3c2d27d425a181e09abfe66d"
+    },
+    {
+      "paper_id": "vldb2023-46",
+      "source_id": "vldb2023",
+      "title": "Scalable and Robust Snapshot Isolation for High-Performance Storage Engines",
+      "base_equation": "Global Visibility MVCC + Is + Cz + Ad -> LeanStore MVCC",
+      "source_text_sha256": "d6c5050439a5177afcd3c0de7037d22f12a651f592d7d71d7803a951954a0efa",
+      "audit_receipt_sha256": "ef081606e25bb8e0c36889adacf87cc8d8b3c75f9c8aca25700bf3b81c1d3c30",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "supporting",
+          "explanation": "Caches cross-worker commit-timestamp lookups so subsequent version checks can reuse the result.",
+          "sections": [
+            "3.1 Snapshot Ordering and Instant Commit",
+            "3.5 Putting Everything Together"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p1426-alhomssi.pdf",
+          "source_passages": [
+            69,
+            104
+          ]
+        }
+      ],
+      "before_sha256": "92a60b63f6db1548fae9b123802bea250902a2f4211ba74d8b37d8144387a834",
+      "after_sha256": "b9833ce9554e508c194fe7e57dced0fe1a04923fa9407aa31814c5b3074f9cfa"
+    },
+    {
+      "paper_id": "vldb2023-52",
+      "source_id": "vldb2023",
+      "title": "What Modern NVMe Storage Can Do, And How To Exploit It: High-Performance I/O for High-Performance Storage Engines",
+      "base_equation": "OS-managed threading + Bo + Ha -> DBMS-managed cooperative multitasking",
+      "source_text_sha256": "3386d704f0553e66809e4a77c576e84ac09cad58f434b7dd0833ee984b94a71c",
+      "audit_receipt_sha256": "5ad386d454d03f405c79f2faf89769cb14be64a81603bfcac8a727f69bdabb72",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "supporting",
+          "explanation": "Retains optimistic parent pointers and validates them during eviction, avoiding repeated root-to-parent traversals when the pointers remain valid.",
+          "sections": [
+            "3.5 CPU Optimizations and Scalability",
+            "What Modern NVMe Storage Can Do, And How To Exploit It: High-Performance I/O for High-Performance Storage Engines"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p2090-haas.pdf",
+          "source_passages": [
+            100,
+            21
+          ]
+        }
+      ],
+      "before_sha256": "0bac9ea0906b670dd094e55f27cf35e244eb5648374ba5259890b803a0e9ae52",
+      "after_sha256": "2e301e3a88a578291100a713f5fd42f660b5e4a8442c8b2719f6f777ef34b8e8"
+    },
+    {
+      "paper_id": "vldb2023-53",
+      "source_id": "vldb2023",
+      "title": "NV-SQL: Boosting OLTP Performance with Non-Volatile DIMMs",
+      "base_equation": "DRAM-SSD DBMS with Volatile Buffering + Ha + Wa + Cz -> NV-SQL",
+      "source_text_sha256": "fc9e6411b534c8effa335726cc026048d28f157aa1c945175b389f1e0b84a692",
+      "audit_receipt_sha256": "d9169fe96224856e93f56a30b4ffd2eeda9e3a7c80d6de9d7cdd0e3c21282ec0",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "core",
+          "explanation": "Retains write-hot pages in persistent memory for subsequent reads and updates; action-consistent pages can also be reused after recovery.",
+          "sections": [
+            "4.2 Basic Framework",
+            "4.3 Page Admission Policy"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p1453-lee.pdf",
+          "source_passages": [
+            66,
+            71
+          ]
+        }
+      ],
+      "before_sha256": "acd634ff282ab42c3df3e1e080507ddaaa7b99fb837471de6634d1effd861fcd",
+      "after_sha256": "fea9889ab6875609d1e3884f6c4cc75150c7706a0ac6dbebde5e6ceb7571cd9f"
+    },
+    {
+      "paper_id": "vldb2023-55",
+      "source_id": "vldb2023",
+      "title": "Efficient framework for operating on data sketches",
+      "base_equation": "O(m*n) Sketch Updates + Wv + Gr + Ep -> FastExpSketch",
+      "source_text_sha256": "bca394bda02c54e4ba767e74839e1e01145477f2b17da1d658c2437091ed455d",
+      "audit_receipt_sha256": "560d53ac1ce695be798cc4bc7a9c104cb13e7ef67157026b8933cda1f3b413a2",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "supporting",
+          "explanation": "Maintains the current maximum sketch statistic and recomputes it only when an update invalidates that retained maximum.",
+          "sections": [
+            "4.1 Algorithm construction"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p1967-lemiesz.pdf",
+          "source_passages": [
+            85,
+            87
+          ]
+        }
+      ],
+      "before_sha256": "c0bca51dc6779181cbdc2a18844251bb35a5f00522ceaa7d6cce3b98171b8385",
+      "after_sha256": "212a9fc0cf5f213b6e93a45217d6c51dfd01789031dbac18e9e3fba100019d73"
+    },
+    {
+      "paper_id": "vldb2023-65",
+      "source_id": "vldb2023",
+      "title": "TreeLine: An Update-In-Place Key-Value Store for Modern Storage",
+      "base_equation": "LSM (Sequential-Write Optimized) + Ha + Cc + Lo -> TreeLine",
+      "source_text_sha256": "dcbd35fe47a1269c1dda9eec1e0295c8900659f1c6398b826ab13a448655b969",
+      "audit_receipt_sha256": "0ba55cbe8eea928b623b3bd54a777047c877d19f6d03b5d3b7e6476d882064c4",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "core",
+          "explanation": "Caches individual records so repeated reads and updates can use memory-resident data rather than access the disk page again.",
+          "sections": [
+            "1 INTRODUCTION",
+            "4.2 Record Cache (Key Idea A)"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p99-yu.pdf",
+          "source_passages": [
+            27,
+            74
+          ]
+        }
+      ],
+      "before_sha256": "357aff41507d2d1f8cb54864a2e0ac325bc2cb23ca3897d51302ffdefa2b55be",
+      "after_sha256": "8c654560a4c84cb30ecb02e6d7dbc593c3a200d47f07352c4d9e62071d32b21d"
+    },
+    {
+      "paper_id": "vldb2023-68",
+      "source_id": "vldb2023",
+      "title": "DINOMO: An Elastic, Scalable, High-Performance Key-Value Store for Disaggregated Persistent Memory",
+      "base_equation": "Shared-Everything DPM KVS + Fp + Ad + Cz -> Dinomo",
+      "source_text_sha256": "9fbf281a1480fba7c253530aac9190c10f54ca5d4091c502492526d51f1fbe85",
+      "audit_receipt_sha256": "41a72992eac7a75ca1a9223e30d8df5663cb1d927853bd1b5e21beb2db61380f",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "core",
+          "explanation": "Retains both fetched values and remote-location shortcuts, avoiding remote data transfers or repeated remote index traversal on cache hits.",
+          "sections": [
+            "3.3 Disaggregated Adaptive Caching"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol15/p4023-lee.pdf",
+          "source_passages": [
+            76,
+            85
+          ]
+        }
+      ],
+      "before_sha256": "cd956f371134d437182e393c5b35c641d1750e7c6a3bfd52941dd64b511efb36",
+      "after_sha256": "5091a8192b56591e6e21d5a037249b2f1cd9963da96ae10a0db3ab997a1dba73"
+    },
+    {
+      "paper_id": "vldb2023-73",
+      "source_id": "vldb2023",
+      "title": "EQUI-VOCAL: Synthesizing Queries for Compositional Video Events from Limited User Interactions",
+      "base_equation": "Enumerative Query-by-Example + Bo + Cm + Ad -> EQUI-VOCAL",
+      "source_text_sha256": "fde4cc2494ee2fc94c19dd10dceb9ec50fcbac8bcf10b8db00db1b47936dcd50",
+      "audit_receipt_sha256": "3ba9abf262911e2509ca23f4967db72a8ab6683fe1ad1d8f78954bcf053ee039",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "supporting",
+          "explanation": "Caches intermediate matches for query prefixes and reuses them when evaluating later candidate video queries with the same prefix.",
+          "sections": [
+            "4 QUERY EXECUTION"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p2714-zhang.pdf",
+          "source_passages": [
+            112,
+            113
+          ]
+        }
+      ],
+      "before_sha256": "dde7bb9efafc74bc32e4a2c967ba2ca9c6e80b86b76e98016b862ea72d096858",
+      "after_sha256": "3b65cd4312c8797c5776bcf99d99af1f13df36fb4796fd503026468c7f8dfdb3"
+    },
+    {
+      "paper_id": "vldb2023-81",
+      "source_id": "vldb2023",
+      "title": "Waffle: A Workload-Aware and Query-Sensitive Framework for Disk-Based Spatial Indexing",
+      "base_equation": "Static Spatial Index + Bo + Cz + Wa -> Waffle",
+      "source_text_sha256": "9f324193e4de6f47a846c7c63c6f85f885ba7f2b668211961d9542e5deafd4fa",
+      "audit_receipt_sha256": "b31deea0f5069c5179a73d9cd534489368c619f3bbee7d4005d65fd6149a05ac",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "supporting",
+          "explanation": "Retains the split decisions that produced child nodes and reuses those decisions when an overflowing directory must itself be split.",
+          "sections": [
+            "3.1 Algorithm",
+            "4.1 Insertions and Deletions"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p670-moti.pdf",
+          "source_passages": [
+            49,
+            83
+          ]
+        }
+      ],
+      "before_sha256": "602872b10bec44e5f37f82507d7383f3b23aeb6456398ab57bd3113efa722d28",
+      "after_sha256": "065e98a5f5151eeccba3c7de64814e8a1873dfe70eafd3d5d580db3794077cda"
+    },
+    {
+      "paper_id": "vldb2023-88",
+      "source_id": "vldb2023",
+      "title": "FARGO: Fast Maximum Inner Product Search via Global Multi-Probing",
+      "base_equation": "LSH with Local Probing + Cm + Pd + Ad -> FARGO",
+      "source_text_sha256": "a6e46cbb04d88b14ff500010f982d34027e20eb20a5b85d8cd982a28ce2c6992",
+      "audit_receipt_sha256": "a8bc16b2ee15bbc8e62387c2aa1847e1599bac4e517e75c8337403ca3e13382a",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "supporting",
+          "explanation": "Shares hash functions across norm partitions so a query's projections and probing sequence can be computed once and reused across those partitions.",
+          "sections": [
+            "3.1 Data Preprocessing and Indexing",
+            "5.2 Algorithm Analysis"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p1100-zheng.pdf",
+          "source_passages": [
+            83,
+            201
+          ]
+        },
+        {
+          "tag": "Qr",
+          "role": "supporting",
+          "explanation": "Terminates probing when its probability model indicates a sufficiently small risk of missing a qualifying inner-product result, reducing search under the specified approximation criterion.",
+          "sections": [
+            "2.1 Problem Definition",
+            "4.2 Global Adaptive Early Termination"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p1100-zheng.pdf",
+          "source_passages": [
+            40,
+            157
+          ]
+        }
+      ],
+      "before_sha256": "8caa9c807a2fb0542419f3ffafd9d7599cfe1cb613fa193bec41cc9b74328057",
+      "after_sha256": "6e959e04b4500a7e2883323a77b7363f34b7c8aa81be42b6f66efc3ea7f4eb2d"
+    },
+    {
+      "paper_id": "vldb2023-93",
+      "source_id": "vldb2023",
+      "title": "k-Best Egalitarian Stable Marriages for Task Assignment",
+      "base_equation": "Brute-force Enumeration + Cm + Wv -> ENUM*-LR",
+      "source_text_sha256": "ee58946ec8b9b2eeff2db978e83461417c1bb1c1f2d8c1cdc288138a88cc07f6",
+      "audit_receipt_sha256": "c5c2ba642e8939ccc6236b55880af545ac0e648bae71c192baf31076662b44e1",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "supporting",
+          "explanation": "Retains rotation-successor sets and search bounds, avoiding repeated graph traversal and bound computation during matching enumeration.",
+          "sections": [
+            "Algorithm 1 ENUM*",
+            "Algorithm 2 ENUM*-LR"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p3240-wu.pdf",
+          "source_passages": [
+            131,
+            140
+          ]
+        }
+      ],
+      "before_sha256": "fcafa034bebd16a2c1197c85c66d14be59862a23060090d63fe4ec083b7d2219",
+      "after_sha256": "327080ce263be47a5c05db71ed62729aa237f1ecfe6a83f1c297a4a5f56c3f3f"
+    },
+    {
+      "paper_id": "vldb2023-106",
+      "source_id": "vldb2023",
+      "title": "Computing Rule-Based Explanations by Leveraging Counterfactuals",
+      "base_equation": "Incomplete Rule Verification + Ep + Gd -> Oracle-Guided Rule Search",
+      "source_text_sha256": "2787beb22dd69594fd1031174e0da6acae06a8cce771f7cbb04834e85b8c3283",
+      "audit_receipt_sha256": "882c4017a066287f0c2963fd0c2e3f6e7284705ee1f6b12d8ec60570ac69132f",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "supporting",
+          "explanation": "Caches counterfactual-model results for candidate rules so later consistency tests do not invoke the model again for the same candidate.",
+          "sections": [
+            "4.2 GeneticRuleCF",
+            "5.4 Microbenchmarks"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p420-geng.pdf",
+          "source_passages": [
+            113,
+            218
+          ]
+        }
+      ],
+      "before_sha256": "7638d5e51bcf00741d251d59ecebfec23e79f4435cada9ce3401ca8122a45661",
+      "after_sha256": "7d18f575c7144499f3aafe075accd6125c171d5ee30985279a30395bbc6bee87"
+    },
+    {
+      "paper_id": "vldb2023-127",
+      "source_id": "vldb2023",
+      "title": "Parallel Colorful h-star Core Maintenance in Dynamic Graphs",
+      "base_equation": "Global Peeling + Dc + Cz + Wv -> Local, Dynamic Core Maintenance",
+      "source_text_sha256": "4d794169264789d25c6d338216894eafbb50f38bb4d044b6f84400e0db348910",
+      "audit_receipt_sha256": "0ce20aa896bc09c26b91fe6a83daf60049f173ee6207d72ba838118489e878e0",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "supporting",
+          "explanation": "Reuses previous core numbers and coloring state, updating only the region affected by graph changes.",
+          "sections": [
+            "Algorithm 4: The EdgeDel algorithm",
+            "Algorithm 5: The EdgeIns algorithm"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p2538-gao.pdf",
+          "source_passages": [
+            111,
+            127
+          ]
+        }
+      ],
+      "before_sha256": "1539a778c42f8598a493fcb356c374f0551155d72f95504128c7699fea3de574",
+      "after_sha256": "ce3cc9f19ebf106a97d4a4e6694879f1a210ef9ff9fd83e3b9d95a0d97eb1616"
+    },
+    {
+      "paper_id": "vldb2023-132",
+      "source_id": "vldb2023",
+      "title": "Neighborhood-based Hypergraph Core Decomposition",
+      "base_equation": "Degree-based Cohesiveness + Se + Gr + Ig + Dc -> Neighborhood-based Core Decomposition",
+      "source_text_sha256": "3544612a2d0dfd06fbd48808f4458291c6785596797fa615ec2407871d335826",
+      "audit_receipt_sha256": "2f5031a70849271f95413763e86d4b682b7aca5eec3f4eda22629e529862f179",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "supporting",
+          "explanation": "Retains per-hyperedge statistics across incident-node computations and incrementally reuses accumulated neighbor sets across thresholds.",
+          "sections": [
+            "4 OPTIMIZATION AND PARALLELIZATION OF THE LOCAL-CORE ALGORITHM"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p2061-arafat.pdf",
+          "source_passages": [
+            121,
+            124
+          ]
+        }
+      ],
+      "before_sha256": "72c18705ca499d260e17b4f068f083c85f559b491bc67347dad0b9054d70ec1c",
+      "after_sha256": "6c3676314dacc380d8c7629610a0e87322b7565c8e6026e7b6e47fc6f17e25f4"
+    },
+    {
+      "paper_id": "vldb2023-140",
+      "source_id": "vldb2023",
+      "title": "L2chain: Towards High-performance, Confidential and Secure Layer-2 Blockchain Solution for Decentralized Applications",
+      "base_equation": "L1 Global Consensus + Fp + Cz + Sy -> L2chain",
+      "source_text_sha256": "caf29b94f957ca8215e4a15e290302bc9de510f55693e8fec8b19ac79f98a919",
+      "audit_receipt_sha256": "89401df49c783c497f8b79fc536f66450be3a07913f361e4e1e275f6710d052c",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "supporting",
+          "explanation": "Maintains cached group witnesses and updates them incrementally, reusing prior cryptographic work to generate later membership witnesses.",
+          "sections": [
+            "ABSTRACT",
+            "3.1 Design Goals and Challenges"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p986-chen.pdf",
+          "source_passages": [
+            7,
+            85
+          ]
+        }
+      ],
+      "before_sha256": "9b5da3139e23f9789ec11eb350bd8d74816b15cbcf9a91da9e0eba66f2353b96",
+      "after_sha256": "c4a1a07857499fd688b1bb59d38c2c33b6ccee5fce69abffae34c2ec10aabc2d"
+    },
+    {
+      "paper_id": "vldb2023-147",
+      "source_id": "vldb2023",
+      "title": "GlassDB: An Efficient Verifiable Ledger Database System Through Transparency",
+      "base_equation": "Log-based Verifiable DB + Si + Bo -> GlassDB",
+      "source_text_sha256": "00d01dff5e5aff9417e6a29b4c2e030bbb926691d95ae00e4197e6624289f977",
+      "audit_receipt_sha256": "c53d76fbe276b076ed17c9f64701e5e91b39e8f2337850e73a7e99b008143a58",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "core",
+          "explanation": "Shares unchanged copy-on-write index structure across state snapshots and reuses common traversal paths when retrieving data and proofs.",
+          "sections": [
+            "3.3 GlassDB Design"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p1359-ooi.pdf",
+          "source_passages": [
+            70,
+            83
+          ]
+        }
+      ],
+      "before_sha256": "dc3a0146dedfe7123992ebbba201eca9e93f785f64311fb539ca493a5684c96b",
+      "after_sha256": "5d13de16e4681b226fe47e937bd9ff3cf22a4d29ff1ffedd71b8801ca9c6a1be"
+    },
+    {
+      "paper_id": "vldb2023-148",
+      "source_id": "vldb2023",
+      "title": "FlexChain: An Elastic Disaggregated Blockchain",
+      "base_equation": "Monolithic Server Assumption + Fp + Ec + Se -> FlexChain",
+      "source_text_sha256": "f1386a5851a683befa00073779a46fc6985b3e605a94d64e85caf359c318b6f4",
+      "audit_receipt_sha256": "d7252bedb6f816d06e6b9a91d4ef7ebe9eae21d31215e3e9f27999793a7bef39",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "supporting",
+          "explanation": "Caches remote addresses and fetched records so later accesses and validation can reuse prior lookups and data retrieval.",
+          "sections": [
+            "4.1 Overview",
+            "6.4 Varying the Extent of Disaggregation"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p23-wu.pdf",
+          "source_passages": [
+            94,
+            156
+          ]
+        },
+        {
+          "tag": "Rv",
+          "role": "core",
+          "explanation": "Constructs logical blockchain peers from independently assigned shared compute, memory, and storage pools, allowing the backing resources to change without changing peer identity.",
+          "sections": [
+            "3.1 Comparing FlexChain with Generic XOV"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p23-wu.pdf",
+          "source_passages": [
+            55,
+            58
+          ]
+        }
+      ],
+      "before_sha256": "cd2023880a0bcc1c9c96199b7c2a0214e36de43bd7f76de54ff96b657ea45366",
+      "after_sha256": "6d179c462437f685035dd7116b10d007532eb687f8d58435900753ab71fe5f18"
+    },
+    {
+      "paper_id": "vldb2023-198",
+      "source_id": "vldb2023",
+      "title": "Seiden: Revisiting Query Processing in Video Database Systems",
+      "base_equation": "Proxy-based VDBMS + Bo + Ad + Lo -> Seiden",
+      "source_text_sha256": "a344d4dc5f31fb9d253294787176de15c0ccedbce8b1f811a6db7e2d5babd018",
+      "audit_receipt_sha256": "390ac72d402a0d24bcf49647773c76998cc38a6709cc629e403f6f50b924545c",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "supporting",
+          "explanation": "Retains oracle labels from index construction and earlier queries, reusing them to guide later sampling without repeating those model evaluations.",
+          "sections": [
+            "4.1 Index Construction",
+            "6.7 RQ6. Oracle Label Reuse Across Queries"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p2289-kakkar.pdf",
+          "source_passages": [
+            90,
+            199
+          ]
+        }
+      ],
+      "before_sha256": "e00e66325909d69b05cf9bb94ccb1b45c8dcc826263cd404eaf0ca8d53a21545",
+      "after_sha256": "58c246f72a47660badd6de268058d46d9e1d905caadca1769ebc1b2d48571b3b"
+    },
+    {
+      "paper_id": "vldb2023-220",
+      "source_id": "vldb2023",
+      "title": "Efficient Triangle-Connected Truss Community Search In Dynamic Graphs",
+      "base_equation": "Fine-grained Equivalence Classes (EquiTruss) + Al + Si -> Hierarchical Forest Index (EquiTree)",
+      "source_text_sha256": "83a84ca92a864372e9c955b4c8ceccbcc4afcd17d0ed2a8c79d7b817e121e89b",
+      "audit_receipt_sha256": "b84261b6433e08b4e52ab4b198a08a17f0170d354d87554d57277e579c5598a9",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "core",
+          "explanation": "Maintains a reusable truss index and modifies only affected portions after graph updates instead of rebuilding the complete search structure.",
+          "sections": [
+            "4.2 The Structure of EquiTree",
+            "5 INDEX MAINTENANCE"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p519-zhu.pdf",
+          "source_passages": [
+            68,
+            100
+          ]
+        }
+      ],
+      "before_sha256": "865d604cafd81688ece14a833702929ca171faffa788790536658f11869a27a2",
+      "after_sha256": "3eee2a2e30ee8ca7a0034910c72cc6cb097a39489aa9408ba5120e504e017c9c"
+    },
+    {
+      "paper_id": "vldb2023-223",
+      "source_id": "vldb2023",
+      "title": "On Efficient Approximate Queries over Machine Learning Models",
+      "base_equation": "Exhaustive Oracle Evaluation + La + Pd + Bo -> AQUAPRO",
+      "source_text_sha256": "4153497ad1658d778fd3d2ff696c8c919542947af1bb059604bf90b085001879",
+      "audit_receipt_sha256": "fe1cd0eef3bc8f9704e0aac0d03b14299cfd8415deb732fd612aa0e22a3c712d",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "supporting",
+          "explanation": "Incrementally updates the retained neighbor-count probability distribution when extending a candidate set, reusing the preceding distribution rather than computing it again.",
+          "sections": [
+            "4.1 Proxy Quality"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p918-ding.pdf",
+          "source_passages": [
+            76,
+            86
+          ]
+        },
+        {
+          "tag": "Qr",
+          "role": "core",
+          "explanation": "Allows approximate answers subject to a specified precision or recall target and failure probability, reducing expensive oracle-model evaluations under the algorithms' stated assumptions.",
+          "sections": [
+            "2.2 Query"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p918-ding.pdf",
+          "source_passages": [
+            37,
+            38
+          ]
+        }
+      ],
+      "before_sha256": "aed14d274a55b8198b8bbdac90d6b66b7ca563b3b40a9e04dd83023fd9f6342f",
+      "after_sha256": "16906c671a431cb1c1674ab67841afd451d135965cda5a0e00a54bffa5d8d17a"
+    },
+    {
+      "paper_id": "vldb2023-227",
+      "source_id": "vldb2023",
+      "title": "SHiFT : An Efficient, Flexible Search Engine for Transfer Learning",
+      "base_equation": "Naive Model Search + Se + Cm + Ad -> SHiFT",
+      "source_text_sha256": "f28ab512b65367c37900a5da3652ed46835a38f6b342d988722d6b9a2336ac78",
+      "audit_receipt_sha256": "2f6d7b7f7884dfac4c3279f5e3a72685516cbfca042ab70905f6949224e7b989",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "core",
+          "explanation": "Caches extracted feature vectors for reuse across model-scoring queries and recomputes only features affected by supported data changes.",
+          "sections": [
+            "3.1 Logical Model of Transfer Learning",
+            "4.3 Other Optimizations"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p304-renggli.pdf",
+          "source_passages": [
+            92,
+            124
+          ]
+        },
+        {
+          "tag": "Qr",
+          "role": "core",
+          "explanation": "Evaluates many candidate models on only part of the data and eliminates weaker candidates, trading possible ranking error for less inference; budget and chunk size control this empirical tradeoff.",
+          "sections": [
+            "3.1 Logical Model of Transfer Learning",
+            "4.1 Successive-Halving (SH)"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p304-renggli.pdf",
+          "source_passages": [
+            78,
+            109
+          ]
+        }
+      ],
+      "before_sha256": "d7af2e6e16f01a04cdd2eec9856ec2a2f158647dc29b592384527dcd35bc1f12",
+      "after_sha256": "7394f7d80b67c330ad6ef1ca459ab03fc9c8bb0348c0f588de8fb8779081235a"
+    },
+    {
+      "paper_id": "vldb2023-234",
+      "source_id": "vldb2023",
+      "title": "SkinnerMT: Parallelizing for Efficiency and Robustness in Adaptive Query Processing on Multicore Platforms",
+      "base_equation": "Sequential AQP + Ad + Wa + Cm -> SkinnerMT",
+      "source_text_sha256": "ec2b211ef4aac09e503ca8c133a6161d63fc00ed072d986fddcbc1c885e41215",
+      "audit_receipt_sha256": "15c2a3f1cb7cd7fea9b0f90dfa74b34ef526d13b5db97fbcc664acdb7c826d67",
+      "additions": [
+        {
+          "tag": "Rw",
+          "role": "supporting",
+          "explanation": "Retains join progress across time slices and compatible join-order prefixes, allowing later execution to resume completed work safely.",
+          "sections": [
+            "3 TRACKING PROGRESS"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p905-wei.pdf",
+          "source_passages": [
+            52,
+            56
+          ]
+        },
+        {
+          "tag": "Rs",
+          "role": "supporting",
+          "explanation": "Stores only the slowest thread's progress for each join order, allowing faster threads to redo work instead of retaining a separate progress tree per thread.",
+          "sections": [
+            "3 TRACKING PROGRESS",
+            "4.2 Selecting Split Tables"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p905-wei.pdf",
+          "source_passages": [
+            56,
+            73
+          ]
+        }
+      ],
+      "before_sha256": "0c60fd8e574410dcfb6ca5af8f0244e5ab8499d0845b5918096443bdb4bb94b5",
+      "after_sha256": "c4c39f14928a50b8e9267104489aba9b34e63642b01dfd7e62a29a4ac03a9c38"
+    },
+    {
+      "paper_id": "osdi23-34",
+      "source_id": "osdi23",
+      "title": "Defcon: Preventing Overload with Graceful Feature Degradation",
+      "base_equation": "Overload-Prone System + Ad + Pm + Cm -> Defcon",
+      "source_text_sha256": "e807f98141eae8de1f3e5005cca9de83969504a443fd04fb9772b162787ee834",
+      "audit_receipt_sha256": "44ce3769f18cf5dc0c9e3c51c1e760c7f58c215927a8735237baf02f7f32db84",
+      "additions": [
+        {
+          "tag": "Qr",
+          "role": "core",
+          "explanation": "Allows configured reductions in optional features during overload to reduce resource demand, with degradation choices evaluated for their user-experience impact.",
+          "sections": [
+            "2.4 Graceful Feature Degradation",
+            "Listing 2: Knob usage."
+          ],
+          "paper_url": "https://www.usenix.org/system/files/osdi23-meza.pdf",
+          "source_passages": [
+            76,
+            96
+          ]
+        }
+      ],
+      "before_sha256": "502599821c7b1cbb075c5dbd9b4032439b74f9aba773b8ca9aba3905737556a5",
+      "after_sha256": "3d0b3ba551b8ab5bcfa334b3ee6730cd9014f64774f585eba22609067c764a87"
+    },
+    {
+      "paper_id": "vldb2003-66",
+      "source_id": "vldb2003",
+      "title": "Multiscale Histograms: Summarizing Topological Relations in Large Spatial Datasets",
+      "base_equation": "Single Euler Histogram + Mo + Wv + Cc -> Multiscale Histograms",
+      "source_text_sha256": "673226e93c2d77968363e3895589d90f314a0cac55a6c9130acef379181af2fe",
+      "audit_receipt_sha256": "d9754fc46e6e1883437abd66ccfd578308ee0b55817fdb7d500b22bfcf3dee69",
+      "additions": [
+        {
+          "tag": "Qr",
+          "role": "core",
+          "explanation": "Uses approximate histogram answers for objects outside the exactly represented scale ranges to keep the summary within a storage budget.",
+          "sections": [
+            "4 Multiscale Histograms with a Fixed Space"
+          ],
+          "paper_url": "https://vldb.org/conf/2003/papers/S24P03.pdf",
+          "source_passages": [
+            139,
+            140
+          ]
+        }
+      ],
+      "before_sha256": "598dffa089932640cb5ed2db7eb04ba2865a64f5a21fc7fb790ecb14981b4f1c",
+      "after_sha256": "e17f847ef485d298b2874434dd99557f975634c51fdef5d21bfd6e843e642f1d"
+    },
+    {
+      "paper_id": "vldb2023-22",
+      "source_id": "vldb2023",
+      "title": "Towards Efficient Index Construction and Approximate Nearest Neighbor Search in High-Dimensional Spaces",
+      "base_equation": "Graph-based ANN + Bo + Pd -> LSH-APG",
+      "source_text_sha256": "6b0808bf158984360a092fc9efae7efe00e0aa9b2aa1bc8e8cacda42f5d00862",
+      "audit_receipt_sha256": "4084ebbb038a82f3ba0bafe552ffafbaebf2a2a4b69b0a42fd90bf9f01395acd",
+      "additions": [
+        {
+          "tag": "Qr",
+          "role": "supporting",
+          "explanation": "Uses a configurable probabilistic distance test to skip candidate distance calculations, accepting a recall tradeoff to reduce search work.",
+          "sections": [
+            "5 LSH-BASED PRUNING CONDITION",
+            "7.2 Self Evaluation"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p1979-zhao.pdf",
+          "source_passages": [
+            114,
+            160
+          ]
+        }
+      ],
+      "before_sha256": "77006a550c5b7e2456a0a120b6ec2981f8d9ac63cc7bfa30c83e92cc02c98d36",
+      "after_sha256": "e2c20ff315b55bbc8a5f58d1431456e71c026ed9d6850d3c0baa824ae60356c7"
+    },
+    {
+      "paper_id": "vldb2023-71",
+      "source_id": "vldb2023",
+      "title": "Toward Quantity-of-Interest Preserving Lossy Compression for Scientific Data",
+      "base_equation": "QoI-Agnostic Compression + Se + Cp + Ep -> QoI-Preserving Compression",
+      "source_text_sha256": "a4d1b4986627796e930a4bd571508a2ca22c265b64e041fa008159bfe16b33df",
+      "audit_receipt_sha256": "4a66bdee92509e84a2a46d668e86cc7480b4e55b45f1663ddd8864b9765b98e8",
+      "additions": [
+        {
+          "tag": "Qr",
+          "role": "core",
+          "explanation": "Derives per-value compression tolerances from an allowed error in a downstream quantity of interest, permitting lossy storage while preserving that quantity's specified accuracy.",
+          "sections": [
+            "3.1 Problem Formulation",
+            "4.1 Univariate QoI Preservation"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p697-liang.pdf",
+          "source_passages": [
+            63,
+            81
+          ]
+        }
+      ],
+      "before_sha256": "0e544b8e7ad0009379b5917117222cf9900a2baafa19b28c2552e2815ecd3d4d",
+      "after_sha256": "a874316798ae34d681486004611ab3a7638504235e9b411c2c27e2e760c0112d"
+    },
+    {
+      "paper_id": "vldb2023-75",
+      "source_id": "vldb2023",
+      "title": "Motiflets - Simple and Accurate Detection of Motifs in Time Series",
+      "base_equation": "r-parameterized Motif Discovery + Gd + Si + Au -> k-Motiflets",
+      "source_text_sha256": "d38c7b17ed995aed77958e48914c4671df1ef647ff6d2e5ba3b52deaf3b2eb7b",
+      "audit_receipt_sha256": "eb2b876185976d194263df085a6f7aef197a0db48e51a0533ef08ae4b79fd865",
+      "additions": [
+        {
+          "tag": "Qr",
+          "role": "supporting",
+          "explanation": "Restricts motif candidate sets to nearest-neighbor constructions, reducing exhaustive search while accepting a bounded approximation to the optimal extent.",
+          "sections": [
+            "4.2 Approximate k-Motiflet Algorithm"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p725-schafer.pdf",
+          "source_passages": [
+            84,
+            88
+          ]
+        }
+      ],
+      "before_sha256": "022a5e256621e07c9a693e70859278d3bf61264cc5905ad7305d92acb9d034df",
+      "after_sha256": "e90874e943c1c70e34fa6df1e54a083cea66facff3726d9fd2ba8ad4e1087102"
+    },
+    {
+      "paper_id": "vldb2023-76",
+      "source_id": "vldb2023",
+      "title": "Fast and Scalable Mining of Time Series Motifs with Probabilistic Guarantees",
+      "base_equation": "All-pairs distance computation + Pd + Ad -> Attimo",
+      "source_text_sha256": "e9dfdc55af875b90e3d8c8a9c1d929f3fa521d986af320a037f7c050b9712c64",
+      "audit_receipt_sha256": "9bd9a88607236c47275e8ab2c34132747034184ea3a19e681a75d32ec16e3eaa",
+      "additions": [
+        {
+          "tag": "Qr",
+          "role": "supporting",
+          "explanation": "Stops motif search when the bound on missing a better pair falls below the specified failure probability, trading a controlled risk of error for less search.",
+          "sections": [
+            "4.3 Correctness of the algorithm"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol15/p3841-ceccarello.pdf",
+          "source_passages": [
+            105,
+            108
+          ]
+        }
+      ],
+      "before_sha256": "c583f5e3297ee6c0ef075f552a557afbdd790c7e5799274bf7fd518a91450111",
+      "after_sha256": "8a12fda55b7e201f8869ee37f0456326691e30f02fb95993416fbbb4a3571e5a"
+    },
+    {
+      "paper_id": "vldb2023-87",
+      "source_id": "vldb2023",
+      "title": "MQH: Locality Sensitive Hashing on Multi-level Quantization Errors for Point-to-Hyperplane Distances",
+      "base_equation": "LSH on original data + Pd + Ad + Mo -> MQH",
+      "source_text_sha256": "07141bd5bc8ee8a039cc12b64ab9c07f8afb4a09cb5cbffb8c3770a7f9681465",
+      "audit_receipt_sha256": "a35f87c651b62b8debb7f2c1c7c523ffcce12a34443ea939093eadbd556f55d4",
+      "additions": [
+        {
+          "tag": "Qr",
+          "role": "supporting",
+          "explanation": "Controls pruning through a parameter that trades search work against the stated approximation guarantee for point-to-hyperplane search.",
+          "sections": [
+            "5.1 Implementation and Algorithm",
+            "6.3 Comparison on Search Performances"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p864-lu.pdf",
+          "source_passages": [
+            181,
+            232
+          ]
+        }
+      ],
+      "before_sha256": "cd97042726c4bc6cdbefafe7362d5ddbc688d6f90c1b71ba33ef25a81f6b3511",
+      "after_sha256": "41f3bed06242090755396dc2f6fb719be4c99eeddf328a8700ccbe9e698ed055"
+    },
+    {
+      "paper_id": "vldb2023-114",
+      "source_id": "vldb2023",
+      "title": "Quasi-stable Coloring for Graph Compression",
+      "base_equation": "Strict Symmetry (Stable Coloring) + Cr + Bo -> Quasi-Stable Coloring",
+      "source_text_sha256": "2cf89f5df132b48e4350d1420097fd5dceaa79773cada4695436d1a9dc8d44f2",
+      "audit_receipt_sha256": "37817383684f638557992d41f1fabe0344c63f5b8dc23b7e36b04d5692d939be",
+      "additions": [
+        {
+          "tag": "Qr",
+          "role": "core",
+          "explanation": "Allows bounded differences among grouped vertices' connectivity and controls graph compression through a color budget or error tolerance.",
+          "sections": [
+            "Quasi-stable Coloring for Graph Compression",
+            "4.1 Linear Optimization"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p803-kayali.pdf",
+          "source_passages": [
+            24,
+            71
+          ]
+        }
+      ],
+      "before_sha256": "9c4a2f97490243f651f2437476d0c3a7f390e4649b4fe4113ae1876bb682413d",
+      "after_sha256": "9335f6b292fb834555b85cc2627ba0b1558f259887be125c1dfa650f303193e8"
+    },
+    {
+      "paper_id": "vldb2023-116",
+      "source_id": "vldb2023",
+      "title": "Scaling Up Structural Clustering to Large Probabilistic Graphs Using Lyapunov Central Limit Theorem",
+      "base_equation": "Exact DP Calculation + Bo + Pd -> NUSCAN",
+      "source_text_sha256": "09663110a5fb4210a7b2b76747a23f169cac4765f3804c493ac0199be3c38588",
+      "audit_receipt_sha256": "9623ee917a98ba4cd6f6e1b2edc0171dc6163f9ade05848e298af7b526cfdf63",
+      "additions": [
+        {
+          "tag": "Qr",
+          "role": "core",
+          "explanation": "Approximates structural-similarity probabilities using a normal distribution with an analyzed error bound, reducing the cost of exact probability computation.",
+          "sections": [
+            "1 INTRODUCTION",
+            "Theorem 4. [Berry-Essen Theorem] Given a sequence"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p3165-howie.pdf",
+          "source_passages": [
+            19,
+            181
+          ]
+        }
+      ],
+      "before_sha256": "464f01022adf37c1e151101941d9eb744b38121e88a357124be68041aa9852ad",
+      "after_sha256": "4a79d988d9532eb8bcf0aa32bc1c335ff2355140608b3117fbc55941a691753b"
+    },
+    {
+      "paper_id": "vldb2023-138",
+      "source_id": "vldb2023",
+      "title": "Secure Shapley Value for Cross-Silo Federated Learning",
+      "base_equation": "Pure HE Protection + Policy/Mechanism (Pm) + Trust via Quorum (Tq) + Consistency Relaxation (Cr) -> SecSV",
+      "source_text_sha256": "d098833465dc4493ebfce55eb40bab302e413180dd927f6ac0b110f53c7dfb01",
+      "audit_receipt_sha256": "e5ff1202a80f714d231c8dd705664f488e4b0df99ada4eabbd85e096cc5f4c11",
+      "additions": [
+        {
+          "tag": "Qr",
+          "role": "core",
+          "explanation": "For nonlinear models, permits approximate Shapley values by skipping selected test evaluations and analyzes the resulting error in terms of wrongly skipped samples; the corresponding linear-model shortcut remains exact.",
+          "sections": [
+            "6.1 Theoretical Analysis"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p1657-zheng.pdf",
+          "source_passages": [
+            147,
+            148
+          ]
+        }
+      ],
+      "before_sha256": "7c7526fe0e7154153e37cdf5be5e2a17108cd8ca908f48588ffac9d3164d9c0f",
+      "after_sha256": "65deb6c910422f3d41c70c023a650dd487ea162d6586a58e05cb51627a053a75"
+    },
+    {
+      "paper_id": "vldb2023-141",
+      "source_id": "vldb2023",
+      "title": "SPG: Structure-Private Graph Database via SqueezePIR",
+      "base_equation": "PIR on Exact Data (Sy + Bo) + Cr + Wv -> SqueezePIR",
+      "source_text_sha256": "e75184db041d2f58b3e5b40d998afbfe1338b501e41e8509ea0b778c92c29a43",
+      "audit_receipt_sha256": "1a7dd4364b16f4fa656f5700242c42705e6555308b4764d8fe689235f48eb5e2",
+      "additions": [
+        {
+          "tag": "Qr",
+          "role": "core",
+          "explanation": "Truncates the rank of feature-tile factorizations before encrypted retrieval, trading reconstruction fidelity for reduced encrypted computation and communication.",
+          "sections": [
+            "3.3 SPG via PIR",
+            "4.1 Protocol Design"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p1615-liang.pdf",
+          "source_passages": [
+            80,
+            89
+          ]
+        }
+      ],
+      "before_sha256": "2993e9f70b208a0077581c667519865612255bb4e83d298d5eefffe4a369b324",
+      "after_sha256": "0c2658b5ba2e0cd04183e5249a3f1183f98d0eb8a5c256f223fd52511af15d7d"
+    },
+    {
+      "paper_id": "vldb2023-167",
+      "source_id": "vldb2023",
+      "title": "Approximating Probabilistic Group Steiner Trees in Graphs",
+      "base_equation": "Classical Steiner Tree (Deterministic Coverage) + Pd + Gd + Bo -> GRE-PATH",
+      "source_text_sha256": "8337c0faec29e9b2a69c700085f413df2e9ec1839a24b5704a677fd43419e9e3",
+      "audit_receipt_sha256": "67b8a114ec3956df8adaa67569f7af61d3c262a200d23c2d3074c282882a33e2",
+      "additions": [
+        {
+          "tag": "Qr",
+          "role": "core",
+          "explanation": "Uses approximation parameters and early termination to reduce search for probabilistic group Steiner trees while retaining the specified solution-quality guarantee.",
+          "sections": [
+            "ABSTRACT",
+            "Algorithm 3 The GRE-PATH algorithm"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p343-sun.pdf",
+          "source_passages": [
+            7,
+            159
+          ]
+        }
+      ],
+      "before_sha256": "9fbedec4a047deb5e182d538bde370bbb9ce458abb4114d2192e1ccf02db8e8a",
+      "after_sha256": "61ffc75b0e4e3c80760331c5a33149828bdaba810d0615f10ffb4b005c0d1d28"
+    },
+    {
+      "paper_id": "vldb2023-169",
+      "source_id": "vldb2023",
+      "title": "Discovering Polarization Niches via Dense Subgraphs with Attractors and Repulsers",
+      "base_equation": "Densest Subgraph Problem + Gd + Ig -> dith",
+      "source_text_sha256": "9c2ae912ce2c8b980623bc4a3c0b1878f809bb86542898aeca51b9027d2ecc91",
+      "audit_receipt_sha256": "0943595a6f5ee54199b08b0cb951d648efa44047574f42f451ae69d15bf75239",
+      "additions": [
+        {
+          "tag": "Qr",
+          "role": "core",
+          "explanation": "Stops optimization once the feasible solution and an upper bound certify the requested relative quality, avoiding further improvement work.",
+          "sections": [
+            "1 INTRODUCTION",
+            "16 return 𝑆 ∗ ;"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol15/p3883-bonchi.pdf",
+          "source_passages": [
+            27,
+            126
+          ]
+        }
+      ],
+      "before_sha256": "1d69958465fe7aa13125af0ea55eb0b56d0773532534691232b927441f53d930",
+      "after_sha256": "bd2a188bda6c618b65bdcc64a54586fa380279277e647e4d3e677fa1d6e9a29f"
+    },
+    {
+      "paper_id": "vldb2023-189",
+      "source_id": "vldb2023",
+      "title": "Serving and Optimizing Machine Learning Workflows on Heterogeneous Infrastructures",
+      "base_equation": "Homogeneous ML Serving + Cm (Cost-based) + Cp (Constraint-based) + Fp (Function Placement) -> JellyBean",
+      "source_text_sha256": "afa34b5adf5364e674c0ffda2ea680d3ca7547c4fbdf198f059a7d4122d0fac7",
+      "audit_receipt_sha256": "e35638cbe9d3071a6972edb588160dd8d299e67fdf151d17d964ecc4bf722adf",
+      "additions": [
+        {
+          "tag": "Qr",
+          "role": "core",
+          "explanation": "Selects cheaper model variants whose estimated end-to-end accuracy meets the requested target, trading permitted accuracy loss for lower serving cost.",
+          "sections": [
+            "4.1 Problem formulation",
+            "4.2 Model Selection"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p406-wu.pdf",
+          "source_passages": [
+            71,
+            80
+          ]
+        }
+      ],
+      "before_sha256": "bd325fcf215a9b9eae9957769a7fba60ee093e5357b3d7920f33b6caa9571231",
+      "after_sha256": "8026b85e8dd18d5e9f01c3a6bd798b50451757a4fa84d10c8d6670f75348bc16"
+    },
+    {
+      "paper_id": "vldb2023-193",
+      "source_id": "vldb2023",
+      "title": "SyncSignature: A Simple, Efficient, Parallelizable Framework for Tree Similarity Joins",
+      "base_equation": "Sequential Index Join + Cz + Pd -> SyncSignature",
+      "source_text_sha256": "77e8a0e5aaed6e9969d02fc0ef4ad7ac2c55f967df16d54509056b4262f1b5ed",
+      "audit_receipt_sha256": "08b0dbf73d7b213a6dfa205f01bdd1ef07d39f2842d054d311fb4dd05605bf21",
+      "additions": [
+        {
+          "tag": "Qr",
+          "role": "supporting",
+          "explanation": "Accepts a controlled probability of missing qualifying tree pairs in exchange for cheaper randomized candidate generation.",
+          "sections": [
+            "SyncSignature: A Simple, Efficient, Parallelizable Framework for Tree Similarity Joins",
+            "3.4 Plugging Signature Generation Schemes to the SyncSignature Framework"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p330-zhang.pdf",
+          "source_passages": [
+            22,
+            157
+          ]
+        }
+      ],
+      "before_sha256": "d8dc08dd173e9950c7b792714d57c51364eb3d197448caf3412e0e90c5aaff6e",
+      "after_sha256": "995c4c8968eb47a62a5f73fb76ec6200054185bc262ecaaff2c5c6739689bd62"
+    },
+    {
+      "paper_id": "vldb2023-226",
+      "source_id": "vldb2023",
+      "title": "Similarity search in the blink of an eye with compressed indices",
+      "base_equation": "Memory-Bandwidth-Limited Graph Search + Bo + Wa + Ha -> OG-LVQ",
+      "source_text_sha256": "ddeac30b07ea8f6fd053cd5f0b8fe95b3e9011d366a89236854afb64e7ff2f77",
+      "audit_receipt_sha256": "8f03646ce0416179e9155e5a7774b72dc7fdffdbbb4933ef36be9a625d6521cf",
+      "additions": [
+        {
+          "tag": "Qr",
+          "role": "core",
+          "explanation": "Quantizes vector values to reduce index storage and data movement, tuning search to achieve the required measured recall rather than preserving exact distances.",
+          "sections": [
+            "1 INTRODUCTION",
+            "3.2 Integrating LVQ into graph-based indices"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p3433-aguerrebere.pdf",
+          "source_passages": [
+            25,
+            79
+          ]
+        }
+      ],
+      "before_sha256": "46c42c12b85a0f6f67419f71baf5e5273b174ae9d081e7274fecf79464972088",
+      "after_sha256": "64fe4c5611a820fa1f60b78ed3682040d0ebea17e832e71edb1342a9361823b3"
+    },
+    {
+      "paper_id": "osdi23-17",
+      "source_id": "osdi23",
+      "title": "Hyrax: Fail-in-Place Server Operation in Cloud Platforms",
+      "base_equation": "All-or-nothing Homogeneity + Ft + Pm + Wa -> Hyrax Fail-in-Place",
+      "source_text_sha256": "5baeee792e0871569aae35221d970207a08c9b7b25242ecb2923063c9971ed24",
+      "audit_receipt_sha256": "66d0981e90286eb70f08d54104e52e9eedbc24d5234fc0eb97d9e96880e65224",
+      "additions": [
+        {
+          "tag": "Rv",
+          "role": "core",
+          "explanation": "Maps virtual-machine memory onto suitable surviving physical pages after hardware degradation, preserving the required resource behavior over changed backing.",
+          "sections": [
+            "5.1 Component Pathway Deactivation ( H )",
+            "5.2 Achieving High Performance on FIP Servers"
+          ],
+          "paper_url": "https://www.usenix.org/system/files/osdi23-lyu.pdf",
+          "source_passages": [
+            102,
+            123
+          ]
+        }
+      ],
+      "before_sha256": "32a31ad47f6b8d0b59717876895b9e05bf14629b5fa5ddb4bf464c4faf811e5d",
+      "after_sha256": "ea61118cea1bfdf8e8e0f249f8f61ca20c9b7eca196d1693d8b9508b7a9fcd69"
+    },
+    {
+      "paper_id": "osdi23-26",
+      "source_id": "osdi23",
+      "title": "eZNS: An Elastic Zoned Namespace for Commodity ZNS SSDs",
+      "base_equation": "Static ZNS Interface + Ad (Adaptive Processing) + Ec (Elasticity) + Bo (Bottleneck-Oriented) -> eZNS",
+      "source_text_sha256": "aa19e93dff3bd0b94fbb0bf66c4338675d691a33051a26eed9db97222c8bdccb",
+      "audit_receipt_sha256": "eb9d188d5e76151eba58c34e4f22652e61922c068db8990969d5cfbddb1f291a",
+      "additions": [
+        {
+          "tag": "Rv",
+          "role": "core",
+          "explanation": "Exposes stable logical zones while dynamically changing and sharing their physical-zone backing to accommodate workload demand.",
+          "sections": [
+            "4.2 Hardware Contract and HAL",
+            "4.4 Zone Ballooning"
+          ],
+          "paper_url": "https://www.usenix.org/system/files/osdi23-min.pdf",
+          "source_passages": [
+            117,
+            124
+          ]
+        }
+      ],
+      "before_sha256": "1cc059ccc84b57ec5246bdf84e0d54482881e212999ee1ec6b7d41406971e597",
+      "after_sha256": "6fd39146ca7c628b7f83c01b6dab09b9cc21edb7a324c71d88786ca731b5615e"
+    },
+    {
+      "paper_id": "cs764-1",
+      "source_id": "cs764",
+      "title": "Join Processing in Database Systems with Large Main Memories",
+      "base_equation": "Sort-Merge-Join + Ep + Ha + Cc -> Hybrid Hash-Join",
+      "source_text_sha256": "50d7b4b8e615d4ff8897d214236bd931c552b93d245f700f100296754c55eed3",
+      "audit_receipt_sha256": "e2693dc527a470aaa78a69016797efa2ac5ea8869adfaf097545ce7d44316082",
+      "additions": [
+        {
+          "tag": "Rs",
+          "role": "core",
+          "explanation": "Retains one hash-join partition in memory while partitioning the remaining data, spending available memory to avoid writing and rereading that partition.",
+          "sections": [
+            "Join Processing in Database Systems with Large Main Memories"
+          ],
+          "paper_url": "https://pages.cs.wisc.edu/~yxy/cs764-f20/papers/shapiro.pdf",
+          "source_passages": [
+            35,
+            38
+          ]
+        }
+      ],
+      "before_sha256": "c34ea59013602b13492a910c6ef10bf3ed354a0e46c05b1d656a61780cbfd993",
+      "after_sha256": "6f6ebd3d3ececbfee848ee859817f9e24596395efcbdda92773f8f7155f0582e"
+    },
+    {
+      "paper_id": "cs764-7",
+      "source_id": "cs764",
+      "title": "The 5 Minute Rule for Trading Memory for Disk Accesses and the 10 Byte Rule for Trading Memory for CPU Time",
+      "base_equation": "Ad-hoc Design + Cm (Cost-based) + Ha (Hardware-Aware) -> Economically-Grounded Design Rules",
+      "source_text_sha256": "a9fe1f4bd961beef5a530929c664760e39b4a3134c12e82e496069374cad6153",
+      "audit_receipt_sha256": "0f4f8f0ecd261aa3182a5437f1d23892aa472bbdbc4c767696bc11ac543ecaf1",
+      "additions": [
+        {
+          "tag": "Rs",
+          "role": "core",
+          "explanation": "Analyzes when additional memory should replace disk accesses or processor instructions, choosing the exchange according to access frequency and relative resource costs.",
+          "sections": [
+            "The 5 Minute Rule for Trading Memory for Disk Accesses and the 10 Byte Rule for Trading Memory for CPU Time"
+          ],
+          "paper_url": "https://pages.cs.wisc.edu/~yxy/cs764-f20/papers/5-minute-rule.pdf",
+          "source_passages": [
+            3,
+            10
+          ]
+        }
+      ],
+      "before_sha256": "b842b3add412c6ae988788b3ebed515601d2b15560bcb22a5f0caf7c3547a660",
+      "after_sha256": "2e32f892771c716ba29b427d372993331f3695f8d8b8a6fedd044dbcb96afd80"
+    },
+    {
+      "paper_id": "cs764-28",
+      "source_id": "cs764",
+      "title": "Improved Query Performance with Variant Indexes",
+      "base_equation": "Value-List Indexes + Ha + Lo + Rw -> Variant Indexes",
+      "source_text_sha256": "51844f178747c0008482144c8f04461144c7f4676ec3346836f9d49db3803bcb",
+      "audit_receipt_sha256": "895b37813618434a23ba941d191ef2b4abd48caeb8e213b7cf4ebb2d391cee6e",
+      "additions": [
+        {
+          "tag": "Rs",
+          "role": "core",
+          "explanation": "Stores additional projection and bit-sliced index representations to replace expensive row access and per-record processing with compact sequential reads and bitmap operations.",
+          "sections": [
+            "Improved Query Performance with Variant Indexes"
+          ],
+          "paper_url": "https://courses.cs.duke.edu/courses/spring04/cps216/papers/oneil-quass-1997.pdf",
+          "source_passages": [
+            4,
+            14
+          ]
+        }
+      ],
+      "before_sha256": "d04916d711233cced6510d6c85d6b9264f457d62e714ba8fa5f468ff59ed9faf",
+      "after_sha256": "4da4df5f4e7f575d52f1f389fe7eddb2959ac9d85fc4664cb96bb67d36e1206e"
+    },
+    {
+      "paper_id": "osdi23-52",
+      "source_id": "osdi23",
+      "title": "ShRing: Networking with Shared Receive Rings",
+      "base_equation": "privRing (Per-core rings) + Ha + Bo + Ad -> ShRing",
+      "source_text_sha256": "491e6b3e0161b51d5c7fb491d3dcd3e139d23de9ae3faf35334c25524c81891b",
+      "audit_receipt_sha256": "539cd0616d317c87e091764c8e816b9413336b81b7d3c2552cb98747abfc2ee0",
+      "additions": [
+        {
+          "tag": "Rs",
+          "role": "core",
+          "explanation": "Shares receive buffers across cores while adding completion metadata and coordination, reducing buffer memory at the cost of additional coordination work.",
+          "sections": [
+            "Abstract",
+            "2.3 Implications"
+          ],
+          "paper_url": "https://www.usenix.org/system/files/osdi23-pismenny.pdf",
+          "source_passages": [
+            33,
+            72
+          ]
+        }
+      ],
+      "before_sha256": "0f3d4ccd75c9c435fe7984fc4b8debfa94261fb554b2908090a7fd800c75a5a9",
+      "after_sha256": "88a27c92880cf8ee0b5b10ad45e03eff56f7c50808335e5d4693fc58431422ba"
+    },
+    {
+      "paper_id": "vldb2003-19",
+      "source_id": "vldb2003",
+      "title": "Efficient Processing of Expressive Node-Selecting Queries on XML Data in Secondary Storage: A Tree Automata-based Approach",
+      "base_equation": "Multi-pass Query Evaluation + Fs + Mo + Al -> Arb",
+      "source_text_sha256": "35d27971725ddc9d4eb9ea1fdb208ece5c8fbdcfe50a491bde5f4b24c90b55e8",
+      "audit_receipt_sha256": "02e7ee2537adffc5f43a3e8278dda71e6bc9a7cad9f4c15f703f50307896657b",
+      "additions": [
+        {
+          "tag": "Rs",
+          "role": "core",
+          "explanation": "Uses sequential passes and temporary per-node state to evaluate tree queries with a depth-bounded memory stack, trading storage access for lower working-memory requirements.",
+          "sections": [
+            "1.2 Contributions"
+          ],
+          "paper_url": "https://vldb.org/conf/2003/papers/S09P01.pdf",
+          "source_passages": [
+            26,
+            30
+          ]
+        }
+      ],
+      "before_sha256": "cd205f6bfcc793458ebba6627a9b7783ad9af9e5624bd136f7b8c87f39636042",
+      "after_sha256": "eb65fd9572598702b57fc54548b2c1729e0dcce8d91b56dc05cfed219f85b60a"
+    },
+    {
+      "paper_id": "vldb2003-22",
+      "source_id": "vldb2003",
+      "title": "Maximizing the Output Rate of Multi-Way Join Queries over Streaming Information Sources",
+      "base_equation": "Binary Join Trees + Gr (Generalized Design) + Wv (Result-Preserving Work Avoidance) + Lo (Locality of Reference) -> MJoin",
+      "source_text_sha256": "0cc103b2990b96b54cdf6f65d96612f3a3845e7951ba62b7eba9a7c53c0acc0d",
+      "audit_receipt_sha256": "d7f0756644fe78650e4c98b5ad7c2e4a63c2561feea45781678064ce5afffc97",
+      "additions": [
+        {
+          "tag": "Rs",
+          "role": "core",
+          "explanation": "Avoids materializing partial multiway-join results and instead performs the required probing against base-stream state, exchanging repeated probe work for lower intermediate-state memory.",
+          "sections": [
+            "2.3 Re-computation of Intermediate Results",
+            "3.3 Inflating Joins and the Impact of the Probing Sequence"
+          ],
+          "paper_url": "https://vldb.org/conf/2003/papers/S10P01.pdf",
+          "source_passages": [
+            31,
+            96
+          ]
+        }
+      ],
+      "before_sha256": "3c2df181e738df744ed3ab8d246eb18dcd040fe230413f48be625c0e4db83ec9",
+      "after_sha256": "54e35eed7921e4ffc1eceae3a86216bac5da97823a0b0dc29e61e2b0ab35e465"
+    },
+    {
+      "paper_id": "vldb2003-34",
+      "source_id": "vldb2003",
+      "title": "Combi-Operator - Database Support for Data Mining Applications",
+      "base_equation": "Explicit Enumeration of Projections + Se + Rw + Ad -> Combi Operator",
+      "source_text_sha256": "a5747a6290c851651722ec56cefb951bd256b724e45ff4af5ff99612030397ec",
+      "audit_receipt_sha256": "10060a180b3e0918e2339158c1a4d0e17a9b9263e1dd63ed1dbdbecf327d3370",
+      "additions": [
+        {
+          "tag": "Rs",
+          "role": "core",
+          "explanation": "Offers partial-rescan execution strategies that revisit input data when combinations do not fit in memory, exchanging additional scanning for bounded working memory.",
+          "sections": [
+            "4.2 Main Memory Based Implementation",
+            "4.3 Sort Based Implementation"
+          ],
+          "paper_url": "https://vldb.org/conf/2003/papers/S14P01.pdf",
+          "source_passages": [
+            73,
+            112
+          ]
+        }
+      ],
+      "before_sha256": "716c389cd485f7bfd7854082f36b0023c713d14203dd7a9b21e61760618b5412",
+      "after_sha256": "e21c8461fec047d22115ca444225d72e7fbd7a7d86fa5a38b8a8e85701ea5e6f"
+    },
+    {
+      "paper_id": "vldb2003-56",
+      "source_id": "vldb2003",
+      "title": "Memory Requirements for Query Execution in Highly Constrained Devices",
+      "base_equation": "Traditional DBMS (Materialization) + Ha + Bo + Wv -> RLB Evaluator with Iteration Filters",
+      "source_text_sha256": "07c976dc7dc8b141a58d90ff0497a9cc2b83e88767d00c9baa2e82690b97b91d",
+      "audit_receipt_sha256": "7764eb0847ba70509eec0541e31f05c87ceb525fab9e175261958566ef72f4ec",
+      "additions": [
+        {
+          "tag": "Rs",
+          "role": "core",
+          "explanation": "Recomputes intermediate information through repeated scans rather than retaining variable-sized state, exchanging processor work and data access for low memory consumption.",
+          "sections": [
+            "3.1 Design rules and consistency constraints",
+            "3.4 GroupBy algorithm"
+          ],
+          "paper_url": "https://vldb.org/conf/2003/papers/S21P02.pdf",
+          "source_passages": [
+            42,
+            60
+          ]
+        }
+      ],
+      "before_sha256": "03c3189bd9edddddb275669a73943ab42d554428f376a9b1d11493190fa0f5ba",
+      "after_sha256": "26c33dbc454a5c40b45c6e810ef825e436bbcfa3d47b05e0a1a7b0204e07d066"
+    },
+    {
+      "paper_id": "vldb2023-11",
+      "source_id": "vldb2023",
+      "title": "SageDB: An Instance-Optimized Data Analytics System",
+      "base_equation": "Manual Physical Design + Wa + Rw + Cm -> Instance-Optimized System",
+      "source_text_sha256": "2569658b2e158f5fb72c5affba15910bdd14131d01769ba6eb21bc36596283ba",
+      "audit_receipt_sha256": "936644d39fc114b161171df31db2c9a8d58d1aacc5318694d5d6b41dea2c2588",
+      "additions": [
+        {
+          "tag": "Rs",
+          "role": "core",
+          "explanation": "Allocates explicit disk and memory budgets to specialized replicas and partial materialized views, spending space and maintenance work to reduce query-time scanning and computation.",
+          "sections": [
+            "4.2 Replicated Data Layouts",
+            "5.4 Optimizing Replicated Layouts"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol15/p4062-ding.pdf",
+          "source_passages": [
+            81,
+            122
+          ]
+        }
+      ],
+      "before_sha256": "773d1dc5b4180cd0e1f637108f7461d25adccde871d2095150fbd3c131ee4f63",
+      "after_sha256": "d6acf8798f94d7279009dc4e2afa3a68b2cb0778a815fd52c9ff307992210e7b"
+    },
+    {
+      "paper_id": "vldb2023-23",
+      "source_id": "vldb2023",
+      "title": "CORE-Sketch: On Exact Computation of Median Absolute Deviation with Limited Space",
+      "base_equation": "In-memory Exact MAD + Bo + Ad + Wv -> CORE-Sketch",
+      "source_text_sha256": "e6cac2ae14ee4202a30a3d33b2c021444e1fba04f27ab18394000213da0e8add",
+      "audit_receipt_sha256": "8dc9bbc1b8e9ce801f7074e920fa15d03f81233ac6d30029bd45dbe242d8bae9",
+      "additions": [
+        {
+          "tag": "Rs",
+          "role": "core",
+          "explanation": "Makes repeated passes over progressively narrowed value ranges to obtain exact statistics under a fixed sketch-memory budget, exchanging additional input scanning for lower memory requirements.",
+          "sections": [
+            "5.1 Comparison with Baselines",
+            "6.1 MADComputation"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p2832-song.pdf",
+          "source_passages": [
+            174,
+            272
+          ]
+        }
+      ],
+      "before_sha256": "254d3edd9f4b6163b8f7dc214ccd2d4fe22f648a063e7a3fef8ee94d4e0c619b",
+      "after_sha256": "c5044f25325a55963a5f2357928db8c586c09fd4b5fcfe3478be18638d71b79a"
+    },
+    {
+      "paper_id": "vldb2023-47",
+      "source_id": "vldb2023",
+      "title": "WiscSort: External Sorting For Byte-Addressable Storage",
+      "base_equation": "Traditional External Sort + Ha + Wv + Bo -> WiscSort",
+      "source_text_sha256": "fdf4d93c8384a53f36e3b46053b432026ef63baa1925f959e8a87292af5ed022",
+      "audit_receipt_sha256": "56548983d303ddce48804346723289c060a0f896e461eef261e552ee68454e96",
+      "additions": [
+        {
+          "tag": "Rs",
+          "role": "core",
+          "explanation": "Sorts compact key-pointer records and retrieves payloads later, spending random reads to avoid repeatedly writing full records during sorting.",
+          "sections": [
+            "3.1 Design goals",
+            "3.3 Key-Value Separation"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p2103-banakar.pdf",
+          "source_passages": [
+            59,
+            72
+          ]
+        }
+      ],
+      "before_sha256": "c9f77dc133ff84ad525cc75d769ea41a583d2726c9e34ebfa6e4c50fc58c3ed4",
+      "after_sha256": "dd6b92b3c9a93615de38357b6fe22f2b5cf34d8ecdde3337df86477b2e33f1ce"
+    },
+    {
+      "paper_id": "vldb2023-60",
+      "source_id": "vldb2023",
+      "title": "InfiniStore : Elastic Serverless Cloud Storage",
+      "base_equation": "Static Replicated FaaS Cache + Wa + Ec + Ft -> Elastic Recoverable FaaS Storage",
+      "source_text_sha256": "f63e78e0eef66d6d1133593c870ea39be687164983f539f2eec1cda77727de3f",
+      "audit_receipt_sha256": "60552582b37fd60e4b5cc946bf39959de04c7bc4146f33cc758b2eb6e3602d03",
+      "additions": [
+        {
+          "tag": "Rs",
+          "role": "core",
+          "explanation": "Reconstructs reclaimed in-memory chunks from object storage using recovery functions, exchanging recovery computation and data transfer for reduced standby-memory replication.",
+          "sections": [
+            "5.3 ServerlessMemory Store Management",
+            "5.5 Fault Tolerance and Data Recovery"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p1629-zhang.pdf",
+          "source_passages": [
+            92,
+            101
+          ]
+        }
+      ],
+      "before_sha256": "3be41167c129301929698bac0c81614e32aad28cd1d7038e93865c6e8a88258f",
+      "after_sha256": "8d083057f1048748e75b88b24bb5ac2736eef287705526944fdc4215362fa39c"
+    },
+    {
+      "paper_id": "vldb2023-66",
+      "source_id": "vldb2023",
+      "title": "PIM-tree: A Skew-resistant Index for Processing-in-Memory",
+      "base_equation": "Static Range Partitioning + Fp + Wa + Lo -> PIM-tree",
+      "source_text_sha256": "2241040b716aec70c69585a383750684e18309e67fc1664242abe82887d38d29",
+      "audit_receipt_sha256": "595c5c2d6b1abae912afb1711b5f36f4f077bcfe4c5d580eba25c1c7d09ce828",
+      "additions": [
+        {
+          "tag": "Rs",
+          "role": "core",
+          "explanation": "Replicates selected search subtrees so a processing-in-memory module can traverse them locally, spending storage to reduce remote pointer-chasing rounds.",
+          "sections": [
+            "3.3 Shadow Subtrees"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p946-kang.pdf",
+          "source_passages": [
+            81,
+            96
+          ]
+        }
+      ],
+      "before_sha256": "09089d2a5e6f2abe2dba4a483fe0b90334bdfb9dfcecced3f0d3fdeb2b5add4e",
+      "after_sha256": "ed4d2d4d4113a255fe3376882c82e16f659a8c7232506238cae64219bdce0e30"
+    },
+    {
+      "paper_id": "vldb2023-70",
+      "source_id": "vldb2023",
+      "title": "The FastLanes Compression Layout: Decoding > 100 Billion Integers per Second with Scalar Code",
+      "base_equation": "SIMD-width-specific layouts + Gr + Ha + Cz -> FastLanes",
+      "source_text_sha256": "e9c2241780d7ac801c4be94be5e38eb0da26794fd3588d70e0a44ac33b8739ab",
+      "audit_receipt_sha256": "b100054980c87aadb00b1a5d96921c7a505ad5a9ad2e92f8398e6edaa501fbb4",
+      "additions": [
+        {
+          "tag": "Rs",
+          "role": "supporting",
+          "explanation": "Stores additional per-lane base values for delta coding, spending a small amount of encoded space to enable independent parallel decoding.",
+          "sections": [
+            "2.4 The Unified Transposed Layout",
+            "4 RELATED WORK"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p2132-afroozeh.pdf",
+          "source_passages": [
+            90,
+            155
+          ]
+        }
+      ],
+      "before_sha256": "93ff0099d73d78feeec3907be9bae2347878b628e442bb99a439e04670e63b7b",
+      "after_sha256": "bdb44c11a298e1bb707a3696af8b02a177fe539242fcf1c11032957daa672c57"
+    },
+    {
+      "paper_id": "vldb2023-113",
+      "source_id": "vldb2023",
+      "title": "ARKGraph: All-Range Approximate K-Nearest-Neighbor Graph",
+      "base_equation": "Brute-force Materialization + Mo + Rw -> ARKGraph",
+      "source_text_sha256": "b7c6259047013de6f56c42a49d21cfb814c412705e8b0ce37277db29aaadd958",
+      "audit_receipt_sha256": "7379532d8ead1dee135d8f76b9de8c9c685b6c60c020e4737d9e29963d2f06bc",
+      "additions": [
+        {
+          "tag": "Rs",
+          "role": "core",
+          "explanation": "Stores compact range information and update deltas instead of full neighbor lists, spending reconstruction work at query time to reduce index storage while retaining the represented graph.",
+          "sections": [
+            "5 QUERY PROCESSING",
+            "6.3 Evaluating Range KGraph Query"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p2645-deng.pdf",
+          "source_passages": [
+            165,
+            198
+          ]
+        }
+      ],
+      "before_sha256": "5a90f474ed474920cdf931c41708a80cc8b948636eb03987872cccfb0fff3674",
+      "after_sha256": "49ed8b88ba6c78727c3dd9d0230a7b38cd785a9fa72d61df7b944acb3afd71ff"
+    },
+    {
+      "paper_id": "vldb2023-129",
+      "source_id": "vldb2023",
+      "title": "Sage: A System for Uncertain Network Analysis",
+      "base_equation": "Materialized Sample Processing + Wv + Rw + Wa -> Sage",
+      "source_text_sha256": "023dda34b82bfbde7ce7eadf799f5234d59098f6b7aa244d8953465942653890",
+      "audit_receipt_sha256": "122bb30023c3e494ace98780d45defea620b6ade1ef271153ae07a77f2779f12",
+      "additions": [
+        {
+          "tag": "Rs",
+          "role": "core",
+          "explanation": "Regenerates deterministic sampled-edge decisions on demand rather than storing all sampled graph topologies, exchanging computation for substantially less sample-state memory.",
+          "sections": [
+            "4.2 Deterministic Network Sampling",
+            "5.3 Evaluation Results"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol15/p3897-seo.pdf",
+          "source_passages": [
+            85,
+            142
+          ]
+        }
+      ],
+      "before_sha256": "e87d67a8c3d019287cab2740b3c3a642d143d0efb7144fc9f52f78d128b3a24d",
+      "after_sha256": "65d780c1bdeaa35b311cda2916ce3bdf4948095502a244f89f27a6345869badd"
+    },
+    {
+      "paper_id": "vldb2023-173",
+      "source_id": "vldb2023",
+      "title": "Efficient Fault Tolerance for Recommendation Model Training via Erasure Coding",
+      "base_equation": "Checkpointing + Wa + Bo + Op -> ECRec",
+      "source_text_sha256": "b8d420d912e2d5a172d38db75053ba1a3795db0cd20eb13bed0355c03b515ec7",
+      "audit_receipt_sha256": "c80431749badfef6988aa67960b07699ced2698089d54c6fc0209026b9f8f214",
+      "additions": [
+        {
+          "tag": "Rs",
+          "role": "core",
+          "explanation": "Uses parity for large embedding state and replication for smaller neural-network state, exchanging recovery and encoding work for memory savings where appropriate while avoiding unnecessary update traffic elsewhere.",
+          "sections": [
+            "3.1 Overview of ECRec",
+            "3.3 Replicated neural network parameters"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p3137-kosaian.pdf",
+          "source_passages": [
+            76,
+            101
+          ]
+        }
+      ],
+      "before_sha256": "519e46ac0d975dc706cc6dea65704539863eb0303161ba01e7419020b683be25",
+      "after_sha256": "3197e9fbe0527a420bc5c86aa43656718e17a807b48710c3ee40d78022cce4ff"
+    },
+    {
+      "paper_id": "vldb2023-197",
+      "source_id": "vldb2023",
+      "title": "Range Search over Encrypted Multi-Attribute Data",
+      "base_equation": "1D Encrypted Range Search + Gr + Pm -> GenericRS Framework",
+      "source_text_sha256": "c05852e57c766ee39fc6c6c6e168f606140f1de07a1497d5b9b4452c1c66e01e",
+      "audit_receipt_sha256": "5173d78ea39cfb21bf76901b4de0fc9f57c308ce970caa456fb21a64e83b1659",
+      "additions": [
+        {
+          "tag": "Rs",
+          "role": "core",
+          "explanation": "Stores encrypted records under multiple canonical ranges, spending additional storage to reduce the query tokens and accesses needed for range retrieval.",
+          "sections": [
+            "4 SCHEMES",
+            "4.4 Tdag-SRC Scheme"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p587-falzon.pdf",
+          "source_passages": [
+            115,
+            148
+          ]
+        }
+      ],
+      "before_sha256": "5e338b24b3438b137586503d1835d1745a2e470baee006af5d339212fe6dd14d",
+      "after_sha256": "52b358fc558e628c64d58f7636772f2fbd62449de975f00274a9110dec394033"
+    },
+    {
+      "paper_id": "vldb2023-206",
+      "source_id": "vldb2023",
+      "title": "Triangular Stability Maximization by Influence Spread over Social Networks",
+      "base_equation": "Conventional IM (Node-Count Objective) + Se + Ep + Wv -> Triangular Stability Maximization",
+      "source_text_sha256": "aabf5dfb27782f5a05f7d6fe687c38de0f7a97d589ea5cac12bcb8420a106195",
+      "audit_receipt_sha256": "af522d9810f7365962beb4671bb62861807c9c86ae5b988af139e367a9b9d2b3",
+      "additions": [
+        {
+          "tag": "Rs",
+          "role": "supporting",
+          "explanation": "Stores summed triangle weights per edge and computes common neighbors when sampling, exchanging per-sample computation for the memory required to materialize all triangles while preserving the sampling distribution.",
+          "sections": [
+            "4.1 Edge-based Triple Sampling"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p2818-zheng.pdf",
+          "source_passages": [
+            122,
+            123
+          ]
+        }
+      ],
+      "before_sha256": "e1c28b48ff468d8bc03d24701be5fc2dd9e983b40779c5d139063a8f8044acc7",
+      "after_sha256": "18bdd02d4f84820184b1ee328c0de28c988117e985f04ccb9e3953992673724c"
+    },
+    {
+      "paper_id": "vldb2023-212",
+      "source_id": "vldb2023",
+      "title": "Elf : Erasing-based Lossless Floating-Point Compression",
+      "base_equation": "XOR-based Compression + Se + Ig + Cc -> Elf",
+      "source_text_sha256": "b8f0f24fef37ca299a7bf078d69cb1dd0f3e7b20e581eddf3dac15042f5c8fc1",
+      "audit_receipt_sha256": "f34aa696c4b2512b8d492ac6064b64d86e448a9ab0411673963455a27bb51278",
+      "additions": [
+        {
+          "tag": "Rs",
+          "role": "supporting",
+          "explanation": "Uses reversible significand erasure and reconstruction to reduce encoded size, exchanging compression and decompression work for storage and data-transfer savings without changing the recovered values.",
+          "sections": [
+            "3.1 Elf Eraser",
+            "6.2 Overall Comparison with Baselines"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p1763-li.pdf",
+          "source_passages": [
+            103,
+            205
+          ]
+        }
+      ],
+      "before_sha256": "f901a02a470b033d6d9fe35d1c326a935a66ad6200d4b1244fefe521ea38a189",
+      "after_sha256": "69cc64af1e58c9728ab6fe9ea5dc61831d4b3606ade10b80686ca849343063c2"
+    },
+    {
+      "paper_id": "vldb2023-229",
+      "source_id": "vldb2023",
+      "title": "DILI: A Distribution-Driven Learned Index",
+      "base_equation": "Top-down Learned Index + Cm + Wa + Wv -> DILI",
+      "source_text_sha256": "1198fc401f53d16d7987471362c2fee7d4e8f0382ab9b70ee9a33a85e0628906",
+      "audit_receipt_sha256": "44cd399b18bd5f3a5389c22b69561114949092d564920fa76b6df3a59f6b80b6",
+      "additions": [
+        {
+          "tag": "Rs",
+          "role": "core",
+          "explanation": "Allocates expanded leaf arrays and additional nodes for conflicting predictions, spending memory to eliminate local search during exact lookups.",
+          "sections": [
+            "Algorithm 5 LocalOpt ( ND , 𝑷 D )",
+            "7.2 Overall Query Performance"
+          ],
+          "paper_url": "https://www.vldb.org/pvldb/vol16/p2212-li.pdf",
+          "source_passages": [
+            135,
+            185
+          ]
+        }
+      ],
+      "before_sha256": "803ed37fb2069c09013a714380b30fc8dcb3a1fa54da4a1908ccea1e83e51b02",
+      "after_sha256": "7ebb93d97ac801ae98afad3d07809f8eacb291084f01f2839b459bdedd32e23c"
+    }
+  ]
+}
