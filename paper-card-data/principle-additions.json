@@ -827,7 +827,7 @@
       "paper_id": "vldb2023-55",
       "source_id": "vldb2023",
       "title": "Efficient framework for operating on data sketches",
-      "base_equation": "O(m*n) Sketch Updates + Wv + Gr + Ep -> FastExpSketch",
+      "base_equation": "O(m*n) Sketch Updates + Wv + Gr + Co + Ep -> FastExpSketch",
       "source_text_sha256": "bca394bda02c54e4ba767e74839e1e01145477f2b17da1d658c2437091ed455d",
       "audit_receipt_sha256": "560d53ac1ce695be798cc4bc7a9c104cb13e7ef67157026b8933cda1f3b413a2",
       "additions": [
@@ -845,8 +845,8 @@
           ]
         }
       ],
-      "before_sha256": "c0bca51dc6779181cbdc2a18844251bb35a5f00522ceaa7d6cce3b98171b8385",
-      "after_sha256": "212a9fc0cf5f213b6e93a45217d6c51dfd01789031dbac18e9e3fba100019d73"
+      "before_sha256": "63c2f1123ea18573994dfb758c5c76afb25f82a927e776e5cac74bf3c8e7ab60",
+      "after_sha256": "0ee52a5fba8beb8f5780ee457a8539b056956447f4fbdf9873959f63848266cd"
     },
     {
       "paper_id": "vldb2023-65",
@@ -1426,8 +1426,8 @@
           ]
         }
       ],
-      "before_sha256": "77006a550c5b7e2456a0a120b6ec2981f8d9ac63cc7bfa30c83e92cc02c98d36",
-      "after_sha256": "e2c20ff315b55bbc8a5f58d1431456e71c026ed9d6850d3c0baa824ae60356c7"
+      "before_sha256": "b480b720019e86f095e518aa4514eab123bcc113d1b10b494082441d0b0df058",
+      "after_sha256": "7753ad6f04fd4458ec0825344b0ff5db35f8301272b6c53349a01c5cd8c0c900"
     },
     {
       "paper_id": "vldb2023-71",
@@ -1509,7 +1509,7 @@
       "paper_id": "vldb2023-87",
       "source_id": "vldb2023",
       "title": "MQH: Locality Sensitive Hashing on Multi-level Quantization Errors for Point-to-Hyperplane Distances",
-      "base_equation": "LSH on original data + Pd + Ad + Mo -> MQH",
+      "base_equation": "LSH on original data + Pd + Ad -> MQH",
       "source_text_sha256": "07141bd5bc8ee8a039cc12b64ab9c07f8afb4a09cb5cbffb8c3770a7f9681465",
       "audit_receipt_sha256": "a35f87c651b62b8debb7f2c1c7c523ffcce12a34443ea939093eadbd556f55d4",
       "additions": [
@@ -1528,8 +1528,8 @@
           ]
         }
       ],
-      "before_sha256": "cd97042726c4bc6cdbefafe7362d5ddbc688d6f90c1b71ba33ef25a81f6b3511",
-      "after_sha256": "41f3bed06242090755396dc2f6fb719be4c99eeddf328a8700ccbe9e698ed055"
+      "before_sha256": "403f1d009bb7abba415b374f261977bedc0b4278fcab0ad1cfe9fe62700e3417",
+      "after_sha256": "00f3b849eb2c96ababa634cfa9788e7b9f3cfe0c99587affcf74fb29e706733d"
     },
     {
       "paper_id": "vldb2023-114",
