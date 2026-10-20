@@ -2,6 +2,8 @@
 
 #### [Joy Arulraj (Georgia Tech)](https://faculty.cc.gatech.edu/~jarulraj/)
 
+[Reviewer data and offline reproduction](reviewer-data/README.md): abstracts, cached embeddings, principle assignments, and clustering results.
+
 System design is often taught through  solutions specific to particular domains, such as databases, operating systems, or computer architecture, each with its own methods and vocabulary. While this diversity is a strength, it can obscure cross-cutting principles that recur across domains. This paper proposes a preliminary taxonomy of system design principles distilled from several domains in computer systems. The goal is a shared, concise vocabulary that helps students, researchers, and practitioners reason about structure and trade-offs, compare designs across domains, and communicate choices more clearly.
 
 ## 1. INTRODUCTION

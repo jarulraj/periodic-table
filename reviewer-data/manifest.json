@@ -1,0 +1,53 @@
+{
+  "schema_version": 2,
+  "prepared_on": "2026-10-20",
+  "status": "Manuscript analysis snapshot for reviewer reproduction.",
+  "scope": {
+    "vldb2023": 234,
+    "vldb2003": 75,
+    "embedding_corpus": "vldb2023"
+  },
+  "source_sha256": {
+    "current_principle_additions": "ea8f1e1e8682664d6507d4f5def0abb8f448e4351594907b9846147586460b0b",
+    "collection_paper_cards": "bbf99128fc45c5bc89bf03538e1c9282ed1acdfe91b5f60ea33c83b0a058fb45"
+  },
+  "abstract_source": "https://www.vldb.org/2023/?program-schedule",
+  "session_source": "https://www.vldb.org/2023/?program-schedule",
+  "session_normalization": "Whitespace, ampersand to 'and', trailing Roman/Arabic session number; reviewed spelling aliases only.",
+  "model_source": "https://ollama.com/library/nomic-embed-text",
+  "software": {
+    "python": "3.10.6",
+    "numpy": "1.26.4",
+    "scipy": "1.15.3",
+    "sklearn": "1.6.1"
+  },
+  "method": {
+    "principle_features": "explicit core_principle_tags",
+    "principle_distance": "Jaccard over individual tags",
+    "linkage": "average",
+    "principle_distance_cut": 0.9,
+    "abstract_distance": "cosine",
+    "abstract_group_count": "Match the number of principle groups (12).",
+    "input_order": "numeric paper number within conference",
+    "group_order": "decreasing size, then lowest paper number",
+    "session_metric": "adjusted mutual information, arithmetic normalization",
+    "website_similarity_field": "Must equal the explicit core tag set; reject disagreements before analysis.",
+    "frequency": "unique core tags per card"
+  },
+  "files": {
+    "README.md": "db286fb009249d33677d4add7bce23a08e2c87729e88547a486a018591e1dcd9",
+    "abstracts.json": "7c140b07aa0368a8d520c636096e3f0b5502de2fee4ebbeaafdbb6165263d684",
+    "clusters.txt": "c8e437f0a98858d31bf90bcee8cdc1a39e30d91cd14b67cca559797b117255e8",
+    "embedding_metadata.json": "a45abfce3c46742b1567ca9aa7e8e1464e7f7abe6dbc58870c7e76a0a835acd9",
+    "embeddings.npy": "349ff420c38be5cdbfa63e34efdb7a8932a45d3c7a3b921b21500fae83590f81",
+    "memberships.csv": "9a90d2a04cb3df01f072dc3e9f60d91be476ed3cf059fc0783d66937d837df8b",
+    "paper-cards.json": "23cfca861d1fda00084c3df2b0009f4671d8a6f15287092cf7701b0f7a7c3764",
+    "principles.json": "a08824119b42faa96215b13300beabdcffb3c74d8d45ec918171d105ca4da2f3",
+    "reproduce.py": "bd47f40be0ed50e56dc1d0d37abc01c1aa025ec4388427aa1089b60882365522",
+    "requirements.txt": "cf7d89298d1c24999bed35fc8267f5ea06c1ab2a4cfb58b50857cedee4251f92",
+    "results.json": "5199b132a2fd846eb4ec0fd59bab69eff681eca2e3c12c7675a6fa2ab808cdbc",
+    "test_reproduce.py": "42ca6e87206be18017de5982a1fa442f40ea6b85e37f282034d008659daf991f"
+  },
+  "card_snapshot": "Cards used by the manuscript, including approved corrections; checksums identify the exact inputs independently of the repository base revision.",
+  "repository_base_revision": "6085c08c801fa4d53519d9bb5d50b0691175848a"
+}

@@ -1,0 +1,235 @@
+paper_id,title,session,core_principles,principle_group,abstract_group
+vldb2023-1,Representing Paths in Graph Database Pattern Matching,"Foundations for Patterns, Constraints, and Dependencies",Rw Wv,C2,E3
+vldb2023-2,Normalizing Property Graphs,"Foundations for Patterns, Constraints, and Dependencies",Ep Fs Mo Se,C3,E6
+vldb2023-3,Exploiting the Power of Equality-generating Dependencies in Ontological Reasoning,"Foundations for Patterns, Constraints, and Dependencies",Fs Ig Wv,C2,E6
+vldb2023-4,Witness Generation for JSON Schema,"Foundations for Patterns, Constraints, and Dependencies",Ep Fs Rw Se,C3,E1
+vldb2023-5,Erebus : Explaining the Outputs of Data Streaming Queries,"Provenance, Trace Capture, and Process Mining",Cr Ep Pm Se,C4,E1
+vldb2023-6,R 3 : Record-Replay-Retroaction for Database-Backed Applications,"Provenance, Trace Capture, and Process Mining",Al Ig Wv,C2,E2
+vldb2023-7,Mining Frequent Infix Patterns from Concurrency-Aware Process Execution Variants,"Provenance, Trace Capture, and Process Mining",Cp Ep Se Wv,C3,E7
+vldb2023-8,Online Schema Evolution is (Almost) Free for Snapshot Databases,View and Change Management,Cz Lu Op,C11,E2
+vldb2023-9,Making Cache Monotonic and Consistent,View and Change Management,La Se,C1,E2
+vldb2023-10,DBSP: Automatic Incremental View Maintenance for Rich Query Languages,View and Change Management,Au Co Fs Gr,C6,E1
+vldb2023-11,SageDB: An Instance-Optimized Data Analytics System,View and Change Management,Cm Rs Rw Wa,C1,E2
+vldb2023-12,Auto-BI: Automatically Build BI-Models Leveraging Local Join Prediction and Global Schema Graph,Information Integration and Mining,Cm Cp Mo,C9,E1
+vldb2023-13,Fast Algorithms for Denial Constraint Discovery,Information Integration and Mining,Bo Cz Rw,C5,E4
+vldb2023-14,Explaining Dataset Changes for Semantic Data Versioning with Explain-Da-V,Information Integration and Mining,Cc Gd Ig Se,C7,E6
+vldb2023-15,Learning and Deducing Temporal Orders,Information Integration and Mining,Ig La Se,C1,E3
+vldb2023-16,TokenJoin: Efficient Filtering for Set Similarity Join with Maximum Weighted Bipartite Matching,Similarity Join and Entity Resolution,Al Bo,C5,E1
+vldb2023-17,A Two-Level Signature Scheme for Stable Set Similarity Joins,Similarity Join and Entity Resolution,Ad Cm Wv,C2,E1
+vldb2023-18,Sparkly: A Simple yet Surprisingly Strong TF/IDF Blocker for Entity Matching,Similarity Join and Entity Resolution,Au Cm Gr Rw,C6,E4
+vldb2023-19,Auto-Tables: Synthesizing Multi-Step Transformations to Relationalize Tables without Using Examples,Data Exploration/Transformation and Usability,Au Ig La,C1,E1
+vldb2023-20,Transactional Panorama: A Conceptual Framework for User Perception in Analytical Visual Interfaces,Data Exploration/Transformation and Usability,Ad Fs Se Wa,C1,E6
+vldb2023-21,FEDEX: An Explainability Framework for Data Exploration Steps,Data Exploration/Transformation and Usability,Au Cm Gr,C6,E1
+vldb2023-22,Towards Efficient Index Construction and Approximate Nearest Neighbor Search in High-Dimensional Spaces,Indexing,Bo Pd,C5,E1
+vldb2023-23,CORE-Sketch: On Exact Computation of Median Absolute Deviation with Limited Space,Indexing,Ad Bo Rs Wv,C2,E3
+vldb2023-24,BP-tree: Overcoming the Point-Range Operation Tradeoff for In-Memory B-trees,Indexing,Cc Cr Lo Wv,C2,E1
+vldb2023-25,Blink-hash: An Adaptive Hybrid Index for In-Memory Time-Series Databases,Indexing,Ad Bo Op Wa,C5,E1
+vldb2023-26,ONe Index for All Kernels (ONIAK): A Zero Re-Indexing LSH Solution to ANNS-ALT (After Linear Transformation),Indexing,Bo Ep Gr Pd,C4,E1
+vldb2023-27,CatSQL : Towards Real World Natural Language to SQL Applications,Foundation Models and Databases,Gr Ig La,C1,E1
+vldb2023-28,Excalibur: A Virtual Machine for Adaptive Fine-grained JIT-Compiled Query Execution based on VOILA,Hardware Acceleration,Ad La Mo Pm Rw,C1,E2
+vldb2023-29,Bringing Compiling Databases to RISC Architectures,Hardware Acceleration,Bo Ha Se,C5,E2
+vldb2023-30,Deploying Computational Storage for HTAP DBMSs Takes More Than Just Computation Offloading,Hardware Acceleration,Fp Gr Pm Wv,C6,E2
+vldb2023-31,Enabling Transparent Acceleration of Big Data Frameworks Using Heterogeneous Hardware,Hardware Acceleration,Al Ha Lu Wv,C2,E5
+vldb2023-32,Analyzing the Impact of Cardinality Estimation on Execution Plans in Microsoft SQL Server,Optimizing Queries and Beyond,Ad Cm Se,C1,E1
+vldb2023-33,Robust Query Driven Cardinality Estimation under Changing Workloads,Optimizing Queries and Beyond,La Se,C1,E1
+vldb2023-34,Scaling a Declarative Cluster Manager Architecture with Query Optimization Techniques,Optimizing Queries and Beyond,Rw Wv,C2,E2
+vldb2023-35,Leveraging Application Data Constraints to Optimize Database-Backed Web Applications,Optimizing Queries and Beyond,Al Cm Ep Se,C3,E1
+vldb2023-36,QueryBooster : Improving SQL Performance Using Middleware Services for Human-Centered Query Rewriting,Optimizing Queries and Beyond,Cm Ep Ex Se,C3,E1
+vldb2023-37,Asymptotically Better Query Optimization Using Indexed Algebra,Rethinking Query Optimization and Execution,Rw Se Si,C8,E1
+vldb2023-38,SlabCity: Whole-Query Optimization using Program Synthesis,Rethinking Query Optimization and Execution,Ep Gd Se,C3,E1
+vldb2023-39,Declarative Sub-Operators for Universal Data Processing,Rethinking Query Optimization and Execution,Au Ep Mo Pm,C6,E2
+vldb2023-40,Fine-Grained Re-Execution for Efficient Batched Commit of Distributed Transactions,Transaction Processing,Cc Cz Fp Rw Se Wv,C2,E2
+vldb2023-41,Epoxy: ACID Transactions Across Diverse Data Stores,Transaction Processing,Cz Pm,C11,E2
+vldb2023-42,Cornus: Atomic Commit for a Cloud DBMS with Storage Disaggregation,Transaction Processing,At Dc Wv,C2,E2
+vldb2023-43,Nezha: Deployable and High-Performance Consensus Using Synchronized Clocks,Transaction Processing,Ad Cz Fp Op,C11,E2
+vldb2023-44,TiQuE: Improving the Transactional Performance of Analytical Systems for True Hybrid Workloads,Transaction Processing,Al Pm Wa,C6,E2
+vldb2023-45,Fries: Fast and Consistent Runtime Reconfiguration in Dataflow Systems with Transactional Guarantees,Transaction Processing,At Cz Ig Se,C7,E7
+vldb2023-46,Scalable and Robust Snapshot Isolation for High-Performance Storage Engines,Transaction Processing,Ad Cz Is Wv,C2,E2
+vldb2023-47,WiscSort: External Sorting For Byte-Addressable Storage,Modern Memory and Storage,Bo Ha Rs Wv,C2,E2
+vldb2023-48,LRU-C: Parallelizing Database I/Os for Flash SSDs,Modern Memory and Storage,Bo Cz Ha,C5,E2
+vldb2023-49,WALTZ: Leveraging Zone Append to Tighten the Tail Latency of LSM Tree on ZNS SSD,Modern Memory and Storage,Au Cz Ha,C2,E2
+vldb2023-50,FlashAlloc: Dedicating Flash Blocks By Objects,Modern Memory and Storage,Al Is Se,C12,E2
+vldb2023-51,Write-Aware Timestamp Tracking: Effective and Efficient Page Replacement for Modern Hardware,Modern Memory and Storage,Cm Ha Wa,C1,E2
+vldb2023-52,"What Modern NVMe Storage Can Do, And How To Exploit It: High-Performance I/O for High-Performance Storage Engines",Modern Memory and Storage,Bo Ha,C5,E2
+vldb2023-53,NV-SQL: Boosting OLTP Performance with Non-Volatile DIMMs,Modern Memory and Storage,Cz Ha Rw Wa,C2,E2
+vldb2023-54,Dalton: Learned Partitioning for Distributed Data Streams,Sketching and Streaming,Ad Dc La Rw Wa,C1,E7
+vldb2023-55,Efficient framework for operating on data sketches,Sketching and Streaming,Co Ep Gr Wv,C3,E5
+vldb2023-56,Optimistic Data Parallelism for FPGA-Accelerated Sketching,Sketching and Streaming,Ha Lo Op Wv,C2,E5
+vldb2023-57,Out-of-Order Sliding-Window Aggregation with Efficient Bulk Evictions and Insertions,Sketching and Streaming,Rw Wv,C2,E5
+vldb2023-58,High-Performance Row Pattern Recognition Using Joins,Sketching and Streaming,Cm Ep,C3,E1
+vldb2023-59,HMAB: Self-Driving Hierarchy of Bandits for Integrated Physical Database Design Tuning,Benchmarking and Performance,Ad La Mo,C1,E1
+vldb2023-60,InfiniStore : Elastic Serverless Cloud Storage,Cloud DB and Parallelism,Ec Fp Ft Rs Wa,C10,E2
+vldb2023-61,Exploiting Cloud Object Storage for High-Performance Analytics,Cloud DB and Parallelism,Ad Bo Ha Wa,C5,E2
+vldb2023-62,Pando: Enhanced Data Skipping with Logical Data Partitioning,Cloud DB and Parallelism,Cm Gr Pm Wa,C6,E1
+vldb2023-63,Parallelism-Optimizing Data Placement for Faster Data-Parallel Computations,Cloud DB and Parallelism,Cp Fp Mo,C9,E1
+vldb2023-64,Tigger: A Database Proxy That Bounces With User-Bypass,Cloud DB and Parallelism,Cc Fp Rw,C2,E2
+vldb2023-65,TreeLine: An Update-In-Place Key-Value Store for Modern Storage,Modern Memory and Storage,Cc Ha Lo Rw Wa,C2,E2
+vldb2023-66,PIM-tree: A Skew-resistant Index for Processing-in-Memory,Modern Memory and Storage,Fp Ha Lo Rs Wa,C10,E1
+vldb2023-67,Dotori: A Key-Value SSD Based KV Store,Modern Memory and Storage,Ha Op Wv,C2,E2
+vldb2023-68,"DINOMO: An Elastic, Scalable, High-Performance Key-Value Store for Disaggregated Persistent Memory",Modern Memory and Storage,Ad Cm Cz Fp Rw,C1,E2
+vldb2023-69,Sim-Piece: Highly Accurate Piecewise Linear Approximation through Similar Segment Merging,Compression,Ep Rw Se,C3,E5
+vldb2023-70,The FastLanes Compression Layout: Decoding > 100 Billion Integers per Second with Scalar Code,Compression,Cz Gr Ha,C2,E5
+vldb2023-71,Toward Quantity-of-Interest Preserving Lossy Compression for Scientific Data,Compression,Cp Ep Qr Se,C3,E5
+vldb2023-72,Extract-Transform-Load for Video Streams,Video Data,Ad Cm Cp Ec,C1,E1
+vldb2023-73,EQUI-VOCAL: Synthesizing Queries for Compositional Video Events from Limited User Interactions,Video Data,Ad Bo Cm Wa,C1,E1
+vldb2023-74,Optimizing Video Analytics with Declarative Model Relationships,Video Data,Ah Cm Se,C3,E1
+vldb2023-75,Motiflets - Simple and Accurate Detection of Motifs in Time Series,Time-Series Analytics,Au Gd Si,C8,E3
+vldb2023-76,Fast and Scalable Mining of Time Series Motifs with Probabilistic Guarantees,Time-Series Analytics,Ad Pd,C4,E3
+vldb2023-77,OneShotSTL: One-Shot Seasonal-Trend Decomposition For Online Time Series Anomaly Detection And Forecasting,Time-Series Analytics,Ad Rw,C1,E3
+vldb2023-78,Towards Designing and Learning Piecewise Space-Filling Curves,Spatial and Multi-Dimensional Indexing,Cm La Wa,C1,E1
+vldb2023-79,Adaptive Indexing of Objects with Spatial Extent,Spatial and Multi-Dimensional Indexing,Ad Bo Wa,C5,E1
+vldb2023-80,Adaptive Indexing in High-Dimensional Metric Spaces,Spatial and Multi-Dimensional Indexing,Ad Ig Rw,C1,E1
+vldb2023-81,Waffle: A Workload-Aware and Query-Sensitive Framework for Disk-Based Spatial Indexing,Spatial and Multi-Dimensional Indexing,Bo Cz Wa,C5,E1
+vldb2023-82,Bayesian Sketches for Volume Estimation in Data Streams,Data Samples and Summaries,La Pd,C1,E5
+vldb2023-83,Panakos: Chasing the Tails for Multidimensional Data Streams,Data Samples and Summaries,Bo Cc Co Pd,C4,E5
+vldb2023-84,Efficient Approximation of Certain and Possible Answers for Ranking and Window Queries over Uncertain Data,Data Samples and Summaries,Bo Cr Rw Se,C5,E1
+vldb2023-85,High-dimensional Data Cubes,Data Samples and Summaries,Co Gr Pd,C4,E1
+vldb2023-86,No Repetition: Fast and Reliable Sampling with Highly Concentrated Hashing,Data Samples and Summaries,Pd Si,C4,E5
+vldb2023-87,MQH: Locality Sensitive Hashing on Multi-level Quantization Errors for Point-to-Hyperplane Distances,Similarity Search,Ad Pd,C4,E1
+vldb2023-88,FARGO: Fast Maximum Inner Product Search via Global Multi-Probing,Similarity Search,Ad Cm Pd,C4,E1
+vldb2023-89,Odyssey: A Journey in the Land of Distributed Data Series Similarity Search,Similarity Search,Ad Cm Rw Sc,C1,E2
+vldb2023-90,Privacy-preserving Cooperative Online Matching over Spatial Crowdsourcing Platforms,Matching and Spatial Crowdsourcing,Pd Sy,C4,E10
+vldb2023-91,ACTA: Autonomy and Coordination Task Assignment in Spatial Crowdsourcing Platforms,Matching and Spatial Crowdsourcing,Ad Dc La Pm,C1,E10
+vldb2023-92,Online Ridesharing with Meeting Points,Matching and Spatial Crowdsourcing,Cc Gr Wv,C2,E11
+vldb2023-93,k-Best Egalitarian Stable Marriages for Task Assignment,Matching and Spatial Crowdsourcing,Cm Wv,C2,E8
+vldb2023-94,A Deep Generative Model for Trajectory Modeling and Utilization,Trajectories and Time Series,Ad Gr Se,C1,E9
+vldb2023-95,Efficient Non-Learning Similar Subtrajectory Search,Trajectories and Time Series,Ep Rw,C1,E1
+vldb2023-96,Effective and Efficient Route Planning Using Historical Trajectories on Road Networks,Trajectories and Time Series,Bo Mo Si,C8,E9
+vldb2023-97,Scalable Graph Convolutional Network Training on Distributed-Memory Systems,Scalable ML,Cm Cz,C11,E3
+vldb2023-98,FastFlow: Accelerating Deep Learning Model Training with Smart Offloading of Input Data Pipeline,Scalable ML,Bo Cm Fp Pm,C6,E7
+vldb2023-99,MiCS: Near-linear Scaling for Training Gigantic Model on Public Cloud,Scalable ML,Bo Ha Lo,C5,E7
+vldb2023-100,JoinBoost: Grow Trees Over Normalized Data Using Only SQL,Data Discovery and Learning over Related Data,Al Ep Wv,C3,E1
+vldb2023-101,Cross Modal Data Discovery over Structured and Unstructured Data Lakes,Data Discovery and Learning over Related Data,Co La Lu Pd,C1,E1
+vldb2023-102,RECA: Related Tables Enhanced Column Semantic Type Annotation Framework,Data Discovery and Learning over Related Data,Bo Se,C5,E1
+vldb2023-103,FederatedScope: A Flexible Federated Learning Platform for Heterogeneity,Scalable ML,Dc Ex Mo Pm,C6,E4
+vldb2023-104,HENCE-X: Toward Heterogeneity-agnostic Multi-level Explainability for Deep Graph Networks,Causality and Explanation,Al Gr Lo Wv,C2,E6
+vldb2023-105,On Data-Aware Global Explainability of Graph Neural Networks,Causality and Explanation,Gd Gr Pd,C4,E6
+vldb2023-106,Computing Rule-Based Explanations by Leveraging Counterfactuals,Causality and Explanation,Ah Ep Gd,C3,E6
+vldb2023-107,Why Not Yet: Fixing a Top-k Ranking that Is Not Fair to Individuals,Fairness,Bo Cp Ep Se,C3,E1
+vldb2023-108,Consistent Range Approximation for Fair Predictive Modeling,Fairness,Cp Pd Se,C4,E1
+vldb2023-109,Models and Mechanisms for Spatial Data Fairness,Fairness,Cp Fs Gr,C9,E10
+vldb2023-110,Satisfying Complex Topk Fairness Constraints by Preference Substitutions,Fairness,Cp Ep,C3,E8
+vldb2023-111,SUFF: Accelerating Subgraph Matching with Historical Data,Graph Analytics,Cm Rw Wv,C2,E3
+vldb2023-112,Computing Graph Edit Distance via Neural Graph Matching,Graph Analytics,Ep La Se,C1,E3
+vldb2023-113,ARKGraph: All-Range Approximate K-Nearest-Neighbor Graph,Graph Analytics,Mo Rs Rw Wv,C2,E1
+vldb2023-114,Quasi-stable Coloring for Graph Compression,Graph Analytics,Bo Cr Qr,C5,E12
+vldb2023-115,Temporal SIR-GN: Efficient and Effective Structural Representation Learning for Temporal Graphs,Graph Analytics,Ep Wv,C3,E3
+vldb2023-116,Scaling Up Structural Clustering to Large Probabilistic Graphs Using Lyapunov Central Limit Theorem,Graph Analytics,Bo Pd Qr,C5,E3
+vldb2023-117,Efficient Maximum k-Plex Computation over Large Sparse Graphs,Graph Analytics,Cc Ig Mo,C7,E3
+vldb2023-118,Text Indexing for Long Patterns: Anchors are All you Need,Text Processing and Search,Cc Ha Rw Wv,C2,E1
+vldb2023-119,Autonomously Computable Information Extraction,Text Processing and Search,Fs Is Rw Wv,C2,E1
+vldb2023-120,REmatch: a novel regex engine for finding all matches,Text Processing and Search,Rw Se Wv,C3,E1
+vldb2023-121,Web Record Extraction with Invariants,Text Processing and Search,Gr Ig Lu,C1,E1
+vldb2023-122,Distributed Graph Embedding with Information-Oriented Random Walks,Graph Analytics,Cc Lo Rw Wv,C2,E3
+vldb2023-123,"Estimating Single-Node PageRank in 𝑂 ˜ (︁ min { 𝑑𝑡 , √ 𝑚 } )︁ Time",Graph Analytics,Cc Ep Pd,C3,E3
+vldb2023-124,Space-Efficient Random Walks on Streaming Graphs,Graph Analytics,Ha Se Wv,C2,E3
+vldb2023-125,Density Personalized Group Query,Graph Analytics,Cp Ep,C3,E3
+vldb2023-126,MiniGraph: Querying Big Graphs with a Single Machine,Graph Analytics,Bo Gr Ha Rw,C5,E3
+vldb2023-127,Parallel Colorful h-star Core Maintenance in Dynamic Graphs,Graph Analytics,Cz Dc Wv,C2,E3
+vldb2023-128,MITra: A Framework for Multi-Instance Graph Traversal,Graph Analytics,Ep Gr Pm Rw,C6,E3
+vldb2023-129,Sage: A System for Uncertain Network Analysis,Graph Analytics,Ad Rs Rw Wa Wv,C1,E3
+vldb2023-130,Influential Community Search over Large Heterogeneous Information Networks,Community Search in Graphs,Bo Wv,C2,E3
+vldb2023-131,Maximal D-truss Search in Dynamic Directed Graphs,Community Search in Graphs,Ig Lo Rw,C8,E3
+vldb2023-132,Neighborhood-based Hypergraph Core Decomposition,Community Search in Graphs,Dc Gr Ig Se,C1,E3
+vldb2023-133,Semantics-aware Dataset Discovery from Data Lakes with Contextualized Column-based Representation Learning,Data Discovery and Integration,Bo La Se,C5,E1
+vldb2023-134,DeepJoin: Joinable Table Discovery with Pre-trained Language Models,Data Discovery and Integration,Gr La,C1,E1
+vldb2023-135,Effective Entity Augmentation By Querying External Data Sources,Data Discovery and Integration,Ad Au Cc La,C1,E1
+vldb2023-136,Integrating Data Lake Tables,Data Discovery and Integration,Ep La Wv,C3,E1
+vldb2023-137,VersaMatch: Ontology Matching with Weak Supervision,Data Discovery and Integration,Cc Co Gr Pd,C4,E1
+vldb2023-138,Secure Shapley Value for Cross-Silo Federated Learning,Private Retrieval and Secure Execution,Cr Pm Qr Tq,C4,E4
+vldb2023-139,Olive: Oblivious Federated Learning on Trusted Execution Environment Against the Risk of Sparsification,Private Retrieval and Secure Execution,Cc Sa,C3,E4
+vldb2023-140,"L2chain: Towards High-performance, Confidential and Secure Layer-2 Blockchain Solution for Decentralized Applications",Private Retrieval and Secure Execution,Cz Fp Ig Sy,C7,E2
+vldb2023-141,SPG: Structure-Private Graph Database via SqueezePIR,Private Retrieval and Secure Execution,Bo Cr Qr Sy Wv,C5,E3
+vldb2023-142,Pantheon: Private Retrieval from Public Key-Value Store,Private Retrieval and Secure Execution,Ep Sc,C3,E4
+vldb2023-143,Information-Theoretically Secure and Highly Efficient Search and Row Retrieval,Private Retrieval and Secure Execution,Cz Sy Wv,C2,E4
+vldb2023-144,ZKSQL: Verifiable and Efficient Query Evaluation with Zero-Knowledge Proofs,Private Retrieval and Secure Execution,Ep Sa,C3,E4
+vldb2023-145,Cracking-Like Join for Trusted Execution Environments,Private Retrieval and Secure Execution,Cz Ha Lo,C2,E4
+vldb2023-146,Enabling Secure and Efficient Data Analytics Pipeline Evolution with Trusted Execution Environment,Private Retrieval and Secure Execution,Mo Rw Sy Wa,C10,E4
+vldb2023-147,GlassDB: An Efficient Verifiable Ledger Database System Through Transparency,Blockchains,Bo Rw Si,C8,E4
+vldb2023-148,FlexChain: An Elastic Disaggregated Blockchain,Blockchains,Cz Ec Fp Rv Se,C7,E2
+vldb2023-149,GriDB: Scaling Blockchain Database via Sharding and Off-Chain Cross-Shard Mechanism,Blockchains,Ad Fp Wv,C2,E4
+vldb2023-150,AdaChain: A Learned Adaptive Blockchain,Blockchains,Ad Dc Ft La Wa,C1,E2
+vldb2023-151,Answering Private Linear Queries Adaptively using the Common Mechanism,Differential Privacy,Ad Ep Rw,C1,E4
+vldb2023-152,Equitable Data Valuation Meets the Right to Be Forgotten in Model Markets,Differential Privacy,Cp Rw Se,C4,E4
+vldb2023-153,OpBoost: A Vertical Federated Tree Boosting Framework Based on Order-Preserving Desensitization,Differential Privacy,Cr Pd Pm Se,C4,E4
+vldb2023-154,Longshot: Indexing Growing Databases using MPC and Differential Privacy,Differential Privacy,Pd Rw Wv,C2,E4
+vldb2023-155,Saibot: A Differentially Private Data Search Platform,Differential Privacy,Bo Co Rw,C8,E4
+vldb2023-156,DPXPlain: Privately Explaining Aggregate Query Answers,Differential Privacy,Pd Se,C4,E4
+vldb2023-157,Cache Me If You Can: Accuracy-Aware Inference Engine for Differentially Private Data Exploration,Differential Privacy,Cm Ep Rw,C3,E4
+vldb2023-158,Multi-Analyst Differential Privacy for Online Query Answering,Differential Privacy,Cp Pd Pm Rw,C4,E4
+vldb2023-159,LDPTrace : Locally Differentially Private Trajectory Synthesis,Differential Privacy,Al Co Gd Pd Sy,C4,E4
+vldb2023-160,Trajectory Data Collection with Local Differential Privacy,Differential Privacy,Lo Pd Se,C4,E4
+vldb2023-161,On the Risks of Collecting Multidimensional Data Under Local Differential Privacy,Differential Privacy,Sy Wa,C10,E4
+vldb2023-162,PreFair: Privately Generating Justifiably Fair Synthetic Data,Differential Privacy,Cp Se,C4,E4
+vldb2023-163,Auxo: A Scalable and Efficient Graph Stream Summarization Structure,Temporal and Evolving Graphs,Co Ec Rw,C8,E3
+vldb2023-164,Scalable Time-Range k-Core Query on Temporal Graphs,Temporal and Evolving Graphs,Ig Rw Wv,C2,E3
+vldb2023-165,Anonymous Edge Representation for Inductive Anomaly Detection in Dynamic Bipartite Graph,Temporal and Evolving Graphs,Bo Gr La Lo,C1,E3
+vldb2023-166,Mining Bursting Core in Large Temporal Graphs,Temporal and Evolving Graphs,Ep Lo,C3,E3
+vldb2023-167,Approximating Probabilistic Group Steiner Trees in Graphs,Graph Structures and Queries,Bo Gd Pd Qr,C5,E12
+vldb2023-168,Lotan: Bridging the Gap between GNNs and Scalable Graph Analytics Engines,Graph Structures and Queries,Ep Mo Pm Rw Wa,C6,E3
+vldb2023-169,Discovering Polarization Niches via Dense Subgraphs with Attractors and Repulsers,Graph Structures and Queries,Gd Ig Op Qr,C7,E8
+vldb2023-170,gCore: Exploring Cross-layer Cohesiveness in Multi-layer Graphs,Graph Structures and Queries,Gr Rw Wv,C2,E3
+vldb2023-171,Zebra: When Temporal Graph Neural Networks Meet Temporal Personalized PageRank,Graph Structures and Queries,Ad Al La Rw,C1,E3
+vldb2023-172,Federated Calibration and Evaluation of Binary Classifiers,"Reasoning, Recommendation, Classification",Lo Pd Sy,C4,E4
+vldb2023-173,Efficient Fault Tolerance for Recommendation Model Training via Erasure Coding,"Reasoning, Recommendation, Classification",Bo Ft Op Rs Wa,C10,E7
+vldb2023-174,Scalable Reasoning on Document Stores via Instance-Aware Query Rewriting,"Reasoning, Recommendation, Classification",Ah Ep Fs Wa,C3,E1
+vldb2023-175,Happiness Maximizing Sets under Group Fairness Constraints,"Reasoning, Recommendation, Classification",Cp Ep Pd,C3,E8
+vldb2023-176,Fairness Matters: A Tit-For-Tat Strategy Against Selfish Mining,"Reasoning, Recommendation, Classification",Ad Cm,C1,E2
+vldb2023-177,C5: Cloned Concurrency Control that Always Keeps Up,Queries and Systems,Al Cz Is,C12,E2
+vldb2023-178,LEON: A New Framework for ML-Aided Query Optimization,Queries and Systems,Ad Ah La Pd,C1,E1
+vldb2023-179,A Case for Graphics-driven Query Processing,Queries and Systems,Ad Al Ha Wa,C5,E5
+vldb2023-180,A Hierarchical Grouping Algorithm for the Multi-Vehicle Dial-a-Ride Problem,"Spatial, Spatio-Temporal",Al Cm Ep,C3,E11
+vldb2023-181,"Route Travel Time Estimation on A Road Network Revisited: Heterogeneity, Proximity, Periodicity and Dynamicity","Spatial, Spatio-Temporal",La Lo Mo Se,C1,E9
+vldb2023-182,"Automatic Road Extraction with Multi-Source Data Revisited: Completeness, Smoothness and Discrimination","Spatial, Spatio-Temporal",Ig La,C1,E9
+vldb2023-183,Budget-Conscious Fine-Grained Configuration Optimization for Spatio-Temporal Applications,"Spatial, Spatio-Temporal",Cm Cp Fp Mo,C9,E1
+vldb2023-184,PLIN: A Persistent Learned Index for Non-Volatile Memory with High Performance and Instant Recovery,Indexing and Learned Indexing,Cr Ha Lo Op,C2,E1
+vldb2023-185,Sieve: A Learned Data-Skipping Index for Data Analytics,Indexing and Learned Indexing,Cm Cr La,C1,E1
+vldb2023-186,LMSFC: A Novel Multidimensional Index based on Learned Monotonic Space Filling Curves,Indexing and Learned Indexing,Cm La Wa Wv,C1,E1
+vldb2023-187,FILM: a Fully Learned Index for Larger-than-Memory Databases,Indexing and Learned Indexing,Ad Al La Rw,C1,E1
+vldb2023-188,Cornet: Learning Table Formatting Rules By Example,Learning and Systems,Ad Au Gd La,C1,E1
+vldb2023-189,Serving and Optimizing Machine Learning Workflows on Heterogeneous Infrastructures,Learning and Systems,Cm Cp Fp Mo Qr,C9,E7
+vldb2023-190,LOGER: A Learned Optimizer towards Generating Efficient and Robust Query Execution Plans,Learning and Systems,Ad Ah La,C1,E1
+vldb2023-191,Falcon: A Privacy-Preserving and Interpretable Vertical Federated Learning System,Learning and Systems,Co Fp Pm,C6,E4
+vldb2023-192,Cost-based or Learning-based? A Hybrid Query Optimizer for Query Plan Selection,Learning and Systems,Ad Ah La Pd,C1,E1
+vldb2023-193,"SyncSignature: A Simple, Efficient, Parallelizable Framework for Tree Similarity Joins",Parallelization and Analytics,Cz Pd,C4,E1
+vldb2023-194,"Flare: A Fast, Secure, and Memory-Efficient Distributed Analytics Framework",Parallelization and Analytics,Ad Ha Pm Wv,C2,E4
+vldb2023-195,SODA: A Set of Fast Oblivious Algorithms in Distributed Secure Data Analytics,Parallelization and Analytics,Cm Pd Sy,C4,E4
+vldb2023-196,Frequency-revealing attacks against Frequency-hiding Order-preserving Encryption,"Trust, Security, Verifiability",Al Pd,C4,E4
+vldb2023-197,Range Search over Encrypted Multi-Attribute Data,"Trust, Security, Verifiability",Gr Pm Rs Sy,C6,E4
+vldb2023-198,Seiden: Revisiting Query Processing in Video Database Systems,Queries and Systems,Ad Bo Lo,C5,E1
+vldb2023-199,Efficient Black-box Checking of Snapshot Isolation in Databases,Queries and Systems,Cp Fs Ho Wv,C2,E4
+vldb2023-200,Async-fork: Mitigating Query Latency Spikes Incurred by the Fork-based Snapshot Mechanism from the OS Level,Queries and Systems,Bo Fp Ig,C7,E2
+vldb2023-201,Fast Approximate Denial Constraint Discovery,Search and Aggregation,Cp Ha,C9,E4
+vldb2023-202,CommunityAF: An Example-based Community Search Method via Autoregressive Flow,Search and Aggregation,Ad La,C1,E3
+vldb2023-203,HEDA : Multi-Attribute Unbounded Aggregation over Homomorphically Encrypted Database,Search and Aggregation,Cc Co Gr Sy,C4,E4
+vldb2023-204,LIDER: An Efficient High-dimensional Learned Index for Large-scale Dense Passage Retrieval,Search and Aggregation,Co La Mo,C1,E1
+vldb2023-205,Influence Maximization in Real-World Closed Social Networks,"Learning, Recommendations, Social Networks",Ad Bo Cm,C1,E8
+vldb2023-206,Triangular Stability Maximization by Influence Spread over Social Networks,"Learning, Recommendations, Social Networks",Ep Se Wv,C3,E8
+vldb2023-207,Coresets over Multiple Tables for Feature-rich and Data-efficient Machine Learning,"Learning, Recommendations, Social Networks",Au Ep Fp,C3,E1
+vldb2023-208,Auto-Tuning with Reinforcement Learning for Permissioned Blockchain Systems,"Learning, Recommendations, Social Networks",Al Dc La Sc,C12,E2
+vldb2023-209,Efficient Distributed Transaction Processing in Heterogeneous Networks,"Transactions, Tuning, and Compression",Al Dc Ha Op,C2,E2
+vldb2023-210,Starry: Multi-master Transaction Processing on Semi-leader Architecture,"Transactions, Tuning, and Compression",Cc Ep Op,C3,E2
+vldb2023-211,Adore: Differentially Oblivious Relational Database Operators,"Transactions, Tuning, and Compression",Bo Cr Pd,C5,E4
+vldb2023-212,Elf : Erasing-based Lossless Floating-Point Compression,"Transactions, Tuning, and Compression",Cc Ig Se,C7,E5
+vldb2023-213,Task : An Efficient Framework for Instant Error-tolerant Spatial Keyword Queries on Road Networks,Potpourri Online I (Systems and Algorithms),Mo Rw,C2,E9
+vldb2023-214,Differentially Private Vertical Federated Clustering,Potpourri Online I (Systems and Algorithms),Ep Pd Sy,C4,E4
+vldb2023-215,Change Propagation Without Joins,Potpourri Online I (Systems and Algorithms),Ep Rw Se Wv,C3,E1
+vldb2023-216,BICE: Exploring Compact Search Space by Using Bipartite Matching and Cell-Wide Verification,Potpourri Online I (Systems and Algorithms),Cp Ep Wv,C3,E3
+vldb2023-217,Self-Training for Label-Efficient Information Extraction from Semi-Structured Web-Pages,Potpourri Online II (Learning and Mining),Ad Gr Pd,C4,E1
+vldb2023-218,Self-supervised and Interpretable Data Cleaning with Sequence Generative Adversarial Networks,Potpourri Online II (Learning and Mining),Ad La Se,C1,E6
+vldb2023-219,FirmTruss Community Search in Multilayer Networks,Potpourri Online II (Learning and Mining),Cp Gd Gr,C9,E3
+vldb2023-220,Efficient Triangle-Connected Truss Community Search In Dynamic Graphs,Potpourri Online II (Learning and Mining),Ad Al Lo Rw Si,C1,E3
+vldb2023-221,Nemo: Guiding and Contextualizing Weak Supervision for Interactive Data Programming,Scalable ML,Cm Lo Wa,C1,E7
+vldb2023-222,Collective Grounding: Applying Database Techniques to Grounding Templated Models,Scalable ML,Cm Pm Rw,C6,E6
+vldb2023-223,On Efficient Approximate Queries over Machine Learning Models,Scalable ML,Bo La Pd Qr,C5,E1
+vldb2023-224,Accelerating Aggregation Queries on Unstructured Streams of Data,Scalable ML,Ad Cm La,C1,E1
+vldb2023-225,Fast Search-By-Classification for Large-Scale Databases Using Index-Aware Decision Trees and Random Forests,Scalable ML,Cp Ep Ha Wv,C3,E1
+vldb2023-226,Similarity search in the blink of an eye with compressed indices,Scalable ML,Bo Ha Qr Wa,C5,E1
+vldb2023-227,"SHiFT : An Efficient, Flexible Search Engine for Transfer Learning",Scalable ML,Ad Cm Qr Rw Se,C1,E7
+vldb2023-228,TOD : GPU-accelerated Outlier Detection via Tensor Operations,Scalable ML,Co Ec Ig Rw,C8,E5
+vldb2023-229,DILI: A Distribution-Driven Learned Index,Learned Indexes and Query Processing/Optimization,Cm Rs Wa Wv,C1,E1
+vldb2023-230,FASTgres: Making Learned Query Optimizer Hinting Effective,Learned Indexes and Query Processing/Optimization,Ad La Wa,C1,E1
+vldb2023-231,Lero: A Learning-to-Rank Query Optimizer,Learned Indexes and Query Processing/Optimization,Ad Bb La,C1,E1
+vldb2023-232,Learned Index Benefits: Machine Learning Based Index Performance Estimation,Learned Indexes and Query Processing/Optimization,La Se Wv,C1,E1
+vldb2023-233,ADOPT: Adaptively Optimizing Attribute Orders for Worst-Case Optimal Join Algorithms via Reinforcement Learning,Learned Indexes and Query Processing/Optimization,Ad La Wv,C1,E1
+vldb2023-234,SkinnerMT: Parallelizing for Efficiency and Robustness in Adaptive Query Processing on Multicore Platforms,Learned Indexes and Query Processing/Optimization,Ad Cm Wa,C1,E1
