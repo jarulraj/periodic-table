@@ -130,3 +130,22 @@ test('published additions have source pointers and reproduce their recorded befo
         assert.equal(published.cards_by_id[id].usagesByTag[tag], undefined);
     }
 });
+
+test('VIVA curation keeps quality relaxation supporting and preserves its core signature', () => {
+    const card = published.cards_by_id['vldb2023-74'];
+    assert.equal(card.equation, 'Black-Box UDF Optimization + Se + Ah + Cm -> VIVA');
+    assert.deepEqual(card.core_principle_tags, ['Se', 'Ah', 'Cm']);
+    assert.deepEqual(card.similarity_principle_tags, ['Ah', 'Cm', 'Se']);
+    assert.deepEqual(card.supporting_principle_tags, ['Ex', 'Qr']);
+    assert.equal(card.usagesByTag.Ep, undefined);
+    assert.equal(card.usagesByTag.Qr[0].core_or_supporting, 'supporting');
+    assert.match(card.usagesByTag.Qr[0].pointer, /Section 5\.4/);
+    assert.match(card.usagesByTag.Qr[0].pointer, /Section 7\.4/);
+    assert.match(card.output, /estimated F1.*canary.*original plan/);
+    assert.match(card.key_deltas[0].tradeoffs_or_costs, /Without hints.*predicate reorderings/);
+    const paper = published.papers.find(p => p.paper_id === card.paper_id);
+    assert.deepEqual(paper.tags, ['Se', 'Ah', 'Ex', 'Qr', 'Cm']);
+    const snapshot = JSON.parse(fs.readFileSync(path.join(__dirname, '../../reviewer-data/paper-cards.json')));
+    assert.deepEqual(snapshot.find(c => c.paper_id === card.paper_id), card);
+    assert.equal(fingerprint(card), loadReview().protected_cards[card.paper_id]);
+});

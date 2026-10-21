@@ -8,8 +8,8 @@
     "embedding_corpus": "vldb2023"
   },
   "source_sha256": {
-    "current_principle_additions": "ea8f1e1e8682664d6507d4f5def0abb8f448e4351594907b9846147586460b0b",
-    "collection_paper_cards": "bbf99128fc45c5bc89bf03538e1c9282ed1acdfe91b5f60ea33c83b0a058fb45"
+    "current_principle_additions": "13dfab4238d24e69f15272ad0dfda8d78c96268e799d5285a51ca191750a9744",
+    "collection_paper_cards": "f13939a5f967199c7eb725885f7d3bff0fb5576be8d79aa1e438246d9e5f5096"
   },
   "abstract_source": "https://www.vldb.org/2023/?program-schedule",
   "session_source": "https://www.vldb.org/2023/?program-schedule",
@@ -41,7 +41,7 @@
     "embedding_metadata.json": "a45abfce3c46742b1567ca9aa7e8e1464e7f7abe6dbc58870c7e76a0a835acd9",
     "embeddings.npy": "349ff420c38be5cdbfa63e34efdb7a8932a45d3c7a3b921b21500fae83590f81",
     "memberships.csv": "9a90d2a04cb3df01f072dc3e9f60d91be476ed3cf059fc0783d66937d837df8b",
-    "paper-cards.json": "23cfca861d1fda00084c3df2b0009f4671d8a6f15287092cf7701b0f7a7c3764",
+    "paper-cards.json": "f6d287809a613703d1cd150dbc5ff302105671cdd6e1882bd9f1e78e53e80100",
     "principles.json": "a08824119b42faa96215b13300beabdcffb3c74d8d45ec918171d105ca4da2f3",
     "reproduce.py": "bd47f40be0ed50e56dc1d0d37abc01c1aa025ec4388427aa1089b60882365522",
     "requirements.txt": "cf7d89298d1c24999bed35fc8267f5ea06c1ab2a4cfb58b50857cedee4251f92",

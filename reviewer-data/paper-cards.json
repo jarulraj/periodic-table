@@ -27438,7 +27438,7 @@
     "limiting_design_assumption": "A query optimizer has no semantic knowledge about the relationships between different ML models (implemented as UDFs) and therefore cannot automatically explore optimizations like model replacement or filtering. The optimizer treats UDFs as black boxes, and users must manually rewrite queries to try different optimizations.",
     "primary_tool_specific_type": "Cost-based query optimizer",
     "state_or_ir": "Query model tree",
-    "output": "An optimized query execution plan that meets a user-specified accuracy requirement.",
+    "output": "An optimized query execution plan whose estimated F1 score meets the user-specified threshold on a representative canary video, relative to the original plan's outputs.",
     "equation": "Black-Box UDF Optimization + Se + Ah + Cm -> VIVA",
     "core_principle_tags": [
       "Se",
@@ -27447,10 +27447,10 @@
     ],
     "supporting_principle_tags": [
       "Ex",
-      "Ep"
+      "Qr"
     ],
-    "principle_composition_rationale": "Semantically Explicit Interfaces expose relationships between otherwise opaque video models. Advisory Hinting lets the optimizer consider those relationships without requiring their use. Cost-based Planning selects the lowest-cost generated plan that meets the requested accuracy. Exact relational rewrites provide additional, supporting alternatives.",
-    "one_sentence_mechanism": "VIVA introduces a declarative hint interface for users to specify semantic relationships (e.g., replacement, filtering) between ML models, enabling a cost-based query optimizer to explore a large space of plans to find the fastest one that meets a user's accuracy constraint.",
+    "principle_composition_rationale": "Semantically Explicit Interfaces expose relationships between otherwise opaque video models. Advisory Hinting lets the optimizer consider those relationships without requiring their use. Cost-based Planning selects the best estimated-cost candidate whose estimated F1 score meets the requested threshold. Quality Relaxation supports considering plans with different outputs within that tolerance.",
+    "one_sentence_mechanism": "VIVA exposes optional replacement and filtering relationships between ML models through declarative hints, then uses estimated cost and plan-level F1 on a representative canary video to select a plan meeting the user's accuracy threshold.",
     "mechanism_family": "query optimization",
     "primary_design_archetype": "declarative interface to optimizer",
     "principle_mapping_confidence": "high",
@@ -27459,13 +27459,13 @@
         "delta_id": "Δ1",
         "summary": "Introduces 'Relational Hints,' a declarative SQL-like interface for users to specify domain knowledge about how ML models can replace or filter for each other, making these relationships known to the query optimizer.",
         "primary_metric_improved": "extensibility",
-        "tradeoffs_or_costs": "The system's effectiveness depends on users providing accurate and useful domain knowledge through hints."
+        "tradeoffs_or_costs": "Hints determine which additional model replacements and filters the optimizer can consider. Without hints, VIVA still explores predicate reorderings. Hint-generated plans are evaluated before selection; users need not guarantee that their suggested replacements or filters meet the accuracy target."
       },
       {
         "delta_id": "Δ2",
-        "summary": "Implements a hint-aware, cost-based query optimizer that systematically generates, validates, and costs a large space of alternative query plans, selecting the best one that meets a user's accuracy target.",
+        "summary": "Implements a hint-aware, cost-based query optimizer that generates alternative plans, estimates their accuracy and cost, and selects the best estimated-cost plan whose estimated F1 score meets the user's threshold.",
         "primary_metric_improved": "latency",
-        "tradeoffs_or_costs": "Query optimization latency increases due to the larger search space. Accuracy estimation relies on a user-provided 'canary input' which must be representative of the larger dataset."
+        "tradeoffs_or_costs": "Plan generation, profiling, and accuracy estimation add optimization overhead. Accuracy is evaluated relative to the original plan on a user-provided canary video; its usefulness on the full input depends on how representative that video is. This does not establish identical results or an unconditional accuracy guarantee on unseen video."
       }
     ],
     "physical_properties": [
@@ -27484,8 +27484,8 @@
       {
         "property": "accuracy",
         "direction": "not specified",
-        "concrete_number": "Meets user-defined requirement (e.g., 90%)",
-        "pointer": "[p.455, Section 7.1]"
+        "concrete_number": "Estimated F1 meets a user-defined threshold (e.g., 90%) on the canary video, relative to the original plan's outputs; identical outputs are not required.",
+        "pointer": "[p.453, p.455, Section 5.4, Section 7.1]"
       },
       {
         "property": "query optimization time",
@@ -27512,8 +27512,8 @@
           "name": "Advisory Hinting",
           "core_or_supporting": "core",
           "evidence_strength": "strong",
-          "mechanism_trigger": "The system's treatment of hints as suggestions that are only applied if they meet the user's accuracy requirement.",
-          "why_it_applies": "The paper explicitly states that hints are not enforced but are options for the optimizer to consider, which is the definition of an advisory hint. The optimizer can choose to ignore a hint if the resulting plan violates the accuracy constraint.",
+          "mechanism_trigger": "Hints propose optional plan alternatives; the optimizer checks applicability and evaluates the resulting plans before selection.",
+          "why_it_applies": "Hints are not enforced. The optimizer can ignore an applicable hint when its plan fails the estimated accuracy threshold or is more costly than another admissible plan. A user-supplied relationship is therefore an optimization opportunity, not a promise of identical outputs or sufficient accuracy.",
           "pointer": "[p.450, Section 4.1]"
         }
       ],
@@ -27528,15 +27528,15 @@
           "pointer": "[p.447, Abstract]"
         }
       ],
-      "Ep": [
+      "Qr": [
         {
           "delta_id": "Δ2",
-          "name": "Equivalence-based",
+          "name": "Quality Relaxation",
           "core_or_supporting": "supporting",
-          "evidence_strength": "medium",
-          "mechanism_trigger": "The planner's exact relational transformations, including reordering independent predicates and eliminating redundant calls.",
-          "why_it_applies": "These transformations preserve the query result and therefore fit Equivalence-based Planning. The approximate CAN REPLACE and CAN FILTER relationships are instead captured by the semantic hint interface and the accuracy-aware costed choice.",
-          "pointer": "[p. 452, p. 454, Section 5.2, Section 5.5]"
+          "evidence_strength": "strong",
+          "mechanism_trigger": "The user-specified accuracy threshold permits lower-cost plans whose outputs differ from the original plan.",
+          "why_it_applies": "VIVA evaluates plan-level F1 on a representative canary video relative to the original plan and considers model replacements or filters within the requested accuracy tolerance. This permits a specified reduction in output quality to reduce latency or price; it does not require every chosen plan to lose accuracy. The role is supporting because prior video optimizers already explored accuracy-performance tradeoffs, while VIVA's core contribution exposes and jointly optimizes alternatives through relational hints.",
+          "pointer": "[p.453, p.456, Section 5.4, Section 7.4]"
         }
       ],
       "Cm": [
