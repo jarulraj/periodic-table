@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "prepared_on": "2026-10-20",
+  "prepared_on": "2026-10-30",
   "status": "Manuscript analysis snapshot for reviewer reproduction.",
   "scope": {
     "vldb2023": 234,
@@ -9,7 +9,7 @@
   },
   "source_sha256": {
     "current_principle_additions": "13dfab4238d24e69f15272ad0dfda8d78c96268e799d5285a51ca191750a9744",
-    "collection_paper_cards": "f13939a5f967199c7eb725885f7d3bff0fb5576be8d79aa1e438246d9e5f5096"
+    "collection_paper_cards": "4b7b3168d1be9bb29cbdaa0772f7d346a854e7898614d5a4db62b184b51fa756"
   },
   "abstract_source": "https://www.vldb.org/2023/?program-schedule",
   "session_source": "https://www.vldb.org/2023/?program-schedule",
@@ -32,21 +32,24 @@
     "group_order": "decreasing size, then lowest paper number",
     "session_metric": "adjusted mutual information, arithmetic normalization",
     "website_similarity_field": "Must equal the explicit core tag set; reject disagreements before analysis.",
-    "frequency": "unique core tags per card"
+    "frequency": "unique core tags per card",
+    "abstract_principle_tests": "20,000 uniform same-size subsets; seed 42; two-sided inclusive-tail p-values with plus-one correction; unadjusted",
+    "abstract_nearest_neighbors": "exclude self; numeric-ID tie break; chance (core frequency - 1) / 233",
+    "abstract_keyword": "case-insensitive words beginning with learn"
   },
   "files": {
-    "README.md": "db286fb009249d33677d4add7bce23a08e2c87729e88547a486a018591e1dcd9",
+    "README.md": "533cebbbe84abce65d97da31f30e32bf21636e800347c0d6ca7842e1431b4c0b",
     "abstracts.json": "7c140b07aa0368a8d520c636096e3f0b5502de2fee4ebbeaafdbb6165263d684",
     "clusters.txt": "c8e437f0a98858d31bf90bcee8cdc1a39e30d91cd14b67cca559797b117255e8",
     "embedding_metadata.json": "a45abfce3c46742b1567ca9aa7e8e1464e7f7abe6dbc58870c7e76a0a835acd9",
     "embeddings.npy": "349ff420c38be5cdbfa63e34efdb7a8932a45d3c7a3b921b21500fae83590f81",
     "memberships.csv": "9a90d2a04cb3df01f072dc3e9f60d91be476ed3cf059fc0783d66937d837df8b",
-    "paper-cards.json": "f6d287809a613703d1cd150dbc5ff302105671cdd6e1882bd9f1e78e53e80100",
+    "paper-cards.json": "66bf0bf04fdd2a61223f89c51ada6a3f7b23a3cb128e42cd909584f12a4ef18f",
     "principles.json": "a08824119b42faa96215b13300beabdcffb3c74d8d45ec918171d105ca4da2f3",
-    "reproduce.py": "bd47f40be0ed50e56dc1d0d37abc01c1aa025ec4388427aa1089b60882365522",
+    "reproduce.py": "62c7a26ab9925c6d939d5eb9a733b00f6ea4cbdd0f39296cb99027c022064e67",
     "requirements.txt": "cf7d89298d1c24999bed35fc8267f5ea06c1ab2a4cfb58b50857cedee4251f92",
-    "results.json": "5199b132a2fd846eb4ec0fd59bab69eff681eca2e3c12c7675a6fa2ab808cdbc",
-    "test_reproduce.py": "42ca6e87206be18017de5982a1fa442f40ea6b85e37f282034d008659daf991f"
+    "results.json": "a6070e9319205f5116a25cf753ecead264bb92594d6d6460cf32dd0b2897f9a7",
+    "test_reproduce.py": "ddaf18ec72325e2090c36a40295b28b88eacca8fc654d3657b73ae7830945528"
   },
   "card_snapshot": "Cards used by the manuscript, including approved corrections; checksums identify the exact inputs independently of the repository base revision.",
   "repository_base_revision": "6085c08c801fa4d53519d9bb5d50b0691175848a"

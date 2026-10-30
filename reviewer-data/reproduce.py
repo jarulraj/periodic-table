@@ -4,6 +4,7 @@ import csv
 import hashlib
 import io
 import json
+import re
 from collections import Counter
 from pathlib import Path
 
@@ -121,6 +122,74 @@ def group_report(cards, groups, labels):
     ]
 
 
+def two_sided_p_value(observed, null):
+    lower = (1 + np.count_nonzero(null <= observed)) / (len(null) + 1)
+    upper = (1 + np.count_nonzero(null >= observed)) / (len(null) + 1)
+    return float(min(1, 2 * min(lower, upper)))
+
+
+def abstract_principle_analysis(cards, abstracts, distances, trials=20000, seed=42):
+    require(trials > 0, "Expected a positive number of random groups")
+    require([a["id"] for a in abstracts] == [c["id"] for c in cards],
+            "Abstract/card ID order differs")
+    require(distances.shape == (len(cards), len(cards)), "Distance shape differs")
+    similarities = 1 - distances.copy()
+    np.fill_diagonal(similarities, -np.inf)
+    nearest = similarities.argmax(axis=1)
+    np.fill_diagonal(similarities, 0)
+    rng = np.random.default_rng(seed)
+    nulls = {}
+    principles = {}
+    skipped = []
+    for tag in sorted({t for c in cards for t in c["core"]}):
+        mask = np.array([tag in c["core"] for c in cards])
+        indices = np.flatnonzero(mask)
+        size = len(indices)
+        if size < 2:
+            skipped.append(tag)
+            continue
+        denominator = size * (size - 1)
+        observed = float(similarities[np.ix_(indices, indices)].sum() / denominator)
+        # Equal-sized tag sets share the same uniformly sampled null groups.
+        if size not in nulls:
+            null = np.empty(trials)
+            for trial in range(trials):
+                sample = rng.choice(len(cards), size=size, replace=False)
+                null[trial] = similarities[np.ix_(sample, sample)].sum() / denominator
+            nulls[size] = null
+        shared = int(mask[nearest[indices]].sum())
+        principles[tag] = {
+            "papers": size,
+            "mean_cosine": observed,
+            "random_mean_cosine": float(nulls[size].mean()),
+            "two_sided_p": two_sided_p_value(observed, nulls[size]),
+            "nearest_shared": shared,
+            "nearest_shared_fraction": shared / size,
+            "nearest_chance_fraction": (size - 1) / (len(cards) - 1),
+        }
+    learned = np.array(["La" in c["core"] for c in cards])
+    keyword = np.array([bool(re.search(r"\blearn\w*", a["abstract"], re.I)) for a in abstracts])
+    keyword_counts = {
+        label: {"papers": int(mask.sum()), "matches": int(keyword[mask].sum())}
+        for label, mask in (("La", learned), ("other", ~learned))
+    }
+    return {
+        "method": {
+            "trials": trials, "seed": seed,
+            "statistic": "mean pairwise cosine similarity, excluding self-pairs",
+            "null": "uniform subsets without replacement; reuse null draws by size in alphabetical tag order",
+            "p_value": "two-sided: twice the smaller inclusive tail, plus-one correction, capped at one; unadjusted",
+            "nearest": "exclude self; ties use the lowest numeric paper ID",
+            "keyword": "case-insensitive words beginning with learn",
+        },
+        "principles": principles,
+        "skipped_singleton_principles": skipped,
+        "nearest_papers": [{"id": c["id"], "nearest_id": cards[int(nearest[i])]["id"]}
+                           for i, c in enumerate(cards)],
+        "learn_keyword": keyword_counts,
+    }
+
+
 def compute(root):
     cohorts = project_inputs(root)
     cards = cohorts[2023]
@@ -147,6 +216,7 @@ def compute(root):
         "frequency_basis": "core tags",
         "frequencies": frequencies,
         "shared_principles_across_years": len(frequencies["2003"].keys() & frequencies["2023"].keys()),
+        "abstract_principle_analysis": abstract_principle_analysis(cards, abstracts, distances),
     }
     results["pairs"] = []
     for first, second in (("28", "59"), ("54", "59"), ("34", "57"), ("183", "189")):
@@ -224,6 +294,7 @@ def main():
     print(f"Principles recurring in both years: {result['shared_principles_across_years']}")
     print("PASS: checksums, embedding alignment, all memberships, frequencies, AMI, and example pairs.")
     print("PASS: core tags and website similarity signatures agree across all 309 cards.")
+    print("PASS: per-principle abstract tests, nearest neighbors, and learning-keyword counts.")
 
 
 if __name__ == "__main__":

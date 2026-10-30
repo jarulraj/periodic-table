@@ -112,29 +112,24 @@
           "pointer": "[quote: '...queries usually follow a Zipfian distribution and histograms should be constructed utilizing the uneven query distribution.' p.5]"
         },
         {
-          "symbol": "La",
-          "name": "Learned Approximation",
+          "symbol": "Rw",
+          "name": "Reuse of Prior Work",
           "invented": false,
           "core_or_supporting": "core",
           "evidence_strength": "strong",
-          "mechanism_trigger": "Using the cache of best-matched tuples (BMT) from past queries to estimate the relevance of databases for a new, unseen query.",
-          "why_it_applies": "The BMT list acts as a learned, data-driven model that approximates the expensive function of querying all databases. It learns from past query-result examples to predict which databases are promising for future queries.",
+          "mechanism_trigger": "Retaining best-matched tuples and their database identifiers from previous queries, then reusing them to select databases for repeated and new queries.",
+          "why_it_applies": "FQ reuses previously fetched results to guide database selection without obtaining internal statistics from each database. For a repeated query it reuses the stored database identifiers; for a new query it ranks retained tuples by the query's distance function and uses their database identifiers. The reusable artifact is prior query output, selected according to workload frequency, rather than a separately trained prediction model.",
           "justification_if_invented": "",
-          "pointer": "[quote: 'If a query is not found in Freq-Q, the N best matched tuples from BMT are obtained. They are sorted... and their corresponding database IDs are used...' p.6]"
-        },
-        {
-          "symbol": "Rc",
-          "name": "Reuse of Computation",
-          "invented": false,
-          "core_or_supporting": "supporting",
-          "evidence_strength": "medium",
-          "mechanism_trigger": "The BMT list stores the best matched tuples from previous queries.",
-          "why_it_applies": "The system reuses the results of previous database probes (the best matched tuples) to inform the database selection for new queries, avoiding the need to re-probe all databases from scratch to make a ranking decision.",
-          "justification_if_invented": "",
-          "pointer": "[p.5]"
+          "pointer": "[Section 3.1(C), pp.5-6]"
         }
       ],
       "rejected_or_borderline_principles": [
+        {
+          "symbol": "La",
+          "name": "Learned Approximation",
+          "reason_rejected_or_borderline": "Using retained examples for unseen queries resembles instance-based learning, but FQ's concrete mechanism is a workload-selected result cache used by a fixed distance-ranking procedure. Reuse of Prior Work and Workload-Aware Optimisation explain this mechanism more directly; a separate learned prediction mechanism is not established.",
+          "pointer": "[Section 3.1(C), pp.5-6]"
+        },
         {
           "symbol": "Wv",
           "name": "Result-Preserving Work Avoidance",
@@ -169,45 +164,42 @@
     }
   ],
   "section_7_compound_equation": {
-    "equation": "Cooperative Distributed Search + Wa + La + Ad -> FQ + MOD-MIN-2",
+    "equation": "Cooperative Distributed Search + Wa + Rw + Ad -> FQ + MOD-MIN-2",
     "baseline_name": "Cooperative Distributed Search",
     "top_3_principle_tags": [
       "Wa",
-      "La",
+      "Rw",
       "Ad"
     ],
     "core_principle_tags": [
       "Wa",
-      "La",
+      "Rw",
       "Ad"
     ],
-    "supporting_principle_tags": [
-      "Rc"
-    ],
+    "supporting_principle_tags": [],
     "all_principle_tags_for_deltas": [
       "Wa",
-      "La",
-      "Rc",
+      "Rw",
       "Ad"
     ],
     "new_system_name": "FQ + MOD-MIN-2",
     "principle_composition_rationale": {
-      "why_these_principles_work_together": "Wa and La work together to solve the database ranking problem in an uncooperative environment. Wa identifies the important parts of the problem space (frequent queries), and La creates an approximate model from observed behavior in that space. Ad then provides a mechanism to consume this ranking more effectively and efficiently, adapting its own behavior based on observed results and workload characteristics to optimize the accuracy/efficiency tradeoff.",
+      "why_these_principles_work_together": "Wa determines which frequent queries and returned tuples to retain, and Rw reuses those results to rank databases without requiring their internal statistics. Ad then provides a mechanism to consume this ranking more effectively and efficiently, adapting its own behavior based on observed results and workload characteristics to optimize the accuracy/efficiency tradeoff.",
       "what_each_principle_contributes": [
         {
           "symbol": "Wa",
-          "contribution_to_equation": "Focuses the learning and caching effort on frequent queries, where accuracy matters most, enabling the system to work without full data statistics."
+          "contribution_to_equation": "Focuses retention on frequent queries and frequently accessed result tuples, where accuracy matters most, enabling the system to work without full data statistics."
         },
         {
-          "symbol": "La",
-          "contribution_to_equation": "Provides the mechanism to generalize from past query results to new queries, approximating the relevance of black-box databases."
+          "symbol": "Rw",
+          "contribution_to_equation": "Reuses previously fetched tuples and their database identifiers to guide database selection for repeated and new queries."
         },
         {
           "symbol": "Ad",
           "contribution_to_equation": "Refines the query execution process by dynamically adjusting the result merging strategy based on observed data and query types, balancing accuracy and cost."
         }
       ],
-      "transfer_question": "In other domains with uncooperative, black-box services, could we similarly learn to rank them by observing frequent requests and adaptively probing them based on their responses?"
+      "transfer_question": "In other domains with uncooperative, black-box services, could we retain results of frequent requests and reuse them to guide subsequent service selection and adaptive probing?"
     }
   },
   "section_8_physical_properties_summary": [
@@ -236,10 +228,10 @@
       "symbol": "Bc",
       "name": "Black-box Characterization",
       "definition": "Infer the internal properties, contents, or performance characteristics of a system component by observing its external input/output behavior, without requiring privileged access or introspection.",
-      "mechanism_pattern": "The FQ method probes databases with user queries and uses the returned results to build a model of which databases contain relevant tuples. This characterizes the content of each database with respect to the query workload, treating each database as a black box.",
-      "why_existing_principles_are_insufficient": "La (Learned Approximation) captures the use of a learned model, and Wa (Workload-Aware) captures the use of the query stream as input. However, neither specifically captures the pattern of learning about an *opaque* component's properties through observation of its external responses. Bc is a specific pattern of applying La and Wa to characterize an otherwise unknown system.",
+      "mechanism_pattern": "The FQ method probes databases with user queries and retains returned tuples to estimate which databases contain relevant data. This characterizes the content of each database with respect to the query workload, treating each database as a black box.",
+      "why_existing_principles_are_insufficient": "Rw (Reuse of Prior Work) captures reuse of returned tuples, and Wa (Workload-Aware) captures their selection according to query frequency. Neither specifically names the characterization of an opaque component through its external responses; whether this warrants a separate principle remains a candidate for review.",
       "closest_existing_principles": [
-        "La",
+        "Rw",
         "Wa"
       ],
       "reusability_beyond_this_paper": "This pattern is common: inferring network topology from pings, learning the cost model of a third-party database, or characterizing the performance of a black-box microservice under different loads.",
@@ -252,7 +244,7 @@
     "one_sentence_mechanism": "Ranks uncooperative distributed databases for top-N queries by building a cache of best-matched tuples from frequent historical queries, and adaptively merges results using a dynamic threshold.",
     "top_3_principles": [
       "Wa",
-      "La",
+      "Rw",
       "Ad"
     ],
     "mechanism_family": "query optimization",
@@ -260,7 +252,7 @@
       "FQ (Frequent Queries) histogram construction",
       "MOD-MIN-2 merge algorithm"
     ],
-    "primary_design_archetype": "learned control loop",
+    "primary_design_archetype": "workload-guided reuse",
     "principle_mapping_confidence": "high"
   }
 }

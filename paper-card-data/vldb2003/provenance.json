@@ -175,7 +175,7 @@
       "paper_title": "Distributed Top-N Query Processing with Possibly Uncooperative Local Systems",
       "paper_url": "https://vldb.org/conf/2003/papers/S05P02.pdf",
       "pdf_sha256": "294e5515730b0df7d6435f2ff8e4836ba665b3bcdc929d77e9f29250e3275b15",
-      "summary_sha256": "a9a115fb67b1aecee73c184862e001e226fcd6d1b6377aa778135f7eb245a920",
+      "summary_sha256": "034cc1813bf4a38e0c1b3f839abfdf8b3f009acb12c54071dd2bd76ef9a2b5d9",
       "analysis_input_sha256": "2b174fbfaf77c7c3d60b636486c4c8a7ba630a8859f28b6a1cc78080fd7fea25",
       "analyzer_sha256": "1f25a60decd56c68e7a82a4471356cad598cf11428a91512803c9905ef6ff03f",
       "full_prompt_sha256": "f6ffaada191d90cecb54ae3a6bc91457149a682d7441ddba6c4c43fd8fa4808c",
@@ -191,6 +191,13 @@
           "paper_id": "vldb2003-8",
           "check": "Full-page OCR restores the title, author list and readable top-N algorithm discussion; all three authors are present in the final card.",
           "status": "source checked"
+        },
+        {
+          "paper_id": "vldb2003-8",
+          "date": "2026-10-21",
+          "check": "Section 3.1(C), PDF pp.5-6: replace core La with core Rw. FQ retains returned tuples and database identifiers, reusing them through a fixed distance-ranking procedure. La is recorded as a borderline interpretation; Wa, Ad, and other principle decisions are unchanged.",
+          "status": "source checked; user-approved correction, not author review",
+          "previous_summary_sha256": "a9a115fb67b1aecee73c184862e001e226fcd6d1b6377aa778135f7eb245a920"
         }
       ]
     },
@@ -1157,7 +1164,7 @@
       "paper_title": "BHUNT: Automatic Discovery of Fuzzy Algebraic Constraints in Relational Data",
       "paper_url": "https://vldb.org/conf/2003/papers/S20P03.pdf",
       "pdf_sha256": "222214371ca1935d0e8569642d9db1746a8c02b6ebcf62a7a45378842e47af7f",
-      "summary_sha256": "58391d3b32430f696df7179be6ac2970d33bdfb8776794699d8977faa3f49460",
+      "summary_sha256": "0911ac6d7d7b764ee49b2e4f11a8dcbe7bd52f8cb66d9234b0b768a245d03f42",
       "analysis_input_sha256": "edb04a9201a0a2e7d2594b498c652fe70a427e69921d6609e0ba3b7b99157a97",
       "analyzer_sha256": "1f25a60decd56c68e7a82a4471356cad598cf11428a91512803c9905ef6ff03f",
       "full_prompt_sha256": "49cf9b11938a2623aa82f8ee7f503ace5e3ed43f16ac862e92e80114c20000f7",
@@ -1168,7 +1175,15 @@
       "pages": 12,
       "full_page_ocr": false,
       "formula_or_code_regions": 18,
-      "reviews": [],
+      "reviews": [
+        {
+          "paper_id": "vldb2003-54",
+          "date": "2026-10-21",
+          "check": "Sections 3.1 and 4: retain La for statistical rule learning of interval predicates from data samples. Clarify that the rules have exceptions, while query results remain exact through separate exception processing. All principle assignments and other mappings are unchanged.",
+          "status": "source checked; user-approved clarification, not author review",
+          "previous_summary_sha256": "58391d3b32430f696df7179be6ac2970d33bdfb8776794699d8977faa3f49460"
+        }
+      ],
       "metadata_corrections": [
         {
           "field": "section_0_paper_identification.year",

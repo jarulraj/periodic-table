@@ -17,7 +17,8 @@ python3 -m venv .venv
 
 After installing the dependencies, reproduction requires no network, API key,
 LLM calls, or running Ollama instance. The script validates checksums and
-recomputes all memberships, frequencies, session agreement, and example pairs.
+recomputes all memberships, frequencies, session agreement, example pairs,
+and the per-principle abstract statistics.
 Use `--output-dir /tmp/principle-review` to save recomputed results separately.
 
 ## Files
@@ -51,6 +52,16 @@ numeric paper order, and a 0.90 distance cutoff. The twelve clusters cover all
 the lowest paper number. Abstract clustering uses cosine distance and average
 linkage, with twelve groups for comparison. Conference session labels do not
 enter either clustering.
+
+For each core principle assigned to at least two papers, we compare mean
+pairwise abstract cosine similarity with 20,000 uniformly sampled groups of
+the same size (seed 42). Null draws are reused by group size in alphabetical
+tag order. Two-sided p-values double the smaller inclusive tail with a
+plus-one correction, capped at one; these p-values are unadjusted. Nearest
+abstracts exclude the paper itself, with ties broken by numeric paper ID;
+the chance baseline is `(group size - 1) / 233`. The learning-keyword check
+matches case-insensitive words beginning with `learn`. Counts, p-values,
+and every nearest-paper ID appear in `results.json`.
 
 Groups are exploratory: linkage ties, the cutoff, and annotation changes can
 affect membership. Frequent principles need not be shared by every member.

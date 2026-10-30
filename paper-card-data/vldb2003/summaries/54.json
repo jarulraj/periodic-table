@@ -103,10 +103,10 @@
           "invented": false,
           "core_or_supporting": "core",
           "evidence_strength": "strong",
-          "mechanism_trigger": "The data-driven discovery of an approximate rule (the fuzzy constraint) from data samples.",
-          "why_it_applies": "The system learns a model of a hidden data relationship from a sample, approximating the true relationship with a set of intervals.",
+          "mechanism_trigger": "Statistical rule learning: infer interval predicates over algebraic expressions from data samples.",
+          "why_it_applies": "BHUNT learns a compact rule describing a relationship in the data. The rule is approximate because some records fall outside its intervals; query results remain exact because those exceptions are processed separately and their results are combined with the constraint-based fast path.",
           "justification_if_invented": "",
-          "pointer": "[quote: '...actively learn about relationships in the data...'] [p.1]"
+          "pointer": "[Section 3.1, statistical discovery of interval predicates; Section 4, query processing with exception tables]"
         },
         {
           "symbol": "Pd",
@@ -234,11 +234,11 @@
     ],
     "new_system_name": "BHUNT",
     "principle_composition_rationale": {
-      "why_these_principles_work_together": "The system first uses Learned Approximation (La) and Probabilistic Design (Pd) to discover high-coverage, 'fuzzy' rules from data. This learned knowledge is then operationalized via Common-Case Specialization (Cc), which creates a fast path for the majority of data that conforms to the rule, while handling the few exceptions separately to maintain correctness.",
+      "why_these_principles_work_together": "The system uses statistical rule learning (La) and Probabilistic Design (Pd) to discover high-coverage, 'fuzzy' rules from data. Common-Case Specialization (Cc) creates a fast path for records that satisfy the rule. Processing exceptions separately and combining the results preserves exact query results.",
       "what_each_principle_contributes": [
         {
           "symbol": "La",
-          "contribution_to_equation": "Contributes the mechanism for learning an approximate model of a hidden data relationship directly from data samples."
+          "contribution_to_equation": "Learns interval predicates from data samples through statistical rule learning; the approximation concerns rule coverage, while query results remain exact."
         },
         {
           "symbol": "Pd",

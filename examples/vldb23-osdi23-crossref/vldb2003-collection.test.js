@@ -51,6 +51,35 @@ test('all 75 audited summaries are published with official PDF and session links
     assert.match(data.cards_by_id['vldb2003-37'].review_note, /Wv merits further review/);
 });
 
+test('FQ uses core reuse rather than learned approximation consistently', () => {
+    const card = data.cards_by_id['vldb2003-8'];
+    const paper = data.papers.find(p => p.paper_id === card.paper_id);
+    const summary = normalizeData(JSON.parse(fs.readFileSync(path.join(root, 'summaries', '8.json'))));
+    assert.deepEqual(card.core_principle_tags, ['Wa', 'Rw', 'Ad']);
+    assert.deepEqual(card.similarity_principle_tags, ['Ad', 'Rw', 'Wa']);
+    assert.deepEqual(card.supporting_principle_tags, []);
+    assert.equal(card.equation, 'Cooperative Distributed Search + Wa + Rw + Ad -> FQ + MOD-MIN-2');
+    assert.equal(card.usagesByTag.Rw[0].core_or_supporting, 'core');
+    assert.equal(card.usagesByTag.Rw[0].evidence_strength, 'strong');
+    assert.ok(!Object.hasOwn(card.usagesByTag, 'La'));
+    assert.ok(paper.tags.includes('Rw'));
+    assert.ok(!paper.tags.includes('La'));
+    assert.ok(summary.section_5_principle_mapping_minimum_set[0].rejected_or_borderline_principles.some(p => p.symbol === 'La'));
+});
+
+test('BHUNT distinguishes statistical rule learning from query-result approximation', () => {
+    const card = data.cards_by_id['vldb2003-54'];
+    assert.deepEqual(card.core_principle_tags, ['La', 'Pd', 'Cc', 'Ep']);
+    assert.deepEqual(card.supporting_principle_tags, ['Se', 'Au', 'Is']);
+    assert.deepEqual(card.similarity_principle_tags, ['Cc', 'Ep', 'La', 'Pd']);
+    const learned = card.usagesByTag.La[0];
+    assert.equal(learned.core_or_supporting, 'core');
+    assert.equal(learned.evidence_strength, 'strong');
+    assert.match(learned.mechanism_trigger, /statistical rule learning/i);
+    assert.match(learned.why_it_applies, /query results remain exact/);
+    assert.match(learned.why_it_applies, /exceptions are processed separately/);
+});
+
 test('2003 and 2023 can be filtered together and compared with the existing ranker', () => {
     assert.equal(filter(data.papers, {collections: new Set(['VLDB 2003', 'VLDB 2023'])}).length, 309);
     const source = data.cards_by_id['vldb2003-33'];

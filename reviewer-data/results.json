@@ -844,7 +844,7 @@
       "Ho": 1,
       "Ig": 8,
       "Is": 1,
-      "La": 2,
+      "La": 1,
       "Lo": 6,
       "Lu": 1,
       "Mo": 3,
@@ -853,7 +853,7 @@
       "Pm": 3,
       "Qr": 2,
       "Rs": 4,
-      "Rw": 13,
+      "Rw": 14,
       "Se": 15,
       "Si": 1,
       "Sy": 1,
@@ -909,6 +909,1342 @@
     }
   },
   "shared_principles_across_years": 38,
+  "abstract_principle_analysis": {
+    "method": {
+      "trials": 20000,
+      "seed": 42,
+      "statistic": "mean pairwise cosine similarity, excluding self-pairs",
+      "null": "uniform subsets without replacement; reuse null draws by size in alphabetical tag order",
+      "p_value": "two-sided: twice the smaller inclusive tail, plus-one correction, capped at one; unadjusted",
+      "nearest": "exclude self; ties use the lowest numeric paper ID",
+      "keyword": "case-insensitive words beginning with learn"
+    },
+    "principles": {
+      "Ad": {
+        "papers": 49,
+        "mean_cosine": 0.6438814521423829,
+        "random_mean_cosine": 0.6280105471125844,
+        "two_sided_p": 0.01929903504824759,
+        "nearest_shared": 16,
+        "nearest_shared_fraction": 0.32653061224489793,
+        "nearest_chance_fraction": 0.20600858369098712
+      },
+      "Ah": {
+        "papers": 6,
+        "mean_cosine": 0.7334677317236292,
+        "random_mean_cosine": 0.6279554047984759,
+        "two_sided_p": 9.99950002499875e-05,
+        "nearest_shared": 1,
+        "nearest_shared_fraction": 0.16666666666666666,
+        "nearest_chance_fraction": 0.02145922746781116
+      },
+      "Al": {
+        "papers": 18,
+        "mean_cosine": 0.6095762720655984,
+        "random_mean_cosine": 0.6279927372845598,
+        "two_sided_p": 0.13309334533273337,
+        "nearest_shared": 3,
+        "nearest_shared_fraction": 0.16666666666666666,
+        "nearest_chance_fraction": 0.07296137339055794
+      },
+      "At": {
+        "papers": 2,
+        "mean_cosine": 0.7002936710453895,
+        "random_mean_cosine": 0.628165088346477,
+        "two_sided_p": 0.24368781560921954,
+        "nearest_shared": 0,
+        "nearest_shared_fraction": 0.0,
+        "nearest_chance_fraction": 0.004291845493562232
+      },
+      "Au": {
+        "papers": 10,
+        "mean_cosine": 0.6469434785190631,
+        "random_mean_cosine": 0.6279302161150577,
+        "two_sided_p": 0.2888855557222139,
+        "nearest_shared": 2,
+        "nearest_shared_fraction": 0.2,
+        "nearest_chance_fraction": 0.03862660944206009
+      },
+      "Bo": {
+        "papers": 38,
+        "mean_cosine": 0.6239505648370641,
+        "random_mean_cosine": 0.6279732292465822,
+        "two_sided_p": 0.615569221538923,
+        "nearest_shared": 10,
+        "nearest_shared_fraction": 0.2631578947368421,
+        "nearest_chance_fraction": 0.15879828326180256
+      },
+      "Cc": {
+        "papers": 17,
+        "mean_cosine": 0.6069839564009174,
+        "random_mean_cosine": 0.6280468383429963,
+        "two_sided_p": 0.10229488525573721,
+        "nearest_shared": 1,
+        "nearest_shared_fraction": 0.058823529411764705,
+        "nearest_chance_fraction": 0.06866952789699571
+      },
+      "Cm": {
+        "papers": 37,
+        "mean_cosine": 0.6488082951069126,
+        "random_mean_cosine": 0.6279968337691684,
+        "two_sided_p": 0.013099345032748363,
+        "nearest_shared": 9,
+        "nearest_shared_fraction": 0.24324324324324326,
+        "nearest_chance_fraction": 0.15450643776824036
+      },
+      "Co": {
+        "papers": 13,
+        "mean_cosine": 0.6499876172857578,
+        "random_mean_cosine": 0.6279276836807085,
+        "two_sided_p": 0.1543922803859807,
+        "nearest_shared": 0,
+        "nearest_shared_fraction": 0.0,
+        "nearest_chance_fraction": 0.05150214592274678
+      },
+      "Cp": {
+        "papers": 21,
+        "mean_cosine": 0.6454306567893457,
+        "random_mean_cosine": 0.6278595214789886,
+        "two_sided_p": 0.1302934853257337,
+        "nearest_shared": 3,
+        "nearest_shared_fraction": 0.14285714285714285,
+        "nearest_chance_fraction": 0.08583690987124463
+      },
+      "Cr": {
+        "papers": 10,
+        "mean_cosine": 0.6436078779324468,
+        "random_mean_cosine": 0.6279302161150577,
+        "two_sided_p": 0.3802809859507025,
+        "nearest_shared": 0,
+        "nearest_shared_fraction": 0.0,
+        "nearest_chance_fraction": 0.03862660944206009
+      },
+      "Cz": {
+        "papers": 21,
+        "mean_cosine": 0.6723049805788803,
+        "random_mean_cosine": 0.6278595214789886,
+        "two_sided_p": 0.0002999850007499625,
+        "nearest_shared": 4,
+        "nearest_shared_fraction": 0.19047619047619047,
+        "nearest_chance_fraction": 0.08583690987124463
+      },
+      "Dc": {
+        "papers": 9,
+        "mean_cosine": 0.6394349964292757,
+        "random_mean_cosine": 0.627814908989822,
+        "two_sided_p": 0.5297735113244337,
+        "nearest_shared": 3,
+        "nearest_shared_fraction": 0.3333333333333333,
+        "nearest_chance_fraction": 0.034334763948497854
+      },
+      "Ec": {
+        "papers": 5,
+        "mean_cosine": 0.654719676746452,
+        "random_mean_cosine": 0.6278012953164727,
+        "two_sided_p": 0.33458327083645817,
+        "nearest_shared": 0,
+        "nearest_shared_fraction": 0.0,
+        "nearest_chance_fraction": 0.017167381974248927
+      },
+      "Ep": {
+        "papers": 40,
+        "mean_cosine": 0.6282490487098588,
+        "random_mean_cosine": 0.6279962989646208,
+        "two_sided_p": 0.9643517824108795,
+        "nearest_shared": 9,
+        "nearest_shared_fraction": 0.225,
+        "nearest_chance_fraction": 0.16738197424892703
+      },
+      "Ex": {
+        "papers": 2,
+        "mean_cosine": 0.5537252855784612,
+        "random_mean_cosine": 0.628165088346477,
+        "two_sided_p": 0.23148842557872107,
+        "nearest_shared": 0,
+        "nearest_shared_fraction": 0.0,
+        "nearest_chance_fraction": 0.004291845493562232
+      },
+      "Fp": {
+        "papers": 17,
+        "mean_cosine": 0.6643130808766867,
+        "random_mean_cosine": 0.6280468383429963,
+        "two_sided_p": 0.007499625018749062,
+        "nearest_shared": 1,
+        "nearest_shared_fraction": 0.058823529411764705,
+        "nearest_chance_fraction": 0.06866952789699571
+      },
+      "Fs": {
+        "papers": 9,
+        "mean_cosine": 0.6734211808514688,
+        "random_mean_cosine": 0.627814908989822,
+        "two_sided_p": 0.02039898005099745,
+        "nearest_shared": 3,
+        "nearest_shared_fraction": 0.3333333333333333,
+        "nearest_chance_fraction": 0.034334763948497854
+      },
+      "Ft": {
+        "papers": 3,
+        "mean_cosine": 0.6666149893778951,
+        "random_mean_cosine": 0.6279084558823007,
+        "two_sided_p": 0.34858257087145644,
+        "nearest_shared": 0,
+        "nearest_shared_fraction": 0.0,
+        "nearest_chance_fraction": 0.008583690987124463
+      },
+      "Gd": {
+        "papers": 10,
+        "mean_cosine": 0.6170957348461783,
+        "random_mean_cosine": 0.6279302161150577,
+        "two_sided_p": 0.5567721613919304,
+        "nearest_shared": 2,
+        "nearest_shared_fraction": 0.2,
+        "nearest_chance_fraction": 0.03862660944206009
+      },
+      "Gr": {
+        "papers": 27,
+        "mean_cosine": 0.6346631033613935,
+        "random_mean_cosine": 0.6279925130564752,
+        "two_sided_p": 0.4906754662266887,
+        "nearest_shared": 5,
+        "nearest_shared_fraction": 0.18518518518518517,
+        "nearest_chance_fraction": 0.11158798283261803
+      },
+      "Ha": {
+        "papers": 26,
+        "mean_cosine": 0.6767301281404254,
+        "random_mean_cosine": 0.6280195563930511,
+        "two_sided_p": 9.99950002499875e-05,
+        "nearest_shared": 12,
+        "nearest_shared_fraction": 0.46153846153846156,
+        "nearest_chance_fraction": 0.1072961373390558
+      },
+      "Ig": {
+        "papers": 19,
+        "mean_cosine": 0.5962800415121197,
+        "random_mean_cosine": 0.6278725929800874,
+        "two_sided_p": 0.006899655017249137,
+        "nearest_shared": 0,
+        "nearest_shared_fraction": 0.0,
+        "nearest_chance_fraction": 0.07725321888412018
+      },
+      "Is": {
+        "papers": 4,
+        "mean_cosine": 0.6824822445941928,
+        "random_mean_cosine": 0.627816765637308,
+        "two_sided_p": 0.1023948802559872,
+        "nearest_shared": 0,
+        "nearest_shared_fraction": 0.0,
+        "nearest_chance_fraction": 0.012875536480686695
+      },
+      "La": {
+        "papers": 39,
+        "mean_cosine": 0.6659356942389099,
+        "random_mean_cosine": 0.628000985372548,
+        "two_sided_p": 9.99950002499875e-05,
+        "nearest_shared": 17,
+        "nearest_shared_fraction": 0.4358974358974359,
+        "nearest_chance_fraction": 0.1630901287553648
+      },
+      "Lo": {
+        "papers": 18,
+        "mean_cosine": 0.6328759567050168,
+        "random_mean_cosine": 0.6279927372845598,
+        "two_sided_p": 0.6894655267236638,
+        "nearest_shared": 4,
+        "nearest_shared_fraction": 0.2222222222222222,
+        "nearest_chance_fraction": 0.07296137339055794
+      },
+      "Lu": {
+        "papers": 4,
+        "mean_cosine": 0.601402568457165,
+        "random_mean_cosine": 0.627816765637308,
+        "two_sided_p": 0.4247787610619469,
+        "nearest_shared": 0,
+        "nearest_shared_fraction": 0.0,
+        "nearest_chance_fraction": 0.012875536480686695
+      },
+      "Mo": {
+        "papers": 17,
+        "mean_cosine": 0.6474842097754453,
+        "random_mean_cosine": 0.6280468383429963,
+        "two_sided_p": 0.14459277036148194,
+        "nearest_shared": 5,
+        "nearest_shared_fraction": 0.29411764705882354,
+        "nearest_chance_fraction": 0.06866952789699571
+      },
+      "Op": {
+        "papers": 10,
+        "mean_cosine": 0.6470774667580039,
+        "random_mean_cosine": 0.6279302161150577,
+        "two_sided_p": 0.2858857057147143,
+        "nearest_shared": 2,
+        "nearest_shared_fraction": 0.2,
+        "nearest_chance_fraction": 0.03862660944206009
+      },
+      "Pd": {
+        "papers": 34,
+        "mean_cosine": 0.6532923977936416,
+        "random_mean_cosine": 0.6279696220388409,
+        "two_sided_p": 0.004099795010249488,
+        "nearest_shared": 14,
+        "nearest_shared_fraction": 0.4117647058823529,
+        "nearest_chance_fraction": 0.14163090128755365
+      },
+      "Pm": {
+        "papers": 19,
+        "mean_cosine": 0.6484959939873972,
+        "random_mean_cosine": 0.6278725929800874,
+        "two_sided_p": 0.09149542522873856,
+        "nearest_shared": 4,
+        "nearest_shared_fraction": 0.21052631578947367,
+        "nearest_chance_fraction": 0.07725321888412018
+      },
+      "Qr": {
+        "papers": 11,
+        "mean_cosine": 0.6310257496856635,
+        "random_mean_cosine": 0.6278976070062429,
+        "two_sided_p": 0.8368581570921454,
+        "nearest_shared": 1,
+        "nearest_shared_fraction": 0.09090909090909091,
+        "nearest_chance_fraction": 0.04291845493562232
+      },
+      "Rs": {
+        "papers": 10,
+        "mean_cosine": 0.6491102276193915,
+        "random_mean_cosine": 0.6279302161150577,
+        "two_sided_p": 0.23818809059547022,
+        "nearest_shared": 0,
+        "nearest_shared_fraction": 0.0,
+        "nearest_chance_fraction": 0.03862660944206009
+      },
+      "Rw": {
+        "papers": 51,
+        "mean_cosine": 0.6404995366696191,
+        "random_mean_cosine": 0.6279332780919394,
+        "two_sided_p": 0.0615969201539923,
+        "nearest_shared": 15,
+        "nearest_shared_fraction": 0.29411764705882354,
+        "nearest_chance_fraction": 0.2145922746781116
+      },
+      "Sa": {
+        "papers": 2,
+        "mean_cosine": 0.6433673481645041,
+        "random_mean_cosine": 0.628165088346477,
+        "two_sided_p": 0.79986000699965,
+        "nearest_shared": 0,
+        "nearest_shared_fraction": 0.0,
+        "nearest_chance_fraction": 0.004291845493562232
+      },
+      "Sc": {
+        "papers": 3,
+        "mean_cosine": 0.6843144386533817,
+        "random_mean_cosine": 0.6279084558823007,
+        "two_sided_p": 0.17739113044347782,
+        "nearest_shared": 0,
+        "nearest_shared_fraction": 0.0,
+        "nearest_chance_fraction": 0.008583690987124463
+      },
+      "Se": {
+        "papers": 44,
+        "mean_cosine": 0.6180464918377065,
+        "random_mean_cosine": 0.6280049737442884,
+        "two_sided_p": 0.1694915254237288,
+        "nearest_shared": 11,
+        "nearest_shared_fraction": 0.25,
+        "nearest_chance_fraction": 0.18454935622317598
+      },
+      "Si": {
+        "papers": 6,
+        "mean_cosine": 0.6111808828534578,
+        "random_mean_cosine": 0.6279554047984759,
+        "two_sided_p": 0.504274786260687,
+        "nearest_shared": 0,
+        "nearest_shared_fraction": 0.0,
+        "nearest_chance_fraction": 0.02145922746781116
+      },
+      "Sy": {
+        "papers": 12,
+        "mean_cosine": 0.6854990693139663,
+        "random_mean_cosine": 0.6277915661474323,
+        "two_sided_p": 0.001399930003499825,
+        "nearest_shared": 2,
+        "nearest_shared_fraction": 0.16666666666666666,
+        "nearest_chance_fraction": 0.04721030042918455
+      },
+      "Wa": {
+        "papers": 30,
+        "mean_cosine": 0.6572205216535486,
+        "random_mean_cosine": 0.6279684285374931,
+        "two_sided_p": 0.00279986000699965,
+        "nearest_shared": 8,
+        "nearest_shared_fraction": 0.26666666666666666,
+        "nearest_chance_fraction": 0.12446351931330472
+      },
+      "Wv": {
+        "papers": 50,
+        "mean_cosine": 0.6327663492166367,
+        "random_mean_cosine": 0.6278885116749118,
+        "two_sided_p": 0.46697665116744164,
+        "nearest_shared": 11,
+        "nearest_shared_fraction": 0.22,
+        "nearest_chance_fraction": 0.21030042918454936
+      }
+    },
+    "skipped_singleton_principles": [
+      "Bb",
+      "Ho",
+      "Rv",
+      "Tq"
+    ],
+    "nearest_papers": [
+      {
+        "id": "1",
+        "nearest_id": "126"
+      },
+      {
+        "id": "2",
+        "nearest_id": "33"
+      },
+      {
+        "id": "3",
+        "nearest_id": "218"
+      },
+      {
+        "id": "4",
+        "nearest_id": "174"
+      },
+      {
+        "id": "5",
+        "nearest_id": "224"
+      },
+      {
+        "id": "6",
+        "nearest_id": "177"
+      },
+      {
+        "id": "7",
+        "nearest_id": "76"
+      },
+      {
+        "id": "8",
+        "nearest_id": "44"
+      },
+      {
+        "id": "9",
+        "nearest_id": "46"
+      },
+      {
+        "id": "10",
+        "nearest_id": "215"
+      },
+      {
+        "id": "11",
+        "nearest_id": "178"
+      },
+      {
+        "id": "12",
+        "nearest_id": "100"
+      },
+      {
+        "id": "13",
+        "nearest_id": "201"
+      },
+      {
+        "id": "14",
+        "nearest_id": "20"
+      },
+      {
+        "id": "15",
+        "nearest_id": "76"
+      },
+      {
+        "id": "16",
+        "nearest_id": "17"
+      },
+      {
+        "id": "17",
+        "nearest_id": "16"
+      },
+      {
+        "id": "18",
+        "nearest_id": "62"
+      },
+      {
+        "id": "19",
+        "nearest_id": "136"
+      },
+      {
+        "id": "20",
+        "nearest_id": "119"
+      },
+      {
+        "id": "21",
+        "nearest_id": "135"
+      },
+      {
+        "id": "22",
+        "nearest_id": "26"
+      },
+      {
+        "id": "23",
+        "nearest_id": "82"
+      },
+      {
+        "id": "24",
+        "nearest_id": "25"
+      },
+      {
+        "id": "25",
+        "nearest_id": "24"
+      },
+      {
+        "id": "26",
+        "nearest_id": "22"
+      },
+      {
+        "id": "27",
+        "nearest_id": "36"
+      },
+      {
+        "id": "28",
+        "nearest_id": "29"
+      },
+      {
+        "id": "29",
+        "nearest_id": "28"
+      },
+      {
+        "id": "30",
+        "nearest_id": "44"
+      },
+      {
+        "id": "31",
+        "nearest_id": "179"
+      },
+      {
+        "id": "32",
+        "nearest_id": "33"
+      },
+      {
+        "id": "33",
+        "nearest_id": "32"
+      },
+      {
+        "id": "34",
+        "nearest_id": "62"
+      },
+      {
+        "id": "35",
+        "nearest_id": "119"
+      },
+      {
+        "id": "36",
+        "nearest_id": "38"
+      },
+      {
+        "id": "37",
+        "nearest_id": "190"
+      },
+      {
+        "id": "38",
+        "nearest_id": "36"
+      },
+      {
+        "id": "39",
+        "nearest_id": "28"
+      },
+      {
+        "id": "40",
+        "nearest_id": "210"
+      },
+      {
+        "id": "41",
+        "nearest_id": "210"
+      },
+      {
+        "id": "42",
+        "nearest_id": "41"
+      },
+      {
+        "id": "43",
+        "nearest_id": "210"
+      },
+      {
+        "id": "44",
+        "nearest_id": "30"
+      },
+      {
+        "id": "45",
+        "nearest_id": "54"
+      },
+      {
+        "id": "46",
+        "nearest_id": "200"
+      },
+      {
+        "id": "47",
+        "nearest_id": "52"
+      },
+      {
+        "id": "48",
+        "nearest_id": "53"
+      },
+      {
+        "id": "49",
+        "nearest_id": "65"
+      },
+      {
+        "id": "50",
+        "nearest_id": "48"
+      },
+      {
+        "id": "51",
+        "nearest_id": "53"
+      },
+      {
+        "id": "52",
+        "nearest_id": "53"
+      },
+      {
+        "id": "53",
+        "nearest_id": "48"
+      },
+      {
+        "id": "54",
+        "nearest_id": "45"
+      },
+      {
+        "id": "55",
+        "nearest_id": "82"
+      },
+      {
+        "id": "56",
+        "nearest_id": "70"
+      },
+      {
+        "id": "57",
+        "nearest_id": "54"
+      },
+      {
+        "id": "58",
+        "nearest_id": "233"
+      },
+      {
+        "id": "59",
+        "nearest_id": "183"
+      },
+      {
+        "id": "60",
+        "nearest_id": "61"
+      },
+      {
+        "id": "61",
+        "nearest_id": "60"
+      },
+      {
+        "id": "62",
+        "nearest_id": "185"
+      },
+      {
+        "id": "63",
+        "nearest_id": "62"
+      },
+      {
+        "id": "64",
+        "nearest_id": "28"
+      },
+      {
+        "id": "65",
+        "nearest_id": "49"
+      },
+      {
+        "id": "66",
+        "nearest_id": "25"
+      },
+      {
+        "id": "67",
+        "nearest_id": "65"
+      },
+      {
+        "id": "68",
+        "nearest_id": "49"
+      },
+      {
+        "id": "69",
+        "nearest_id": "212"
+      },
+      {
+        "id": "70",
+        "nearest_id": "56"
+      },
+      {
+        "id": "71",
+        "nearest_id": "69"
+      },
+      {
+        "id": "72",
+        "nearest_id": "224"
+      },
+      {
+        "id": "73",
+        "nearest_id": "74"
+      },
+      {
+        "id": "74",
+        "nearest_id": "198"
+      },
+      {
+        "id": "75",
+        "nearest_id": "76"
+      },
+      {
+        "id": "76",
+        "nearest_id": "75"
+      },
+      {
+        "id": "77",
+        "nearest_id": "76"
+      },
+      {
+        "id": "78",
+        "nearest_id": "186"
+      },
+      {
+        "id": "79",
+        "nearest_id": "80"
+      },
+      {
+        "id": "80",
+        "nearest_id": "79"
+      },
+      {
+        "id": "81",
+        "nearest_id": "79"
+      },
+      {
+        "id": "82",
+        "nearest_id": "55"
+      },
+      {
+        "id": "83",
+        "nearest_id": "54"
+      },
+      {
+        "id": "84",
+        "nearest_id": "107"
+      },
+      {
+        "id": "85",
+        "nearest_id": "62"
+      },
+      {
+        "id": "86",
+        "nearest_id": "82"
+      },
+      {
+        "id": "87",
+        "nearest_id": "88"
+      },
+      {
+        "id": "88",
+        "nearest_id": "87"
+      },
+      {
+        "id": "89",
+        "nearest_id": "63"
+      },
+      {
+        "id": "90",
+        "nearest_id": "91"
+      },
+      {
+        "id": "91",
+        "nearest_id": "90"
+      },
+      {
+        "id": "92",
+        "nearest_id": "180"
+      },
+      {
+        "id": "93",
+        "nearest_id": "110"
+      },
+      {
+        "id": "94",
+        "nearest_id": "96"
+      },
+      {
+        "id": "95",
+        "nearest_id": "26"
+      },
+      {
+        "id": "96",
+        "nearest_id": "94"
+      },
+      {
+        "id": "97",
+        "nearest_id": "168"
+      },
+      {
+        "id": "98",
+        "nearest_id": "99"
+      },
+      {
+        "id": "99",
+        "nearest_id": "98"
+      },
+      {
+        "id": "100",
+        "nearest_id": "33"
+      },
+      {
+        "id": "101",
+        "nearest_id": "133"
+      },
+      {
+        "id": "102",
+        "nearest_id": "101"
+      },
+      {
+        "id": "103",
+        "nearest_id": "139"
+      },
+      {
+        "id": "104",
+        "nearest_id": "105"
+      },
+      {
+        "id": "105",
+        "nearest_id": "104"
+      },
+      {
+        "id": "106",
+        "nearest_id": "105"
+      },
+      {
+        "id": "107",
+        "nearest_id": "84"
+      },
+      {
+        "id": "108",
+        "nearest_id": "223"
+      },
+      {
+        "id": "109",
+        "nearest_id": "108"
+      },
+      {
+        "id": "110",
+        "nearest_id": "175"
+      },
+      {
+        "id": "111",
+        "nearest_id": "216"
+      },
+      {
+        "id": "112",
+        "nearest_id": "168"
+      },
+      {
+        "id": "113",
+        "nearest_id": "22"
+      },
+      {
+        "id": "114",
+        "nearest_id": "127"
+      },
+      {
+        "id": "115",
+        "nearest_id": "171"
+      },
+      {
+        "id": "116",
+        "nearest_id": "115"
+      },
+      {
+        "id": "117",
+        "nearest_id": "113"
+      },
+      {
+        "id": "118",
+        "nearest_id": "187"
+      },
+      {
+        "id": "119",
+        "nearest_id": "120"
+      },
+      {
+        "id": "120",
+        "nearest_id": "119"
+      },
+      {
+        "id": "121",
+        "nearest_id": "35"
+      },
+      {
+        "id": "122",
+        "nearest_id": "97"
+      },
+      {
+        "id": "123",
+        "nearest_id": "116"
+      },
+      {
+        "id": "124",
+        "nearest_id": "122"
+      },
+      {
+        "id": "125",
+        "nearest_id": "111"
+      },
+      {
+        "id": "126",
+        "nearest_id": "122"
+      },
+      {
+        "id": "127",
+        "nearest_id": "170"
+      },
+      {
+        "id": "128",
+        "nearest_id": "1"
+      },
+      {
+        "id": "129",
+        "nearest_id": "84"
+      },
+      {
+        "id": "130",
+        "nearest_id": "219"
+      },
+      {
+        "id": "131",
+        "nearest_id": "220"
+      },
+      {
+        "id": "132",
+        "nearest_id": "127"
+      },
+      {
+        "id": "133",
+        "nearest_id": "134"
+      },
+      {
+        "id": "134",
+        "nearest_id": "133"
+      },
+      {
+        "id": "135",
+        "nearest_id": "21"
+      },
+      {
+        "id": "136",
+        "nearest_id": "134"
+      },
+      {
+        "id": "137",
+        "nearest_id": "133"
+      },
+      {
+        "id": "138",
+        "nearest_id": "191"
+      },
+      {
+        "id": "139",
+        "nearest_id": "191"
+      },
+      {
+        "id": "140",
+        "nearest_id": "148"
+      },
+      {
+        "id": "141",
+        "nearest_id": "122"
+      },
+      {
+        "id": "142",
+        "nearest_id": "145"
+      },
+      {
+        "id": "143",
+        "nearest_id": "197"
+      },
+      {
+        "id": "144",
+        "nearest_id": "154"
+      },
+      {
+        "id": "145",
+        "nearest_id": "142"
+      },
+      {
+        "id": "146",
+        "nearest_id": "194"
+      },
+      {
+        "id": "147",
+        "nearest_id": "149"
+      },
+      {
+        "id": "148",
+        "nearest_id": "150"
+      },
+      {
+        "id": "149",
+        "nearest_id": "147"
+      },
+      {
+        "id": "150",
+        "nearest_id": "208"
+      },
+      {
+        "id": "151",
+        "nearest_id": "158"
+      },
+      {
+        "id": "152",
+        "nearest_id": "138"
+      },
+      {
+        "id": "153",
+        "nearest_id": "214"
+      },
+      {
+        "id": "154",
+        "nearest_id": "143"
+      },
+      {
+        "id": "155",
+        "nearest_id": "151"
+      },
+      {
+        "id": "156",
+        "nearest_id": "157"
+      },
+      {
+        "id": "157",
+        "nearest_id": "156"
+      },
+      {
+        "id": "158",
+        "nearest_id": "157"
+      },
+      {
+        "id": "159",
+        "nearest_id": "160"
+      },
+      {
+        "id": "160",
+        "nearest_id": "159"
+      },
+      {
+        "id": "161",
+        "nearest_id": "153"
+      },
+      {
+        "id": "162",
+        "nearest_id": "157"
+      },
+      {
+        "id": "163",
+        "nearest_id": "122"
+      },
+      {
+        "id": "164",
+        "nearest_id": "166"
+      },
+      {
+        "id": "165",
+        "nearest_id": "104"
+      },
+      {
+        "id": "166",
+        "nearest_id": "171"
+      },
+      {
+        "id": "167",
+        "nearest_id": "116"
+      },
+      {
+        "id": "168",
+        "nearest_id": "97"
+      },
+      {
+        "id": "169",
+        "nearest_id": "206"
+      },
+      {
+        "id": "170",
+        "nearest_id": "127"
+      },
+      {
+        "id": "171",
+        "nearest_id": "166"
+      },
+      {
+        "id": "172",
+        "nearest_id": "138"
+      },
+      {
+        "id": "173",
+        "nearest_id": "98"
+      },
+      {
+        "id": "174",
+        "nearest_id": "4"
+      },
+      {
+        "id": "175",
+        "nearest_id": "108"
+      },
+      {
+        "id": "176",
+        "nearest_id": "201"
+      },
+      {
+        "id": "177",
+        "nearest_id": "6"
+      },
+      {
+        "id": "178",
+        "nearest_id": "231"
+      },
+      {
+        "id": "179",
+        "nearest_id": "28"
+      },
+      {
+        "id": "180",
+        "nearest_id": "92"
+      },
+      {
+        "id": "181",
+        "nearest_id": "96"
+      },
+      {
+        "id": "182",
+        "nearest_id": "94"
+      },
+      {
+        "id": "183",
+        "nearest_id": "59"
+      },
+      {
+        "id": "184",
+        "nearest_id": "66"
+      },
+      {
+        "id": "185",
+        "nearest_id": "62"
+      },
+      {
+        "id": "186",
+        "nearest_id": "78"
+      },
+      {
+        "id": "187",
+        "nearest_id": "79"
+      },
+      {
+        "id": "188",
+        "nearest_id": "106"
+      },
+      {
+        "id": "189",
+        "nearest_id": "99"
+      },
+      {
+        "id": "190",
+        "nearest_id": "178"
+      },
+      {
+        "id": "191",
+        "nearest_id": "214"
+      },
+      {
+        "id": "192",
+        "nearest_id": "230"
+      },
+      {
+        "id": "193",
+        "nearest_id": "17"
+      },
+      {
+        "id": "194",
+        "nearest_id": "146"
+      },
+      {
+        "id": "195",
+        "nearest_id": "145"
+      },
+      {
+        "id": "196",
+        "nearest_id": "143"
+      },
+      {
+        "id": "197",
+        "nearest_id": "143"
+      },
+      {
+        "id": "198",
+        "nearest_id": "74"
+      },
+      {
+        "id": "199",
+        "nearest_id": "46"
+      },
+      {
+        "id": "200",
+        "nearest_id": "46"
+      },
+      {
+        "id": "201",
+        "nearest_id": "13"
+      },
+      {
+        "id": "202",
+        "nearest_id": "219"
+      },
+      {
+        "id": "203",
+        "nearest_id": "154"
+      },
+      {
+        "id": "204",
+        "nearest_id": "229"
+      },
+      {
+        "id": "205",
+        "nearest_id": "206"
+      },
+      {
+        "id": "206",
+        "nearest_id": "205"
+      },
+      {
+        "id": "207",
+        "nearest_id": "100"
+      },
+      {
+        "id": "208",
+        "nearest_id": "150"
+      },
+      {
+        "id": "209",
+        "nearest_id": "210"
+      },
+      {
+        "id": "210",
+        "nearest_id": "41"
+      },
+      {
+        "id": "211",
+        "nearest_id": "157"
+      },
+      {
+        "id": "212",
+        "nearest_id": "69"
+      },
+      {
+        "id": "213",
+        "nearest_id": "79"
+      },
+      {
+        "id": "214",
+        "nearest_id": "153"
+      },
+      {
+        "id": "215",
+        "nearest_id": "10"
+      },
+      {
+        "id": "216",
+        "nearest_id": "111"
+      },
+      {
+        "id": "217",
+        "nearest_id": "135"
+      },
+      {
+        "id": "218",
+        "nearest_id": "222"
+      },
+      {
+        "id": "219",
+        "nearest_id": "131"
+      },
+      {
+        "id": "220",
+        "nearest_id": "131"
+      },
+      {
+        "id": "221",
+        "nearest_id": "103"
+      },
+      {
+        "id": "222",
+        "nearest_id": "33"
+      },
+      {
+        "id": "223",
+        "nearest_id": "178"
+      },
+      {
+        "id": "224",
+        "nearest_id": "198"
+      },
+      {
+        "id": "225",
+        "nearest_id": "79"
+      },
+      {
+        "id": "226",
+        "nearest_id": "80"
+      },
+      {
+        "id": "227",
+        "nearest_id": "98"
+      },
+      {
+        "id": "228",
+        "nearest_id": "98"
+      },
+      {
+        "id": "229",
+        "nearest_id": "186"
+      },
+      {
+        "id": "230",
+        "nearest_id": "192"
+      },
+      {
+        "id": "231",
+        "nearest_id": "178"
+      },
+      {
+        "id": "232",
+        "nearest_id": "231"
+      },
+      {
+        "id": "233",
+        "nearest_id": "190"
+      },
+      {
+        "id": "234",
+        "nearest_id": "63"
+      }
+    ],
+    "learn_keyword": {
+      "La": {
+        "papers": 39,
+        "matches": 30
+      },
+      "other": {
+        "papers": 195,
+        "matches": 34
+      }
+    }
+  },
   "pairs": [
     {
       "ids": [

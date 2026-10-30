@@ -1356,7 +1356,7 @@
     ],
     "similarity_principle_tags": [
       "Ad",
-      "La",
+      "Rw",
       "Wa"
     ],
     "similarity_principle_source": "equation_core",
@@ -1412,19 +1412,17 @@
     "primary_tool_specific_type": "Workload-based statistical summary",
     "state_or_ir": "The FQ 'histogram', which consists of a list of frequent queries (Freq-Q) and a list of the best matched tuples (BMT) returned for those queries from various databases.",
     "output": "A ranked list of databases to be searched, and a stream of top-N result tuples.",
-    "equation": "Cooperative Distributed Search + Wa + La + Ad -> FQ + MOD-MIN-2",
+    "equation": "Cooperative Distributed Search + Wa + Rw + Ad -> FQ + MOD-MIN-2",
     "core_principle_tags": [
       "Wa",
-      "La",
+      "Rw",
       "Ad"
     ],
-    "supporting_principle_tags": [
-      "Rw"
-    ],
-    "principle_composition_rationale": "Wa and La work together to solve the database ranking problem in an uncooperative environment. Wa identifies the important parts of the problem space (frequent queries), and La creates an approximate model from observed behavior in that space. Ad then provides a mechanism to consume this ranking more effectively and efficiently, adapting its own behavior based on observed results and workload characteristics to optimize the accuracy/efficiency tradeoff.",
+    "supporting_principle_tags": [],
+    "principle_composition_rationale": "Wa determines which frequent queries and returned tuples to retain, and Rw reuses those results to rank databases without requiring their internal statistics. Ad then provides a mechanism to consume this ranking more effectively and efficiently, adapting its own behavior based on observed results and workload characteristics to optimize the accuracy/efficiency tradeoff.",
     "one_sentence_mechanism": "Ranks uncooperative distributed databases for top-N queries by building a cache of best-matched tuples from frequent historical queries, and adaptively merges results using a dynamic threshold.",
     "mechanism_family": "query optimization",
-    "primary_design_archetype": "learned control loop",
+    "primary_design_archetype": "workload-guided reuse",
     "principle_mapping_confidence": "high",
     "key_deltas": [
       {
@@ -1472,26 +1470,15 @@
           "pointer": "[p.5]"
         }
       ],
-      "La": [
-        {
-          "delta_id": "Δ1",
-          "name": "Learned Approximation",
-          "core_or_supporting": "core",
-          "evidence_strength": "strong",
-          "mechanism_trigger": "Using the cache of best-matched tuples (BMT) from past queries to estimate the relevance of databases for a new, unseen query.",
-          "why_it_applies": "The BMT list acts as a learned, data-driven model that approximates the expensive function of querying all databases. It learns from past query-result examples to predict which databases are promising for future queries.",
-          "pointer": "[p.6]"
-        }
-      ],
       "Rw": [
         {
           "delta_id": "Δ1",
           "name": "Reuse of Prior Work",
-          "core_or_supporting": "supporting",
-          "evidence_strength": "medium",
-          "mechanism_trigger": "The BMT list stores the best matched tuples from previous queries.",
-          "why_it_applies": "The system reuses the results of previous database probes (the best matched tuples) to inform the database selection for new queries, avoiding the need to re-probe all databases from scratch to make a ranking decision.",
-          "pointer": "[p.5]"
+          "core_or_supporting": "core",
+          "evidence_strength": "strong",
+          "mechanism_trigger": "Retaining best-matched tuples and their database identifiers from previous queries, then reusing them to select databases for repeated and new queries.",
+          "why_it_applies": "FQ reuses previously fetched results to guide database selection without obtaining internal statistics from each database. For a repeated query it reuses the stored database identifiers; for a new query it ranks retained tuples by the query's distance function and uses their database identifiers. The reusable artifact is prior query output, selected according to workload frequency, rather than a separately trained prediction model.",
+          "pointer": "[Section 3.1]"
         }
       ],
       "Ad": [
@@ -9729,7 +9716,7 @@
       "Au",
       "Is"
     ],
-    "principle_composition_rationale": "The system first uses Learned Approximation (La) and Probabilistic Design (Pd) to discover high-coverage, 'fuzzy' rules from data. This learned knowledge is then operationalized via Common-Case Specialization (Cc), which creates a fast path for the majority of data that conforms to the rule, while handling the few exceptions separately to maintain correctness.",
+    "principle_composition_rationale": "The system uses statistical rule learning (La) and Probabilistic Design (Pd) to discover high-coverage, 'fuzzy' rules from data. Common-Case Specialization (Cc) creates a fast path for records that satisfy the rule. Processing exceptions separately and combining the results preserves exact query results.",
     "one_sentence_mechanism": "BHUNT automatically discovers fuzzy algebraic constraints from data samples using statistical segmentation and then rewrites queries to use these constraints for a fast-path on the common-case data, while handling outliers in a separate exception table to ensure correctness.",
     "mechanism_family": "query optimization",
     "primary_design_archetype": "invariant-preserving shortcut",
@@ -9781,9 +9768,9 @@
           "name": "Learned Approximation",
           "core_or_supporting": "core",
           "evidence_strength": "strong",
-          "mechanism_trigger": "The data-driven discovery of an approximate rule (the fuzzy constraint) from data samples.",
-          "why_it_applies": "The system learns a model of a hidden data relationship from a sample, approximating the true relationship with a set of intervals.",
-          "pointer": "[p.1]"
+          "mechanism_trigger": "Statistical rule learning: infer interval predicates over algebraic expressions from data samples.",
+          "why_it_applies": "BHUNT learns a compact rule describing a relationship in the data. The rule is approximate because some records fall outside its intervals; query results remain exact because those exceptions are processed separately and their results are combined with the constraint-based fast path.",
+          "pointer": "[Section 3.1, Section 4]"
         }
       ],
       "Pd": [

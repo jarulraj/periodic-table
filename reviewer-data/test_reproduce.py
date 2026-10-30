@@ -22,6 +22,54 @@ class ReproductionTests(unittest.TestCase):
     def test_input_and_code_checksums(self):
         r.verify_files(r.ROOT, r.load(r.ROOT, "manifest.json"))
 
+    def test_two_sided_p_value(self):
+        null = np.array([0.1, 0.2, 0.3, 0.4])
+        self.assertEqual(r.two_sided_p_value(0.9, null), 0.4)
+        self.assertEqual(r.two_sided_p_value(0.0, null), 0.4)
+        self.assertEqual(r.two_sided_p_value(0.25, null), 1.0)
+        self.assertEqual(r.two_sided_p_value(0.4, null), 0.8)
+
+    def test_abstract_analysis_mechanics_and_determinism(self):
+        cards = [{"id": "1", "core": ["La", "X"]},
+                 {"id": "2", "core": ["La", "Y"]},
+                 {"id": "3", "core": ["X"]}]
+        abstracts = [{"id": "1", "abstract": "Learned rules"},
+                     {"id": "2", "abstract": "LEARNING rules"},
+                     {"id": "3", "abstract": "Unlearned rules"}]
+        distances = np.array([[0, 0.1, 0.1], [0.1, 0, 0.8], [0.1, 0.8, 0]])
+        result = r.abstract_principle_analysis(cards, abstracts, distances, trials=30)
+        self.assertEqual(result, r.abstract_principle_analysis(cards, abstracts, distances, trials=30))
+        self.assertEqual(result["skipped_singleton_principles"], ["Y"])
+        self.assertEqual([p["nearest_id"] for p in result["nearest_papers"]], ["2", "1", "1"])
+        self.assertAlmostEqual(result["principles"]["La"]["mean_cosine"], 0.9)
+        self.assertEqual(result["principles"]["La"]["nearest_shared"], 2)
+        self.assertEqual(result["principles"]["La"]["nearest_chance_fraction"], 0.5)
+        self.assertEqual(result["principles"]["La"]["random_mean_cosine"],
+                         result["principles"]["X"]["random_mean_cosine"])
+        self.assertEqual(result["learn_keyword"],
+                         {"La": {"papers": 2, "matches": 2}, "other": {"papers": 1, "matches": 0}})
+        with self.assertRaisesRegex(ValueError, "ID order"):
+            r.abstract_principle_analysis(cards, abstracts[::-1], distances, trials=30)
+
+    def test_abstract_claims_in_manuscript(self):
+        analysis = self.result["abstract_principle_analysis"]
+        self.assertEqual(analysis["method"]["trials"], 20000)
+        for tag in ("Sy", "Ha", "Cz", "La"):
+            result = analysis["principles"][tag]
+            self.assertGreater(result["mean_cosine"], result["random_mean_cosine"])
+            self.assertLess(result["two_sided_p"], 0.05)
+        for tag in ("Ep", "Wv", "Bo"):
+            self.assertGreater(analysis["principles"][tag]["two_sided_p"], 0.05)
+        for tag, size, shared, percentage, chance in (("La", 39, 17, 44, 16), ("Wv", 50, 11, 22, 21)):
+            result = analysis["principles"][tag]
+            self.assertEqual((result["papers"], result["nearest_shared"]), (size, shared))
+            self.assertEqual(round(100 * result["nearest_shared_fraction"]), percentage)
+            self.assertEqual(round(100 * result["nearest_chance_fraction"]), chance)
+        self.assertEqual(analysis["learn_keyword"],
+                         {"La": {"papers": 39, "matches": 30}, "other": {"papers": 195, "matches": 34}})
+        self.assertEqual(len(analysis["nearest_papers"]), 234)
+        self.assertTrue(all(p["id"] != p["nearest_id"] for p in analysis["nearest_papers"]))
+
     def test_all_papers_covered_once(self):
         groups = self.result["groups"]
         self.assertEqual(sorted(int(i) for g in groups for i in g["members"]), list(range(1, 235)))
@@ -51,6 +99,17 @@ class ReproductionTests(unittest.TestCase):
         cards[1]["id"] = cards[0]["id"]
         with self.assertRaisesRegex(ValueError, "Duplicate"):
             r.validate_cards(cards, r.load(r.ROOT, "principles.json"), 75)
+
+    def test_fq_reclassification_changes_only_its_principle_roles(self):
+        cards = {c["paper_id"]: c for c in r.load(r.ROOT, "paper-cards.json")}
+        card = cards["vldb2003-8"]
+        self.assertEqual(card["core_principle_tags"], ["Wa", "Rw", "Ad"])
+        self.assertEqual(card["similarity_principle_tags"], ["Ad", "Rw", "Wa"])
+        self.assertEqual(card["supporting_principle_tags"], [])
+        self.assertNotIn("La", card["usagesByTag"])
+        self.assertEqual(card["usagesByTag"]["Rw"][0]["core_or_supporting"], "core")
+        self.assertEqual(self.result["frequencies"]["2003"]["La"], 1)
+        self.assertEqual(self.result["frequencies"]["2003"]["Rw"], 14)
 
     def test_reject_empty_signature(self):
         with self.assertRaisesRegex(ValueError, "Empty"):
