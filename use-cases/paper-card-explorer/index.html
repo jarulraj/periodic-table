@@ -6,7 +6,7 @@
     <title>Systems Paper Card Explorer</title>
     <style>
         :root {
-            --bg: #fafafa;
+            --bg: #ffffff;
             --panel: #ffffff;
             --ink: #202020;
             --muted: #626262;
@@ -14,7 +14,7 @@
             --line-strong: #999999;
             --accent: #242424;
             --accent-soft: #f2f2f2;
-            --link: #2459a6;
+            --link: #353535;
             --shadow: none;
         }
         * {
@@ -31,7 +31,8 @@
         }
         button,
         input,
-        select {
+        select,
+        textarea {
             font: inherit;
         }
         button {
@@ -43,19 +44,22 @@
         button:focus-visible,
         input:focus-visible,
         select:focus-visible,
+        textarea:focus-visible,
         a:focus-visible {
             outline: 2px solid var(--ink);
             outline-offset: 2px;
         }
         .page {
-            width: min(1680px, calc(100% - 28px));
+            width: min(1680px, calc(100% - clamp(40px, 7vw, 120px)));
             margin: 0 auto;
+        }
+        .page {
             padding: 28px 0 44px;
         }
         .page-header {
             display: grid;
-            gap: 8px;
-            margin-bottom: 20px;
+            gap: 12px;
+            margin-bottom: 28px;
         }
         h1,
         h2,
@@ -64,17 +68,31 @@
             margin-top: 0;
         }
         h1 {
-            max-width: 980px;
+            max-width: 1100px;
             margin-bottom: 0;
-            font-size: clamp(1.65rem, 3vw, 2.3rem);
-            line-height: 1.05;
-            letter-spacing: 0;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: clamp(2rem, 3.5vw, 3rem);
+            font-weight: 700;
+            line-height: 1.12;
+            letter-spacing: -0.025em;
         }
         .intro {
-            max-width: 960px;
+            max-width: 920px;
             margin-bottom: 0;
             color: var(--muted);
-            font-size: 1.05rem;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        .catalog-summary {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.81rem;
+            line-height: 1.5;
+        }
+        .catalog-summary span {
+            color: var(--ink);
+            font-variant-numeric: tabular-nums;
+            font-weight: 650;
         }
         .panel {
             background: var(--panel);
@@ -423,6 +441,123 @@
             z-index: 1;
             font-weight: 500;
         }
+        .design-equation {
+            margin: 14px 0;
+            border: 1px solid var(--line-strong);
+            border-radius: 5px;
+            background: #fff;
+        }
+        .design-equation-main { padding: 14px 16px 12px; }
+        .design-equation-line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px 10px;
+            justify-content: center;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 1.3rem;
+            line-height: 1.4;
+        }
+        .equation-principles { display: inline-flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; max-width: 100%; }
+        .equation-addition { display: inline-flex; align-items: center; gap: 10px; max-width: 100%; }
+        .equation-transition {
+            display: grid;
+            grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+            grid-template-rows: auto auto auto;
+            justify-content: center;
+            align-items: center;
+            gap: 3px 12px;
+            width: 100%;
+            margin-top: 7px;
+        }
+        .equation-mechanism {
+            grid-column: 1;
+            grid-row: 1;
+            text-align: center;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        .equation-arrow {
+            position: relative;
+            grid-column: 1;
+            grid-row: 2;
+            border-top: 1px solid var(--ink);
+        }
+        .equation-arrow::after {
+            content: "";
+            position: absolute;
+            right: 0;
+            top: -4px;
+            width: 6px;
+            height: 6px;
+            border-top: 1px solid var(--ink);
+            border-right: 1px solid var(--ink);
+            transform: rotate(45deg);
+        }
+        .equation-result { grid-column: 2; grid-row: 2; font-size: 1.2rem; line-height: 1.3; white-space: normal; min-width: 0; }
+        .equation-annotations {
+            grid-column: 1;
+            grid-row: 3;
+            text-align: center;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .equation-annotations span { display: block; }
+        .equation-property-change { font-weight: 700; }
+        .equation-annotations { min-width: 0; }
+        .equation-evidence p { margin: 0 0 10px; }
+        .equation-source { margin-top: 10px !important; margin-bottom: 0 !important; }
+        @media (max-width: 560px) {
+            .design-equation-line { font-size: 1.1rem; }
+            .equation-transition { column-gap: 8px; grid-template-columns: minmax(0, 1fr) 86px; }
+            .equation-result { white-space: normal; font-size: 1rem; line-height: 1.2; }
+            .equation-mechanism, .equation-annotations { font-size: 0.82rem; }
+        }
+        .equation-endpoint { font-weight: 700; }
+        .equation-operator { color: var(--muted); font-weight: 400; }
+        .design-equation .equation-symbol {
+            display: inline-flex;
+            min-width: 38px;
+            min-height: 38px;
+            justify-content: center;
+            padding: 2px 7px;
+            font-family: inherit;
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: #f6f6f6;
+        }
+        .design-equation .equation-symbol[aria-pressed="true"] { background: var(--accent); }
+        .equation-caption {
+            margin: 9px 0 0;
+            color: var(--muted);
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 0.75rem;
+            line-height: 1.45;
+        }
+        .equation-legend {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(210px, 100%), 1fr));
+            gap: 14px 20px;
+            margin: 0;
+            padding: 12px 16px 14px;
+            border-top: 1px solid var(--line);
+            background: #fafafa;
+        }
+        .equation-legend dt { margin: 0 0 5px; font-size: 0.82rem; font-weight: 700; }
+        .equation-legend dd { margin: 0; color: #444; font-size: 0.8rem; line-height: 1.5; }
+        .design-equation-compact .design-equation-main { padding: 10px 12px; }
+        .design-equation-compact .design-equation-line { justify-content: flex-start; font-size: 1.05rem; gap: 6px 8px; }
+        .design-equation-compact .equation-principles,
+        .design-equation-compact .equation-addition { gap: 6px; }
+        .design-equation-compact .equation-symbol { min-width: 30px; min-height: 32px; font-size: 1.05rem; padding: 1px 5px; }
+        .equation-summary-result { display: inline-flex; gap: 8px; align-items: center; }
+        .equation-evidence { padding: 14px 16px; border-top: 1px solid var(--line); font-size: 0.85rem; line-height: 1.55; }
+        .equation-evidence h3 { margin: 0 0 6px; font-size: 0.9rem; }
+        .equation-evidence ul { margin: 0; padding-left: 18px; }
+        .equation-evidence li + li { margin-top: 7px; }
+        .equation-evidence a { color: inherit; text-underline-offset: 2px; }
         .paper-tags {
             display: flex;
             flex-wrap: wrap;
@@ -585,6 +720,53 @@
         .paper-match a { color: var(--link); font-weight: 650; }
         .paper-match .paper-tags { margin-top: 8px; }
         .similar-section { overflow-wrap: anywhere; }
+        .compact-card-results { display: grid; gap: 12px; margin-top: 12px; }
+        .paper-comparison { margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--line); font-size: 0.82rem; color: var(--muted); }
+        .paper-comparison p { margin: 4px 0; }
+        .paper-comparison .session-badge { position: relative; z-index: 1; }
+        a.paper-open { text-decoration: none; }
+        a.paper-open:hover { text-decoration: underline; }
+        .feedback-panel {
+            margin-top: 28px;
+            padding: 24px;
+        }
+        .feedback-panel h2 {
+            margin-bottom: 6px;
+            font-size: 1.2rem;
+        }
+        .feedback-prompt { margin-bottom: 16px; }
+        .feedback-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            align-items: end;
+            gap: 12px;
+        }
+        .feedback-input {
+            width: 100%;
+            min-width: 0;
+            min-height: 96px;
+            padding: 12px;
+            resize: vertical;
+            border: 1px solid var(--line-strong);
+            border-radius: 6px;
+            color: var(--ink);
+            background: var(--panel);
+        }
+        .feedback-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 44px;
+            padding: 11px 20px;
+            border: 1px solid var(--accent);
+            border-radius: 6px;
+            background: var(--accent);
+            color: #fff;
+            font-weight: 650;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .feedback-button:hover { background: #444; }
         @media (max-width: 760px) {
             html.drawer-open { scrollbar-gutter: auto; }
             .control-grid,
@@ -606,9 +788,16 @@
         }
         @media (max-width: 560px) {
             .page {
-                width: min(100% - 20px, 1680px);
-                padding-top: 18px;
+                width: calc(100% - 32px);
             }
+            .page {
+                padding-top: 24px;
+            }
+            .feedback-panel { padding: 16px; }
+            .feedback-row { grid-template-columns: 1fr; }
+            .feedback-button { width: 100%; }
+            .page-header { margin-bottom: 24px; }
+            .intro { font-size: 0.95rem; }
             .side-panel,
             .results-panel {
                 padding: 12px;
@@ -634,7 +823,8 @@
     <main class="page">
         <header class="page-header">
             <h1>Systems Paper Card Explorer</h1>
-            <p class="intro">This page indexes system cards based on their design principles (as opposed to research areas). You can search papers by paper title or select principle tags to read the corresponding paper cards.</p>
+            <p class="intro">Explore systems papers by their high-level design principles (as opposed to research areas). You can search by principle symbol, paper title, or author name to find and read the corresponding paper cards.</p>
+            <p class="catalog-summary">Full catalog: <span id="stat_cards">0</span> paper cards &middot; <span id="stat_conferences">0</span> collections</p>
         </header>
 
         <section class="explorer-grid">
@@ -677,7 +867,6 @@
                     <p id="related_note" class="panel-copy">Counts show papers with each tag in the current results.</p>
                     <div id="related_tags" class="related-list"></div>
                 </section>
-                <p class="corpus-note">Full catalog: <span id="stat_cards">0</span> paper cards in <span id="stat_conferences">0</span> collections.</p>
                 </div>
             </details>
 
@@ -705,6 +894,15 @@
             </section>
 
         </section>
+
+        <footer class="panel feedback-panel" aria-labelledby="feedback_heading">
+            <h2 id="feedback_heading">What would make this paper explorer more useful to you?</h2>
+            <p class="feedback-prompt">Would you like to propose a new design principle :)</p>
+            <div class="feedback-row">
+                <textarea id="feedback_message" class="feedback-input" rows="3" maxlength="2000" aria-label="Your feedback" placeholder="Your feedback"></textarea>
+                <a id="feedback_email" class="feedback-button" href="mailto:arulraj@gatech.edu?subject=Paper%20Card%20Explorer%20feedback">Email feedback</a>
+            </div>
+        </footer>
     </main>
     <dialog id="paper_dialog" class="paper-drawer" aria-label="Paper details" aria-labelledby="detail_title">
         <div class="drawer-toolbar"><span>Paper details</span><button class="clear-button" type="button" id="close_detail" autofocus>Close details</button></div>
@@ -736,6 +934,8 @@
         let differentSessionsOnly = true;
         let searchAcrossConferences = true;
         const DEFAULT_COLLECTION = 'VLDB 2023';
+        // Source-checked arrow annotations for the LeanStore MVCC example.
+        const LEANSTORE_MVCC_PAPER_ID = 'vldb2023-46';
 
         function escapeHtml(value) {
             return String(value == null ? '' : value).replace(/[&<>"']/g, function(match) {
@@ -1045,8 +1245,175 @@
             }
             const disabled = options.prospective && options.count === 0 && !selected;
             return '<button type="button" class="principle-button ' + (options.className || 'mini-tag') + '" data-tag="' + escapeHtml(tag) + '" aria-pressed="' + selected + '" aria-label="' + escapeHtml(title) + '" title="' + escapeHtml(title) + '"' + (disabled ? ' disabled' : '') + '>' +
-                '<span class="principle-text">' + escapeHtml(label) + '</span>' +
+                '<span class="principle-text">' + escapeHtml(options.symbolOnly ? tag : label) + '</span>' +
                 (options.count === undefined ? '' : '<span class="tag-count">' + options.count + '</span>') + '</button>';
+        }
+
+        function recordedPaperEquation(card) {
+            if (!card || !card.equation) return null;
+            const raw = card.equation;
+            const sides = raw.split(/\s*(?:->|→)\s*/);
+            if (sides.length !== 2 || !sides[0] || !sides[1]) return {raw:raw};
+            // Only standalone, top-level + signs separate principles. Keep names
+            // such as RS+FD, Datalog+/-, and parenthesized baseline expressions intact.
+            const terms = [];
+            let depth = 0;
+            let start = 0;
+            for (let i = 0; i < sides[0].length; i++) {
+                const character = sides[0][i];
+                if (character === '(') depth++;
+                else if (character === ')') depth = Math.max(0, depth - 1);
+                else if (character === '+' && depth === 0 && /\s/.test(sides[0][i - 1] || '') && /\s/.test(sides[0][i + 1] || '')) {
+                    terms.push(sides[0].slice(start, i).trim());
+                    start = i + 1;
+                }
+            }
+            terms.push(sides[0].slice(start).trim());
+            const baseline = terms.shift();
+            const tags = terms.map(function(term) {
+                const match = term.match(/^([A-Z][a-z])(?:\s*\([^)]*\))?$/) || term.match(/^.+\(([A-Z][a-z])\)$/);
+                return match && PRINCIPLES[match[1]] ? match[1] : null;
+            });
+            // Preserve nonstandard equations as text instead of dropping terms or inventing a composition.
+            if (!baseline || !tags.length || tags.some(function(tag) { return !tag; })) return {raw:raw};
+            return {baseline:baseline, tags:tags, system:sides[1]};
+        }
+
+        function annotatedPaperEquation(card) {
+            if (!card || card.paper_id !== LEANSTORE_MVCC_PAPER_ID || !card.equation) return null;
+            const sides = card.equation.split(/\s*->\s*/);
+            if (sides.length !== 2) return null;
+            const terms = sides[0].split(/\s*\+\s*/);
+            const baseline = terms.shift();
+            if (!baseline || !sides[1] || !terms.length || terms.some(function(tag) { return !PRINCIPLES[tag]; })) return null;
+            // The reviewed core mappings include Wv (Graveyard Index, section 3.2),
+            // which the older stored equation omits. Keep this presentation aligned with those mappings.
+            const coreTags = card.core_principle_tags;
+            const tags = Array.isArray(coreTags) && coreTags.length && coreTags.every(function(tag) { return PRINCIPLES[tag]; }) ? coreTags : terms;
+            return {
+                baseline:baseline, tags:tags, system:sides[1],
+                mechanism:'Graveyard Index + OSIC + FatTuple',
+                properties:['OLTP throughput under long queries ↑', 'out-of-memory read scalability ↑'],
+                costs:'cost: merge work + commit-log memory',
+                risk:'risk: more page misses'
+            };
+        }
+
+        function paperEquation(card) {
+            return annotatedPaperEquation(card) || recordedPaperEquation(card);
+        }
+
+        function paperPhysicalProperties(card) {
+            return (card.physical_properties || []).map(function(property) {
+                if (card.paper_id === 'vldb2023-179' && property.property === 'GPU memory usage' && property.direction === 'not specified') {
+                    // GARUDA section 5 (p.2506) halves hash-image storage with a compact
+                    // 16-bit layout. The old 1GB entry is a configuration cap, not a memory comparison.
+                    // https://www.vldb.org/pvldb/vol16/p2499-doraiswamy.pdf#page=8
+                    return {
+                        property:'Hash-image storage', direction:'down',
+                        concrete_number:'50% less storage per hash image using 16-bit color channels and a compact layout.',
+                        pointer:'[p.2506, §5]'
+                    };
+                }
+                return property;
+            });
+        }
+
+        function propertyChangeLabel(property) {
+            const directions = {up:'↑', down:'↓', mixed:'(mixed)', 'not specified':'(direction not specified)'};
+            const direction = directions[property.direction] || (property.direction ? '(' + property.direction + ')' : '(direction not recorded)');
+            return (property.property || 'System property') + ' ' + direction;
+        }
+
+        function equationAnnotations(card, equation) {
+            let properties = equation.properties || paperPhysicalProperties(card).map(function(property) {
+                // Tigger reports the same metrics for forwarding and mirroring.
+                // Summarize each direction once here; retain both measurements in the evidence.
+                if (card.paper_id === 'vldb2023-64' && /^(CPU utilization|Latency) \(mirroring\)$/.test(property.property)) {
+                    return propertyChangeLabel(Object.assign({}, property, {
+                        property:property.property.replace(' (mirroring)', '')
+                    }));
+                }
+                return propertyChangeLabel(property);
+            });
+            if (card.paper_id === 'vldb2023-64') properties = Array.from(new Set(properties));
+            return {
+                mechanism:equation.mechanism || card.mechanism_family || 'Mechanism not recorded',
+                properties:properties.length ? properties : ['Property changes not recorded']
+            };
+        }
+
+        function renderEquationEvidence(card) {
+            if (card.paper_id === LEANSTORE_MVCC_PAPER_ID) {
+                return '<section class="equation-evidence" aria-label="Evidence and conditions"><h3>Evidence and conditions</h3><ul>' +
+                    '<li><strong>Long-running queries:</strong> TPC-C throughput stays stable with one TPC-C thread and one scan thread. <a href="https://www.vldb.org/pvldb/vol16/p1426-alhomssi.pdf#page=9" target="_blank" rel="noopener">Figure 9</a>.</li>' +
+                    '<li><strong>Read scalability:</strong> out-of-memory random lookups reach 20 GiB/s at 400 worker threads. <a href="https://www.vldb.org/pvldb/vol16/p1426-alhomssi.pdf#page=11" target="_blank" rel="noopener">Figure 12</a>.</li>' +
+                    '<li><strong>Costs and risks:</strong> OLAP merges two indexes; commit logs retain up to W² entries (W = workers). Larger FatTuples can increase page misses in out-of-memory workloads. <a href="https://www.vldb.org/pvldb/vol16/p1426-alhomssi.pdf#page=5" target="_blank" rel="noopener">§§3.1–3.3</a>; <a href="https://www.vldb.org/pvldb/vol16/p1426-alhomssi.pdf#page=10" target="_blank" rel="noopener">§4</a>.</li>' +
+                    '</ul></section>';
+            }
+            let html = '<section class="equation-evidence" aria-label="Evidence and conditions"><h3>Evidence and conditions</h3>' +
+                (card.one_sentence_mechanism ? '<p>' + escapeHtml(card.one_sentence_mechanism) + '</p>' : '') + '<ul>';
+            const properties = paperPhysicalProperties(card);
+            if (!properties.length) html += '<li>Property changes are not recorded in this card.</li>';
+            html += properties.map(function(property) {
+                const value = property.concrete_number;
+                const evidence = value && !/^not specified(?: in provided text)?[.]?$/i.test(value.trim()) ? value : 'No quantitative result recorded.';
+                return '<li><strong>' + escapeHtml(propertyChangeLabel(property)) + ':</strong> ' + escapeHtml(evidence) +
+                    (property.pointer ? ' <span>' + escapeHtml(property.pointer) + '</span>' : '') + '</li>';
+            }).join('');
+            if (card.paper_id === 'vldb2023-179') {
+                html += '<li><strong>Hash-stack setting:</strong> SH_limit = 8 images (1 GB), an implementation setting. [p.2506, §5]</li>';
+            }
+            html += (card.key_deltas || []).filter(function(delta) { return delta.tradeoffs_or_costs; }).map(function(delta) {
+                return '<li><strong>' + 'Tradeoff' + ':</strong> ' +
+                    escapeHtml(delta.tradeoffs_or_costs) + '</li>';
+            }).join('');
+            html += '</ul>';
+            if (card.paper_url && /^https?:\/\//i.test(card.paper_url)) {
+                html += '<p class="equation-source"><a href="' + escapeHtml(card.paper_url) + '" target="_blank" rel="noopener">Read the paper</a></p>';
+            }
+            return html + '</section>';
+        }
+
+        function renderPaperEquation(card, equation, compact) {
+            if (!equation) return '';
+            if (equation.raw) {
+                return '<section class="design-equation design-equation-compact" aria-label="Design equation"><div class="design-equation-main">' +
+                    '<div class="design-equation-line">' + escapeHtml(equation.raw.replace(/->/g, '→')) + '</div></div>' +
+                    (compact ? '' : renderEquationEvidence(card)) + '</section>';
+            }
+            const terms = equation.tags.map(function(tag) {
+                return '<span class="equation-addition"><span class="equation-operator" aria-hidden="true">+</span>' +
+                    principleButton(tag, {className:'equation-symbol', symbolOnly:true}) + '</span>';
+            }).join('');
+            const accessibleEquation = equation.baseline + ' plus ' + equation.tags.join(' plus ') + ' leads to ' + equation.system;
+            const beginning = '<section class="design-equation' + (compact ? ' design-equation-compact' : '') + '" aria-label="Design equation">' +
+                '<div class="design-equation-main">' +
+                '<div class="design-equation-line" role="group" aria-label="' + escapeHtml(accessibleEquation) + '">' +
+                '<span class="equation-endpoint">' + escapeHtml(equation.baseline) + '</span><span class="equation-principles">' + terms + '</span>';
+            if (compact) {
+                return beginning + '<span class="equation-summary-result"><span class="equation-operator" aria-hidden="true">→</span>' +
+                    '<span class="equation-endpoint">' + escapeHtml(equation.system) + '</span></span></div>' +
+                    '</div></section>';
+            }
+            const legend = equation.tags.map(function(tag) {
+                const usage = ((card.usagesByTag || {})[tag] || [])[0];
+                const mechanism = usage && (usage.mechanism_trigger || usage.why_it_applies);
+                return '<div><dt>' + escapeHtml(tag + ' — ' + principle(tag).name) + '</dt>' +
+                    '<dd>' + escapeHtml(mechanism || 'See the principle evidence in the paper card.') + '</dd></div>';
+            }).join('');
+            const annotations = equationAnnotations(card, equation);
+            const properties = annotations.properties.map(function(property) {
+                return '<span class="equation-property-change">' + escapeHtml(property) + '</span>';
+            }).join('');
+            const evidence = renderEquationEvidence(card);
+            return beginning + '<div class="equation-transition">' +
+                '<span class="equation-mechanism">' + escapeHtml(annotations.mechanism) + '</span>' +
+                '<span class="equation-arrow" aria-hidden="true"></span>' +
+                '<span class="equation-result equation-endpoint">' + escapeHtml(equation.system) + '</span>' +
+                '<div class="equation-annotations">' + properties +
+                '</div></div></div></div>' +
+                evidence + '<dl class="equation-legend">' + legend + '</dl></section>';
         }
 
         function principleLabels(tags) {
@@ -1087,15 +1454,21 @@
                 '> Other session categories only' + (hasCategory ? '' : ' (session metadata unavailable)') + '</label>' +
                 '<p class="session-category">' + (isConference && searchAcrossConferences ? 'All conferences' : escapeHtml(card.collection)) + ' | Core-principle Jaccard | At least two shared principles</p>';
             if (!matches.length) html += '<p class="detail-empty">No papers meet these criteria.</p>';
-            html += '<ol class="similar-results">' + matches.map(function(match) {
+            html += '<ol class="similar-results compact-card-results">' + matches.map(function(match) {
                 const other = match.card;
                 const union = PaperSimilarity.tags(card).length + PaperSimilarity.tags(other).length - match.shared.length;
-                return '<li class="similar-result paper-match"><a href="' + escapeHtml(similarPaperUrl(other.paper_id)) + '">' + escapeHtml(other.paper_title) + '</a>' +
-                    '<div class="paper-topline"><span class="conference-badge">' + escapeHtml(paperCollection(other)) + '</span></div>' +
-                    (sessionBadges(other.conference_session_categories, paperCollection(other)) || '<p class="session-category">Session category unavailable</p>') +
-                    '<p><strong>Jaccard ' + match.score.toFixed(2) + '</strong> (' + match.shared.length + ' shared / ' + union + ' distinct principles)</p>' +
-                    '<div class="paper-tags" aria-label="Shared principles">' + principleLabels(match.shared) + '</div>' +
-                    (card.similarity_principle_source !== 'equation_core' || other.similarity_principle_source !== 'equation_core' ? '<p>Includes top-three fallback tags.</p>' : '') + '</li>';
+                const paper = findPaperByIdentifier(other.paper_id) || {
+                    paper_id:other.paper_id, title:other.paper_title, collection:paperCollection(other),
+                    publication_year:other.publication_year
+                };
+                const context = '<div class="paper-comparison">' +
+                    '<p><strong>Jaccard ' + match.score.toFixed(2) + '</strong> · ' + match.shared.length + ' shared / ' + union + ' distinct principles</p>' +
+                    '<p>Shared: ' + escapeHtml(match.shared.join(', ')) + '</p>' +
+                    (sessionBadges(other.conference_session_categories, paperCollection(other)) || '<p>Session category unavailable</p>') +
+                    (card.similarity_principle_source !== 'equation_core' || other.similarity_principle_source !== 'equation_core' ? '<p>Includes top-three fallback tags.</p>' : '') + '</div>';
+                return '<li class="similar-result">' + renderCompactPaperCard(paper, other, paperEquation(other), {
+                    href:similarPaperUrl(other.paper_id), contextHtml:context
+                }) + '</li>';
             }).join('') + '</ol></div></section>';
             return html;
         }
@@ -1108,11 +1481,15 @@
             if (!showSameSession) return html + '<div id="session_peers_content" hidden></div></section>';
             html += '<div id="session_peers_content">';
             if (!peers.length) html += '<p class="detail-empty">No other papers in this session category.</p>';
-            html += '<ol class="similar-results">' + peers.map(function(other) {
-                const tags = principleTagsForPaper(findPaperByIdentifier(other.paper_id), other);
-                return '<li class="session-peer paper-match"><a href="' + escapeHtml(similarPaperUrl(other.paper_id)) + '">' + escapeHtml(other.paper_title) + '</a>' +
-                    sessionBadges(other.conference_session_categories, paperCollection(other)) +
-                    '<div class="paper-tags" aria-label="Principles">' + principleLabels(tags) + '</div></li>';
+            html += '<ol class="similar-results compact-card-results">' + peers.map(function(other) {
+                const paper = findPaperByIdentifier(other.paper_id) || {
+                    paper_id:other.paper_id, title:other.paper_title, collection:paperCollection(other),
+                    publication_year:other.publication_year, tags:principleTagsForPaper(null, other)
+                };
+                const equation = paperEquation(other);
+                return '<li class="session-peer">' + renderCompactPaperCard(paper, other, equation, {
+                    href:similarPaperUrl(other.paper_id)
+                }) + '</li>';
             }).join('') + '</ol></div></section>';
             return html;
         }
@@ -1170,6 +1547,8 @@
                 return;
             }
 
+            const equation = paperEquation(card);
+            body += renderPaperEquation(card, equation, false);
             body += renderSimilarPapers(card);
             body += renderSameSessionPapers(card);
             body += '<section class="detail-section"><h3>Paper Card</h3><dl class="detail-list">' +
@@ -1182,11 +1561,6 @@
                 detailItem('Mechanism', card.one_sentence_mechanism) +
                 detailItem('Primary archetype', card.primary_design_archetype) +
                 '</dl></section>';
-
-            if (card.equation) {
-                body += '<section class="detail-section"><h3>Design Equation</h3><div class="equation-box">' +
-                    escapeHtml(card.equation) + '</div></section>';
-            }
 
             const principleTags = orderedPrincipleTagsForPaper(paper, card);
             if (principleTags.length) {
@@ -1202,9 +1576,9 @@
                 body += '<section class="detail-section"><h3>Principle Composition</h3><p>' + escapeHtml(card.principle_composition_rationale) + '</p></section>';
             }
 
-            if (card.physical_properties && card.physical_properties.length) {
+            if (paperPhysicalProperties(card).length) {
                 body += '<section class="detail-section"><h3>System Property Shifts</h3>' +
-                    card.physical_properties.map(function(property) {
+                    paperPhysicalProperties(card).map(function(property) {
                         const label = [property.property, property.direction].filter(Boolean).join(' / ');
                         return '<div class="usage-card"><div class="usage-label">' + escapeHtml(label) + '</div>' +
                             (property.concrete_number ? '<div class="usage-text">' + escapeHtml(property.concrete_number) + '</div>' : '') +
@@ -1351,6 +1725,23 @@
             }).join('');
         }
 
+        function renderCompactPaperCard(paper, card, equation, options) {
+            options = options || {};
+            const title = options.href ?
+                '<a class="paper-open" href="' + escapeHtml(options.href) + '">' + escapeHtml(paper.title) + '</a>' :
+                '<button type="button" class="paper-open" data-open-paper="' + escapeHtml(paper.paper_id) + '" aria-haspopup="dialog">' + escapeHtml(paper.title) + '</button>';
+            return '<article class="paper-card' + (options.active ? ' active' : '') + '" data-paper-id="' + escapeHtml(paper.paper_id) + '">' +
+                '<h3 class="paper-title">' + title + '</h3>' +
+                '<div class="paper-topline">' + (card && card.system_or_method_name ? '<span class="paper-system">' + escapeHtml(card.system_or_method_name) + '</span>' : '') +
+                '<span class="conference-badge">' + escapeHtml(paperCollection(paper)) + '</span>' +
+                (paper.publication_year ? '<span class="detail-badge muted">' + escapeHtml(paper.publication_year) + '</span>' : '') +
+                (options.matchLabel ? '<span class="match-badge">' + escapeHtml(options.matchLabel) + '</span>' : '') + '</div>' +
+                renderPaperEquation(card, equation, true) +
+                '<p class="paper-mechanism">' + escapeHtml(card && card.one_sentence_mechanism || 'Mechanism summary unavailable. Open the paper for details.') + '</p>' +
+                (options.contextHtml || '') +
+                '</article>';
+        }
+
         function renderResults(matches) {
             const note = document.getElementById('results_note');
             const results = document.getElementById('paper_results');
@@ -1392,21 +1783,14 @@
                 note.textContent = 'Showing ' + matches.length + (matches.length === 1 ? ' paper in ' : ' papers in ') + selectedCollections.join(', ') + '.';
             }
             results.innerHTML = sortedPapers(matches).map(function(paper) {
-                const tagButtons = principleLabels(paper.tags);
+                const card = paperCard(paper);
+                const equation = paperEquation(card);
                 const matchLabel = selectedTags.size > 0 ?
                     matchingTagCount(paper) + ' of ' + selectedTags.size + ' selected tags' :
                     (hasSearchQuery ? 'Search match' : '');
-                const card = paperCard(paper);
-                const active = activePaperId === paper.paper_id ? ' active' : '';
-                return '<article class="paper-card' + active + '" data-paper-id="' + escapeHtml(paper.paper_id) + '">' +
-                    '<h3 class="paper-title"><button type="button" class="paper-open" data-open-paper="' + escapeHtml(paper.paper_id) + '" aria-haspopup="dialog">' + escapeHtml(paper.title) + '</button></h3>' +
-                    '<div class="paper-topline">' + (card && card.system_or_method_name ? '<span class="paper-system">' + escapeHtml(card.system_or_method_name) + '</span>' : '') +
-                    '<span class="conference-badge">' + escapeHtml(paperCollection(paper)) + '</span>' +
-                    (paper.publication_year ? '<span class="detail-badge muted">' + escapeHtml(paper.publication_year) + '</span>' : '') +
-                    (matchLabel ? '<span class="match-badge">' + matchLabel + '</span>' : '') + '</div>' +
-                    '<p class="paper-mechanism">' + escapeHtml(card && card.one_sentence_mechanism || 'Mechanism summary unavailable. Open the paper for details.') + '</p>' +
-                    '<div class="paper-tags">' + tagButtons + '</div>' +
-                    '</article>';
+                return renderCompactPaperCard(paper, card, equation, {
+                    active:activePaperId === paper.paper_id, matchLabel:matchLabel
+                });
             }).join('');
         }
 
@@ -1508,7 +1892,21 @@
             if (sync) updateUrl();
         }
 
+        function feedbackEmailUrl(message) {
+            const body = message.trim().replace(/\r?\n/g, '\r\n');
+            return 'mailto:arulraj@gatech.edu?subject=Paper%20Card%20Explorer%20feedback' +
+                (body ? '&body=' + encodeURIComponent(body) : '');
+        }
+
         function init() {
+            const feedbackMessage = document.getElementById('feedback_message');
+            const feedbackEmail = document.getElementById('feedback_email');
+            function updateFeedbackEmail() {
+                feedbackEmail.href = feedbackEmailUrl(feedbackMessage.value);
+            }
+            feedbackMessage.addEventListener('input', updateFeedbackEmail);
+            feedbackEmail.addEventListener('click', updateFeedbackEmail);
+            updateFeedbackEmail();
             loadUrlState();
             const mobile = window.matchMedia('(max-width: 760px)');
             const filterPanel = document.getElementById('filters_panel');
