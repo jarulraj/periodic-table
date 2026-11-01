@@ -937,6 +937,80 @@
         // Source-checked arrow annotations for the LeanStore MVCC example.
         const LEANSTORE_MVCC_PAPER_ID = 'vldb2023-46';
 
+        // Source-reviewed equations for the first card in each collection's default order.
+        // Qualitative guarantees and benchmark capabilities are kept distinct from measured speedups.
+        const REVIEWED_PAPER_EQUATIONS = {
+            'cs764-16': {
+                baseline:'Lock-based serializable isolation', tags:['Fs', 'Se', 'Op', 'Cr'], system:'Snapshot Isolation',
+                mechanism:'Snapshot reads + first-committer-wins',
+                properties:['Reader–writer blocking ↓', 'Serializability not guaranteed'],
+                principleNotes:{
+                    Fs:'Specify admissible transaction histories.',
+                    Se:'Make snapshot visibility and commit rules explicit.',
+                    Op:'Validate overlapping writes at commit.',
+                    Cr:'Allow write skew between disjoint updates.'
+                },
+                sourceUrl:'https://pages.cs.wisc.edu/~yxy/cs764-f20/papers/SQL-isolation-critique.pdf',
+                evidence:[
+                    {label:'Read concurrency', text:'Snapshots eliminate reader–writer blocking. This is a protocol property, not a measured throughput result.', reference:'§4.2', page:8},
+                    {label:'Conflict handling', text:'Overlapping write sets trigger first-committer-wins; long-running update transactions can still abort.', reference:'§4.2', page:10},
+                    {label:'Isolation tradeoff', text:'Concurrent updates to different items can jointly violate an invariant (write skew). The equation contrasts Snapshot Isolation with serializable locking.', reference:'§4.2, history H5', page:9}
+                ]
+            },
+            'osdi23-6': {
+                baseline:'Centralized SSO logging', tags:['Ac', 'Sy', 'Fs'], system:'Larch',
+                mechanism:'Split secrets + proofs over encrypted log entries',
+                properties:['Destination disclosure to logger ↓', 'Logger-only impersonation prevented'],
+                principleNotes:{
+                    Ac:'Couple credential issuance to an auditable log entry.',
+                    Sy:'Split authentication secrets between client and logger.',
+                    Fs:'Prove that encrypted entries match the credential request.'
+                },
+                sourceUrl:'https://www.usenix.org/system/files/osdi23-dauterman.pdf',
+                evidence:[
+                    {label:'Accountability', text:'Joint authentication produces a credential and a verifiable encrypted log entry; the logger cannot authenticate alone.', reference:'§§2.2–2.3', page:5},
+                    {label:'Guarantee limits', text:'Assumes honest setup and no log–relying-party collusion. Password reuse and TOTP replay can permit later logins without new records.', reference:'§2.4', page:5},
+                    {label:'Measured cost', text:'FIDO2 authentication takes 150 ms and 1.73 MiB in the evaluated setup: 4 client cores, 8 server cores, and 20 ms RTT.', reference:'§8, Table 6', page:14},
+                    {label:'Availability tradeoff', text:'Credential generation depends on log-service participation; a refusing or unreachable log can block login.', reference:'§2.4', page:5}
+                ]
+            },
+            'vldb2003-60': {
+                baseline:'Fault-free TPC-C evaluation', tags:['Fs', 'Gr', 'Ho', 'Se'], system:'DBench-OLTP',
+                mechanism:'Operator faultload + client/server availability',
+                properties:['Fault-impact visibility ↑', 'Benchmarking effort ↑'],
+                principleNotes:{
+                    Fs:'Specify workload, fault injection, recovery, and disclosure rules.',
+                    Gr:'Use comparable operator faults across similarly configured systems.',
+                    Ho:'Report throughput, recovery, and integrity under faults.',
+                    Se:'Separate server availability (AvtS) from client availability (AvtC).'
+                },
+                sourceUrl:'https://www.vldb.org/archives/website/2003/papers/S22P03.pdf',
+                evidence:[
+                    {label:'Evaluation scope', text:'Runs TPC-C with and without operator faults; comparable faultloads depend on storage configuration.', reference:'§§3.1–3.4', page:3},
+                    {label:'Interpreting the results', text:'Table 4 compares DBMS configurations A and B. Its throughput and availability differences are outcomes of those configurations, not improvements caused by the benchmark.', reference:'§4.2, Table 4', page:9},
+                    {label:'Effort tradeoff', text:'The ten-system campaign used 50 person-days: 10 for TPC-C, 10 for DBench-OLTP, and 30 for execution.', reference:'§5, Table 6', page:11}
+                ]
+            },
+            'vldb2023-179': {
+                baseline:'Hand-tuned GPU compute kernels', tags:['Al', 'Ha', 'Ad', 'Wa'], system:'GARUDA',
+                mechanism:'Vulkan rendering + image hash tables + SnakeJoin',
+                properties:['Join execution time ↓', 'Hardware-specific tuning ↓'],
+                principleNotes:{
+                    Al:'Express joins and group-bys as rendering passes.',
+                    Ha:'Use graphics-driver scheduling and texture access.',
+                    Ad:'Switch the build side for each join partition.',
+                    Wa:'Measure collisions to choose the smaller hash stack.'
+                },
+                sourceUrl:'https://www.vldb.org/pvldb/vol16/p2499-doraiswamy.pdf',
+                evidence:[
+                    {label:'Join performance', text:'At least 2× faster than HCJoin on evaluated synthetic and TPC-H joins using an RTX 3080.', reference:'§6.3.1, Figure 8', page:10},
+                    {label:'Adaptation', text:'SnakeJoin picks the build side per partition; pathological hash stacks are flattened.', reference:'§§3.4.3–3.4.4', page:6},
+                    {label:'Portability', text:'Unchanged GARUDA code runs on an Intel HD620; the portability test uses a smaller, 100 GB TPC-H database.', reference:'§6.5, Figure 14', page:11},
+                    {label:'Execution tradeoffs', text:'Statistics and count passes add work; fixed-size graphics images require partitioning and output-size planning.', reference:'§§3.2–3.4', page:4}
+                ]
+            }
+        };
+
         function escapeHtml(value) {
             return String(value == null ? '' : value).replace(/[&<>"']/g, function(match) {
                 return {
@@ -1280,7 +1354,9 @@
         }
 
         function annotatedPaperEquation(card) {
-            if (!card || card.paper_id !== LEANSTORE_MVCC_PAPER_ID || !card.equation) return null;
+            if (!card) return null;
+            if (REVIEWED_PAPER_EQUATIONS[card.paper_id]) return REVIEWED_PAPER_EQUATIONS[card.paper_id];
+            if (card.paper_id !== LEANSTORE_MVCC_PAPER_ID || !card.equation) return null;
             const sides = card.equation.split(/\s*->\s*/);
             if (sides.length !== 2) return null;
             const terms = sides[0].split(/\s*\+\s*/);
@@ -1344,6 +1420,15 @@
         }
 
         function renderEquationEvidence(card) {
+            const reviewed = REVIEWED_PAPER_EQUATIONS[card.paper_id];
+            if (reviewed) {
+                return '<section class="equation-evidence" aria-label="Evidence and conditions"><h3>Evidence and conditions</h3><ul>' +
+                    reviewed.evidence.map(function(item) {
+                        return '<li><strong>' + escapeHtml(item.label) + ':</strong> ' + escapeHtml(item.text) +
+                            ' <a href="' + escapeHtml(reviewed.sourceUrl + '#page=' + item.page) + '" target="_blank" rel="noopener">' +
+                            escapeHtml(item.reference) + '</a>.</li>';
+                    }).join('') + '</ul></section>';
+            }
             if (card.paper_id === LEANSTORE_MVCC_PAPER_ID) {
                 return '<section class="equation-evidence" aria-label="Evidence and conditions"><h3>Evidence and conditions</h3><ul>' +
                     '<li><strong>Long-running queries:</strong> TPC-C throughput stays stable with one TPC-C thread and one scan thread. <a href="https://www.vldb.org/pvldb/vol16/p1426-alhomssi.pdf#page=9" target="_blank" rel="noopener">Figure 9</a>.</li>' +
@@ -1398,7 +1483,7 @@
             }
             const legend = equation.tags.map(function(tag) {
                 const usage = ((card.usagesByTag || {})[tag] || [])[0];
-                const mechanism = usage && (usage.mechanism_trigger || usage.why_it_applies);
+                const mechanism = (equation.principleNotes || {})[tag] || (usage && (usage.mechanism_trigger || usage.why_it_applies));
                 return '<div><dt>' + escapeHtml(tag + ' — ' + principle(tag).name) + '</dt>' +
                     '<dd>' + escapeHtml(mechanism || 'See the principle evidence in the paper card.') + '</dd></div>';
             }).join('');
